@@ -1,0 +1,65 @@
+# The Homa transport protocol over any carrier. The project's own code and the
+# owner's crate on crates.io. It names nothing of Aosabi, so a subtree split of
+# this directory is a crate of its own (design-v1 section 2.6), and the split
+# commit writes the values the workspace supplies below.
+[package]
+name = "homa"
+version = "0.0.0"
+description = "The Homa transport protocol over any carrier that moves whole packets, from a UART to raw IP 146 and the Linux kernel."
+# The kernel builds with edition 2021 and rustc 1.85 at least (the design note
+# section 4.9), so the engine keeps both, and clippy's incompatible_msrv lint
+# holds it to 1.85. cargo fmt formats the crate under this edition.
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+readme = "README.md"
+repository.workspace = true
+authors.workspace = true
+categories = ["network-programming", "no-std", "embedded"]
+# The owner publishes the crate.
+publish = false
+
+[features]
+default = ["client", "server", "wire-compact"]
+client = []
+server = []
+alloc = []
+wire-compact = []
+wire-full = []
+start-msg = ["wire-full"]
+prio = ["wire-full"]
+prio-compute = ["prio"]
+overcommit = []
+incast = ["wire-full", "start-msg"]
+pacer-rate = []
+pacer-budget = []
+stream-delimited = []
+stream-prefixed = []
+# The feature kernel-socket below is declared ahead of its code, because a
+# #[cfg] may name only a feature the manifest has, and it takes socket2 in
+# the serial step of its stage. The helper reaches socket2 through ip.
+# The Unix Socket transports of Linux user space, H2-S.
+unix = ["dep:socket2", "alloc"]
+# The IP driver of Network in user space, Linux only, H4-S.
+ip = ["dep:socket2", "alloc", "wire-full"]
+# The client of the socket API of the crate's kernel module, Linux only, H5-S.
+kernel-socket = ["alloc"]
+helper = ["ip", "client", "start-msg", "prio", "overcommit", "incast", "pacer-rate"]
+sim = ["alloc", "client", "server", "wire-compact", "wire-full", "start-msg", "prio",
+       "prio-compute", "overcommit", "incast", "pacer-rate", "pacer-budget",
+       "stream-delimited", "stream-prefixed"]
+
+[dependencies]
+# The floor of the reviewed version, as the register's default for a
+# requirement, and the exact version in Cargo.lock. A platform crate of the
+# Linux cards, reached by their features alone.
+socket2 = { version = "0.6.5", features = ["all"], optional = true }
+
+# The helper, built only with its feature, so no other build compiles it.
+[[bin]]
+name = "homa-raw"
+path = "src/bin/homa_raw.rs"
+required-features = ["helper"]
+
+[lints]
+workspace = true

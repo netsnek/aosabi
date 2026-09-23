@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: MIT
+# The lint gates the byte contract needs.
+#
+# docs/byte-equality.md section 6.4: every object Aosabi writes carries the
+# ECMA-262 OrdinaryOwnPropertyKeys order, which is canonical numeric keys first
+# and insertion order afterwards. A HashMap has no deterministic order and a
+# BTreeMap sorts, which is neither. The IndexMap of aosabi-json,
+# aosabi_json::map::IndexMap, is the only accepted carrier in a JSONObject or
+# JSON position, and the compiler cannot see that position, so the refusal is a
+# lint.
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "iteration order is not deterministic. Use aosabi_json::map::IndexMap, see docs/byte-equality.md section 6.4" },
+    { path = "std::collections::BTreeMap", reason = "sorts keys, which is neither insertion order nor the numeric first rule. Use aosabi_json::map::IndexMap, see docs/byte-equality.md section 6.4" },
+]
+
+# Documentation/architecture.md section 14: no thread started in any served crate, so the
+# wasm32 and player targets cost no rewrite. Every way the standard library
+# offers to start a thread is refused. Its one unsafe way,
+# Builder::spawn_unchecked, is refused already by forbid(unsafe_code), and a
+# wait on the one thread, such as sleep, yield_now, park or join, starts none
+# and stays allowed.
+disallowed-methods = [
+    { path = "std::thread::spawn", reason = "no operating system threads in a served crate. See Documentation/architecture.md section 14" },
+    { path = "std::thread::Builder::spawn", reason = "no operating system threads in a served crate. See Documentation/architecture.md section 14" },
+    { path = "std::thread::Builder::spawn_scoped", reason = "no operating system threads in a served crate. See Documentation/architecture.md section 14" },
+    { path = "std::thread::scope", reason = "no operating system threads in a served crate. See Documentation/architecture.md section 14" },
+    { path = "std::thread::Scope::spawn", reason = "no operating system threads in a served crate. See Documentation/architecture.md section 14" },
+]

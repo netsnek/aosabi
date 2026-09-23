@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT
+# The formatting of aosabi, which is the kernel's.
+#
+# Aosabi follows the Linux kernel coding style, and the kernel's Rust guidelines
+# say the code is formatted with rustfmt at its default settings. This file is
+# therefore the kernel's own .rustfmt.toml with one value changed: the edition is
+# the one this workspace declares in Cargo.toml, which is 2024, where the kernel
+# declares 2021. Everything else is copied, including the block of unstable
+# options that is kept commented out.
+#
+# Mirrored from torvalds/linux .rustfmt.toml, commit 80db40bac8f42f23132b2898b0490f8f76868a57,
+# read at master 518e5b794c06c0f0eb40df3e202274a66202c137. The rule and the reading are
+# Documentation/coding-style.md.
+
+edition = "2024"
+newline_style = "Unix"
+
+# Unstable options that help catching some mistakes in formatting and that we may want to enable
+# when they become stable.
+#
+# They are kept here since they are useful to run from time to time.
+#format_code_in_doc_comments = true
+#reorder_impl_items = true
+#comment_width = 100
+#wrap_comments = true
+#normalize_comments = true

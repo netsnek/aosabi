@@ -1,0 +1,68 @@
+# The Aosabi workspace.
+#
+# This file is the one place
+# the settings every crate inherits are written down. Each crate is listed by
+# name as its milestone lands, see the comment above members.
+
+[workspace]
+resolver = "3"
+# Listed one by one rather than globbed. tools/provenance writes extracted
+# literals into the crate directory that NOTICE declares for them, which means a
+# directory under crates/ can hold vendored bytes before the crate that carries
+# them exists. A glob would treat those as members and fail the workspace.
+members = [
+    "crates/homa",
+]
+# The crates vendored the kernel way under third_party/rust/ stay outside the
+# members and the workspace lints. A path dependency inside the workspace
+# directory is a member otherwise, whose optional and dev dependencies enter
+# the lock and which cargo fmt --all and cargo clippy --workspace would rewrite.
+exclude = ["third_party"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT"
+authors = ["Florian Kleber <kleber@snek.at>"]
+repository = "https://github.com/netsnek/aosabi"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# The map guard of the byte contract. A JSONObject or JSON position has to carry
+# insertion order, so the disallowed types list in clippy.toml refuses HashMap
+# and BTreeMap in this workspace and the IndexMap of aosabi-json is the only
+# accepted carrier.
+disallowed_types = "deny"
+# The wasm and player targets forbid operating system threads in any served
+# crate, so the constraint is a lint rather than a review note.
+disallowed_methods = "deny"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+
+# The portable player profile. Size over speed, one static binary.
+[profile.player]
+inherits = "release"
+opt-level = "z"
+strip = true
+
+# The wasm modules the viewer ships. Size over speed and no symbols, because
+# the modules are committed products whose hashes assets.lock records.
+[profile.wasm]
+inherits = "release"
+opt-level = "z"
+strip = "symbols"
+
+# The Worker keeps the module of the profile wasm, whose settings are those of
+# the profile worker-stripped of tests/budget.
+[profile.wasm-node]
+inherits = "wasm"
+opt-level = 3

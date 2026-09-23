@@ -1,0 +1,37 @@
+# Rust build output
+target/
+
+# JavaScript dependency trees of the reference side
+node_modules/
+
+# The build and migrate artifacts of aosabi-build in an app of the TypeScript
+# option
+.aosabi/
+
+# Python environment of the harness
+.venv/
+
+# Notebook checkpoints
+*.ipynb_checkpoints
+
+# Compiled Python bytecode of the harness package
+__pycache__/
+
+# Executed notebooks and their reports
+tests/notebooks/out/
+
+# Downloads of the harness, each checked by SHA-256, such as the source
+# archive of the Voyager capture
+tests/.cache/
+
+# Local scratch space, never part of a change
+work/
+
+# Editor and platform leftovers
+.DS_Store
+
+# Wrangler cache of the site deployment
+.wrangler/
+
+# The oracles of the conformance suites, cloned by tests/fetch_oracles.py
+vendor/

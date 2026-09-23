@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT
+# The toolchain aosabi is built and judged on.
+#
+# 1.95.0 is the stable rustc the Linux kernel on the development machine is
+# built with, reported by CONFIG_RUSTC_VERSION_TEXT in that kernel's config.
+# The kernel's own scripts/min-tool-version.sh names 1.78.0, which is the floor
+# it still compiles on rather than the version in use, so it is not the pin.
+#
+# A bump here is a deliberate change. It regenerates goldens and it travels in
+# the golden manifest beside the Node pin.
+#
+# The target wasm32-unknown-unknown is what a Workers build compiles for. The
+# notebooks 10_schema_tier1 and 31_http_errors check the application crates of
+# the fixture twins for it. The target riscv32imc-unknown-none-elf is the one
+# of the ESP32-C3, and riscv32imac-unknown-none-elf is the same family with
+# atomics. Section 7 of 02_language builds aosabi-type and aosabi-validate for
+# both. So rustup installs the standard library of each target with the pin,
+# and 00_environment fails when one of them is missing.
+#
+# The targets x86_64-unknown-linux-musl and aarch64-unknown-linux-musl are the
+# two architectures of the determinism gate of the documentation generator.
+
+[toolchain]
+channel = "1.95.0"
+components = ["rustfmt", "clippy"]
+targets = [
+    "wasm32-unknown-unknown",
+    "riscv32imc-unknown-none-elf",
+    "riscv32imac-unknown-none-elf",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+]
+profile = "minimal"
