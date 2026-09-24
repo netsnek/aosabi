@@ -12,6 +12,7 @@ resolver = "3"
 # them exists. A glob would treat those as members and fail the workspace.
 members = [
     "crates/aosabi-json",
+    "crates/aosabi-lang",
     "crates/homa",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the

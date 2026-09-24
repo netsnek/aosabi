@@ -1,0 +1,53 @@
+# The language layer. Documentation/architecture.md section 4 maps graphql-js
+# src/language onto this crate, and section 3 places it in layer 1 beside
+# aosabi-json as the only crates that turn a number, a string or a GraphQL token
+# into bytes. The crate is no_std with alloc, because the wasm module of aoviewer
+# and the player link it.
+[package]
+name = "aosabi-lang"
+version = "0.0.0"
+description = "The GraphQL language layer of Aosabi: source, location, kinds, the abstract syntax tree and the GraphQL error, translated from graphql-js 16.12.0."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The standard library. Every item of this crate builds on core and alloc alone,
+# so the feature gates nothing today and exists as the configuration symbol a
+# host build turns on uniformly across the workspace. A crate that adds an item
+# needing the standard library puts it behind this feature and nowhere else.
+std = []
+# The path and the locations of an error of a host as graphql-js writes them
+# where the model of a path and of a location holds no form for them: a path item
+# that is no string and no index, and a column that is no whole number, which a
+# GraphQLError of an app of the TypeScript option may carry. Only the module of
+# aosabi-js takes it, through the feature host-errors of aosabi-execute, so a
+# build of the Rust option keeps the public types and the answer bytes of an
+# error as they are.
+host-errors = []
+# The walk of the body from its start, kept for one release as the second judge
+# of the table of line starts. It is a dev feature: aosabi-devtool names it so
+# the notebooks can hold the table to the walk, and no package of a card names
+# it, so it never ships.
+exec-walk-location = []
+
+[dependencies]
+# The extensions of an error, the formatted error and the JSON shapes of a token
+# and a location are JSON object positions, and IndexMap is the only accepted
+# carrier there, which JsObject wraps. Both crates sit in layer 1, so the
+# dependency reaches sideways inside one layer and never up.
+aosabi-json = { path = "../aosabi-json" }
+# The cell that holds the table of the line starts of a source, which the first
+# location request builds. A source lives in an `Arc` and crosses threads with
+# its document, so the cell is `Sync`, and the race cell needs no standard
+# library and no lock. A cell like it cannot be written without unsafe, and the
+# type layer keeps the crate pinned under reason 4 of ADR-0024 with the same
+# requirement, so every deployed build already holds it and this line adds no
+# crate to any of them.
+once_cell = { version = "1.21.4", default-features = false, features = ["alloc"] }
