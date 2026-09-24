@@ -3,6 +3,13 @@
 version = 4
 
 [[package]]
+name = "aosabi-json"
+version = "0.0.0"
+dependencies = [
+ "homa",
+]
+
+[[package]]
 name = "homa"
 version = "0.0.0"
 dependencies = [
