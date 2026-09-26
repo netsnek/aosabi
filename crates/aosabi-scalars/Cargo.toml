@@ -1,0 +1,31 @@
+# The scalar library. The crate is no_std with alloc, because the kernel and the player
+# link every crate below the execution layer.
+[package]
+name = "aosabi-scalars"
+version = "0.0.0"
+description = "The four graphql-scalars 1.25.0 scalars Aosabi binds, DateTimeISO, JSON, JSONObject and Void, translated with their message strings."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The standard library. Every item of this crate builds on core and alloc alone, so the
+# feature gates nothing today and exists as the configuration symbol a host build turns on
+# uniformly across the workspace.
+std = []
+
+[dependencies]
+# The value model the hooks receive and return. A JSON scalar value, a JSON object and the
+# key order of a parsed object literal are JSON positions, and JsObject is the one accepted
+# carrier there. The number to string rule of a message is the Number::toString the writer
+# already implements.
+aosabi-json = { path = "../aosabi-json" }
+# The literal value nodes a parseLiteral hook reads, the printer a message
+# renders a literal with, and the GraphQLError every hook throws.
+aosabi-lang = { path = "../aosabi-lang" }

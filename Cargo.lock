@@ -18,6 +18,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-scalars"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+ "aosabi-lang",
+]
+
+[[package]]
 name = "aosabi-type"
 version = "0.0.0"
 dependencies = [
