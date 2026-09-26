@@ -1,0 +1,39 @@
+# The validation layer. Documentation/architecture.md section 4 maps graphql-js
+# src/validation onto this crate, and section 3 places it in layer 2 above
+# aosabi-type, whose schema and type information every rule reads. The crate is
+# no_std with alloc, like the two layers it stands on, because the bare metal
+# build of a microcontroller card links it.
+[package]
+name = "aosabi-validate"
+version = "0.0.0"
+description = "The GraphQL validation layer of Aosabi: the validation contexts, the specified rules and the SDL validation, translated from graphql-js 16.12.0."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The standard library. Every item of this crate builds on core and alloc
+# alone, so the feature gates nothing today and exists as the configuration
+# symbol a host build turns on uniformly across the workspace.
+std = []
+# The stack mark of the single pass, which records the lowest address of the
+# stack a recursive step of its walk reaches and hands it out beside the
+# verdict through pass::check_marked. Off by default, so no card builds it,
+# and a probe that measures the stack of the pass turns it on.
+pass-stack-mark = []
+
+[dependencies]
+# The tree a rule walks, the visitor it is, and the error it reports.
+aosabi-lang = { path = "../aosabi-lang" }
+# The schema a rule reads, the type information that follows the walk, and
+# the two schema builders whose SDL validation seam this crate fills.
+aosabi-type = { path = "../aosabi-type" }
+# The default value a variable usage carries, and the insertion ordered map the
+# node keyed caches of a context share with every other map of the workspace.
+aosabi-json = { path = "../aosabi-json" }
