@@ -18,6 +18,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-type"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+ "aosabi-lang",
+ "once_cell",
+]
+
+[[package]]
 name = "homa"
 version = "0.0.0"
 dependencies = [

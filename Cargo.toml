@@ -13,6 +13,7 @@ resolver = "3"
 members = [
     "crates/aosabi-json",
     "crates/aosabi-lang",
+    "crates/aosabi-type",
     "crates/homa",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the

@@ -1,0 +1,38 @@
+# The type layer. Documentation/architecture.md section 4 maps graphql-js src/type onto this
+# crate, and section 3 places it in layer 2 above aosabi-lang, whose tree and error it
+# carries in every definition. The crate is no_std with alloc, because the wasm module of
+# aoviewer links it beside aosabi-lang and the bare metal build of a microcontroller card
+# links the validator above it.
+[package]
+name = "aosabi-type"
+version = "0.0.0"
+description = "The GraphQL type layer of Aosabi: the type definitions, the schema, the specified directives and the specified scalars, translated from graphql-js 16.12.0."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The standard library. Every item of this crate builds on core and alloc alone, so the
+# feature gates nothing today and exists as the configuration symbol a host build turns on
+# uniformly across the workspace.
+std = []
+
+[dependencies]
+# The tree, the error and the printer every definition refers to. The layer above reaches
+# down and never sideways into a layer it does not own.
+aosabi-lang = { path = "../aosabi-lang" }
+# The value model of scalar coercion, the extensions of every definition and the insertion
+# ordered map and set every map of this crate is.
+aosabi-json = { path = "../aosabi-json" }
+# The memoization cell behind every thunk of a type and the cell behind the built in types.
+# The race cell needs no standard library and no lock, and it is `Sync`, which is what lets
+# a type live in a static the way a module level constant of the reference does. A cell like
+# it cannot be written without unsafe, so the crate is kept, pinned, under reason 4 of
+# ADR-0024, with the reviewed version as the floor.
+once_cell = { version = "1.21.4", default-features = false, features = ["alloc"] }
