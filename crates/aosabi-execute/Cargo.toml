@@ -1,0 +1,75 @@
+# The execution layer. Documentation/architecture.md section 4 maps the executor onto this
+# crate and section 4.1 says why Aosabi owns it: byte equality of the errors
+# array needs ECMA-262 promise job ordering, which no borrowed executor
+# reproduces. The crate uses the standard library and no operating system
+# thread, no async runtime and no unsafe code, so it builds for
+# wasm32-unknown-unknown as it builds for a host.
+[package]
+name = "aosabi-execute"
+version = "0.0.0"
+description = "The GraphQL executor of Aosabi: the promise job model of ECMA-262 and the executor of @graphql-tools/executor 1.5.1, translated with its message strings."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The queue of an agent that a host owns, the faithful job mode of the
+# TypeScript option: a notifier tells the host of every job, the host grants
+# each job to a drain inside the poll of its request or runs it through
+# run_one_job, a settlement of the host runs the reactions it enqueues in its
+# own microtask, or at once inside the call of a job that makes it, where the
+# jobs those reactions enqueue wait for a microtask the host reserved at that
+# call, and the host declares the promises it owes the agent. Only the module
+# of the npm package aosabi, crates/aosabi-js, and the core probe
+# tests/budget/ts1-core enable it, so every other build of the crate holds
+# none of these fields and paths. It turns on host-reads, since a build whose
+# host owns the queue is a build of the TypeScript option, whose host also
+# owns the objects.
+host-queue = ["host-reads"]
+# Without it a read is get, which a Rust type answers with no throw, and
+# Thrown has no value, so a build of the Rust option holds neither the two
+# methods in the table of each object type nor a path for a throw in the
+# projection of aosabi-core. It holds as well the provided methods own_keys_js
+# and get_js of ObjectLike, through which a key of an object of a host that
+# holds a lone surrogate reaches the JSON of a value, and the object of the
+# JSON model that keeps such a key.
+host-reads = []
+# The feature host-errors turns on host-errors of aosabi-lang, the path and
+# the locations of an error of a host the model holds no form for, and keeps
+# them in the copy of an error. Only the module of aosabi-js takes it, apart
+# from host-reads, since the field the feature adds to an error grows the
+# error past the bound of clippy's large_enum_variant in the enums that hold
+# one on a target of 64 bits, the seam of aosabi-devtool and the probe of the
+# gate among them.
+host-errors = ["aosabi-lang/host-errors"]
+# The members of a result a host sets, in the order of the own keys of its
+# object, where a done hook of a plugin of an app of the TypeScript option
+# sets a result whose members the three members of a result hold no form for:
+# errors that are an empty array or null, extensions that are null, a member
+# of another name, or an order other than errors, data and extensions, which
+# JSON.stringify writes as the object holds them. Only the module of aosabi-js
+# turns it on, so a build of the Rust option holds no such field and writes a
+# result as before.
+host-results = []
+
+[dependencies]
+# The value model of a result, the JavaScript string, the one writer that
+# turns a result into bytes, and the insertion ordered map every map of this
+# crate is.
+aosabi-json = { path = "../aosabi-json" }
+# The document the executor walks and the GraphQLError it reports.
+aosabi-lang = { path = "../aosabi-lang" }
+# The schema, the types, the input coercion and the introspection resolvers.
+aosabi-type = { path = "../aosabi-type" }
+# The specified rules the request pipeline runs before it executes.
+aosabi-validate = { path = "../aosabi-validate" }
+# The Date instance a resolver returns and ECMA-262 ToString over the JSON
+# value model.
+aosabi-scalars = { path = "../aosabi-scalars" }
+# The executor entry traits below HTTP, which the general executor implements.
+aosabi-kernel = { path = "../aosabi-kernel" }

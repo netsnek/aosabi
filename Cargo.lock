@@ -3,6 +3,18 @@
 version = 4
 
 [[package]]
+name = "aosabi-execute"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+ "aosabi-kernel",
+ "aosabi-lang",
+ "aosabi-scalars",
+ "aosabi-type",
+ "aosabi-validate",
+]
+
+[[package]]
 name = "aosabi-json"
 version = "0.0.0"
 dependencies = [
