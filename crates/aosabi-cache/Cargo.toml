@@ -1,0 +1,24 @@
+# It builds with no standard library and needs an allocator, it holds no atomic
+# type and names no type of alloc::sync, so every target of the workspace links
+# it, riscv32imc-unknown-none-elf among them. It is generic over the handle of a
+# document, the handle of a schema and the payload of a verdict, so it names no
+# type of the GraphQL crates.
+[package]
+name = "aosabi-cache"
+version = "0.0.0"
+description = "The request side cache of Aosabi: parsed documents and the verdicts of their validations in one bounded table, with no standard library."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The one call SipHash-1-3 of KeyState::hash_bytes, the keyed hash of a text
+# under the key of the process (src/hash.rs). Its default features are off,
+# so the cache links no standard library through it, and a build that turns
+# on the feature std of aosabi-json elsewhere keys the hash with seed.
+aosabi-json = { path = "../aosabi-json", default-features = false }

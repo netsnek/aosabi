@@ -11,6 +11,7 @@ resolver = "3"
 # directory under crates/ can hold vendored bytes before the crate that carries
 # them exists. A glob would treat those as members and fail the workspace.
 members = [
+    "crates/aosabi-cache",
     "crates/aosabi-execute",
     "crates/aosabi-json",
     "crates/aosabi-kernel",
