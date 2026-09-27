@@ -1,0 +1,23 @@
+# GraphTP, the Graph Transfer Protocol: the types and the wire codec of
+# GraphTP/1 in the shape of the crate http, and nothing that moves a byte. The
+# manifest is the one docs/graphtp.md section 10.1 gives, with the edition, the
+# lowest Rust version, the licence and the lints taken from the workspace, which
+# says the same. The crate is no_std with alloc, because a microcontroller links
+# it.
+[package]
+name = "graphtp"
+version = "0.0.0"
+description = "GraphTP, the Graph Transfer Protocol: the types and the wire codec of GraphQL requests and answers over a message transport"
+categories = ["network-programming", "no-std", "compression"]
+keywords = ["graphql", "protocol", "homa", "no-std", "deflate"]
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+# No [features] table and no [dependencies] table. The DEFLATE encoder and
+# decoder in the zlib format are always part of the crate, and the crate takes
+# no outside crate in any build.

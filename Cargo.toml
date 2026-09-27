@@ -19,6 +19,7 @@ members = [
     "crates/aosabi-scalars",
     "crates/aosabi-type",
     "crates/aosabi-validate",
+    "crates/graphtp",
     "crates/homa",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the
