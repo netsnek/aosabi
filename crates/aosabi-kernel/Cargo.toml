@@ -1,0 +1,39 @@
+# Layer 0. Documentation/architecture.md section 3.1 names the four things this crate holds
+# and nothing else: the closed executor, the persisted document table, the CBOR codec and
+# the framing. It compiles with no standard library and with allocation optional, so a bare
+# metal build links this and nothing above it. The crate holds its no_std shape ahead of
+# the executor, because the shape is cheap to hold from the start and expensive to
+# retrofit. The framing is AoFrame, which the crate homa holds and this crate re-exports,
+# so one implementation serves the kernel, the carrier crates and a client outside Aosabi.
+[package]
+name = "aosabi-kernel"
+version = "0.0.0"
+description = "Layer 0 of Aosabi: the closed executor, the persisted document table, the CBOR codec and the framing, with no standard library and allocation optional."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The server, worker, browser and player cards all have a heap, so the feature
+# is on by default and a bare metal build turns it off.
+default = ["alloc"]
+# A heap. Without it the crate answers over caller owned byte slices only,
+# which is what the 2 KB class needs.
+alloc = []
+# The client role of Homa with the compact form and both forms of AoFrame, and
+# the re-export of AoFrame as the framing of this crate.
+client = ["dep:homa", "homa/client", "homa/wire-compact", "homa/stream-delimited", "homa/stream-prefixed"]
+# Both roles of Homa. The two features land with the re-export of homa::stream in the
+# change that removes the module frame of this crate.
+homa = ["client", "homa/server"]
+
+[dependencies]
+# AoFrame and the Homa roles, which a bare metal build names through this crate.
+# The crate homa is the project's own and below layer 0, so it is no outside
+# dependency, and it depends on nothing.
+homa = { path = "../homa", default-features = false, optional = true }

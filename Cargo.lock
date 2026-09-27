@@ -10,6 +10,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-kernel"
+version = "0.0.0"
+dependencies = [
+ "homa",
+]
+
+[[package]]
 name = "aosabi-lang"
 version = "0.0.0"
 dependencies = [
