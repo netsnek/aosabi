@@ -1,0 +1,60 @@
+# GraphQL over HTTP as one function, the jobs of graphql-yoga 5.18.0 with the
+# hooks of the server adapter of @whatwg-node/server 0.10.18 and the
+# introspection refusal an app installs. It carries the GraphiQL template
+# tools/provenance writes under src/graphiql/.
+[package]
+name = "graphql-over-http"
+version = "0.0.0"
+description = "GraphQL over HTTP as one function, the jobs of graphql-yoga 5.18.0 as Aosabi runs it: the request parsers, the multipart parser, the checks, the result processors, masking, the cache of documents, GraphiQL, the logger and the introspection refusal."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The members of a result a host set in the order of its object, the feature
+# host-results of aosabi-execute, which the stringifier carries through the
+# result it makes without the internals, as the spread of the reference keeps
+# every member of the result in its place. Only the module of aosabi-js turns
+# it on, so a build of the Rust option keeps its bytes.
+host-results = ["aosabi-execute/host-results"]
+# The variables of the process and the writer of the console a host of the
+# TypeScript option hands in at the boot, since a module for
+# wasm32-unknown-unknown reads no environment and its standard streams write
+# nowhere, the module host_env, which the interval of the ping of a stream
+# reads NODE_ENV through and the logger of Yoga reads DEBUG and prints its
+# lines through. Only the module and the native library of aosabi-js turn it
+# on, so a build of the Rust option reads its process and prints on its
+# streams alone.
+host-env = []
+# The files of a multipart body a host of the TypeScript option hands in
+# once: the parser leaves the bytes of a file part at its place in the body
+# of the request and keeps that place, so the body is the one copy of the
+# file in the engine, and the host reads the file there. Only the module and
+# the native library of aosabi-js turn it on, so a build of the Rust option
+# keeps a file with its own bytes.
+host-body = []
+
+[dependencies]
+# The Fetch types a request and an answer of Yoga are. No feature of the
+# adapter or of the coding is needed here.
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["web"] }
+# The orchestrator the server runs its hooks through.
+aosabi-hooks = { path = "../aosabi-hooks" }
+# The executor, its agent and the value a hook throws.
+aosabi-execute = { path = "../aosabi-execute" }
+# The parse of a request document.
+aosabi-lang = { path = "../aosabi-lang" }
+# The schema of the server.
+aosabi-type = { path = "../aosabi-type" }
+# The validation and the rule of the introspection refusal.
+aosabi-validate = { path = "../aosabi-validate" }
+# The value model and the writer of a result body.
+aosabi-json = { path = "../aosabi-json" }
+# The table the plugin use_parser_and_validation_cache keeps its documents and
+# verdicts in.
+aosabi-cache = { path = "../aosabi-cache" }

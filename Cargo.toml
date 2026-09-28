@@ -21,6 +21,7 @@ members = [
     "crates/aosabi-scalars",
     "crates/aosabi-type",
     "crates/aosabi-validate",
+    "crates/graphql-over-http",
     "crates/graphtp",
     "crates/graphtp-homa",
     "crates/homa",

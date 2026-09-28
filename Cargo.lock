@@ -89,6 +89,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "graphql-over-http"
+version = "0.0.0"
+dependencies = [
+ "aosabi-cache",
+ "aosabi-execute",
+ "aosabi-hooks",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-lang",
+ "aosabi-type",
+ "aosabi-validate",
+]
+
+[[package]]
 name = "graphtp"
 version = "0.0.0"
 
