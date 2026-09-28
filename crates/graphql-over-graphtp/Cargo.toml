@@ -1,0 +1,32 @@
+# The GraphTP listener, which serves an app's fetch over Homa with the fixed
+# fields of GraphTP and its streams, the crate GraphTP calls in place of the
+# module graphtp of aosabi-core, which names it under its feature homa. The
+# crate is no_std with alloc, because the listener of a microcontroller links
+# it.
+[package]
+name = "graphql-over-graphtp"
+version = "0.0.0"
+description = "GraphQL over GraphTP: the listener that serves an app's fetch over Homa with the fixed fields of GraphTP, its status and substatus, and its streams."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+# The owner's three crates and nothing else, so the listener takes 0 outside
+# crates.
+[dependencies]
+# The codes, the status registry and the stream handles of GraphTP, which the
+# listener names. The owner's crate outside the layers, with no outside crate
+# of its own.
+graphtp = { path = "../graphtp" }
+# The sans I/O server of GraphTP over Homa and its adapter, with the server
+# role alone, since a listener sends no request.
+graphtp-homa = { path = "../graphtp-homa", default-features = false, features = ["server"] }
+# The Homa engine whose endpoint and whose trait of RPCs the listener's two
+# turns take. The roles come from graphtp-homa's feature server, so this line
+# names no feature of its own.
+homa = { path = "../homa", default-features = false }
