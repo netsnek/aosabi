@@ -1,0 +1,40 @@
+# Aosabi's hook layer of layer 3: the plugins of a GraphQL request, the order
+# their hooks run in, and the engine, schema, context and masked errors
+# plugins, whose answers follow @envelop/core 5.5.1. It holds no runtime and
+# starts no thread, so it builds for wasm32-unknown-unknown as it builds for a
+# host.
+[package]
+name = "aosabi-hooks"
+version = "0.0.0"
+description = "Aosabi's hook layer: the plugins of a GraphQL request, the order their hooks run in, and the engine, schema, context and masked errors plugins."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# A done hook of a host that throws: the payload of onExecuteDone, of
+# onSubscribeResult and of onNext carries the value a hook of a plugin of an
+# app of the TypeScript option threw, and the orchestrator rejects the
+# execution, the subscription or the result of the stream with it, as the
+# orchestrator of Envelop rejects them and runs no done hook after it. A done
+# hook of a Rust plugin answers with no throw, so only the module of aosabi-js
+# and its native library turn the feature on, and a build of the Rust option
+# keeps its bytes.
+host-hooks = []
+
+[dependencies]
+# The parse the engine plugin binds.
+aosabi-lang = { path = "../aosabi-lang" }
+# The schema the schema plugin sets.
+aosabi-type = { path = "../aosabi-type" }
+# The validation the engine plugin binds.
+aosabi-validate = { path = "../aosabi-validate" }
+# The executor the engine plugin binds, and the value a hook throws.
+aosabi-execute = { path = "../aosabi-execute" }
+# The insertion ordered map of the context.
+aosabi-json = { path = "../aosabi-json" }
