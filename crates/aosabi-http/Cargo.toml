@@ -1,0 +1,74 @@
+# The crate of layer 1 that turns an HTTP answer into bytes. Documentation/architecture.md
+# section 3 puts it beside aosabi-json and aosabi-lang. It holds the zlib
+# wrapper of HTTP around graphtp::deflate, the content coding deflate, the
+# neutral messages the adapter and the serve layer exchange, the tables of
+# Node with the helpers of the record of the Node adapter, and behind the
+# feature web the web layer of every Rust target, the translation of hono
+# 4.11.9 under Aosabi's own names. The HTTP/1.1 server itself is the
+# fork of hyper under third_party/rust/, which this crate never names, so the
+# ESP32-C3 builds the parts below the web layer with no standard library and a
+# Worker links the web layer alone.
+[package]
+name = "aosabi-http"
+version = "0.0.0"
+description = "The HTTP layer of Aosabi below the server: the zlib wrapper of HTTP, the neutral messages of a served request and its answer, the tables of Node, and the web layer of every Rust target, the routes, the middleware, the context, the cookies, compress, cors and serve_static of hono 4.11.9 over the Fetch types."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+# Every crate that names this one writes default-features = false and the
+# features it needs, so a build that turns a feature off gets none of it
+# through feature unification.
+[features]
+default = ["deflate", "messages", "node"]
+# The zlib wrapper of HTTP, the content coding deflate, around graphtp::deflate,
+# which brings the crate graphtp.
+deflate = ["dep:graphtp"]
+# The neutral messages the Node adapter of aosabi-serve and the serve layer
+# exchange.
+messages = []
+# The tables of Node, the helpers of the record of the Node adapter, the bytes
+# of a value under the first write and the check of a record.
+node = ["messages"]
+# The web layer of every Rust target, the translation of hono 4.11.9 under
+# Aosabi's own names: the Fetch types, the app of routes and middleware,
+# the chain of the middleware, the context, the router, the cookie helpers,
+# compress, cors, except and serve_static. It takes the standard library on a
+# target with an operating system.
+web = ["dep:aosabi-json"]
+# compress() codes an answer as deflate over the zlib wrapper of the feature
+# deflate, the content coding deflate alone. It is a feature of its own, so a
+# crate that names the wrapper alone, the devtool among them, gets no coding
+# of compress() through feature unification.
+web-deflate = ["web", "deflate"]
+# The Fetch types answer as the Node adapter of aosabi-serve fills them, the
+# platform NODE_SERVER names, with the tables of Node beside them. The feature
+# carries the name of the feature of the port it takes over, which the card
+# packages name through the facade.
+node-server = ["web", "node"]
+# compress() hands its coding to the host and links no encoder, the Worker
+# card. Under web-deflate beside it, web-deflate wins.
+platform-coding = ["web"]
+# The platform of the host of the TypeScript option: the clock of Date.now()
+# on wasm32-unknown-unknown is the time the host hands through date::set_now,
+# the getter body of a response whose body is a string answers its bytes on a
+# platform that lists no type of a string body, Bun, and a served request may
+# hold its body at the host, which the first read of the body reads once. The
+# module core.wasm and the native library of the TypeScript option alone turn
+# it on, so a build of the Rust option keeps its bytes.
+host-platform = ["web"]
+
+# The crate graphtp is the owner's protocol crate outside the layers, whose
+# DEFLATE encoder the wrapper of the feature deflate frames, so the workspace
+# holds one DEFLATE encoder. It takes no outside crate, so a build with deflate
+# adds none, and a build without deflate uses core and alloc alone.
+[dependencies]
+graphtp = { path = "../graphtp", optional = true }
+# The value model and the one writer of a JSON body, which c.json writes
+# through, under the feature web.
+aosabi-json = { path = "../aosabi-json", optional = true }

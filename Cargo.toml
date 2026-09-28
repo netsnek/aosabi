@@ -13,6 +13,7 @@ resolver = "3"
 members = [
     "crates/aosabi-cache",
     "crates/aosabi-execute",
+    "crates/aosabi-http",
     "crates/aosabi-json",
     "crates/aosabi-kernel",
     "crates/aosabi-lang",

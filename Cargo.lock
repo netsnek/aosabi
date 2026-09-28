@@ -22,6 +22,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-http"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+ "graphtp",
+]
+
+[[package]]
 name = "aosabi-json"
 version = "0.0.0"
 dependencies = [
