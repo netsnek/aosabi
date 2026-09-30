@@ -1,0 +1,123 @@
+# The crate of layer 4 an application links. Documentation/architecture.md
+# section 4 maps the application, its plugin contract and its context
+# onto this crate. It holds the descriptor types, because a procedural macro
+# crate exports macros and nothing else, so the types the macros of
+# aosabi-macros emit need a library crate as their home. Behind the feature
+# `runtime` it holds what a service runs on: the resolver wrapping, the
+# context, the seven bound scalars and the service.
+[package]
+name = "aosabi-core"
+version = "0.0.0"
+description = "The core of Aosabi: the static type descriptors the derive macros emit, and behind the feature runtime the resolver wrapping, the context, the bound scalars and the service."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["runtime", "std"]
+# Everything a service runs on. With the feature off the crate is the
+# descriptor module alone and builds with no standard library, which is how a
+# build script links it.
+runtime = [
+    "dep:aosabi-execute",
+    "dep:aosabi-type",
+    "dep:aosabi-validate",
+    "dep:aosabi-lang",
+    "dep:aosabi-json",
+    "dep:aosabi-scalars",
+    "dep:aosabi-kernel",
+    "dep:aosabi-http",
+    "dep:aosabi-hooks",
+    "dep:graphql-over-http",
+    "dep:aosabi-auth-contract",
+]
+# The standard library of a host build. With the feature runtime it turns on
+# the feature std of aosabi-json, which keys the hasher of every map where the
+# target's standard library draws its keys from the operating system. A build
+# with runtime and without std keeps the fixed hasher, which is what a build
+# with no standard library needs
+# (docs/decisions/ADR-0026-runtime-graphql-over-aoenvelope.md).
+std = ["aosabi-json?/std"]
+# The GraphTP listener of docs/graphtp-in-aosabi.md section 3, the module
+# graphtp. It takes the crate graphql-over-graphtp, the listener with no
+# standard library, and nothing of the feature runtime, so a card with no
+# standard library builds it.
+homa = ["dep:graphql-over-graphtp"]
+# The watcher of the console, which an SDK installs to read the lines the
+# logger and the serving plugin write through the console, as the console
+# integration of @sentry/node does. aosabi-sentry turns it on. Without it
+# console_log! is println! itself, so a service that installs no SDK gains
+# no byte for the console.
+console-watch = ["runtime"]
+# The fields of a record of the logger that a host hands in, whose line and
+# whose JSON line the model of JSON holds no one value for, a function, a
+# symbol or an object whose JSON is no object of an app of the TypeScript
+# option. aosabi-js turns it on for the module and the native library, and a
+# Rust service, which makes no such field, gains no byte for it.
+host-fields = ["runtime"]
+# The type resolvers of a canary build, whose checks test a value
+# with in alone over every property name of it, which a boot takes where the
+# host hands them, and the names of a value of the host the projection of an
+# abstract type of such a resolver holds for it. aosabi-js turns it on for the
+# module and the native library, and a Rust service, whose build writes the
+# type resolvers of the reference, gains no byte for it.
+canary-types = ["runtime", "aosabi-execute?/host-reads"]
+# A dev feature. The projection of a resolver as the object the reference
+# builds, a plain object with a copy of each key, beside the view of the
+# selection every build projects into, selected per thread with
+# wrap_resolver::set_eager_projection. It is the second judge of the view for
+# one release, which the devtool turns on and no card names.
+exec-eager-projection = ["runtime"]
+# The schema record a build writes of its SDL and its IR, which a boot reads
+# with no parse and the schema build makes the types from, known valid, the
+# module boot::prebuilt. aosabi-js turns it on for the module and the native
+# library, and a Rust service, whose schema its build describes at compile
+# time, gains no byte for it.
+prebuilt = ["canary-types"]
+# The coding of the base pipeline, whose first layer is then
+# compress(), which codes a large answer where the request accepts a coding.
+# aosabi-js turns it on for the module and the native library, which code
+# that way. Without it the base pipeline codes no answer, and a Rust service
+# codes one only where it writes compress(), divergence D72 of
+# docs/byte-equality.md section 3.
+base-compress = ["runtime"]
+
+[dependencies]
+# The executor, its promise model and its value, which the resolver wrapping
+# runs on and the generated glue names.
+aosabi-execute = { path = "../aosabi-execute", optional = true }
+# The schema, its types and the binding seam the resolvers and the scalars
+# enter a schema through.
+aosabi-type = { path = "../aosabi-type", optional = true }
+# The schema build with the SDL rules, which createSchema runs.
+aosabi-validate = { path = "../aosabi-validate", optional = true }
+# The document nodes the selection walk reads and the GraphQLError a
+# ServiceError is.
+aosabi-lang = { path = "../aosabi-lang", optional = true }
+# The JSON value model, the reader of a request line, the writer of a response
+# line, and the insertion ordered map every map of this crate is.
+aosabi-json = { path = "../aosabi-json", optional = true }
+# The hooks of the four scalars taken from graphql-scalars, and the Date
+# instance.
+aosabi-scalars = { path = "../aosabi-scalars", optional = true }
+# The executor entry traits below HTTP, which the service implements.
+aosabi-kernel = { path = "../aosabi-kernel", optional = true }
+# The web app, its context and the Fetch types the application is, the
+# web layer of aosabi-http. The facade names the features of the platform and
+# of the coding per card, so the core names none of them.
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["web"], optional = true }
+# The orchestrator the plugins of the core hook into.
+aosabi-hooks = { path = "../aosabi-hooks", optional = true }
+# The Yoga server the GraphQL handler builds, and the introspection refusal of
+# the plugin list.
+graphql-over-http = { path = "../graphql-over-http", optional = true }
+# ForbiddenError, which a thrown value of the core carries.
+aosabi-auth-contract = { path = "../../plugins/aosabi-auth-contract", optional = true }
+# The GraphTP listener over the server of graphtp-homa, with its request,
+# its answer and the bounds of the cards, which the module graphtp names.
+graphql-over-graphtp = { path = "../graphql-over-graphtp", optional = true }

@@ -1,0 +1,8 @@
+directive @inContext(
+  """The locale for this operation, e.g. `en` or `de-AT`."""
+  locale: String
+  """Per-operation context, as JSON (an app-typed `OperationContext` bag). Carried as a
+  variable so it folds into the client cache key. INERT until the server acts on it — e.g.
+  `useDatabase({operationContext})` honouring an acting tenant; a bare value grants nothing."""
+  context: String
+) on QUERY | MUTATION | SUBSCRIPTION

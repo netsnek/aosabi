@@ -17,6 +17,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-core"
+version = "0.0.0"
+dependencies = [
+ "aosabi-auth-contract",
+ "aosabi-execute",
+ "aosabi-hooks",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-kernel",
+ "aosabi-lang",
+ "aosabi-scalars",
+ "aosabi-type",
+ "aosabi-validate",
+ "graphql-over-graphtp",
+ "graphql-over-http",
+]
+
+[[package]]
 name = "aosabi-execute"
 version = "0.0.0"
 dependencies = [
