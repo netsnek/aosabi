@@ -66,6 +66,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-ir"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+]
+
+[[package]]
 name = "aosabi-json"
 version = "0.0.0"
 dependencies = [

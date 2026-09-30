@@ -1,0 +1,27 @@
+# The intermediate representation. Documentation/architecture.md section 3
+# places it in layer 4. The crate is no_std with alloc, because the model and
+# its printer need an allocator and nothing else of a host.
+[package]
+name = "aosabi-ir"
+version = "0.0.0"
+description = "The intermediate representation of Aosabi: the model, its JSON shape, the SDL printer and the collation of the implements sort."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The standard library. Every item of this crate builds on core and alloc alone, so the
+# feature gates nothing today and exists as the configuration symbol a host build turns
+# on uniformly across the workspace.
+std = []
+
+[dependencies]
+# The value model the JSON shape of the IR is written through, the one writer of JSON
+# bytes, and the insertion ordered map and set every map of this crate is.
+aosabi-json = { path = "../aosabi-json" }
