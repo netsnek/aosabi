@@ -1,0 +1,28 @@
+# The emission of the run time glue of a type, which the procedural macros of
+# aosabi-macros call for the derive path and the builder of aosabi-build calls
+# for the types of a plain crate. It is a library written in the project that
+# emits tokens, and it runs inside the procedural macros and on the build host
+# alone, so it reaches no card.
+[package]
+name = "aosabi-codegen"
+version = "0.0.0"
+description = "The emission of the run time glue of Aosabi, which the derive macros and the builder of a plain crate share."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The three crates the Linux kernel carries under rust/, at exactly the
+# versions aosabi-macros names, so the lock holds one of each. The default
+# features are off: the glue writes the tokens of proc-macro2 and reads the
+# syntax of whole items, so neither the bridge to the compiler of the feature
+# proc-macro nor the derive input of syn is asked here, and the macros turn on
+# what they ask for themselves.
+proc-macro2 = { version = "=1.0.101", default-features = false }
+quote = { version = "=1.0.40", default-features = false }
+syn = { version = "=2.0.106", default-features = false, features = ["full", "parsing", "printing", "clone-impls"] }

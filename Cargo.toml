@@ -12,6 +12,7 @@ resolver = "3"
 # them exists. A glob would treat those as members and fail the workspace.
 members = [
     "crates/aosabi-cache",
+    "crates/aosabi-codegen",
     "crates/aosabi-core",
     "crates/aosabi-execute",
     "crates/aosabi-hooks",
