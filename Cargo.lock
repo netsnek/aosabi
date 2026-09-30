@@ -3,6 +3,13 @@
 version = 4
 
 [[package]]
+name = "aosabi-auth-contract"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+]
+
+[[package]]
 name = "aosabi-cache"
 version = "0.0.0"
 dependencies = [

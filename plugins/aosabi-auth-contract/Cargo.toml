@@ -1,0 +1,29 @@
+# The authorization contract of layer 4. It builds with no standard library
+# and needs an allocator, and it names aosabi-json alone, so every target
+# links it, riscv32imc-unknown-none-elf among them.
+[package]
+name = "aosabi-auth-contract"
+version = "0.0.0"
+description = "The authorization contract of Aosabi: the principal, its role and permission checks, the identity provider seam and ForbiddenError, with no standard library."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The truth of the feature of a ForbiddenError a host made, which the host of
+# the TypeScript option tests on the value it holds, as the map of the
+# identity plugin tests it, so the map writes the copy JSON reads of
+# a true feature whatever the truth of the copy, an invalid Date, whose copy
+# is null, among them.
+host-errors = []
+
+[dependencies]
+# The insertion ordered object the attributes of a principal are, and the
+# Number::toString a numeric id prints through. Its default features are off,
+# so the contract links no standard library through it.
+aosabi-json = { path = "../../crates/aosabi-json", default-features = false }
