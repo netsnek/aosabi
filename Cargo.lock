@@ -75,6 +75,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-infer"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-ir",
+ "aosabi-json",
+]
+
+[[package]]
 name = "aosabi-ir"
 version = "0.0.0"
 dependencies = [

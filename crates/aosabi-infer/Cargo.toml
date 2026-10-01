@@ -1,0 +1,26 @@
+# The schema inference. Documentation/architecture.md section 3 places it in
+# layer 4. The crate runs at build time on a host, inside a build script and
+# inside the devtool, so it uses the standard library.
+[package]
+name = "aosabi-infer"
+version = "0.0.0"
+description = "The schema inference of Aosabi: the five inference modules over the TypeSource seam, and the first type source, the derive descriptor graph."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The static descriptors the derive macros emit. Only the descriptor_source module reads
+# them, and the five translated modules never do.
+aosabi-core = { path = "../aosabi-core" }
+# The intermediate representation the inference fills, its printer and the
+# context directive text that closes every schema.
+aosabi-ir = { path = "../aosabi-ir" }
+# The one writer of JSON bytes, which writes the comparable field shape and the descriptor
+# dump, and the insertion ordered map and set every map of this crate is.
+aosabi-json = { path = "../aosabi-json" }

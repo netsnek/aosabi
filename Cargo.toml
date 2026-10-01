@@ -17,6 +17,7 @@ members = [
     "crates/aosabi-execute",
     "crates/aosabi-hooks",
     "crates/aosabi-http",
+    "crates/aosabi-infer",
     "crates/aosabi-ir",
     "crates/aosabi-json",
     "crates/aosabi-kernel",
