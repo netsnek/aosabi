@@ -1,0 +1,43 @@
+# The macros of layer 4. Documentation/architecture.md section 4 names the three of them,
+# `#[derive(Aosabi)]`, `#[aosabi::resolvers]` and `#[aosabi::scalar]`. They
+# write the descriptor types of aosabi-core as constants, and an application
+# reaches them through the facade crate aosabi and never by this name.
+[package]
+name = "aosabi-macros"
+version = "0.0.0"
+description = "The procedural macros of Aosabi: the derive and the two attributes that record the static type descriptors the schema inference reads."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+proc-macro = true
+
+[features]
+mirror = []
+
+[dependencies]
+# The three crates the Linux kernel carries under rust/, each at exactly the
+# version the README of its directory there names, because the kernel vets a
+# version and not a crate name. Cargo.lock pins each version with its
+# checksum, which is a normal dependency, pinned, in
+# docs/decisions/ADR-0024-dependencies.md. A version moves in a change of its
+# own, and only to the version the kernel carries, as section 4 of
+# docs/dependencies.md says.
+#
+# The parser of the annotated items. The `full` feature carries the `impl`
+# block and the method signatures `#[aosabi::resolvers]` reads, which the
+# default feature set leaves out.
+syn = { version = "=2.0.106", features = ["full"] }
+# The token templates of the generated code.
+quote = "=1.0.40"
+# The token and span types both of the above are written over.
+proc-macro2 = "=1.0.101"
+# The emission of the run time glue, the library the builder of a plain crate calls too,
+# so the glue of a member is written once.
+aosabi-codegen = { path = "../aosabi-codegen" }

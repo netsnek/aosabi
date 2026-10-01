@@ -21,6 +21,7 @@ members = [
     "crates/aosabi-json",
     "crates/aosabi-kernel",
     "crates/aosabi-lang",
+    "crates/aosabi-macros",
     "crates/aosabi-scalars",
     "crates/aosabi-type",
     "crates/aosabi-validate",
