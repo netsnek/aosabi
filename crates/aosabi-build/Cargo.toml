@@ -1,0 +1,73 @@
+# The build step. Documentation/architecture.md section 3 places it in layer 4.
+# A server crate names it under
+# [build-dependencies] and calls it from its build script, so the crate runs
+# on a host at build time and uses the standard library.
+[package]
+name = "aosabi-build"
+version = "0.0.0"
+description = "The build step of Aosabi: reads the descriptors of an application crate inside a build script, runs the schema inference, validates the schema and writes schema.graphql, resolvers.js, ir.json and descriptors.json when they change."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The reader of the plain source of an application crate, the module source,
+# the source path of aosabi-builder. It brings the parser syn, the spans of
+# proc-macro2 with their lines, which a reader outside rustc counts only with
+# span-locations, and aosabi-codegen with quote, which write the glue of the
+# generated copy of a plain crate. The feature is off by default, so the build
+# script of every application and every wasm build of this crate leave syn out.
+# The command line turns it on, and the devtool turns it on for the notebooks
+# on every target but wasm32.
+source = ["dep:syn", "dep:aosabi-codegen", "dep:quote", "proc-macro2/span-locations"]
+
+[dependencies]
+# The roots descriptor a build script names as the type argument, which
+# carries the declaration list of the application crate. The default features
+# are off, so this crate asks for the descriptors and not for the executor
+# behind the feature `runtime`.
+aosabi-core = { path = "../aosabi-core", default-features = false }
+# The inference, its first type source over the descriptor graph, and the dump
+# of that graph, which is the third artifact.
+aosabi-infer = { path = "../aosabi-infer" }
+# The JSON form of the intermediate representation, which is ir.json.
+aosabi-ir = { path = "../aosabi-ir" }
+# The string of the reference, which carries the message of a schema error code
+# unit for code unit, and the one writer of JSON bytes.
+aosabi-json = { path = "../aosabi-json" }
+# The parse options of the schema build and the string builder the message of
+# an invalid schema is assembled with.
+aosabi-lang = { path = "../aosabi-lang" }
+# `validate_schema` and the error a schema build returns.
+aosabi-type = { path = "../aosabi-type" }
+# `build_schema` with the SDL rules handed in, which is `buildSchema` of the
+# reference with no options.
+aosabi-validate = { path = "../aosabi-validate" }
+# The lexer the build script of an application crate reads its module tree
+# with, so the scan of the declaration list reads tokens and never the text of
+# a comment or a string. The requirement names exactly the version the Linux
+# kernel carries, as aosabi-macros does, a normal dependency, pinned. The
+# default feature `proc-macro` is off, because a build script runs outside
+# rustc, where proc-macro2 lexes with its own fallback.
+proc-macro2 = { version = "=1.0.101", default-features = false }
+# The parser the reader of the feature source parses the plain source of an
+# application crate with, on the build host. The requirement names exactly the
+# version the Linux kernel carries, the one aosabi-macros names, so the lock
+# holds one syn, and it ships in no artifact. The default features are off, so
+# this syn turns on neither derive nor the feature proc-macro of proc-macro2
+# and quote, and the reader takes the syntax of whole files, the parser, the
+# spans of a syntax tree and its clones.
+syn = { version = "=2.0.106", default-features = false, features = ["full", "parsing", "printing", "clone-impls"], optional = true }
+# The emission of the run time glue, the library the macros of the derive path
+# call as well, which writes the glue of every type of a plain crate into the
+# module of its generated copy. It is a library of the project behind the
+# feature source.
+aosabi-codegen = { path = "../aosabi-codegen", optional = true }
+# The token templates of the glue, at the version aosabi-macros names, with
+# the feature proc-macro off as for syn, behind the feature source.
+quote = { version = "=1.0.40", default-features = false, optional = true }

@@ -10,6 +10,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-build"
+version = "0.0.0"
+dependencies = [
+ "aosabi-codegen",
+ "aosabi-core",
+ "aosabi-infer",
+ "aosabi-ir",
+ "aosabi-json",
+ "aosabi-lang",
+ "aosabi-type",
+ "aosabi-validate",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "aosabi-cache"
 version = "0.0.0"
 dependencies = [
