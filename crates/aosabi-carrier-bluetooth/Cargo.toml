@@ -1,0 +1,61 @@
+# The carrier Bluetooth of layer 4, one carrier and one crate as
+# Documentation/architecture.md section 4.3 asks. It carries compact Homa
+# packets on the GATT data path, one packet an ATT value, which every card
+# with Bluetooth links unless it switches it off, and on the L2CAP LE credit
+# based channel in prefixed AoFrame, gives the values of the links as
+# functions a device card fills and the seam of a bare metal LE host, and
+# serves GraphTP(Homa) on a Linux card through BlueZ and the GraphTP listener
+# as a local task of the runtime of aosabi-serve.
+[package]
+name = "aosabi-carrier-bluetooth"
+version = "0.0.0"
+description = "The carrier Bluetooth: compact Homa packets on the GATT data path and on the L2CAP LE credit based channel, and GraphTP(Homa) on a Linux card through BlueZ."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The GATT data path is on in every card with Bluetooth unless the card
+# switches it off.
+default = ["gatt"]
+# The driver of Linux user space, a D-Bus client of BlueZ written in the
+# project, served by the GraphTP listener over the runtime of aosabi-serve.
+# The listener's fetch is the booted app's, the fetch of a carrier of
+# aosabi-core, and the endpoint keeps its pages in owned storage.
+linux = [
+    "dep:aosabi-serve",
+    "dep:graphql-over-graphtp",
+    "aosabi-core/homa",
+    "aosabi-core/runtime",
+    "homa/alloc",
+]
+# The GATT data path, RX written without response and TX notified, one Homa
+# packet an ATT value.
+gatt = []
+# The service that publishes its PSM is the one of the GATT data path, so the
+# channel brings it.
+channel = ["gatt", "homa/stream-prefixed"]
+bare = []
+# The trace of the GATT data path, which a harness turns on: the time on the
+# realtime clock and the compact header of every packet send hands to the bus
+# and of every value recv takes from RX. The devtool names it, and no card and
+# no feature of the facade does, so no served build keeps a trace.
+trace = ["gatt"]
+
+[dependencies]
+# The engine the carrier moves the packets of, with the role server of a
+# device, the compact form and prefixed AoFrame.
+homa = { path = "../homa", default-features = false, features = ["server", "wire-compact", "stream-prefixed"] }
+# The runtime whose local task the Linux driver is, its reactor, its clock and
+# the driver and listener contract of serve_with.
+aosabi-serve = { path = "../aosabi-serve", optional = true }
+# The booted app and the fetch of a carrier over it, the module graphtp of
+# the features homa and runtime.
+aosabi-core = { path = "../aosabi-core", default-features = false, features = ["homa"], optional = true }
+# The GraphTP listener, its request and answer and the bounds of the cards.
+graphql-over-graphtp = { path = "../graphql-over-graphtp", optional = true }
