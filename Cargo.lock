@@ -73,6 +73,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-fetch"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-http",
+ "aosabi-serve",
+ "hyper",
+ "rustls",
+ "rustls-pki-types",
+]
+
+[[package]]
 name = "aosabi-hooks"
 version = "0.0.0"
 dependencies = [

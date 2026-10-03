@@ -16,6 +16,7 @@ members = [
     "crates/aosabi-codegen",
     "crates/aosabi-core",
     "crates/aosabi-execute",
+    "crates/aosabi-fetch",
     "crates/aosabi-hooks",
     "crates/aosabi-http",
     "crates/aosabi-infer",

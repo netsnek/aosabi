@@ -1,0 +1,39 @@
+# The outbound HTTP client of layer 4, the twin of the global fetch of a
+# service on the native targets of cfg(unix). The facade names it under
+# cfg(unix) behind its feature fetch.
+[package]
+name = "aosabi-fetch"
+version = "0.0.0"
+description = "The outbound HTTP/1.1 client of the Linux cards: NativeFetch over TCP and TLS 1.3, the root store, and the driver of the network capability."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The network capability this crate is the driver of, its Fetch trait and its
+# FetchError, which sit behind the feature runtime.
+aosabi-core = { path = "../aosabi-core", features = ["runtime"] }
+# The Request and the Response of the capability and the absolute URL a call
+# reaches, the web layer of aosabi-http. No feature of the platform or of the
+# coding is needed here.
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["web"] }
+# The executor of one thread, its TcpStream and HyperIo, and the connect of
+# runtime/connect.rs, with no feature of a card, so the card that names this
+# crate chooses the reactor through the feature linux of aosabi-serve.
+aosabi-serve = { path = "../aosabi-serve" }
+# The fork vendored the kernel way under third_party/rust/, reached by path for
+# its runtime traits rt::Read and rt::Write alone. It names std and no feature
+# client, so the fork brings no client of its own and no tokio.
+hyper = { path = "../../third_party/rust/hyper", default-features = false, features = ["std"] }
+# The requirement names the version the register reviewed as its floor, and the
+# default features are off, so no aws-lc-rs and no logging crate enters. TLS
+# 1.3 is compiled always, and the client configuration names it alone.
+rustls = { version = "0.23.45", default-features = false, features = ["std", "ring"] }
+# The server name, the certificate of the root store and its PEM reader. The
+# requirement names the version the register reviewed as its floor.
+rustls-pki-types = { version = "1.15.1", default-features = false, features = ["std"] }
