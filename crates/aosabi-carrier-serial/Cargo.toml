@@ -1,0 +1,46 @@
+# The carrier Serial Line of layer 4, one carrier and one crate as
+# Documentation/architecture.md section 4.3 asks. It carries compact Homa packets in
+# delimited AoFrame over a UART, gives the values of the link as functions a device
+# card fills, and serves GraphTP(Homa) on a Linux tty through the GraphTP listener
+# as a local task of the runtime of aosabi-serve.
+[package]
+name = "aosabi-carrier-serial"
+version = "0.0.0"
+description = "The carrier Serial Line: compact Homa packets in delimited AoFrame over a UART, and GraphTP(Homa) on a Linux tty."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The driver of Linux user space, a tty served by the GraphTP listener over
+# the runtime of aosabi-serve. The listener's fetch is the booted app's, the
+# fetch of a carrier of aosabi-core, and the endpoint keeps its pages in owned
+# storage.
+linux = [
+    "dep:aosabi-serve",
+    "dep:graphql-over-graphtp",
+    "aosabi-core/homa",
+    "aosabi-core/runtime",
+    "homa/alloc",
+    "homa/stream-delimited",
+]
+bare = []
+
+[dependencies]
+# The engine the carrier moves the packets of, with the role server of a
+# device, the compact form and delimited AoFrame.
+homa = { path = "../homa", default-features = false, features = ["server", "wire-compact", "stream-delimited"] }
+# The runtime whose local task the Linux driver is, its reactor, its clock and
+# the driver and listener contract of serve_with.
+aosabi-serve = { path = "../aosabi-serve", optional = true }
+# The booted app and the fetch of a carrier over it, the module graphtp of
+# the features homa and runtime.
+aosabi-core = { path = "../aosabi-core", default-features = false, features = ["homa"], optional = true }
+# The GraphTP listener, its request and answer and the bounds of the cards.
+graphql-over-graphtp = { path = "../graphql-over-graphtp", optional = true }
