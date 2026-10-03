@@ -25,6 +25,7 @@ members = [
     "crates/aosabi-lang",
     "crates/aosabi-macros",
     "crates/aosabi-scalars",
+    "crates/aosabi-serve",
     "crates/aosabi-type",
     "crates/aosabi-validate",
     "crates/graphql-over-graphtp",

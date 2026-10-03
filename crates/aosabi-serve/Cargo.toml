@@ -1,0 +1,75 @@
+# The engine of layer 4, the part of Aosabi that serves sockets on the native
+# targets of cfg(unix). It boots the app, runs the runtime of one thread, and
+# serves HTTP/1.1 through the fork of hyper, and TLS and HTTP/2 behind their
+# features. A device card switches it on through the feature serve of the
+# facade, so a Worker build and the default ESP32-C3 build link none of it.
+[package]
+name = "aosabi-serve"
+version = "0.0.0"
+description = "The engine of Aosabi: serve_with, the node server plugin, the runtime of one thread, the TCP listener, the protocol selection, the node handler and the Node adapter of @hono/node-server 1.19.9, with TLS and HTTP/2 behind features of the Linux cards."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+# Every feature is off by default, and a Linux card switches on what it needs
+# through the facade, so a platform crate enters the builds of its card alone.
+[features]
+# The epoll reactor and the peer credential of a Unix socket, through rustix on
+# a Linux target.
+linux = ["dep:rustix"]
+# The HTTP/2 server of hyper over the fork of h2, which h2c and tls enable.
+# It names std and h2 in the fork and not sync, so a connection of HTTP/2
+# shares its state on one thread as one of HTTP/1.1 does.
+http2 = ["hyper/http2"]
+# HTTP/2 by prior knowledge on a plain listener.
+h2c = ["http2"]
+# TLS through rustls with the provider ring, whose listener offers h2 and
+# http/1.1 through ALPN.
+tls = ["http2", "dep:rustls"]
+
+[dependencies]
+# The app, the boot, the plugin and config contracts and the listener trait.
+aosabi-core = { path = "../aosabi-core" }
+# The neutral messages of the Node adapter, the tables of Node, and the web
+# layer whose Fetch types the adapter answers as Node fills them.
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["messages", "node", "node-server"] }
+# The one writer of JSON bytes, which writes the boot report of the harness,
+# and the function seed of its feature std, which the boot keys the hashes of
+# its thread with (src/serve.rs, seed_keys).
+aosabi-json = { path = "../aosabi-json", features = ["std"] }
+# The forks vendored the kernel way under third_party/rust/, reached by path.
+# Hyper serves HTTP/1.1 with the Node parity of its layer B and std without
+# sync, so every connection runs on one thread, and http and http-body are the
+# types and the body trait of its public interface.
+hyper = { path = "../../third_party/rust/hyper", default-features = false, features = ["std", "http1", "server", "node"] }
+http = { path = "../../third_party/rust/http", default-features = false, features = ["std"] }
+http-body = { path = "../../third_party/rust/http-body", default-features = false, features = ["std"] }
+# The buffers of hyper's public interface, kept and pinned, whose requirement
+# names the version the register reviewed as its floor.
+bytes = { version = "1.12.1", default-features = false, features = ["std"] }
+# The TLS library behind the feature tls, under reason 3.1 of
+# docs/decisions/ADR-0024-dependencies.md. The requirement names the version the
+# register reviewed as its floor, and the default features are off, so the
+# provider is ring and not aws-lc-rs and no logging crate enters.
+rustls = { version = "0.23.45", optional = true, default-features = false, features = ["std", "ring"] }
+
+# The one outside crate of a Linux card, behind the feature linux and for a
+# Linux target alone, so a build without the feature or for another target
+# compiles no outside crate of it. It gives the safe epoll and SO_PEERCRED the
+# workspace cannot write without unsafe.
+[target.'cfg(target_os = "linux")'.dependencies]
+rustix = { version = "1.1.5", optional = true, default-features = false, features = ["std", "event", "net"] }
+
+# The runtime with one timer beyond the 32 bit range of a wait, which accepts
+# one connection, the probe of the timeout of the epoll reactor that
+# tests/notebooks/08_card_builds.ipynb builds for the host with each backend
+# of rustix and for the player and runs, and which ships in no artifact.
+[[example]]
+name = "far_timer"
+path = "examples/far_timer.rs"
+required-features = ["linux"]
