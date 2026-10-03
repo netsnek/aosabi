@@ -1,0 +1,51 @@
+# The carrier USB of layer 4, one carrier and one crate as Documentation/architecture.md
+# section 4.3 asks. It carries compact Homa packets over USB bulk, one packet a transfer
+# through a vendor interface of FunctionFS, and over USB serial, delimited AoFrame on
+# the tty of the ACM function, gives the values of the links as functions a device card
+# fills, and serves GraphTP(Homa) on the gadget of a Linux card through the GraphTP
+# listener as a local task of the runtime of aosabi-serve.
+[package]
+name = "aosabi-carrier-usb"
+version = "0.0.0"
+description = "The carrier USB: compact Homa packets over USB bulk through FunctionFS and over USB serial, and GraphTP(Homa) on the gadget of a Linux card."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The driver of Linux user space, the gadget side, served by the GraphTP
+# listener over the runtime of aosabi-serve. The listener's fetch is the
+# booted app's, the fetch of a carrier of aosabi-core, and the endpoint keeps
+# its pages in owned storage.
+linux = [
+    "dep:aosabi-serve",
+    "dep:graphql-over-graphtp",
+    "aosabi-core/homa",
+    "aosabi-core/runtime",
+    "homa/alloc",
+]
+# USB bulk, one vendor interface of FunctionFS with a bulk IN and a bulk OUT
+# endpoint, one Homa packet a transfer.
+bulk = []
+# USB serial, the tty of the ACM function in delimited AoFrame.
+serial = ["homa/stream-delimited"]
+bare = []
+
+[dependencies]
+# The engine the carrier moves the packets of, with the role server of a
+# device, the compact form and delimited AoFrame.
+homa = { path = "../homa", default-features = false, features = ["server", "wire-compact", "stream-delimited"] }
+# The runtime whose local task the Linux driver is, its reactor, its clock and
+# the driver and listener contract of serve_with.
+aosabi-serve = { path = "../aosabi-serve", optional = true }
+# The booted app and the fetch of a carrier over it, the module graphtp of
+# the features homa and runtime.
+aosabi-core = { path = "../aosabi-core", default-features = false, features = ["homa"], optional = true }
+# The GraphTP listener, its request and answer and the bounds of the cards.
+graphql-over-graphtp = { path = "../graphql-over-graphtp", optional = true }
