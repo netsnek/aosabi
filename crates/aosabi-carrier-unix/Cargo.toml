@@ -1,0 +1,27 @@
+# The carrier Unix Socket of layer 4, one carrier and one crate as
+# Documentation/architecture.md section 4.3 asks. It serves HTTP(Unix Socket) through the
+# serve layer of aosabi-serve, which never names it, and builds for the native
+# targets of cfg(unix).
+[package]
+name = "aosabi-carrier-unix"
+version = "0.0.0"
+description = "The carrier Unix Socket: HTTP(Unix Socket) in the runtime directory of the user, served through aosabi-serve, with the peer check on Linux."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# A build links one protocol on Unix Socket, as its device card chooses.
+homa = []
+
+[dependencies]
+# The booted app and the listener trait the boot runs.
+aosabi-core = { path = "../aosabi-core" }
+# The runtime with its Unix sockets and serve_stream, which answers a socket as
+# a TCP socket is answered.
+aosabi-serve = { path = "../aosabi-serve" }
