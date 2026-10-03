@@ -44,6 +44,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-carrier-network"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-serve",
+ "graphql-over-graphtp",
+ "homa",
+]
+
+[[package]]
 name = "aosabi-carrier-serial"
 version = "0.0.0"
 dependencies = [

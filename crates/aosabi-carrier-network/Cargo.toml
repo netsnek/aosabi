@@ -1,0 +1,73 @@
+# The carrier Network of layer 4, one carrier and one crate as
+# Documentation/architecture.md section 4.3 asks. It carries the full form of
+# Homa over raw IP protocol 146 on the crate's own engine, the default path,
+# and later over the socket of the crate's kernel module, gives the values of
+# the Network profile as functions a card fills, and serves GraphTP(Homa) on a
+# Linux card through the GraphTP listener as a local task of the runtime of
+# aosabi-serve, beside its HTTP(TCP).
+[package]
+name = "aosabi-carrier-network"
+version = "0.0.0"
+description = "The carrier Network: GraphTP(Homa) over raw IP 146 on the crate's engine, beside HTTP(TCP) on a Linux card."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The IP driver of homa over raw IP 146, the default path of a Linux card,
+# served by the GraphTP listener over the runtime of aosabi-serve. The
+# listener's fetch is the booted app's, the fetch of a carrier of aosabi-core,
+# and the endpoint keeps its pages in owned storage.
+homa-ip = [
+    "dep:aosabi-serve",
+    "dep:graphql-over-graphtp",
+    "aosabi-core/homa",
+    "aosabi-core/runtime",
+    "homa/ip",
+]
+# The kernel path over the socket of the crate's kernel module, whose code
+# stage H5 writes with the feature kernel-socket of homa. Until then it takes
+# the raw path for the modules both paths share, and a path of the kernel
+# reads NoModule.
+homa-kernel = ["homa-ip"]
+
+[dependencies]
+# The engine with the features a server card that names GraphTP(Homa) on
+# Network turns on, both roles, the full form with START_MSG, priorities with
+# their computed cutoffs, overcommitment, incast control and the rate pacer.
+homa = { path = "../homa", default-features = false, features = [
+    "client",
+    "server",
+    "alloc",
+    "wire-full",
+    "start-msg",
+    "prio",
+    "prio-compute",
+    "overcommit",
+    "incast",
+    "pacer-rate",
+] }
+# The runtime whose local task the driver is, its reactor, its clock and the
+# driver and listener contract of serve_with.
+aosabi-serve = { path = "../aosabi-serve", optional = true }
+# The booted app and the fetch of a carrier over it, the module graphtp of
+# the features homa and runtime.
+aosabi-core = { path = "../aosabi-core", default-features = false, features = ["homa"], optional = true }
+# The GraphTP listener, its request and answer and the bounds of the cards.
+graphql-over-graphtp = { path = "../graphql-over-graphtp", optional = true }
+
+# The server of GraphTP(Homa) on Network alone, over a fetch that answers at
+# once, which the raw server cell of tests/notebooks/23_homa_budget.ipynb
+# builds with the release profile and weighs by the code and read only bytes
+# of the symbols of each crate, the bytes of each crate's source lines printed
+# beside, and which ships in no artifact.
+[[example]]
+name = "raw_server"
+path = "examples/raw_server.rs"
+required-features = ["homa-ip"]
