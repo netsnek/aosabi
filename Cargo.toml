@@ -14,6 +14,7 @@ members = [
     "crates/aosabi-build",
     "crates/aosabi-cache",
     "crates/aosabi-carrier-bluetooth",
+    "crates/aosabi-carrier-lora",
     "crates/aosabi-carrier-network",
     "crates/aosabi-carrier-serial",
     "crates/aosabi-carrier-unix",

@@ -1,0 +1,38 @@
+# The carrier LoRa of layer 4, one carrier and one crate as Documentation/architecture.md
+# section 4.3 asks. It carries one compact Homa packet in one LoRa packet, sealed with
+# ChaCha20-Poly1305 behind a header of the link and the counter, and keeps the air of its
+# radio inside the duty cycle of its band. Every LoRa card builds it bare metal through a
+# card crate of the device card track, and the devtool builds its model on the host.
+[package]
+name = "aosabi-carrier-lora"
+version = "0.0.0"
+description = "The carrier LoRa: one compact Homa packet in one sealed LoRa packet, an airtime ledger inside the duty cycle, and the SX1262."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The driver of the SX1262 over the SPI and the pins of the card's HAL, a
+# platform crate of the LoRa card that the card crate turns on.
+sx1262 = ["dep:embedded-hal"]
+# The model radio of the notebooks, built by the devtool alone.
+model = ["homa/sim"]
+
+[dependencies]
+# The engine the carrier moves the packets of, with the role server of a
+# device, the compact form and the budget pacer the airtime ledger runs over.
+homa = { path = "../homa", default-features = false, features = ["server", "wire-compact", "pacer-budget"] }
+# The AEAD of RFC 8439, reason 1 of ADR-0024, the reviewed version as the
+# floor and the exact version in Cargo.lock (docs/dependencies.md section
+# 3.17).
+chacha20poly1305 = { version = "0.11.0", default-features = false }
+# The traits of the SPI bus and the pins of the card's HAL, a platform crate
+# of the LoRa card reached through sx1262 alone (docs/dependencies.md section
+# 3.18).
+embedded-hal = { version = "1.0.0", optional = true }
