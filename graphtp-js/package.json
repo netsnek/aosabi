@@ -1,0 +1,50 @@
+{
+  "name": "graphtp",
+  "version": "0.0.0",
+  "description": "graphtpFetch, a fetch that speaks GraphTP/1 over Homa to a GraphQL service, for Apollo Client, urql, graphql-request, GraphiQL, Relay and the federation of Aosabi",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Florian Kleber <kleber@snek.at>",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./register": "./register.js",
+    "./graphtp.wasm": "./graphtp.wasm"
+  },
+  "types": "./index.d.ts",
+  "sideEffects": [
+    "./register.js"
+  ],
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "register.js",
+    "graphtp.wasm",
+    "graphtp.wasm.sha256",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "node-ble": "^1",
+    "serialport": "^13",
+    "usb": "^3"
+  },
+  "peerDependenciesMeta": {
+    "node-ble": {
+      "optional": true
+    },
+    "serialport": {
+      "optional": true
+    },
+    "usb": {
+      "optional": true
+    }
+  }
+}

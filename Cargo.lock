@@ -432,6 +432,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "graphtp-wasm"
+version = "0.0.0"
+dependencies = [
+ "graphtp",
+ "graphtp-homa",
+ "homa",
+]
+
+[[package]]
 name = "h2"
 version = "0.4.19"
 dependencies = [

@@ -1,0 +1,38 @@
+# The wasm module of the npm package graphtp: the codec of GraphTP/1, the
+# encoder and the decoder of its zlib profile, the client of graphtp-homa and
+# the client role of homa with its compact form and both forms of AoFrame, as
+# one module for wasm32-unknown-unknown that imports nothing. The crate is
+# never published, since the package carries its module as a build product.
+[package]
+name = "graphtp-wasm"
+version = "0.0.0"
+description = "The wasm module of the npm package graphtp: the GraphTP/1 codec, its zlib profile and the Homa client role, with no import."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+# The owner's three crates and nothing else, so the module takes 0 outside
+# crates. The client role of graphtp-homa and of homa, with the features
+# docs/graphtp-fetch.md section 2.2 names.
+[dependencies]
+graphtp = { path = "../graphtp" }
+graphtp-homa = { path = "../graphtp-homa", default-features = false, features = ["client"] }
+homa = { path = "../homa", default-features = false, features = ["client", "alloc", "wire-compact", "stream-delimited", "stream-prefixed"] }
+
+# The lints of the workspace table copied line for line, with unsafe_code at
+# deny in place of forbid, because a wasm export needs the unsafe attribute
+# #[unsafe(no_mangle)] and forbid admits no expectation.
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+disallowed_types = "deny"
+disallowed_methods = "deny"

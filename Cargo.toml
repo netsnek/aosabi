@@ -39,6 +39,7 @@ members = [
     "crates/graphql-over-http",
     "crates/graphtp",
     "crates/graphtp-homa",
+    "crates/graphtp-wasm",
     "crates/homa",
     "plugins/aosabi-auth-contract",
 ]
