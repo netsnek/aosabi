@@ -1,0 +1,37 @@
+# It binds the principal of a request through the identity plugin and gates
+# a call on it. It names no crate outside the workspace and sits behind no
+# feature of the facade, because every service imports the auth root
+# without an install and the linker keeps none of it when a service calls
+# none of it.
+[package]
+name = "aosabi-auth"
+version = "0.0.0"
+description = "The auth root of Aosabi: the identity plugin, get_principal, authorize, require_role and the mapping of a forbidden error."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The truth of the feature of a ForbiddenError a host made, the feature
+# host-errors of aosabi-auth-contract, which the map of the identity plugin
+# reads. Only the module of aosabi-js turns it on, so a build of the Rust
+# option keeps its bytes.
+host-errors = ["aosabi-auth-contract/host-errors"]
+
+[dependencies]
+# The principal, its checks, the identity provider seam and ForbiddenError.
+aosabi-auth-contract = { path = "../aosabi-auth-contract" }
+# The plugin contract, the context of a request, getContext and the value a
+# resolver throws, all of which sit behind the feature runtime.
+aosabi-core = { path = "../../crates/aosabi-core", features = ["runtime"] }
+# The done hook of an execution the forbidden mapping runs in.
+aosabi-hooks = { path = "../../crates/aosabi-hooks" }
+# The GraphQLError the forbidden mapping builds.
+aosabi-lang = { path = "../../crates/aosabi-lang" }
+# The insertion ordered object of the extensions of a mapped error.
+aosabi-json = { path = "../../crates/aosabi-json" }

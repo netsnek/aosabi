@@ -13,6 +13,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-auth"
+version = "0.0.0"
+dependencies = [
+ "aosabi-auth-contract",
+ "aosabi-core",
+ "aosabi-hooks",
+ "aosabi-json",
+ "aosabi-lang",
+]
+
+[[package]]
 name = "aosabi-auth-contract"
 version = "0.0.0"
 dependencies = [

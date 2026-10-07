@@ -41,6 +41,7 @@ members = [
     "crates/graphtp-homa",
     "crates/graphtp-wasm",
     "crates/homa",
+    "plugins/aosabi-auth",
     "plugins/aosabi-auth-contract",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the
