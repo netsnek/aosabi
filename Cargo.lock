@@ -31,6 +31,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-auth-zitadel"
+version = "0.0.0"
+dependencies = [
+ "aosabi-auth",
+ "aosabi-auth-contract",
+ "aosabi-core",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-lang",
+ "ring",
+ "rustls-pki-types",
+]
+
+[[package]]
 name = "aosabi-build"
 version = "0.0.0"
 dependencies = [

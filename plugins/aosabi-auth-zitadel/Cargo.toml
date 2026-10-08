@@ -1,0 +1,69 @@
+# Every request it sends goes through the network capability of aosabi-core,
+# so it names no client by name, and the facade names it behind its feature
+# auth-zitadel, which turns fetch on.
+[package]
+name = "aosabi-auth-zitadel"
+version = "0.0.0"
+description = "The Zitadel integration of Aosabi: zitadelLogin, zitadelAuth and the OIDC client subset the two reach."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The plugin contract, the context of a request, getContext, the value a
+# route or a provider throws, and the network and randomness capabilities
+# every request and every verifier is made with, all of which sit behind the
+# feature runtime.
+aosabi-core = { path = "../../crates/aosabi-core", features = ["runtime"] }
+# The request Context, its query and cookie helpers, the redirect of a route
+# and the Fetch types of an outbound call, the web layer of aosabi-http. No
+# feature of the platform or of the coding is needed here.
+aosabi-http = { path = "../../crates/aosabi-http", default-features = false, features = ["web"] }
+# The insertion ordered object of a claim set, a discovery document and a
+# user info answer, and the one writer and reader of their JSON.
+aosabi-json = { path = "../../crates/aosabi-json" }
+# The principal the provider answers and the identity provider seam it
+# implements.
+aosabi-auth-contract = { path = "../aosabi-auth-contract" }
+# The identity seam over the request context, which the provider half plugs
+# into.
+aosabi-auth = { path = "../aosabi-auth" }
+# The string operations of the language layer, to_string_lossy, the one
+# reader of a string as text, with U+FFFD for each lone surrogate where the
+# reference meets the text of the string. Every twin links the crate, so the
+# edge brings no package into the root lock or into the locks of
+# tests/fixtures/rs/c6, zitadel-auth-app and zitadel-login-app.
+aosabi-lang = { path = "../../crates/aosabi-lang" }
+
+[features]
+# The signer of the client assertion, the digest of the PKCE challenge and the
+# reader of a key file, by the backend the build names and never by the target
+# alone. The cards of pure Rust take the default ring, which signs and digests
+# over ring on a target of cfg(unix), so a build for wasm32 links neither
+# crate and the signer answers the thrown TypeError of rule 9 of section LOGIN
+# there. The module core.wasm and the native library of the TypeScript option
+# take host-crypto with no default, so they link no ring and no
+# rustls-pki-types and take the three from the functions of their host, the
+# node:crypto and node:fs of Bun and the node:crypto of Cloudflare. Where both
+# are on, the host wins.
+default = ["ring"]
+ring = ["dep:ring", "dep:rustls-pki-types"]
+host-crypto = []
+
+# Both sit under cfg(unix), so the feature ring of a build for wasm32 names
+# neither.
+[target.'cfg(unix)'.dependencies]
+# RsaKeyPair for RSASSA-PKCS1-v1_5 with SHA-256, and SHA-256 itself. The
+# module rsa sits behind alloc, and std adds the Error impls of KeyRejected
+# and Unspecified and a hidden helper of the tests of ring, none of which the
+# crate uses, so the crate names alloc alone.
+ring = { version = "0.17.14", default-features = false, features = ["alloc"], optional = true }
+# The PEM reader of the PKCS#1 and PKCS#8 private keys of a Zitadel key file,
+# from_pem_slice, which sits behind alloc, while std adds the file and the
+# reader forms the crate does not call.
+rustls-pki-types = { version = "1.15.1", default-features = false, features = ["alloc"], optional = true }
