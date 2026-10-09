@@ -165,6 +165,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-federation"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-execute",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-lang",
+ "aosabi-type",
+]
+
+[[package]]
 name = "aosabi-fetch"
 version = "0.0.0"
 dependencies = [

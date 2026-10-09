@@ -1,0 +1,53 @@
+# Federation of layer 4, createGateway and the port of the two graphql-tools
+# layers it delegates through, the delegation of
+# @graphql-tools/delegate 12.0.9 with the wrapping schema of
+# @graphql-tools/wrap 11.1.9, and the HTTP executor of
+# @graphql-tools/executor-http 3.1.0. It names crates of the workspace alone.
+# It builds for every card that names the facade feature federation, the worker
+# card on wasm32-unknown-unknown among them, because a delegation leaves
+# through the network capability of the core and never through a socket of its
+# own.
+[package]
+name = "aosabi-federation"
+version = "0.0.0"
+description = "Federation of Aosabi: createGateway and the port of the delegation of @graphql-tools/delegate 12.0.9, @graphql-tools/wrap 11.1.9 and @graphql-tools/executor-http 3.1.0 below it."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The context, the thrown value, the resolve info and the delegated value
+# contract of a pulled registry, which a delegation reads and hands back. The
+# feature std stays the card's, which the facade names.
+aosabi-core = { path = "../../crates/aosabi-core", default-features = false, features = ["runtime"] }
+# The executor, its promise model and its value, which the outer delegation
+# runs locally over the wrapping schema.
+aosabi-execute = { path = "../../crates/aosabi-execute" }
+# The schema, the walk with type information and the wrapping schema of a
+# remote.
+aosabi-type = { path = "../../crates/aosabi-type" }
+# The document nodes, the printer, the editing walk and the stripping of
+# ignored characters, which every outbound document passes through.
+aosabi-lang = { path = "../../crates/aosabi-lang" }
+# The JSON value model and the one writer of an outbound body.
+aosabi-json = { path = "../../crates/aosabi-json" }
+# The Fetch types of an outbound request and of its answer, the web layer of
+# aosabi-http, with no feature of the platform or of the coding, which the
+# card names through the facade.
+aosabi-http = { path = "../../crates/aosabi-http", default-features = false, features = ["web"] }
+
+[features]
+# The headers function of the host, which the builds of the TypeScript option
+# take: aosabi-js hands a federation of the app a function of the host with the
+# identity the wrapper gives it, which keys the slot of the cache of remote
+# schemas as the address of a function of the configuration keys it, so a
+# function of the app reaches the executor with no function pointer between. A
+# build of the Rust option takes it not, so no call of the host and no identity
+# reach its code, and the key of a slot of its cache holds the headers function
+# of the configuration alone, as before. It adds no crate.
+host-headers = []
