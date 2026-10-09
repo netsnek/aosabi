@@ -1,0 +1,33 @@
+# It sends an event through the network capability of aosabi-core and names no
+# crate outside the workspace.
+[package]
+name = "aosabi-sentry"
+version = "0.0.0"
+description = "The Sentry plugin of Aosabi, useSentry: the plugin and its options, the @hono/sentry middleware, a minimal Sentry client and the envelope transport over the network capability."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The plugin contract, the context of a request, the value a resolver throws,
+# and the network and randomness capabilities an event is sent and named with,
+# all of which sit behind the feature runtime, and the watcher of the console
+# the console integration of init reads its lines with.
+aosabi-core = { path = "../../crates/aosabi-core", features = ["runtime", "console-watch"] }
+# The request Context the middleware reads its error from and the Fetch types
+# of an envelope, the web layer of aosabi-http. No feature of the platform or
+# of the coding is needed here.
+aosabi-http = { path = "../../crates/aosabi-http", default-features = false, features = ["web"] }
+# The done hook of an execution and the check of an original GraphQL error.
+aosabi-hooks = { path = "../../crates/aosabi-hooks" }
+# The document of an execution, its printer and the GraphQLError a capture
+# reads.
+aosabi-lang = { path = "../../crates/aosabi-lang" }
+# The insertion ordered object of the tags, the extras and the contexts, and
+# the one writer of the JSON of an event.
+aosabi-json = { path = "../../crates/aosabi-json" }

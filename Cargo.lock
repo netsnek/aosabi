@@ -252,6 +252,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-sentry"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-hooks",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-lang",
+]
+
+[[package]]
 name = "aosabi-serve"
 version = "0.0.0"
 dependencies = [

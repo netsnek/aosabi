@@ -44,6 +44,7 @@ members = [
     "plugins/aosabi-auth",
     "plugins/aosabi-auth-contract",
     "plugins/aosabi-auth-zitadel",
+    "plugins/aosabi-sentry",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the
 # members and the workspace lints. A path dependency inside the workspace
