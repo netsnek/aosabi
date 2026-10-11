@@ -1,0 +1,22 @@
+# The viewer plugin of layer 4. It holds the first plugin slot and the route
+# /viewer with a page of Aosabi's own until aoviewer serves the route
+# (docs/decisions/ADR-0009-aoviewer-owns-viewer.md).
+[package]
+name = "aosabi-viewer"
+version = "0.0.0"
+description = "The viewer plugin in the first plugin slot, answering /viewer with a placeholder page outside the byte contract."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The plugin contract the plugin implements.
+aosabi-core = { path = "../../crates/aosabi-core" }
+# The context and the answer of the route, the web layer of aosabi-http. No
+# feature of the platform or of the coding is needed here.
+aosabi-http = { path = "../../crates/aosabi-http", default-features = false, features = ["web"] }

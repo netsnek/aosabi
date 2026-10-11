@@ -316,6 +316,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-viewer"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-http",
+]
+
+[[package]]
 name = "bitflags"
 version = "2.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

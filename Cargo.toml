@@ -47,6 +47,7 @@ members = [
     "plugins/aosabi-federation",
     "plugins/aosabi-landing",
     "plugins/aosabi-sentry",
+    "plugins/aosabi-viewer",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the
 # members and the workspace lints. A path dependency inside the workspace
