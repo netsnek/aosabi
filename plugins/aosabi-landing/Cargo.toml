@@ -1,0 +1,21 @@
+# The landing page plugin of layer 4. It carries the landing template
+# src/landing.html.tmpl and the constant of the version the page names.
+[package]
+name = "aosabi-landing"
+version = "0.0.0"
+description = "The unhandled route plugin of Aosabi, which answers the landing page."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The plugin contract the plugin implements.
+aosabi-core = { path = "../../crates/aosabi-core" }
+# The context and the answer of the route. No feature of the adapter or of the
+# coding is needed here.
+aosabi-http = { path = "../../crates/aosabi-http", default-features = false, features = ["web"] }

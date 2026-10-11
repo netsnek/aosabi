@@ -238,6 +238,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-landing"
+version = "0.0.0"
+dependencies = [
+ "aosabi-core",
+ "aosabi-http",
+]
+
+[[package]]
 name = "aosabi-lang"
 version = "0.0.0"
 dependencies = [

@@ -45,6 +45,7 @@ members = [
     "plugins/aosabi-auth-contract",
     "plugins/aosabi-auth-zitadel",
     "plugins/aosabi-federation",
+    "plugins/aosabi-landing",
     "plugins/aosabi-sentry",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the
