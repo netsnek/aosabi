@@ -1,0 +1,176 @@
+# The facade, layer 5. Documentation/architecture.md section 3 names it the one
+# crate a service depends on. It holds no code of its own but the function serve
+# and the macro build_output.
+#
+# Its defaults are the translation alone, the web layer of aosabi-http and the
+# Yoga layer with the executor, which every card links, and the engine that
+# serves sockets is a feature the package of a card names.
+#
+#   server, server-legacy, docker
+#                    aosabi = { <aosabi>, features = ["serve", "unix-socket", "deflate", "linux"] }
+#                    with "tls" when [carriers.network] names a certificate and
+#                    "h2c" when it switches h2c on
+#   player           aosabi = { <aosabi>, features = ["serve", "unix-socket", "deflate", "linux"] }
+#   worker           aosabi = { <aosabi>, features = ["platform-coding"] }
+#
+# The Linux pillar ships two cards, server linked with packed relocations for a
+# loader of glibc 2.36 or newer and server-legacy linked without them, the two
+# otherwise the same build, so both name the same features. A shipped card of
+# the three pillars holds at most 1 MiB with its application and without a
+# development tool, the framework aiming at 512 KiB, and the Linux web server
+# with TLS, HTTP/2 and OIDC at most 3 MiB, under the size profile. The plan and
+# the amendment reach this branch with the merge of main.
+[package]
+name = "aosabi"
+version = "0.0.0"
+description = "Aosabi in Rust: the facade crate a service depends on."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The translation alone, which every card links.
+default = []
+# The feature keeps the macros and create_decorator at their paths,
+# aosabi::serve beside serve_app, Lazy and the module remote, the contract of
+# the registries of aosabi pull, and the names of the engine in the module json,
+# and reaches the rest through the module mirror, aosabi::mirror::App among
+# them.
+mirror = ["aosabi-macros/mirror"]
+# The engine that serves sockets, whose aosabi-serve names aosabi-http with
+# node-server, and the file server serve_static over the file system provider
+# FsContent of aosabi-serve, which the facade exports with ServeStaticOptions on
+# a cfg(unix) target alone.
+serve = ["dep:aosabi-serve"]
+# HTTP(Unix Socket), whose driver the boot runs under AOSABI_UNIX_SOCKET=1.
+unix-socket = ["serve", "dep:aosabi-carrier-unix"]
+# The Fetch types as the Node adapter of @hono/node-server fills them, which
+# serve brings.
+node-server = ["aosabi-http/node-server"]
+# The coding of compress() over the zlib wrapper of aosabi-http, the content
+# coding deflate.
+deflate = ["aosabi-http/web-deflate"]
+# The function compress() hands its coding to the host, the worker card. Under deflate
+# beside it, deflate wins.
+platform-coding = ["aosabi-http/platform-coding"]
+# The epoll reactor and the peer check of a Unix socket through rustix.
+linux = ["serve", "aosabi-serve/linux"]
+# Hyper's HTTP/2 server over the fork of h2.
+http2 = ["serve", "aosabi-serve/http2"]
+# HTTP/2 by prior knowledge on a plain listener.
+h2c = ["http2", "aosabi-serve/h2c"]
+# TLS through rustls with ring, whose listener always offers h2 and http/1.1.
+tls = ["http2", "aosabi-serve/tls"]
+# The carriers Serial Line, USB and Bluetooth with their drivers of Linux user
+# space, which a Linux card names beside serve and whose driver the boot runs
+# under AOSABI_SERIAL, AOSABI_USB_FFS or AOSABI_USB_ACM, and AOSABI_BLUETOOTH.
+# Each is off by default, is a dependency of a Linux target alone and enables
+# its crate with its feature linux, USB with both of its functions, bulk and
+# serial, and Bluetooth with the GATT data path its crate turns on by default.
+serial = ["dep:aosabi-carrier-serial", "aosabi-carrier-serial/linux"]
+usb = ["dep:aosabi-carrier-usb", "aosabi-carrier-usb/linux", "aosabi-carrier-usb/bulk", "aosabi-carrier-usb/serial"]
+bluetooth = ["dep:aosabi-carrier-bluetooth", "aosabi-carrier-bluetooth/linux"]
+# GraphTP(Homa) on Network over raw IP 146 on the crate's engine, beside the
+# HTTP(TCP) of the same service, whose driver the boot runs under
+# AOSABI_HOMA_NETWORK with AOSABI_HOMA_PROTECTION. It is off by default, is a
+# dependency of a Linux target alone and enables the crate with its feature
+# homa-ip, and stage H5 adds the kernel path to it.
+homa-network = ["dep:aosabi-carrier-network", "aosabi-carrier-network/homa-ip"]
+# The carrier LoRa, which a card crate of the device card track that names LoRa
+# turns on for its bare metal image, and which leaves the driver of the SX1262
+# to the card crate's own dependency with its feature sx1262. It is off by
+# default and reaches no host build, so no card but a LoRa card links it.
+lora = ["dep:aosabi-carrier-lora"]
+# The outbound HTTP call of a service, aosabi::fetch and FetchError, and on a
+# native target the client of aosabi-fetch, which serve hands the boot as the
+# driver of the network capability. It names no feature of a card, and
+# aosabi-fetch stands under cfg(unix), so a Worker build that names it links
+# no client, and its call answers NoNetwork until the glue of its card hands
+# the host's fetch over.
+fetch = ["dep:aosabi-fetch"]
+# The Sentry plugin, aosabi::use_sentry and aosabi::sentry. Off by
+# default, since a service that reports to no Sentry should link none of it. It
+# names no feature of a card, so the check that the worker build links no engine
+# holds with it. It turns fetch on, so a DSN sends an envelope wherever the card
+# serves on a native target, as useSentry with a DSN sends one.
+sentry = ["dep:aosabi-sentry", "fetch"]
+# The Zitadel integration, aosabi::auth::zitadel, the subpath
+# ./auth/zitadel of the package aosabi: zitadel_login with its browser
+# routes and zitadel_auth, the provider that reads the session cookie those
+# routes set. Off by default, since a service that logs in through no issuer
+# should link none of it. It turns fetch on, since every request to the issuer
+# goes through the network capability, which the client of aosabi-fetch drives
+# on a native target and the glue of the Worker card drives there.
+auth-zitadel = ["fetch", "dep:aosabi-auth-zitadel"]
+# Federation, createGateway, which a
+# service names to delegate a field to another service. It is off by default and
+# turns on no feature of a card, so a service that names no remote compiles none
+# of it. It turns fetch on, the client a delegation leaves through on a native
+# target, and since aosabi-fetch stands under cfg(unix), the check that the
+# worker build links no engine holds with it.
+federation = ["dep:aosabi-federation", "fetch"]
+
+[dependencies]
+# The descriptor types the generated code names through `::aosabi::descriptor`,
+# the glue it names through `::aosabi::__private::glue`, the app, its
+# plugin and config contracts, the context, the logger and the service.
+aosabi-core = { path = "../aosabi-core" }
+# The JSON value types a resolver builds, and the macro json.
+aosabi-json = { path = "../aosabi-json" }
+# The derive, the attributes and the macros of the authoring surface.
+aosabi-macros = { path = "../aosabi-macros" }
+# The web layer, the Fetch types an app answers with, the cookie helpers and
+# cors, and the features of the platform and of the coding a card names. No
+# feature of either is named here, so a Worker build that names
+# platform-coding alone links neither the semantics of the Node adapter nor
+# the encoder.
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["web"] }
+# The principal, its checks and the identity provider seam, which the facade
+# re-exports under auth::contract, and ForbiddenError, which it re-exports
+# under db and auth.
+aosabi-auth-contract = { path = "../../plugins/aosabi-auth-contract" }
+# The auth root, get_principal, authorize, require_role and the
+# identity plugin, under auth and auth::plugin. It sits behind no feature,
+# since every service imports the auth root without an install and the
+# linker keeps none of it when a service calls none of it.
+aosabi-auth = { path = "../../plugins/aosabi-auth" }
+# The result of an execution a done hook of on_execute_done reads and
+# replaces, which the facade names at its root.
+aosabi-hooks = { path = "../aosabi-hooks" }
+# The Sentry plugin, behind the feature sentry.
+aosabi-sentry = { path = "../../plugins/aosabi-sentry", optional = true }
+# The Zitadel integration, behind the feature auth-zitadel. It builds on
+# every target, and on one that is not cfg(unix) without its signer.
+aosabi-auth-zitadel = { path = "../../plugins/aosabi-auth-zitadel", optional = true }
+# The two plugins every boot adds, the viewer in the first slot and the
+# landing page of the unhandled route.
+aosabi-landing = { path = "../../plugins/aosabi-landing" }
+aosabi-viewer = { path = "../../plugins/aosabi-viewer" }
+# Federation behind the feature federation, on every target, the worker card
+# on wasm32 among them, since a delegation leaves through the network
+# capability and never through a socket of its own.
+aosabi-federation = { path = "../../plugins/aosabi-federation", optional = true }
+
+# The engine and the outbound client, named under cfg(unix), so a build for
+# wasm32 leaves them out whatever feature names them.
+[target.'cfg(unix)'.dependencies]
+aosabi-serve = { path = "../aosabi-serve", optional = true }
+aosabi-carrier-unix = { path = "../aosabi-carrier-unix", optional = true }
+aosabi-fetch = { path = "../aosabi-fetch", optional = true }
+
+# The device carriers of a Linux card, whose drivers build on Linux alone.
+[target.'cfg(target_os = "linux")'.dependencies]
+aosabi-carrier-serial = { path = "../aosabi-carrier-serial", optional = true }
+aosabi-carrier-usb = { path = "../aosabi-carrier-usb", optional = true }
+aosabi-carrier-bluetooth = { path = "../aosabi-carrier-bluetooth", optional = true }
+aosabi-carrier-network = { path = "../aosabi-carrier-network", optional = true }
+
+# Every LoRa card builds bare metal, so the carrier is a dependency of the
+# targets without an operating system alone.
+[target.'cfg(target_os = "none")'.dependencies]
+aosabi-carrier-lora = { path = "../aosabi-carrier-lora", optional = true }

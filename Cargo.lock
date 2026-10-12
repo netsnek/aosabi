@@ -13,6 +13,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi"
+version = "0.0.0"
+dependencies = [
+ "aosabi-auth",
+ "aosabi-auth-contract",
+ "aosabi-auth-zitadel",
+ "aosabi-carrier-bluetooth",
+ "aosabi-carrier-lora",
+ "aosabi-carrier-network",
+ "aosabi-carrier-serial",
+ "aosabi-carrier-unix",
+ "aosabi-carrier-usb",
+ "aosabi-core",
+ "aosabi-federation",
+ "aosabi-fetch",
+ "aosabi-hooks",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-landing",
+ "aosabi-macros",
+ "aosabi-sentry",
+ "aosabi-serve",
+ "aosabi-viewer",
+]
+
+[[package]]
 name = "aosabi-auth"
 version = "0.0.0"
 dependencies = [
