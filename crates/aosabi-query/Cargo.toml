@@ -1,0 +1,27 @@
+# The client the reference emits. It ports query/build and the client step of the
+# builder, which write the TypeScript client of a service, runs on the build host, and
+# uses the standard library.
+[package]
+name = "aosabi-query"
+version = "0.0.0"
+description = "The TypeScript client of a service: the schema descriptor, the root type and the files types.ts, index.ts and index.js."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The compact writer the descriptor goes into index.ts with, as
+# JSON.stringify writes it, and the insertion ordered map it is kept in.
+aosabi-json = { path = "../aosabi-json" }
+# The parse options of the schema build.
+aosabi-lang = { path = "../aosabi-lang" }
+# The schema and its type map, which the descriptor and the root type walk in
+# the order graphql-js gives.
+aosabi-type = { path = "../aosabi-type" }
+# `build_schema` with the SDL rules, which is `buildSchema` of the reference.
+aosabi-validate = { path = "../aosabi-validate" }

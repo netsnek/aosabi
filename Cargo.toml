@@ -33,6 +33,7 @@ members = [
     "crates/aosabi-kernel",
     "crates/aosabi-lang",
     "crates/aosabi-macros",
+    "crates/aosabi-query",
     "crates/aosabi-scalars",
     "crates/aosabi-serve",
     "crates/aosabi-type",

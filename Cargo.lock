@@ -309,6 +309,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-query"
+version = "0.0.0"
+dependencies = [
+ "aosabi-json",
+ "aosabi-lang",
+ "aosabi-type",
+ "aosabi-validate",
+]
+
+[[package]]
 name = "aosabi-scalars"
 version = "0.0.0"
 dependencies = [
