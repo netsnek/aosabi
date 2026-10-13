@@ -1,0 +1,25 @@
+{
+  "name": "aosabi-linux-x64-musl",
+  "version": "0.0.0",
+  "description": "The native library of the Aosabi engine for the npm package aosabi on Linux x86_64 with musl, built from the crate aosabi-js for x86_64-unknown-linux-musl and loaded by aosabi/bun over bun:ffi",
+  "private": true,
+  "license": "MIT",
+  "author": "Florian Kleber <kleber@snek.at>",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "musl"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./libaosabi.so": "./libaosabi.so"
+  },
+  "files": [
+    "libaosabi.so",
+    "LICENSE"
+  ]
+}

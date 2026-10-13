@@ -1,0 +1,165 @@
+# The wrapper of the folder aosabi-ts drives it, and the engine reaches the
+# values of an app through the one import block of src/abi.rs. The same code
+# builds the native library of the engine for Bun on Linux under the feature
+# native below, the section The native engine for Bun on Linux of the same plan.
+# It is the module of the npm package aosabi, as graphtp-wasm is the module of
+# the npm package graphtp, and no feature of a device card. The crate is never
+# published, since the package carries its module and the platform packages of
+# aosabi-ts-native carry its libraries as build products.
+[package]
+name = "aosabi-js"
+version = "0.0.0"
+description = "The module core.wasm of the npm package aosabi and its native library for Bun on Linux: the engine with every default layer behind the host boundary of the TypeScript option."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+# The lints of the workspace table copied line for line, with unsafe_code at
+# deny in place of forbid, the precedent of graphtp-wasm: a wasm export needs
+# the unsafe attribute #[unsafe(no_mangle)] and a wasm import an unsafe extern
+# block, and forbid admits no expectation. Each export line of src/abi.rs
+# carries its own #[expect(unsafe_code)], the one import block carries one,
+# every module but the crate root and src/abi.rs forbids unsafe_code at its top,
+# and no unsafe block exists. The native library takes the same export lines
+# and, in place of the import block, the table of typed function pointers of
+# src/native.rs, which forbids unsafe_code. The crate root holds no code but the
+# declarations of its modules, and a forbid there would bind src/abi.rs as well.
+# So missing_docs and the two deny lists of clippy.toml bind the crate as they
+# bind every crate of the workspace.
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+disallowed_types = "deny"
+disallowed_methods = "deny"
+
+# The crates the core probe tests/budget/ts1-core of the gate names: the facade
+# with platform-coding, with its router, cookies, yoga with GraphiQL, envelop,
+# auth and the landing page, the core with lang, type, validate, execute, json,
+# scalars, cache and pub sub, and the Sentry plugin, named here and not through
+# the feature sentry of the facade, which names the outbound client of the Unix
+# cards beside it. Each is a path package of the workspace, so the crate adds no
+# outside crate. They are dependencies of wasm32 here and of the feature native
+# on any other target, so a build of the workspace for the host, which takes no
+# feature native, compiles none of them for this crate and unifies no feature of
+# theirs into the builds of the other members. The executor comes with its
+# feature host-queue, the queue of an agent that the wrapper owns in the
+# faithful job mode, which turns on its feature host-reads as well, the provided
+# methods read and select of ObjectLike that src/value.rs implements for an
+# object of the host. The request parsers of graphql-over-http, which the core
+# names with its default features already, read the names of the variables the
+# client of a request sent, which give the value of a variable its prototype on
+# the host. The language crate, which the executor names already, gives the
+# original error, the path and the locations of a GraphQLError of the host, the
+# path and the locations the model holds no form for through the feature
+# host-errors of the executor. The core comes with its feature host-fields, the
+# fields of a logger call of the host whose line and whose JSON line differ, and
+# its feature canary-types, the type resolvers of a build of the canary that
+# the glue hands handler(), which src/boot.rs reads. The auth root, which the
+# facade names already, gives the map of the identity plugin, the hook onExecute
+# of useIdentity of the package, which the engine runs over the errors of a
+# result, with its feature host-errors, the truth of the feature of a
+# ForbiddenError the host tested on its own value. The crate of Envelop, which
+# the core names already, gives the types of the hooks of an execution that
+# src/plugin.rs makes of the hooks of a plugin of the app, with its feature
+# host-hooks, the throw of a done hook of the app, which rejects the execution.
+# The executor and the port of Yoga, which the core names already, come with
+# their feature host-results, the members of a result a done hook of the app
+# sets in the order of its object, and the port of Yoga with its feature
+# host-env, the variables of the process the host hands in at the boot, which
+# the interval of the ping of a stream reads NODE_ENV of, since the module reads
+# no environment of its own, and its feature host-body, the files of a multipart
+# body that stand at their parts of the one copy of the body the module reads,
+# or in bytes of their own for a part in base64. The port of hono, which runs
+# the GraphQL handler and the routes of the plugins of the engine alone while
+# the routes, the middleware and the cookies of an app run in the real hono of
+# the host, comes with its feature host-platform, the body of a response as the
+# getter of the platform of the host answers it and the body of a request the
+# host holds until the first read of it.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+aosabi = { path = "../aosabi", features = ["platform-coding"] }
+aosabi-auth = { path = "../../plugins/aosabi-auth", features = ["host-errors"] }
+aosabi-auth-zitadel = { path = "../../plugins/aosabi-auth-zitadel", default-features = false, features = ["host-crypto"] }
+aosabi-hooks = { path = "../aosabi-hooks", features = ["host-hooks"] }
+aosabi-federation = { path = "../../plugins/aosabi-federation", features = ["host-headers"] }
+aosabi-core = { path = "../aosabi-core", features = ["host-fields", "canary-types", "prebuilt", "base-compress"] }
+aosabi-execute = { path = "../aosabi-execute", features = ["host-queue", "host-errors", "host-results"] }
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["platform-coding", "host-platform"] }
+aosabi-json = { path = "../aosabi-json" }
+aosabi-lang = { path = "../aosabi-lang" }
+aosabi-scalars = { path = "../aosabi-scalars" }
+aosabi-sentry = { path = "../../plugins/aosabi-sentry" }
+graphql-over-http = { path = "../graphql-over-http", features = ["host-results", "host-env", "host-body"] }
+
+# The same crates with the same features for the native library, which the
+# feature native takes, line for line those of wasm32 above, so the library
+# links the engine core.wasm links and nothing more.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+aosabi = { path = "../aosabi", features = ["platform-coding"], optional = true }
+aosabi-auth = { path = "../../plugins/aosabi-auth", features = ["host-errors"], optional = true }
+aosabi-auth-zitadel = { path = "../../plugins/aosabi-auth-zitadel", default-features = false, features = ["host-crypto"], optional = true }
+aosabi-hooks = { path = "../aosabi-hooks", features = ["host-hooks"], optional = true }
+aosabi-federation = { path = "../../plugins/aosabi-federation", features = ["host-headers"], optional = true }
+aosabi-core = { path = "../aosabi-core", features = ["host-fields", "canary-types", "prebuilt", "base-compress"], optional = true }
+aosabi-execute = { path = "../aosabi-execute", features = ["host-queue", "host-errors", "host-results"], optional = true }
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["platform-coding", "host-platform"], optional = true }
+aosabi-json = { path = "../aosabi-json", optional = true }
+aosabi-lang = { path = "../aosabi-lang", optional = true }
+aosabi-scalars = { path = "../aosabi-scalars", optional = true }
+aosabi-sentry = { path = "../../plugins/aosabi-sentry", optional = true }
+graphql-over-http = { path = "../graphql-over-http", features = ["host-results", "host-env", "host-body"], optional = true }
+
+[features]
+# The native library of the engine for Bun on Linux, a cdylib for
+# x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu and their musl twins from
+# the code of core.wasm, which the crate root admits on those four targets
+# alone. It exports the export lines of src/abi.rs and takes the functions of
+# the host as typed function pointers at boot, the table of src/native.rs, in
+# place of the import block. It adds no export line, no import and no crate.
+native = [
+    "dep:aosabi",
+    "dep:aosabi-auth",
+    "dep:aosabi-auth-zitadel",
+    "dep:aosabi-hooks",
+    "dep:aosabi-federation",
+    "dep:aosabi-core",
+    "dep:aosabi-execute",
+    "dep:aosabi-http",
+    "dep:aosabi-json",
+    "dep:aosabi-lang",
+    "dep:aosabi-scalars",
+    "dep:aosabi-sentry",
+    "dep:graphql-over-http",
+]
+# The feature trap makes a test build of the module, which traps on purpose when
+# it reads a string value of the host that is the marker of src/value.rs, so
+# 13_ts1_boundary can judge the second condition of the import block on a real
+# trap, inside the export fetch and inside the export settle. The module of the
+# package never takes it, and it adds no export line, no import and no crate.
+trap = []
+# The feature execute makes a test build of the module whose request of the
+# method POST to the path /.ts1/execute answers the payload aosabi-devtool
+# execute answers for one request of the protocol of tests/sidecar/execute.mjs,
+# the result text of the executor of the engine over the app of the boot below
+# HTTP, so the side ts of 20_execute and of 31_http_errors judges the JavaScript
+# resolvers of a behaviour table and of a fixture on the module. The module of
+# the package never takes it, and it adds no export line, no import and no
+# crate.
+execute = []
+# The feature print makes a test build of the module whose export
+# schema_record also prints the schema a schema record builds and the schema
+# its SDL builds, through the printer of aosabi-type, so 13_ts1_boundary can
+# hold the two to each other and to the SDL of the build for every fixture.
+# The module of the package never takes it, and it adds no export line, no
+# import and no crate.
+print = []

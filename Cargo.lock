@@ -250,6 +250,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-js"
+version = "0.0.0"
+dependencies = [
+ "aosabi",
+ "aosabi-auth",
+ "aosabi-auth-zitadel",
+ "aosabi-core",
+ "aosabi-execute",
+ "aosabi-federation",
+ "aosabi-hooks",
+ "aosabi-http",
+ "aosabi-json",
+ "aosabi-lang",
+ "aosabi-scalars",
+ "aosabi-sentry",
+ "graphql-over-http",
+]
+
+[[package]]
 name = "aosabi-json"
 version = "0.0.0"
 dependencies = [

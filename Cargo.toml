@@ -28,6 +28,7 @@ members = [
     "crates/aosabi-http",
     "crates/aosabi-infer",
     "crates/aosabi-ir",
+    "crates/aosabi-js",
     "crates/aosabi-json",
     "crates/aosabi-kernel",
     "crates/aosabi-lang",

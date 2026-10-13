@@ -1,0 +1,25 @@
+{
+  "name": "aosabi-linux-arm64-gnu",
+  "version": "0.0.0",
+  "description": "The native library of the Aosabi engine for the npm package aosabi on Linux arm64 with glibc, built from the crate aosabi-js for aarch64-unknown-linux-gnu and loaded by aosabi/bun over bun:ffi",
+  "private": true,
+  "license": "MIT",
+  "author": "Florian Kleber <kleber@snek.at>",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./libaosabi.so": "./libaosabi.so"
+  },
+  "files": [
+    "libaosabi.so",
+    "LICENSE"
+  ]
+}
