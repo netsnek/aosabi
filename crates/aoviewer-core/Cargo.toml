@@ -1,0 +1,32 @@
+# The shared core of aoviewer and of the documentation generator. The viewer
+# and the documents call the same function for a route, so one golden tests
+# both. The crate is no_std with alloc and names no dependency, because the
+# wasm module of the viewer and every host tool build the same code.
+[package]
+name = "aoviewer-core"
+version = "0.0.0"
+description = "The shared core of aoviewer and of the documentation generator: the model, the views, the layout, the scene and the writers, with no dependency."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = ["markdown", "typst"]
+# The Markdown writer. The viewer uses it only behind copy as Markdown, so it
+# is the first part that leaves the wasm module when the module misses its size
+# gate.
+markdown = []
+# The Typst writers and the theme file. The viewer never asks for them.
+typst = []
+
+[dependencies]
+# None. The JSON reader and writer, the CommonMark subset and SHA-256 are
+# written in the project.
