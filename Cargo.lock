@@ -152,6 +152,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-cli"
+version = "0.0.0"
+dependencies = [
+ "aosabi-build",
+ "aosabi-ir",
+ "aosabi-json",
+ "aosabi-lang",
+ "aosabi-query",
+ "aosabi-type",
+ "aosabi-validate",
+]
+
+[[package]]
 name = "aosabi-codegen"
 version = "0.0.0"
 dependencies = [

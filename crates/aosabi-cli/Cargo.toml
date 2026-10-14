@@ -1,0 +1,67 @@
+# The command line of Aosabi. Documentation/architecture.md section 3 places
+# this crate in layer 6, the tooling. The package is a library and two
+# programs, cargo-aosabi and aosabi, each a three line wrapper around the
+# library, so the devtool reaches the parsers as it reaches every other crate.
+# It runs on the build host and uses the standard library.
+[package]
+name = "aosabi-cli"
+version = "0.0.0"
+description = "The command line of Aosabi: cargo aosabi build and dev, and aosabi inspect, verify, mcp, pull and new."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+# The two programs are declared below, so cargo infers no third one from
+# src/main.rs under the name of the package.
+autobins = false
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+# The program cargo runs for `cargo aosabi`, with `aosabi` as its first
+# argument. The documentation of both programs is the library's, so rustdoc
+# writes no page for either, and the page of the program aosabi would otherwise
+# take the path of the page of the facade.
+[[bin]]
+name = "cargo-aosabi"
+path = "src/main.rs"
+doc = false
+
+# The same program under the name that inspect, verify, mcp, pull and new are
+# spelled with.
+[[bin]]
+name = "aosabi"
+path = "src/bin/aosabi.rs"
+doc = false
+
+# The crate graph of the plan names aosabi-fetch, aosabi-core for its trait
+# net::Fetch, the web layer of aosabi-http and aosabi-serve beside the crates
+# below. The project has no outbound client crate, so pull and the readiness
+# probe of dev use the http:// only client of src/http.rs, which blocks over
+# std::net::TcpStream and needs no runtime, and the crate names none of the
+# four.
+[dependencies]
+# The inspect runner entry the generated workspace calls, and
+# update_file_if_changed, through which every generated file is written. The
+# feature source brings the source path, the reader of a plain crate and its
+# third type source, which build and inspect run for a crate whose roots no
+# fragment of graphql! holds, with syn on the build host.
+aosabi-build = { path = "../aosabi-build", features = ["source"] }
+# The canonical application model of inspect, the SDL printer and collate.
+aosabi-ir = { path = "../aosabi-ir" }
+# The JSON reader of cargo metadata, of the JSON messages of cargo, of the
+# lines of mcp and of a pulled introspection, and the writer with a gap.
+aosabi-json = { path = "../aosabi-json" }
+# The parse of a pulled schema and of the default values it carries.
+aosabi-lang = { path = "../aosabi-lang" }
+# The introspection query, the client schema of an introspection result and
+# the schema pull walks.
+aosabi-type = { path = "../aosabi-type" }
+# `build_schema` with the SDL rules.
+aosabi-validate = { path = "../aosabi-validate" }
+# The three client files the build writes.
+aosabi-query = { path = "../aosabi-query" }
