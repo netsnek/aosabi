@@ -40,6 +40,7 @@ members = [
     "crates/aosabi-type",
     "crates/aosabi-validate",
     "crates/aoviewer-core",
+    "crates/aoviewer-wasm",
     "crates/graphql-over-graphtp",
     "crates/graphql-over-http",
     "crates/graphtp",

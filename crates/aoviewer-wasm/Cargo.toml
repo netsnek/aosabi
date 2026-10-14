@@ -1,0 +1,27 @@
+# The wasm module of aoviewer. It exports nine functions over the core, with
+# records of one kind byte, a length and a body in its buffers, and imports
+# nothing. The host build is an rlib, so the seam of the notebooks links the
+# same code the module carries.
+[package]
+name = "aoviewer-wasm"
+version = "0.0.0"
+description = "The wasm module of aoviewer: nine exports over aoviewer-core and no import."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+# The workspace table, unchanged. A wasm export needs its symbol name, which is
+# an unsafe attribute in edition 2024, and forbid(unsafe_code) refuses it.
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# The core the nine exports answer through, with its default features, so the
+# module carries the Markdown and the Typst writers and the native against wasm
+# comparison covers every file of a tree.
+aoviewer-core = { path = "../aoviewer-core" }
