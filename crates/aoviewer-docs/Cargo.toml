@@ -1,0 +1,25 @@
+# The documentation generator of Aosabi. It reads a schema, renders the tree of
+# a reference through aoviewer-core and writes or checks it on the host. No
+# served crate depends on it, so no byte of it reaches a served binary.
+[package]
+name = "aoviewer-docs"
+version = "0.0.0"
+description = "The documentation generator of Aosabi: reads a schema and writes or checks the tree of its reference."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The model, the views, the writers and the tree of a reference.
+aoviewer-core = { path = "../aoviewer-core" }
+# The SDL path: an SDL file is parsed by aosabi-lang, built with the SDL rules
+# that aosabi-validate hands to the schema builder of aosabi-type, and read
+# into the model through the introspection accessors of aosabi-type.
+aosabi-lang = { path = "../aosabi-lang" }
+aosabi-type = { path = "../aosabi-type" }
+aosabi-validate = { path = "../aosabi-validate" }

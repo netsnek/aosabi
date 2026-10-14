@@ -396,6 +396,16 @@ name = "aoviewer-core"
 version = "0.0.0"
 
 [[package]]
+name = "aoviewer-docs"
+version = "0.0.0"
+dependencies = [
+ "aosabi-lang",
+ "aosabi-type",
+ "aosabi-validate",
+ "aoviewer-core",
+]
+
+[[package]]
 name = "aoviewer-wasm"
 version = "0.0.0"
 dependencies = [
