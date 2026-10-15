@@ -406,6 +406,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "aoviewer-docs-pdf"
+version = "0.0.0"
+
+[[package]]
 name = "aoviewer-wasm"
 version = "0.0.0"
 dependencies = [

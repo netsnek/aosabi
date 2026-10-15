@@ -1,0 +1,25 @@
+# The PDF of a generated reference, on the host alone and optional. Without the
+# feature pdf the crate names no dependency, answers every request with the
+# line that compiles api.typ by hand, and a build that selects a served package
+# compiles none of it.
+[package]
+name = "aoviewer-docs-pdf"
+version = "0.0.0"
+description = "The PDF of a generated reference, behind the pdf feature and off by default."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# The compilation of api.typ into a PDF. It names nothing yet, so a
+# cfg(feature = "pdf") is a known condition.
+pdf = []
+
+[dependencies]
+# None without the feature pdf.
