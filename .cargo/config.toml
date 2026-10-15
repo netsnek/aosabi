@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+# The cargo configuration of the Aosabi workspace.
+#
+# One alias, so the one tool that writes the committed viewer products runs as
+# cargo xtask viewer-assets from the repository root. The wasm files and
+# assets.lock have that writer and no other. The alias carries --locked,
+# because every build of the harness and of continuous integration passes it.
+
+[alias]
+xtask = "run --locked --package xtask --"

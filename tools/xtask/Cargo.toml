@@ -1,0 +1,25 @@
+# The task runner of the repository, run as cargo xtask through the alias of
+# .cargo/config.toml. Its one sub command, viewer-assets, is the only writer of the
+# committed wasm files and of assets.lock. It is never published and no crate depends
+# on it.
+[package]
+name = "xtask"
+version = "0.0.0"
+description = "The task runner of the repository: cargo xtask viewer-assets writes the committed viewer products and assets.lock."
+publish = false
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# The SHA-256 every entry of assets.lock records, which is the core's, so the lock
+# and the manifest of a tree hash with one function.
+aoviewer-core = { path = "../../crates/aoviewer-core" }
+# The writer of assets.lock, which is JSON with sorted keys, through the only crate
+# that turns a value into JSON bytes.
+aosabi-json = { path = "../../crates/aosabi-json" }
