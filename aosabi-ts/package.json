@@ -1,0 +1,74 @@
+{
+  "name": "aosabi",
+  "version": "0.0.0",
+  "description": "The Aosabi engine for an app written in TypeScript, compatible with Pylon v3 apps, the module core.wasm, the native library of its platform packages on Linux and a wrapper of plain ES modules over the real hono, its peer",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Florian Kleber <kleber@snek.at>",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./pylon": {
+      "types": "./pylon.d.ts",
+      "default": "./lib/pylon.js"
+    },
+    "./auth": {
+      "types": "./auth.d.ts",
+      "default": "./lib/auth.js"
+    },
+    "./auth/plugin": {
+      "types": "./auth-plugin.d.ts",
+      "default": "./lib/auth-plugin.js"
+    },
+    "./auth/contract": {
+      "types": "./auth-contract.d.ts",
+      "default": "./lib/auth-contract.js"
+    },
+    "./auth/zitadel": "./lib/zitadel.js",
+    "./graphql": {
+      "types": "./graphql.d.ts",
+      "default": "./lib/graphql.js"
+    },
+    "./sentry/node": {
+      "types": "./sentry.d.ts",
+      "default": "./lib/sentry.js"
+    },
+    "./worker": {
+      "types": "./worker.d.ts",
+      "default": "./lib/worker.js"
+    },
+    "./bun": "./lib/bun.js",
+    "./unsupported/*": "./lib/unsupported.js"
+  },
+  "types": "./index.d.ts",
+  "files": [
+    "index.d.ts",
+    "pylon.d.ts",
+    "graphql.d.ts",
+    "worker.d.ts",
+    "auth.d.ts",
+    "auth-plugin.d.ts",
+    "auth-contract.d.ts",
+    "sentry.d.ts",
+    "types/",
+    "lib/",
+    "core.wasm",
+    "core.wasm.sha256",
+    "strings.wasm",
+    "strings.wasm.sha256",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "hono": "^4.13.14"
+  },
+  "optionalDependencies": {
+    "aosabi-linux-x64-gnu": "0.0.0",
+    "aosabi-linux-arm64-gnu": "0.0.0",
+    "aosabi-linux-x64-musl": "0.0.0",
+    "aosabi-linux-arm64-musl": "0.0.0"
+  }
+}
