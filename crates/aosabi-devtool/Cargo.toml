@@ -1,0 +1,167 @@
+# The Python seam. Documentation/architecture.md section 4 names it the one
+# crate a notebook calls. It depends on the crates under test alone, whose code
+# writes its bytes, and it parses its command line, reads its lock and hashes in
+# its own code.
+[package]
+name = "aosabi-devtool"
+version = "0.0.0"
+description = "The Python seam. One byte level primitive per sub command, called by the notebooks under tests/notebooks."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The primitive host-queue, which runs the scenarios of the queue of an agent
+# that a host owns on aosabi-execute with its feature host-queue. Only the
+# notebook 13_ts1_boundary builds the seam with it, in a target directory of
+# its own, so the default build and every primitive in it run the agent
+# without that queue, as every card but the module of the npm package aosabi
+# runs it.
+host-queue = ["aosabi-execute/host-queue"]
+
+[dependencies]
+# The crate behind the json primitive, and the only crate that turns a value
+# into JSON bytes. The interface line of every sub command is written by it too,
+# so the seam owns no JSON of its own, and its module case is behind the case
+# primitive.
+aosabi-json = { path = "../aosabi-json" }
+# The three crates behind the language, type and validation primitives. parse
+# and print reach aosabi-lang, build-schema, validate-schema, print-schema and
+# natural-compare reach aosabi-type, and validate reaches aosabi-validate, which
+# also hands the SDL rules to the schema builder of the type layer. The dev
+# feature exec-walk-location keeps the walk of the body from its start, the
+# second judge of the table of line starts, which the operation locate answers
+# with walk true, so the notebooks hold the table to it. The seam ships in no
+# card, so the walk never ships.
+aosabi-lang = { path = "../aosabi-lang", features = ["exec-walk-location"] }
+aosabi-type = { path = "../aosabi-type" }
+aosabi-validate = { path = "../aosabi-validate" }
+# The crate behind the client primitive, the TypeScript client a build
+# emits, its two sources and its bundle.
+aosabi-query = { path = "../aosabi-query" }
+# The two crates behind the schema primitives. print-sdl and collate reach
+# aosabi-ir, which carries the printer, the collation and the JSON shape of the
+# intermediate representation, and infer reaches aosabi-infer, which runs the
+# inference over a descriptor dump and links no application.
+aosabi-infer = { path = "../aosabi-infer" }
+aosabi-ir = { path = "../aosabi-ir" }
+# The text of resolvers.js, which infer --emit resolvers-js answers from the
+# same function a build writes the file with, so the text has one source.
+aosabi-build = { path = "../aosabi-build" }
+# The crates behind the execute primitive. aosabi-execute carries the promise
+# job model and the executor, aosabi-core the resolver wrapping, the bound
+# scalars and the service a service table runs through, and aosabi-scalars the
+# date type a behaviour table makes. The feature homa brings the GraphTP
+# listener, which the operation serve of the graphtp primitive runs as the card
+# test-graphtp over a Unix Socket. The dev feature exec-eager-projection keeps
+# the projection of the reference, a plain object with a copy of each key,
+# beside the view of the selection, the second judge of the view, which the
+# primitive execute answers with --projection object, so the notebooks hold the
+# view to it. The seam ships in no card, so the object never ships.
+aosabi-core = { path = "../aosabi-core", features = ["homa", "exec-eager-projection"] }
+aosabi-execute = { path = "../aosabi-execute" }
+aosabi-scalars = { path = "../aosabi-scalars" }
+aosabi-auth = { path = "../../plugins/aosabi-auth" }
+aosabi-landing = { path = "../../plugins/aosabi-landing" }
+aosabi-viewer = { path = "../../plugins/aosabi-viewer" }
+# The crate behind the zitadel primitive, whose operations answer the principal,
+# the token, the roles and the introspection body of the provider half in
+# process.
+aosabi-auth-zitadel = { path = "../../plugins/aosabi-auth-zitadel" }
+# The crates behind the yoga primitive, which answers the in process capture
+# rows through the Yoga of graphql-over-http over the Fetch types of the web
+# layer of aosabi-http, with the plugin of the instance noData written against
+# the hooks of aosabi-hooks. The capture ran on Node, whose Response of Yoga is
+# the ponyfill that adds the length of a string body, so the web layer takes
+# node-server here, the feature that tells Yoga it answers on Node. The
+# operation substatus of the graphtp primitive hands the processor of a single
+# JSON result of graphql-over-http a result of aosabi-hooks.
+aosabi-hooks = { path = "../aosabi-hooks" }
+graphql-over-http = { path = "../graphql-over-http" }
+# The crate behind the operation cache of the graphtp primitive, whose table and
+# estimate answer what the request cache of a card keeps of a document under its
+# budget, the answer section 8 of 38_card_limits holds against the budget of the
+# card.
+aosabi-cache = { path = "../aosabi-cache" }
+# The crate behind the http primitive, whose --tables prints the tables of Node
+# that the node feature holds, behind the operation http-coding of the graphtp
+# primitive, which reaches the zlib wrapper of HTTP that the deflate feature
+# holds, and the web layer with node-server, which the yoga primitive above
+# names. The feature web-deflate stays off, so compress() of an app the devtool
+# boots codes nothing.
+aosabi-http = { path = "../aosabi-http", default-features = false, features = ["deflate", "node", "node-server"] }
+# The crates behind the viewer primitive. The crate aoviewer-core carries the
+# model, the views, the layout and the writers of aoviewer and of the
+# documentation generator, and aoviewer-docs the loader every input of the seam
+# is read through, so the seam and the command share one reader.
+aoviewer-core = { path = "../aoviewer-core" }
+aoviewer-docs = { path = "../aoviewer-docs" }
+aosabi-federation = { path = "../../plugins/aosabi-federation" }
+# The crate behind the graphtp primitive, the types and the wire codec of
+# GraphTP/1 with its DEFLATE core, which the notebooks reach through this seam
+# alone.
+graphtp = { path = "../graphtp" }
+# The crate behind the homa-packet, homa-frame, homa-sim and homa-unix
+# primitives, with its simulators, which no served build links. The crate is the
+# project's own protocol crate below layer 0 and names nothing of Aosabi.
+homa = { path = "../homa", features = ["sim"] }
+# The fork of hyper behind the http primitive, whose --requests runs every case
+# of the HTTP families through the Node connection of the fork in process, with
+# the features of the served build.
+hyper = { path = "../../third_party/rust/hyper", default-features = false, features = ["std", "http1", "server", "node"] }
+# The carrier of LoRa behind the lora primitive and the radio model of homa-sim,
+# with its feature model, which makes the port of the radio model of homa::sim a
+# radio of the carrier. The devtool builds it without sx1262, the driver of a
+# card.
+aosabi-carrier-lora = { path = "../aosabi-carrier-lora", features = ["model"] }
+
+# The reader of the plain source of a crate behind the source primitive, the
+# feature source of aosabi-build, which brings syn on the build host. The table
+# names it for every target but wasm32, so the build of this binary for
+# wasm32-unknown-unknown that 02_language makes leaves syn out.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+aosabi-build = { path = "../aosabi-build", features = ["source"] }
+
+# The command line behind the pull and dotenv primitives, its registry of a
+# remote and its reader of .env. The plan gives the command line the runtime of
+# aosabi-serve, which builds for a Unix host alone, so the seam names it there
+# alone and still builds for wasm32-unknown-unknown. Its client of http:// alone
+# needs no runtime, and the table keeps the form of the plan for the day the
+# client moves to aosabi-fetch.
+[target.'cfg(unix)'.dependencies]
+aosabi-cli = { path = "../aosabi-cli" }
+
+# The Unix Socket transports of homa, which homa-unix and the socket links of
+# homa-sim run over real sockets. They build on Linux alone, and
+# tests/notebooks/02_language.ipynb builds this binary for
+# wasm32-unknown-unknown as well, so the feature unix joins sim on Linux.
+[target.'cfg(target_os = "linux")'.dependencies]
+homa = { path = "../homa", features = ["sim", "unix"] }
+# The device carriers of stage H3 of the Homa track, Serial Line, USB and
+# Bluetooth, with their drivers of Linux user space, which the carrier primitive
+# runs over the runtime of aosabi-serve, the poll reactor of a build without its
+# feature linux. The drivers build on Linux alone. The feature trace of the
+# Bluetooth carrier keeps the time and the compact header of every packet of its
+# GATT data path, which the operation serve answers where a notebook turns it
+# on. The devtool alone names it, as it alone names the feature sim of homa, so
+# no card keeps a trace.
+aosabi-carrier-bluetooth = { path = "../aosabi-carrier-bluetooth", features = ["linux", "channel", "trace"] }
+aosabi-carrier-serial = { path = "../aosabi-carrier-serial", features = ["linux"] }
+aosabi-carrier-usb = { path = "../aosabi-carrier-usb", features = ["linux", "bulk", "serial"] }
+aosabi-serve = { path = "../aosabi-serve" }
+# The carrier Network of stage H4 with its IP driver over raw IP 146, which the
+# homa-ip primitive serves on the runtime of aosabi-serve and in a loop of its
+# own, beside a client of the crate homa over the same raw socket. The driver
+# builds on Linux alone.
+aosabi-carrier-network = { path = "../aosabi-carrier-network", features = ["homa-ip"] }
+# The outbound client of the Linux cards behind the operation delegate of the
+# federation primitive, whose front reaches the remote stub over the loopback
+# through the network capability on the runtime of aosabi-serve, as a served
+# card reaches its remote. The client builds for cfg(unix), and the runtime it
+# runs on is named here on Linux alone.
+aosabi-fetch = { path = "../aosabi-fetch" }

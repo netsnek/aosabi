@@ -23,6 +23,7 @@ members = [
     "crates/aosabi-cli",
     "crates/aosabi-codegen",
     "crates/aosabi-core",
+    "crates/aosabi-devtool",
     "crates/aosabi-execute",
     "crates/aosabi-fetch",
     "crates/aosabi-hooks",

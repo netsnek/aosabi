@@ -192,6 +192,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-devtool"
+version = "0.0.0"
+dependencies = [
+ "aosabi-auth",
+ "aosabi-auth-zitadel",
+ "aosabi-build",
+ "aosabi-cache",
+ "aosabi-carrier-bluetooth",
+ "aosabi-carrier-lora",
+ "aosabi-carrier-network",
+ "aosabi-carrier-serial",
+ "aosabi-carrier-usb",
+ "aosabi-cli",
+ "aosabi-core",
+ "aosabi-execute",
+ "aosabi-federation",
+ "aosabi-fetch",
+ "aosabi-hooks",
+ "aosabi-http",
+ "aosabi-infer",
+ "aosabi-ir",
+ "aosabi-json",
+ "aosabi-landing",
+ "aosabi-lang",
+ "aosabi-query",
+ "aosabi-scalars",
+ "aosabi-serve",
+ "aosabi-type",
+ "aosabi-validate",
+ "aosabi-viewer",
+ "aoviewer-core",
+ "aoviewer-docs",
+ "graphql-over-http",
+ "graphtp",
+ "homa",
+ "hyper",
+]
+
+[[package]]
 name = "aosabi-execute"
 version = "0.0.0"
 dependencies = [
