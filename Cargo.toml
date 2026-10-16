@@ -22,6 +22,7 @@ members = [
     "crates/aosabi-carrier-usb",
     "crates/aosabi-cli",
     "crates/aosabi-codegen",
+    "crates/aosabi-compat",
     "crates/aosabi-core",
     "crates/aosabi-devtool",
     "crates/aosabi-execute",
