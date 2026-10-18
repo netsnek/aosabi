@@ -1,0 +1,53 @@
+# The module infer.wasm of the npm package aosabi-build, the author mode of the
+# TypeScript option of docs/decisions/ADR-0028-typescript-authoring.md: the
+# schema inference of aosabi-infer, the intermediate representation of
+# aosabi-ir and the writers of aosabi-build, as one cdylib for
+# wasm32-unknown-unknown whose second type source asks the live checker of
+# typescript through one import block. The command aosabi build of the folder
+# aosabi-ts-build drives it on Node at build time. The crate is never published
+# and ships in no build, since the dev package carries its module as a build
+# product and an app ships none of it.
+[package]
+name = "aosabi-infer-wasm"
+version = "0.0.0"
+description = "The module infer.wasm of the npm package aosabi-build: the schema inference of Aosabi over the live TypeScript checker, answered through the host."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+# The lints of the workspace table copied line for line, with unsafe_code at
+# deny in place of forbid, the precedent of aosabi-js and graphtp-wasm: a wasm
+# export needs the unsafe attribute #[unsafe(no_mangle)] and a wasm import an
+# unsafe extern block, and forbid admits no expectation. Each export line of
+# src/abi.rs carries its own #[expect(unsafe_code)], the one import block
+# carries one, every module but the crate root and src/abi.rs forbids
+# unsafe_code at its top, and no unsafe block exists. The crate root holds no
+# code but the declarations of its modules, and a forbid there would bind
+# src/abi.rs as well.
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+disallowed_types = "deny"
+disallowed_methods = "deny"
+
+# The inference with its seam TypeSource, the JSON form of the IR, and the
+# writers of aosabi-build, resolvers.js and the validation of the schema text
+# before a byte is written, each a path package of the workspace, so the crate
+# adds no outside crate of its own. They are dependencies of wasm32 alone, so a
+# build of the workspace for the host compiles none of them for this crate
+# and unifies no feature of theirs into the builds of the other members.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+aosabi-build = { path = "../aosabi-build" }
+aosabi-infer = { path = "../aosabi-infer" }
+aosabi-ir = { path = "../aosabi-ir" }

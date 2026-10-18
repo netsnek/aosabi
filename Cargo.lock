@@ -299,6 +299,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aosabi-infer-wasm"
+version = "0.0.0"
+dependencies = [
+ "aosabi-build",
+ "aosabi-infer",
+ "aosabi-ir",
+]
+
+[[package]]
 name = "aosabi-ir"
 version = "0.0.0"
 dependencies = [

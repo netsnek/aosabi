@@ -1,0 +1,27 @@
+{
+  "name": "aosabi-build",
+  "version": "0.0.0",
+  "description": "The dev package of the TypeScript option of Aosabi, the command aosabi with aosabi migrate and aosabi build, whose module infer.wasm infers the schema over the live checker of typescript 5.9.3, installed beside the package aosabi and never shipped with an app",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Florian Kleber <kleber@snek.at>",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "bin": {
+    "aosabi": "./bin/aosabi.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "migrate-map.json",
+    "infer.wasm",
+    "infer.wasm.sha256",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "typescript": "5.9.3"
+  }
+}

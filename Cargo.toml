@@ -30,6 +30,7 @@ members = [
     "crates/aosabi-hooks",
     "crates/aosabi-http",
     "crates/aosabi-infer",
+    "crates/aosabi-infer-wasm",
     "crates/aosabi-ir",
     "crates/aosabi-js",
     "crates/aosabi-json",

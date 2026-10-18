@@ -1,0 +1,170 @@
+{
+  "description": "The specifier table of aosabi migrate. An entry row maps a specifier with an engine item to its entry of the npm package aosabi by the prefix rule, with two exceptions: @getcronit/pylon to the entry aosabi/pylon, the Pylon layer over the real hono, and graphql-yoga to the root. A rename row gives a name of a specifier the name the package exports it under, a variable row gives a variable of the environment the name the engine reads it under, a stop row names a specifier of Pylon with no entry and the state that keeps it out, and a name row names a name with no engine item inside a specifier that has an entry. The list pulled names the packages Pylon pulls in by default, the dependencies of its package.json, so a specifier of one of them with no row stops as well, but a specifier of a package of the list kept, hono, the peer of the package aosabi, and @hono/node-server, which an app on Node installs itself, while a specifier outside Pylon and those packages, such as node:fs, is kept. The rows follow the export map of Pylon at 2653a81. The row folder names the build folder whose paths in the scripts of package.json the step points at .aosabi, and the list files names the files of an app the step renames.",
+  "pylon": "2653a81",
+  "package": {
+    "from": "@getcronit/pylon",
+    "to": "aosabi"
+  },
+  "script": {
+    "from": "pylon build",
+    "to": "aosabi build"
+  },
+  "folder": {
+    "from": ".pylon",
+    "to": ".aosabi"
+  },
+  "files": [
+    {"from": "pylon.config.ts", "to": "aosabi.config.ts"},
+    {"from": "pylon.config.mts", "to": "aosabi.config.mts"},
+    {"from": "pylon.config.js", "to": "aosabi.config.js"},
+    {"from": "pylon.config.mjs", "to": "aosabi.config.mjs"},
+    {"from": "pylon.d.ts", "to": "aosabi.d.ts"}
+  ],
+  "entries": [
+    {
+      "specifier": "@getcronit/pylon",
+      "entry": "aosabi/pylon",
+      "engine": ["aosabi-core", "graphql-over-http", "aosabi-hooks", "aosabi-http", "aosabi-federation"],
+      "lands": "T5"
+    },
+    {
+      "specifier": "@getcronit/pylon/auth",
+      "entry": "aosabi/auth",
+      "engine": ["aosabi-auth", "aosabi-auth-contract"],
+      "lands": "T5"
+    },
+    {
+      "specifier": "@getcronit/pylon/auth/plugin",
+      "entry": "aosabi/auth/plugin",
+      "engine": ["aosabi-auth"],
+      "lands": "T5"
+    },
+    {
+      "specifier": "@getcronit/pylon/auth/contract",
+      "entry": "aosabi/auth/contract",
+      "engine": ["aosabi-auth-contract"],
+      "lands": "T5"
+    },
+    {
+      "specifier": "@getcronit/pylon/auth/zitadel",
+      "entry": "aosabi/auth/zitadel",
+      "engine": ["aosabi-auth-zitadel"],
+      "lands": "T9"
+    },
+    {
+      "specifier": "graphql-yoga",
+      "entry": "aosabi",
+      "engine": ["aosabi-execute", "graphql-over-http"],
+      "lands": "T6"
+    },
+    {
+      "specifier": "graphql",
+      "entry": "aosabi/graphql",
+      "engine": ["aosabi-lang", "aosabi-type"],
+      "lands": "T5"
+    },
+    {
+      "specifier": "@sentry/node",
+      "entry": "aosabi/sentry/node",
+      "engine": ["aosabi-sentry"],
+      "lands": "T7"
+    }
+  ],
+  "stops": [
+    {"specifier": "@getcronit/pylon/db", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/db/plugin", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/queues", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/pages", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/pages/plugin", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/query", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/ir", "until": "M9", "mark": true},
+    {"specifier": "@getcronit/pylon/queues/plugin", "until": "M9", "mark": false},
+    {"specifier": "@getcronit/pylon/queues/run-worker", "until": "M9", "mark": false},
+    {"specifier": "@getcronit/pylon/pages/dev", "until": "M9", "mark": false},
+    {"specifier": "@getcronit/pylon/pages/index.css", "until": "M9", "mark": false},
+    {
+      "specifier": "@getcronit/pylon/query/build",
+      "until": null,
+      "mark": false,
+      "state": "a tool of the build, which aosabi-query ports on the build host and which no app imports"
+    },
+    {
+      "specifier": "@getcronit/pylon/tsconfig.pylon.json",
+      "until": null,
+      "mark": false,
+      "state": "a configuration of the TypeScript compiler and no module"
+    }
+  ],
+  "names": [],
+  "renames": [
+    {"specifier": "@getcronit/pylon", "name": "Pylon", "to": "App", "lands": "S2 of LEAN1"},
+    {"specifier": "@getcronit/pylon", "name": "PylonConfig", "to": "AppConfig", "lands": "S1 of LEAN1"},
+    {"specifier": "@getcronit/pylon", "name": "PylonConfigFactory", "to": "AppConfigFactory", "lands": "S1 of LEAN1"},
+    {"specifier": "@getcronit/pylon", "name": "PylonOptions", "to": "AppOptions", "lands": "S1 of LEAN1"},
+    {"specifier": "@getcronit/pylon", "name": "PylonRole", "to": "Role", "lands": "S1 of LEAN1"}
+  ],
+  "variables": [
+    {"name": "PYLON_ROLE", "to": "AOSABI_ROLE", "lands": "S1 of LEAN1"},
+    {"name": "PYLON_DEV", "to": "AOSABI_DEV", "lands": "S1 of LEAN1"},
+    {"name": "PYLON_DEBUG", "to": "AOSABI_DEBUG", "lands": "S1 of LEAN1"},
+    {"name": "PYLON_LOG_FORMAT", "to": "AOSABI_LOG_FORMAT", "lands": "S1 of LEAN1"}
+  ],
+  "kept": [
+    {"package": "hono", "why": "the peer of the package aosabi, the real hono under the class App of aosabi/pylon", "lands": "S2 of LEAN1"},
+    {"package": "@hono/node-server", "why": "the Node adapter of hono, which an app on Node installs itself", "lands": "S2 of LEAN1"}
+  ],
+  "pulled": [
+    "@envelop/core",
+    "@graphql-tools/delegate",
+    "@graphql-tools/executor-http",
+    "@graphql-tools/wrap",
+    "@graphql-yoga/plugin-disable-introspection",
+    "@hono/node-server",
+    "@hono/sentry",
+    "@modelcontextprotocol/sdk",
+    "@radix-ui/react-collapsible",
+    "@radix-ui/react-slot",
+    "@sentry/bun",
+    "@sentry/node",
+    "@sentry/react",
+    "@vercel/nft",
+    "@vitejs/plugin-react",
+    "bullmq",
+    "chokidar",
+    "class-variance-authority",
+    "clsx",
+    "commander",
+    "conf",
+    "consola",
+    "dotenv",
+    "esbuild-plugin-tsc",
+    "escape-string-regexp",
+    "graphql",
+    "graphql-scalars",
+    "graphql-yoga",
+    "hono",
+    "ioredis",
+    "kysely",
+    "lightningcss",
+    "lucide-react",
+    "mime",
+    "mitt",
+    "openid-client",
+    "pg",
+    "postcss-load-config",
+    "postcss-value-parser",
+    "posthog-node",
+    "react-router",
+    "rolldown",
+    "rolldown-vite",
+    "sharp",
+    "tailwind-merge",
+    "tailwindcss-animate",
+    "thumbhash",
+    "tiny-glob",
+    "toucan-js",
+    "ts-morph",
+    "tsx",
+    "vite-tsconfig-paths"
+  ]
+}
