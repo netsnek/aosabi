@@ -1,0 +1,340 @@
+# SPDX-License-Identifier: MIT
+# The run matrix of the Aosabi harness. Each entry is one notebook and the
+# parameters papermill injects into its parameters cell, and the runner sweeps
+# the file in order:
+#
+#     python tests/run.py --matrix tests/matrix.yaml
+#
+# An entry carries a notebook, an optional id, an optional per cell timeout and
+# a parameters mapping. The notebook is a repository relative path or a bare
+# notebook name, which the runner resolves under tests/notebooks/. The same
+# notebook appears as many times as the sweep needs it, once per fixture,
+# variant and node environment, and the id names the executed copy under
+# tests/notebooks/out/.
+#
+# The runner runs up to N entries at once with --jobs N, each in a kernel of
+# its own, and entries of one notebook take turns, because they share the
+# notebook's out directory:
+#
+#     python tests/run.py --matrix tests/matrix.yaml --jobs 4
+#
+# An entry marked `exclusive: true` runs alone under --jobs above 1, after the
+# other entries and with no other entry running. Such an entry prints timing,
+# latency or throughput numbers, runs real timers short enough for a loaded
+# machine to trip, boots a guest of tests/guests, or holds a resource another
+# entry touches, and the comment above its key names the reason. Under --jobs 1
+# the key changes nothing.
+#
+# A notebook that binds or connects to a fixed port, always one of 4000 to
+# 5999, declares `port_offset` in its parameters cell, 0 by default, and adds
+# it to each such port. Under --jobs above 1 the runner passes 2000 times the
+# slot of the job, one of the slots of 1 to 12 that the run holds for the whole
+# machine, so no two entries that run together, in one run or in two, bind a
+# common port. No entry sets it here.
+#
+# A parameter belongs here when the run chooses it, such as a fixture, a
+# variant, a port or a goldens directory. A pin belongs in the notebook's own
+# parameters cell, so that the reference commit and the wire versions have one
+# source and a matrix entry cannot contradict them.
+#
+# The full parameter set of docs/harness.md section 8, which every notebook
+# reads from and takes what it needs, looks like this:
+#
+# - notebook: 30_http_tier1.ipynb
+#   id: 30_http_tier1-in-context-app-default
+#   cell_timeout: 900
+#   parameters:
+#     fixture: in-context-app        # the key into tests/fixtures/ts and tests/fixtures/rs
+#     variant: default               # default, graphiql_false, landing_false, both, logger_false
+#     node_env: unset                # unset, development or test
+#     depth: 3                       # the generator depth D
+#     fanout: 6                      # the generator fan out F
+#     max_ops: 5000                  # the per fixture and per configuration budget
+#     seed: 1                        # the generator seed, written into the manifest
+#     update_goldens: false          # regenerate goldens from the TypeScript side
+#     goldens_dir: tests/goldens     # where goldens live
+#     ts_port: 4101                  # explicit, never 0, from the range the family owns
+#     rs_port: 4102                  # explicit, never 0, from the range the family owns
+#     aosabi_root: .                 # the Rust tree under comparison
+#     timeout_s: 60                  # the per case timeout inside the notebook
+
+# The two byte level notebooks of stage H0 of the Homa track judge the compact
+# wire form and AoFrame of the crate homa through aosabi-devtool against the
+# Python references of tests/harness/homa/. Each runs the gates it rests on
+# first, the build of the devtool and the lints of the workspace among them,
+# so each entry carries the cold build timeout. The seed and the corpus counts
+# are the run's choice.
+- notebook: tests/notebooks/03_homa_packets.ipynb
+  id: 03_homa_packets
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    seed: 20260927
+    max_ops: 1000
+    fuzz_ops: 10000
+    timeout_s: 600
+
+- notebook: tests/notebooks/04_aoframe.ipynb
+  id: 04_aoframe
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    seed: 20260927
+    max_ops: 100000
+    frames_ops: 2000
+    timeout_s: 600
+
+# The byte level notebook of stage H1 of the Homa track judges the full wire
+# form of the crate homa through aosabi-devtool homa-packet against
+# tests/harness/homa/full.py, written from homa_wire.h at the pinned HomaModule
+# commit. It runs the gates it rests on first, so it carries the cold build
+# timeout.
+- notebook: tests/notebooks/05_homa_wire_full.ipynb
+  id: 05_homa_wire_full-synthetic
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    seed: 20260927
+    max_ops: 1000
+    fuzz_ops: 10000
+    timeout_s: 600
+
+# The byte level notebook of stage H6 of the Homa track judges the LoRa frame
+# of aosabi-carrier-lora, its seal, its open, its window and its counters,
+# through aosabi-devtool lora against tests/harness/homa/lora.py over
+# chacha.py, held first to the vectors of RFC 8439. It runs the gates it rests
+# on first, the builds of the carrier for the device among them, so it carries
+# the cold build timeout.
+- notebook: tests/notebooks/06_lora_frame.ipynb
+  id: 06_lora_frame
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    seed: 20260928
+    frames_ops: 1000
+    restarts: 100
+    timeout_s: 600
+
+# The engine notebooks of stage H0 of the Homa track run the crate homa over
+# the simulated links of homa::sim through aosabi-devtool homa-sim, each half
+# its own entry sized to finish within the per call bound of the development
+# machine. 21_homa_loopback carries its compact half, 22_homa_lossy its engine
+# half and 23_homa_budget its simulation half with the probe cell, which builds
+# tests/fixtures/rs/homa-probe for riscv32imc-unknown-none-elf. Each runs the
+# gates it rests on first, so each entry carries the cold build timeout. The
+# halves of later stages join as entries of their own.
+- notebook: tests/notebooks/21_homa_loopback.ipynb
+  id: 21_homa_loopback-compact
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: compact
+    seed: 20260927
+    max_ops: 10000
+    timeout_s: 600
+
+# The Network half of 21_homa_loopback is stage H1's: the full form on the
+# Network profile in both scheduling modes, the ports of a peer and the table
+# at 4,096 peers.
+- notebook: tests/notebooks/21_homa_loopback.ipynb
+  id: 21_homa_loopback-network
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: network
+    seed: 20260927
+    max_ops: 10000
+    binding_ops: 2000
+    table_peers: 4096
+    timeout_s: 600
+
+# The real socket half of 21_homa_loopback is stage H2's: the engine of the
+# crate over the Unix Socket transports of homa::unix in both forms, first in
+# one process through homa-sim and then against the Python engine
+# tests/harness/homa/client.py through homa-unix in both directions, and the
+# table against AoFrame alone, which builds the device probe of
+# 23_homa_budget for its bytes added.
+- notebook: tests/notebooks/21_homa_loopback.ipynb
+  id: 21_homa_loopback-socket
+  cell_timeout: 900
+  # Exclusive, timing: the table of the socket half prints the latency, the
+  # throughput and the resident memory over real Unix Sockets.
+  exclusive: true
+  parameters:
+    aosabi_root: .
+    half: socket
+    seed: 20260927
+    socket_ops: 10000
+    timeout_s: 600
+
+- notebook: tests/notebooks/22_homa_lossy.ipynb
+  id: 22_homa_lossy-engine
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: engine
+    seed: 20260927
+    seeds: 100
+    timeout_s: 600
+
+# The socket half of 22_homa_lossy is stage H2's: homa-unix serve on a real
+# Unix Socket driven by client.py through its loss hooks, a server rebuilt
+# over its open socket, a silent client, and a pty pair of pty.py through
+# homa-sim.
+- notebook: tests/notebooks/22_homa_lossy.ipynb
+  id: 22_homa_lossy-socket
+  cell_timeout: 900
+  # Exclusive, real timers: the server and the client run a RESEND after 20 ms
+  # and a dead peer after 200 ms on real Unix Sockets, and the silent client is
+  # judged by when the server gives it up.
+  exclusive: true
+  parameters:
+    aosabi_root: .
+    half: socket
+    seed: 20260927
+    timeout_s: 600
+
+- notebook: tests/notebooks/23_homa_budget.ipynb
+  id: 23_homa_budget-simulation
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: simulation
+    seed: 20260927
+    timeout_s: 600
+
+# The client cells of 23_homa_budget are stage H2's: the wasm client probe
+# for wasm32-unknown-unknown, built three times, and the bytes an answer in
+# progress holds through reply_reserve against reply with a buffer.
+- notebook: tests/notebooks/23_homa_budget.ipynb
+  id: 23_homa_budget-client
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: client
+    seed: 20260927
+    timeout_s: 600
+
+- notebook: tests/notebooks/23_homa_budget.ipynb
+  id: 23_homa_budget-graphtp
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: graphtp
+    timeout_s: 600
+
+# The LoRa probe cell of 23_homa_budget is stage H6's: the device probe for
+# the HT-CT62, built five times for riscv32imc-unknown-none-elf, one part of
+# LoRa more each time, the budget pacer, chacha20poly1305, the frame with the
+# ledger and the time on air, the carrier, and the driver of the SX1262.
+- notebook: tests/notebooks/23_homa_budget.ipynb
+  id: 23_homa_budget-lora
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: lora
+    seed: 20260927
+    timeout_s: 600
+
+# The raw server cell of 23_homa_budget is stage H4's: the example raw_server
+# of aosabi-carrier-network, a server that names GraphTP(Homa) on Network over
+# raw IP 146, built with the release profile and weighed by the symbols of each
+# crate, holding homa with the IP driver to 40 KiB and the Network driver to 8
+# KiB, and the storage of its endpoint, holding a peer to 202 bytes and an RPC
+# without its pages to 216. It carries the cold build timeout. So
+# driver_question and rpc_question name the two questions, and each row prints
+# OPEN beside its measure and the bound it crosses.
+- notebook: tests/notebooks/23_homa_budget.ipynb
+  id: 23_homa_budget-raw-server
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: raw-server
+    timeout_s: 600
+    driver_question: 29
+    rpc_question: 32
+
+# The fabric notebook of stage H1 runs the data centre mechanisms of the
+# engine on the rack of homa::sim::Fabric through aosabi-devtool homa-sim
+# fabric, built with the release profile because its runs move millions of
+# packets, and holds them to tests/harness/homa/fabric.py and trace.py. It
+# runs the gates it rests on first, the release build among them, so it
+# carries the cold build timeout.
+- notebook: tests/notebooks/29_homa_fabric.ipynb
+  id: 29_homa_fabric
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    seed: 20260927
+    duration_ns: 20000000
+    level_seeds: 3
+    cutoff_messages: 100000
+    timeout_s: 600
+
+# The carrier notebook of LoRa of stage H6 runs the carrier of
+# aosabi-carrier-lora over the radio model of homa::sim through aosabi-devtool
+# homa-sim: 1,000 calls in each of six configurations under loss and a third
+# radio, the ledger under a full budget, the pause alone and behind a long
+# answer, a restart of the device and the table against whole messages in
+# sealed frames, and holds the air to the duty cycle of its band with
+# tests/harness/homa/lora.py. It builds the device probe for the bytes added of
+# its table, so it carries the cold build timeout.
+- notebook: tests/notebooks/29_carrier_lora.ipynb
+  id: 29_carrier_lora-model
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    half: model
+    seed: 20260928
+    calls: 1000
+    loss_permille: 100
+    saturation_calls: 200
+    timeout_s: 600
+
+# The notebook of the carrier Unix Socket starts the card test-graphtp, the
+# GraphTP listener of aosabi-core behind the primitive graphtp of the devtool,
+# once per section and form, and drives it with the client of
+# tests/harness/homa/graphtp.py over the Python Homa engine. It builds the
+# devtool with --locked and runs the lints of aosabi-core with its feature homa
+# alone, so the cell timeout matches the cold build entries above.
+- notebook: tests/notebooks/25_carrier_unix.ipynb
+  id: 25_carrier_unix
+  cell_timeout: 900
+  # Exclusive, real timers: both ends run a RESEND after 20 ms and a dead peer
+  # after 200 ms of silence on real Unix Sockets.
+  exclusive: true
+  parameters:
+    aosabi_root: .
+    forms: seqpacket,stream
+    seed: 20260928
+    permutations: 200
+    loss_operations: 200
+    timeout_s: 600
+
+- notebook: tests/notebooks/28_carrier_bluetooth.ipynb
+  id: 28_carrier_bluetooth-emulated
+  cell_timeout: 900
+  # Exclusive, a guest: it boots guest A under KVM, whose agent socket, pid
+  # file and hub sockets under target/guests/ every guest entry shares, runs
+  # BlueZ over D-Bus and an AF_BLUETOOTH channel in it, and judges the wait of
+  # a small answer on the GATT data path against 45 ms. The row judges the
+  # form of the Homa design note, first version, section 6.4, which the 45 ms
+  # comes from and 23_homa_budget times as well: the small request sent at a
+  # seeded moment spread over the download of the large answer and timed from
+  # the central's write at its event, so its uplink is left out. The form the
+  # record of the wait measured, timed from the making of the small request
+  # with its uplink, prints beside it with no bound, since on the paced link
+  # it cannot fall below about two intervals whatever the carrier does. Every
+  # request of serve names the pace the central keeps, 2 packets an event of
+  # 30 ms with a depth of 2, and the verdict holds at most that depth of
+  # packets of the large answer below the engine when the small answer leaves.
+  exclusive: true
+  parameters:
+    aosabi_root: .
+    seed: 20260930
+    operations: 100
+    transfers: 5
+    hostile: 2000
+    timeout_s: 600
+    wait_question: null
+    wait_issue: null

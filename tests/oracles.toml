@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+#
+# The oracles the conformance suites compare Aosabi with, each a git repository at a pinned
+# commit. graphql-js is the oracle of the GraphQL engine. tests/fetch_oracles.py clones each one
+# into its path, which git ignores.
+
+[[oracle]]
+name = "graphql-js"
+path = "vendor/graphql-js"
+url = "https://github.com/graphql/graphql-js.git"
+commit = "bf9ffffa6b46197dc59326cfc2ba678b70cc20d3"

@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: MIT
+# The Python side of the Aosabi harness, pinned.
+#
+# Every test case in this project is a notebook under tests/notebooks/, run by
+# papermill, so this file is the whole runtime the assertions need. The pins are
+# exact because a notebook run carries its own environment into the golden
+# manifest, and a floating dependency would move a recorded number without a
+# change in the repository.
+#
+# The pins are what pip resolves on the development machine, which runs Python
+# 3.14.3 rather than the 3.12 the notebook guide names. requires-python stays at
+# 3.12 because that is the floor the notebooks are written against.
+
+[project]
+name = "aosabi-tests"
+version = "0.0.0"
+description = "The notebook harness that decides whether Aosabi equals the reference"
+requires-python = ">=3.12"
+license = "MIT"
+
+# papermill runs a notebook and records the parameters it was run with.
+# nbclient drives the kernel for tests/run.py, which needs per cell timeouts.
+# nbformat reads and writes the notebook files themselves.
+# ipykernel is the kernel the notebooks run on, registered as aosabi.
+# jupyter_client is the kernel protocol both papermill and nbclient speak.
+# pyyaml reads tests/matrix.yaml.
+# requests drives the two servers over HTTP.
+dependencies = [
+    "papermill==2.7.0",
+    "nbclient==0.11.0",
+    "nbformat==5.11.1",
+    "ipykernel==7.3.0",
+    "jupyter_client==8.10.0",
+    "pyyaml==6.0.3",
+    "requests==2.34.2",
+]
+
+[project.urls]
+Repository = "https://github.com/netsnek/aosabi"
