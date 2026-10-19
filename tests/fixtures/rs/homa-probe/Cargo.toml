@@ -1,0 +1,80 @@
+# The device probe of the crate homa, the measure of its bytes in a device image
+# before a card links one. A static library for riscv32imc-unknown-none-elf, the
+# RV32IMC core of the ESP32-C3, with the features that core's card turns on, so
+# 23_homa_budget sums the code and the read only data of its objects and finds
+# no symbol of an atomic type.
+#
+# The probe is a cargo workspace of its own with its own lock, as a fixture
+# application is, and the Aosabi workspace at the repository root does not list
+# it. The one command that builds it, from the repository root:
+#
+#   ~/.cargo/bin/cargo build --release --manifest-path tests/fixtures/rs/homa-probe/Cargo.toml --target riscv32imc-unknown-none-elf
+
+[workspace]
+resolver = "3"
+
+[package]
+name = "homa-probe"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT"
+authors = ["Florian Kleber <kleber@snek.at>"]
+repository = "https://github.com/netsnek/aosabi"
+# A probe is measured in place and is never published.
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[features]
+# Leaves the endpoint out and keeps AoFrame alone, so 23_homa_budget reads what
+# the engine adds to a card that frames its packets anyway.
+frame-only = []
+# Adds the role client and the calls a card makes as a client, so
+# 23_homa_budget holds the image of a card that federates to the bound of the
+# server image.
+client = ["homa/client"]
+# The HT-CT62 of stage H6, one feature per part of the LoRa cell of
+# 23_homa_budget, each build the one before it and one part more, so the
+# difference of two builds is the bytes of one part: the budget pacer the
+# airtime ledger runs over, the AEAD of chacha20poly1305 through the seal of
+# the carrier, the frame, the window, the counters, the ledger and the time on
+# air called on their own, the carrier over a radio of the probe with the
+# turn of a card's driver, and the driver of the SX1262 over a HAL of the
+# probe.
+pacer-budget = ["homa/pacer-budget"]
+aead = ["pacer-budget", "dep:aosabi-carrier-lora"]
+lora-frame = ["aead"]
+lora = ["lora-frame"]
+sx1262 = ["lora", "aosabi-carrier-lora/sx1262", "dep:embedded-hal"]
+
+[dependencies]
+homa = { path = "../../../../crates/homa", default-features = false, features = ["server", "wire-compact", "stream-delimited", "stream-prefixed"] }
+# The carrier LoRa of stage H6, which brings chacha20poly1305 and its
+# companions, the register's rows of docs/dependencies.md section 3.17.
+aosabi-carrier-lora = { path = "../../../../crates/aosabi-carrier-lora", optional = true }
+# The traits the HAL of the probe implements for the SX1262, the register's
+# row of docs/dependencies.md section 3.18.
+embedded-hal = { version = "1.0.0", optional = true }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# The map guard of the byte contract, as in the Aosabi workspace. The list of
+# refused types is clippy.toml at the repository root, which clippy finds by
+# walking up from this manifest.
+disallowed_types = "deny"
+# No operating system threads in a served crate, as in the Aosabi workspace.
+disallowed_methods = "deny"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+opt-level = "z"

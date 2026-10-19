@@ -1,0 +1,66 @@
+# The wasm client probe of the crate homa, the measure of the client role a
+# page links before graphtp-wasm is built. A cdylib for wasm32-unknown-unknown
+# with homa in the features graphtp-wasm links, so 23_homa_budget reads the
+# size of the module, its gzip size and its import section from the module
+# bytes.
+#
+# The probe is a cargo workspace of its own with its own lock, as a fixture
+# application is, and the Aosabi workspace at the repository root does not
+# list it, so it ships nothing. The one command that builds it, from the
+# repository root:
+#
+#   ~/.cargo/bin/cargo build --release --manifest-path tests/fixtures/rs/wasm-client-probe/Cargo.toml --target wasm32-unknown-unknown
+
+[workspace]
+resolver = "3"
+
+[package]
+name = "wasm-client-probe"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT"
+authors = ["Florian Kleber <kleber@snek.at>"]
+repository = "https://github.com/netsnek/aosabi"
+# A probe is measured in place and is never published.
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+# The prefixed form of AoFrame, which graphtp-wasm links for the Bluetooth
+# channel and a stream socket, on by default so the probe measures the module
+# as the page links it, and off in the build that prints its delta.
+default = ["stream-prefixed"]
+stream-prefixed = ["homa/stream-prefixed"]
+
+[dependencies]
+homa = { path = "../../../../crates/homa", default-features = false, features = ["client", "alloc", "wire-compact", "stream-delimited"] }
+
+# The lints of the Aosabi workspace, with unsafe_code at deny in place of
+# forbid, because a wasm export needs the unsafe attribute #[unsafe(no_mangle)]
+# and forbid admits no expectation. Each of the two exports carries its own
+# #[expect(unsafe_code)] and no unsafe block.
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# The map guard of the byte contract, as in the Aosabi workspace. The list of
+# refused types is clippy.toml at the repository root, which clippy finds by
+# walking up from this manifest.
+disallowed_types = "deny"
+# No operating system threads in a served crate, as in the Aosabi workspace.
+disallowed_methods = "deny"
+
+# Size over speed, as the wasm modules the viewer ships are built.
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+opt-level = "z"
+strip = "symbols"
