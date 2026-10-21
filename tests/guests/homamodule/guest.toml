@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+# Guest C of the harness, the reference of the full form: the koji kernel
+# 6.17.8-300.fc43, the release the main branch of HomaModule is known to work
+# under, and HomaModule at 50d65305 built from its source with its own
+# Makefile and its util tools. Its packets are the golden headers of the
+# capture half of 05_homa_wire_full and of the interop half of 29_homa_raw,
+# and its latency is their bar.
+
+name = "C"
+description = "Fedora 43 cloud image on the koji kernel 6.17.8-300.fc43 with HomaModule at 50d65305"
+image = "fedora-cloud-base-43-1.6"
+kernel = "6.17.8-300.fc43.aarch64"
+artifacts = [
+    "kernel-core-6.17.8-300.fc43",
+    "kernel-modules-core-6.17.8-300.fc43",
+    "kernel-modules-6.17.8-300.fc43",
+    "kernel-devel-6.17.8-300.fc43",
+    "homamodule-50d65305",
+]
+phases = ["provision.sh", "build.sh"]

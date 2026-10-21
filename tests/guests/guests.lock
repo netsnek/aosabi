@@ -1,0 +1,243 @@
+# SPDX-License-Identifier: MIT
+#
+# The pins of the harness guests: every image, kernel package, source and
+# host tool the guests of tests/harness/homa/guest.py boot from or install,
+# each by the URL it is fetched from and the SHA-256 and size of the file.
+# guest.py fetches an entry into target/guests/cache/ under `file` and refuses
+# it where the size or the hash differ, and a guest's provisioning script
+# checks the hash again inside the guest, so no byte a guest runs is taken on
+# trust. The guests are A and B from the Fedora 43 cloud image and C on the
+# koji kernel 6.17.8-300.fc43 with HomaModule at 50d65305. `guests` names the
+# guests that take an entry, and an entry no guest takes is a tool of the host.
+#
+# The koji URLs name the build as koji stores it, which is the file each
+# SHA-256 below was computed over on 2026-09-28. A package a guest installs
+# from the Fedora repositories and does not name here, such as tcpdump, comes
+# signed from those repositories through dnf.
+
+version = 1
+
+# The Fedora 43 cloud image, whose kernel is 6.17.1-300.fc43 with pages of
+# 4 KiB (the published CHECKSUM file of the release names this SHA-256).
+[[artifact]]
+name = "fedora-cloud-base-43-1.6"
+kind = "image"
+url = "https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2"
+file = "Fedora-Cloud-Base-Generic-43-1.6.aarch64.qcow2"
+sha256 = "66031aea9ec61e6d0d5bba12b9454e80ca94e8a79c913d37ded4c60311705b8b"
+size = 544997376
+guests = ["A", "B", "C"]
+
+# The modules of the image's own kernel the cloud image leaves out, Bluetooth
+# and hci_vhci, since the image carries kernel-core and kernel-modules-core
+# alone, whose modules hold 9p, veth, the queuing disciplines, the classifier
+# and the gadget functions.
+[[artifact]]
+name = "kernel-modules-6.17.1-300.fc43"
+kind = "kernel"
+url = "https://kojipkgs.fedoraproject.org/packages/kernel/6.17.1/300.fc43/aarch64/kernel-modules-6.17.1-300.fc43.aarch64.rpm"
+file = "kernel-modules-6.17.1-300.fc43.aarch64.rpm"
+sha256 = "11ff592816eff4407909aec3900d9e174443db8c1da8a7a494195e177f056147"
+size = 62181829
+guests = ["A"]
+
+# The build tree of the image's kernel, for dummy_hcd, which Fedora does not
+# build (CONFIG_USB_DUMMY_HCD is not set in its .config), and for the crate's
+# kernel module of stage H5.
+[[artifact]]
+name = "kernel-devel-6.17.1-300.fc43"
+kind = "kernel"
+url = "https://kojipkgs.fedoraproject.org/packages/kernel/6.17.1/300.fc43/aarch64/kernel-devel-6.17.1-300.fc43.aarch64.rpm"
+file = "kernel-devel-6.17.1-300.fc43.aarch64.rpm"
+sha256 = "02de05711f8203ddb702429a326527940c54c914fe8316d74edc250e1e15e832"
+size = 20342629
+guests = ["A"]
+
+# The rustc the image's kernel names, CONFIG_RUSTC_VERSION_TEXT "rustc 1.90.0
+# (1159e78c4 2025-09-14) (Fedora 1.90.0-1.fc43)" in the .config of its
+# kernel-devel, with its standard library and clippy.
+[[artifact]]
+name = "rust-1.90.0-1.fc43"
+kind = "toolchain"
+url = "https://kojipkgs.fedoraproject.org/packages/rust/1.90.0/1.fc43/aarch64/rust-1.90.0-1.fc43.aarch64.rpm"
+file = "rust-1.90.0-1.fc43.aarch64.rpm"
+sha256 = "7b4d0a74ed2602a9a6f8eac618ffa00bf9aeb8cd3b18641a8961021bf963c4f0"
+size = 28760079
+guests = ["A"]
+
+[[artifact]]
+name = "rust-std-static-1.90.0-1.fc43"
+kind = "toolchain"
+url = "https://kojipkgs.fedoraproject.org/packages/rust/1.90.0/1.fc43/aarch64/rust-std-static-1.90.0-1.fc43.aarch64.rpm"
+file = "rust-std-static-1.90.0-1.fc43.aarch64.rpm"
+sha256 = "d72fd6026bf8cb5d1d71795a0556457089e45ce98d36f90bf577d49bc349b05b"
+size = 40583525
+guests = ["A"]
+
+[[artifact]]
+name = "clippy-1.90.0-1.fc43"
+kind = "toolchain"
+url = "https://kojipkgs.fedoraproject.org/packages/rust/1.90.0/1.fc43/aarch64/clippy-1.90.0-1.fc43.aarch64.rpm"
+file = "clippy-1.90.0-1.fc43.aarch64.rpm"
+sha256 = "27656dfdb70a28aa83ce8462111e88d489fee40c1b12a58e4f5512370cc6e0c0"
+size = 3268363
+guests = ["A"]
+
+# The emulated USB host controller of guest A, one file of the stable tree
+# at the tag of the image's kernel, built out of tree against its
+# kernel-devel.
+[[artifact]]
+name = "dummy_hcd-v6.17.1"
+kind = "source"
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/drivers/usb/gadget/udc/dummy_hcd.c?h=v6.17.1"
+file = "dummy_hcd-v6.17.1.c"
+sha256 = "f5faa4435db8fe2af1ed21d925fc51eb101922626ea540e3433c304cd1e037b3"
+size = 75003
+guests = ["A"]
+
+# The emulated Bluetooth controllers of guest A: the source of the BlueZ
+# release the image's repositories install, 5.87, whose emulator/btvirt runs
+# two virtual controllers over hci_vhci that reach each other, since Fedora
+# packages no btvirt (the SHA-256 is the one of the signed sha256sums.asc of
+# https://www.kernel.org/pub/linux/bluetooth/, read on 2026-09-30).
+[[artifact]]
+name = "bluez-5.87"
+kind = "source"
+url = "https://www.kernel.org/pub/linux/bluetooth/bluez-5.87.tar.xz"
+file = "bluez-5.87.tar.xz"
+sha256 = "26bdcf2cebd7310c6f598850606b037ef0c515fe6608ebc54d22c50c4c32b35f"
+size = 2318516
+guests = ["A"]
+
+# Guest C, the reference: the koji kernel 6.17.8-300.fc43, the release the
+# main branch of HomaModule is known to work under (INSTALL.md lines 13 to 17
+# at the pinned commit), and HomaModule at 50d65305.
+[[artifact]]
+name = "kernel-core-6.17.8-300.fc43"
+kind = "kernel"
+url = "https://kojipkgs.fedoraproject.org/packages/kernel/6.17.8/300.fc43/aarch64/kernel-core-6.17.8-300.fc43.aarch64.rpm"
+file = "kernel-core-6.17.8-300.fc43.aarch64.rpm"
+sha256 = "a2ded16e632eedb4b0f204c39e80eeb201ba4c23f8760813526649b30070dc15"
+size = 22168357
+guests = ["C"]
+
+[[artifact]]
+name = "kernel-modules-core-6.17.8-300.fc43"
+kind = "kernel"
+url = "https://kojipkgs.fedoraproject.org/packages/kernel/6.17.8/300.fc43/aarch64/kernel-modules-core-6.17.8-300.fc43.aarch64.rpm"
+file = "kernel-modules-core-6.17.8-300.fc43.aarch64.rpm"
+sha256 = "4a574d7cf4f0dea98b77a82cc787ff8bdc8608e20936ec6efe9e281a49bc8571"
+size = 41307321
+guests = ["C"]
+
+[[artifact]]
+name = "kernel-modules-6.17.8-300.fc43"
+kind = "kernel"
+url = "https://kojipkgs.fedoraproject.org/packages/kernel/6.17.8/300.fc43/aarch64/kernel-modules-6.17.8-300.fc43.aarch64.rpm"
+file = "kernel-modules-6.17.8-300.fc43.aarch64.rpm"
+sha256 = "8d0ea548e4f52450de7b40b9f72c4610a9308ab70d45dba7083f48dd617bb055"
+size = 62182705
+guests = ["C"]
+
+[[artifact]]
+name = "kernel-devel-6.17.8-300.fc43"
+kind = "kernel"
+url = "https://kojipkgs.fedoraproject.org/packages/kernel/6.17.8/300.fc43/aarch64/kernel-devel-6.17.8-300.fc43.aarch64.rpm"
+file = "kernel-devel-6.17.8-300.fc43.aarch64.rpm"
+sha256 = "b6469406eb70701d0ed7b46815293ef7d2c629a9c766d8bb2b771c86a3b5d04a"
+size = 20286469
+guests = ["C"]
+
+[[artifact]]
+name = "homamodule-50d65305"
+kind = "source"
+url = "https://github.com/PlatformLab/HomaModule/archive/50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3.tar.gz"
+file = "HomaModule-50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3.tar.gz"
+sha256 = "0f9d75768433a70dc63e209c6594dcaebc25d8a09e1bdbb32365af39e5e1a6a3"
+size = 656817
+guests = ["C"]
+
+# The tools of the host, taken where the host lacks them: qemu-system-aarch64
+# and qemu-img of Fedora 43 with the libraries a Fedora host without qemu
+# misses, and the UEFI firmware of edk2. guest.py unpacks them into
+# target/guests/tools/ and never installs a package on the host.
+[[artifact]]
+name = "qemu-system-aarch64-core-10.1.5-1.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/qemu/10.1.5/1.fc43/aarch64/qemu-system-aarch64-core-10.1.5-1.fc43.aarch64.rpm"
+file = "qemu-system-aarch64-core-10.1.5-1.fc43.aarch64.rpm"
+sha256 = "8fa32092b0359674604915f6a95f951ed84a4998051fdd2ed37b5b5e707a3908"
+size = 5567075
+guests = []
+
+[[artifact]]
+name = "qemu-img-10.1.5-1.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/qemu/10.1.5/1.fc43/aarch64/qemu-img-10.1.5-1.fc43.aarch64.rpm"
+file = "qemu-img-10.1.5-1.fc43.aarch64.rpm"
+sha256 = "93b44adcad045ff4aee0e1865e801dfac6b67213032b844c5905141e52e5acc0"
+size = 2618221
+guests = []
+
+[[artifact]]
+name = "edk2-aarch64-20260812-4.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/edk2/20260812/4.fc43/noarch/edk2-aarch64-20260812-4.fc43.noarch.rpm"
+file = "edk2-aarch64-20260812-4.fc43.noarch.rpm"
+sha256 = "434779d1b226e7df6618b53a9983ebdc4000ee94d18564aa8648421cad7c8276"
+size = 11303316
+guests = []
+
+[[artifact]]
+name = "xen-libs-4.20.4-1.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/xen/4.20.4/1.fc43/aarch64/xen-libs-4.20.4-1.fc43.aarch64.rpm"
+file = "xen-libs-4.20.4-1.fc43.aarch64.rpm"
+sha256 = "eba32fee8f76c91497fe813852648907cf6f891d36ee8be724ad931123131d2b"
+size = 589229
+guests = []
+
+[[artifact]]
+name = "daxctl-libs-85-1.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/ndctl/85/1.fc43/aarch64/daxctl-libs-85-1.fc43.aarch64.rpm"
+file = "daxctl-libs-85-1.fc43.aarch64.rpm"
+sha256 = "df2ee852572ed19d0e409b58711798944eb6d1dcf0a7b41ab16601a8e57e0e96"
+size = 42201
+guests = []
+
+[[artifact]]
+name = "libfdt-1.7.2-7.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/dtc/1.7.2/7.fc43/aarch64/libfdt-1.7.2-7.fc43.aarch64.rpm"
+file = "libfdt-1.7.2-7.fc43.aarch64.rpm"
+sha256 = "463debffde25b00ce38b4a2eb6f03925788828676867480793dadb6d320798aa"
+size = 36544
+guests = []
+
+[[artifact]]
+name = "librdmacm-58.0-4.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/rdma-core/58.0/4.fc43/aarch64/librdmacm-58.0-4.fc43.aarch64.rpm"
+file = "librdmacm-58.0-4.fc43.aarch64.rpm"
+sha256 = "2c29eedc5b9a339e1c8b80ccd98e0009aec4ee2b54aae530cbc4aa4aafa474a4"
+size = 72865
+guests = []
+
+[[artifact]]
+name = "libslirp-4.9.1-2.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/libslirp/4.9.1/2.fc43/aarch64/libslirp-4.9.1-2.fc43.aarch64.rpm"
+file = "libslirp-4.9.1-2.fc43.aarch64.rpm"
+sha256 = "7706e2d22b142b8bdcba1b2c9b27a615f1ec8b00d5f3458e0aae6c4c70cb59ae"
+size = 78307
+guests = []
+
+[[artifact]]
+name = "libxdp-1.5.8-1.fc43"
+kind = "tool"
+url = "https://kojipkgs.fedoraproject.org/packages/xdp-tools/1.5.8/1.fc43/aarch64/libxdp-1.5.8-1.fc43.aarch64.rpm"
+file = "libxdp-1.5.8-1.fc43.aarch64.rpm"
+sha256 = "ed010a716659c066eb523d0319aa23b66ac3bdf29c01e2dae00fd165fc03e750"
+size = 70888
+guests = []
