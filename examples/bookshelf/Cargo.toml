@@ -1,0 +1,23 @@
+# A small bookshelf, an example service of the native Rust layer of Aosabi, in the shape
+# `aosabi new` writes, with the facade crate named by its path in this repository.
+
+[package]
+name = "bookshelf"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+# A service is a cargo workspace of its own, so it builds wherever it is
+# created, also below another workspace.
+[workspace]
+
+[dependencies]
+aosabi = { path = "../../crates/aosabi" }
+
+# The cards that serve sockets link the engine of the facade with these
+# features. The table names them for a Unix target alone, so a Worker build
+# links no engine. It is also how Cargo.lock pins the packages the engine
+# takes from a registry, rustix and libc among them, which the lock of every
+# build is checked against, so a service without it does not build.
+[target.'cfg(unix)'.dependencies]
+aosabi = { path = "../../crates/aosabi", features = ["serve", "unix-socket", "deflate", "linux"] }

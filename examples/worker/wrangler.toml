@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+# The Worker entry of the build, which `wrangler dev` serves on workerd on this machine.
+name = "worker"
+main = ".aosabi/worker.mjs"
+compatibility_date = "2024-09-03"
+compatibility_flags = ["nodejs_compat_v2"]
+
+# The glue of the build reads the URL of its module, which a Worker leaves undefined.
+[define]
+"import.meta.url" = "\"file:///.aosabi/server.mjs\""

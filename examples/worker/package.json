@@ -1,0 +1,11 @@
+{
+  "name": "worker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "aosabi": "file:../../aosabi-ts"
+  },
+  "devDependencies": {
+    "aosabi-build": "file:../../aosabi-ts-build"
+  }
+}
