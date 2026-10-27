@@ -1,0 +1,14 @@
+# Wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+
+# The bytecode of the builders
+__pycache__/
+
+# The docs section, generated from Documentation/ at every build by assets-src/build_docs.py
+public/docs/
+public/docs.building/
+public/docs.css
