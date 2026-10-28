@@ -1,0 +1,85 @@
+
+  /* ------------------------------------------------------------------
+     The docs pages. Everything above this line is learn.css, the shared
+     stylesheet with the rules of a document page. Below are the rules
+     only a page of the documentation needs on top of it: the line with
+     the file and its links, the folded list of sections, the rendered
+     Markdown and the index of all pages.
+     ------------------------------------------------------------------ */
+
+  /* The line under the title: the path of the file in mono, the link to the editor of GitHub as the
+     one outlined control of the page, and the history as a quiet patina link */
+  .docmeta { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  .docmeta .path { font: 500 12.5px/1.4 var(--mono); color: var(--muted-text); overflow-wrap: anywhere; }
+  .docmeta a { display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px var(--mono); color: var(--ao-text); text-decoration: none; }
+  .docmeta a:hover, .docmeta a:focus-visible { text-decoration: underline; }
+  .docmeta .gl { width: 14px; height: 14px; }
+  .docmeta a.edit { padding: 8px 13px; border: 1px solid var(--ao); border-radius: 10px; background: #fff; font: 700 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .docmeta a.edit:hover, .docmeta a.edit:focus-visible { text-decoration: none; box-shadow: var(--sh-2); }
+
+  /* The sections of a page, folded, so a long file opens on its first paragraph */
+  .toc { margin-top: 24px; max-width: 52em; border: 1px solid var(--line-2); border-radius: var(--r3); background: var(--paper); }
+  .toc summary { cursor: pointer; padding: 13px 18px; font: 700 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+  .toc summary::marker { color: var(--ao-text); }
+  .toc ul { margin: 0; padding: 2px 18px 16px; list-style: none; columns: 2 20em; column-gap: 32px; }
+  .toc li { break-inside: avoid; padding-block: 4px; font-size: 14px; line-height: 1.45; }
+  .toc a { color: var(--ao-text); text-decoration: none; }
+  .toc a:hover, .toc a:focus-visible { text-decoration: underline; }
+  .toc code { font-size: .9em; }
+
+  /* The rendered Markdown. Running text keeps the measure of a learn page, and a table or a block of
+     code takes the width of the column and scrolls inside its own box where it is wider */
+  .prose { margin-top: clamp(28px, 3.5vw, 44px); }
+  .prose > :first-child { margin-top: 0; }
+  .doc .prose h2 { margin-top: clamp(40px, 5vw, 64px); scroll-margin-top: 16px; }
+  .prose h3 { margin-top: 34px; max-width: 32em; font-size: 19px; font-weight: 800; letter-spacing: -.01em; line-height: 1.3; scroll-margin-top: 16px; }
+  .prose h4, .prose h5, .prose h6 { margin-top: 28px; max-width: 36em; font-size: 16px; font-weight: 800; line-height: 1.35; scroll-margin-top: 16px; }
+  .prose h5, .prose h6 { font-size: 15px; }
+  .prose h2 code, .prose h3 code, .prose h4 code { font-size: .85em; }
+  .prose strong { color: var(--ink); }
+  .prose ul, .prose ol { margin-top: 14px; max-width: 42em; padding-left: 1.4em; color: var(--muted-text); font-size: clamp(15px, 1.45vw, 17px); line-height: 1.65; }
+  .prose li { margin-top: 6px; padding-left: 2px; }
+  .prose li::marker { color: var(--ao-text); }
+  .prose li ul, .prose li ol { margin-top: 6px; font-size: inherit; }
+  .doc .prose li > p { margin-top: 10px; font-size: inherit; }
+  .doc .prose li > p:first-child { margin-top: 0; }
+  .prose blockquote { margin-top: 18px; max-width: 42em; padding-left: 16px; border-left: 2px solid var(--line-2); }
+  .doc .prose blockquote p { margin-top: 10px; }
+  .doc .prose blockquote > :first-child { margin-top: 0; }
+  .prose hr { margin: clamp(32px, 4vw, 48px) 0 0; max-width: 72em; border: 0; border-top: 1px solid var(--line); }
+  .prose a { color: var(--ao-text); }
+  .prose a:hover, .prose a:focus-visible { text-decoration-thickness: 2px; }
+  /* A code span that names a file of the repository links to it and keeps the look of code */
+  .prose a.code { text-underline-offset: 3px; }
+  .prose pre { margin-top: 18px; max-width: 72em; padding: 14px 16px; overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r2); font: 500 13px/1.55 var(--mono); color: var(--ink); }
+  .prose pre code { font: inherit; color: inherit; overflow-wrap: normal; white-space: pre; }
+  .prose .tab { margin-top: 20px; max-width: 72em; overflow-x: auto; background: #fff; border: 1px solid var(--line-2); border-radius: var(--r3); box-shadow: var(--sh-1); }
+  .prose table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.55; }
+  .prose th, .prose td { padding: 10px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  .prose thead th { border-bottom: 1px solid var(--line-2); font: 700 11px/1.35 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--tone); vertical-align: bottom; }
+  .prose thead th code { text-transform: none; letter-spacing: 0; }
+  .prose tbody tr:last-child > * { border-bottom: 0; }
+  .prose td { color: var(--muted-text); }
+  .prose td strong, .prose td b { color: var(--ink); }
+
+  /* The index: one row per page, its title and its file beside its first sentence */
+  .doc .all h2 { margin-top: clamp(40px, 5vw, 64px); }
+  .all h2 .count { margin-left: 10px; font: 500 12px var(--mono); letter-spacing: .04em; color: var(--muted-text); white-space: nowrap; }
+  .docs-index { margin-top: 18px; padding: 0; list-style: none; max-width: 72em; }
+  .docs-index li { display: grid; grid-template-columns: minmax(0, 21em) minmax(0, 1fr); gap: 4px clamp(16px, 3vw, 40px); padding-block: 14px; border-top: 1px solid var(--line); }
+  .docs-index a { font-size: 15.5px; font-weight: 700; line-height: 1.4; color: var(--ink); text-decoration: none; }
+  .docs-index a:hover, .docs-index a:focus-visible { color: var(--ao-text); text-decoration: underline; }
+  .docs-index .path { display: block; margin-top: 4px; font: 500 11.5px/1.4 var(--mono); color: var(--ao-text); overflow-wrap: anywhere; }
+  .doc .docs-index p { margin-top: 0; max-width: none; font-size: 14.5px; line-height: 1.6; }
+
+  @media (max-width: 767px) {
+    .docs-index li { grid-template-columns: 1fr; }
+    .toc ul { columns: 1; }
+  }
+  @media (max-width: 640px) {
+    /* Every column of a table keeps a width it can be read at, and a table of three or more
+       columns scrolls in its box */
+    .prose th, .prose td { min-width: 9.5em; padding-inline: 12px; }
+    .prose .tab.c1 th, .prose .tab.c1 td { min-width: 0; }
+    .prose pre { font-size: 12.5px; }
+  }
