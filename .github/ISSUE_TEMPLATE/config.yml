@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/netsnek/aosabi/security/advisories/new
+    about: >-
+      Report it privately through the private vulnerability reporting of GitHub and never in a
+      public issue.

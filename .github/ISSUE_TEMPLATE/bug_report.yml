@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: MIT
+name: Bug report
+description: Report a wrong answer, a crash, a failed build or a mistake in the documentation.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug. A security vulnerability goes to the
+        private vulnerability reporting of this repository and never into a public issue.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What went wrong, in a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce it
+      description: >-
+        The smallest service, schema, request and command that show the bug. A GraphQL request
+        is best given as the exact bytes it sends, such as a curl command.
+      placeholder: |
+        1. Build the service with ...
+        2. Send the request ...
+        3. The answer is ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: >-
+        What should have happened instead. For a GraphQL response, the response you expected,
+        and the answer of graphql-js to the same schema and document if you know it.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The release of Aosabi or the commit you built.
+      placeholder: 0.1.0, or the hash of a commit
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Where it runs
+      description: Every platform on which you saw the bug.
+      multiple: true
+      options:
+        - Linux on x86_64
+        - Linux on aarch64
+        - Cloudflare Workers
+        - Bun on Linux
+        - A small Linux device
+        - A board with no operating system
+        - Another platform
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: How the service is written
+      options:
+        - In Rust
+        - In TypeScript
+        - In TypeScript through the compatibility layer aosabi/pylon
+        - It does not apply
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: >-
+        The output of rustc -vV and of the command line of Aosabi with --version, and for a
+        TypeScript service its runtime with the version of the runtime.
+      render: text
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The whole output of the command that failed. The form shows it as code.
+      render: text

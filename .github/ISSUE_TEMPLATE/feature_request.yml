@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: MIT
+name: Feature request
+description: Propose something Aosabi does not do yet.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Two rules decide every feature of Aosabi. Security comes before features, so a feature
+        never weakens a default and stays off until a service turns it on. Boilerplate comes
+        before magic, so a feature is code that a reader of the service can follow. The
+        [roadmap](https://github.com/netsnek/aosabi/tree/main/roadmap) shows what is planned
+        already.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you want to do and what stops you today.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: The proposal
+      description: How a service would use the feature, as code if you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: What you do instead today, and the other designs you considered.
+
+  - type: textarea
+    id: cost
+    attributes:
+      label: What it costs
+      description: >-
+        What the feature adds in code size, memory, time per request and attack surface, and
+        how it fits a board with no operating system.
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: >-
+        Aosabi takes a new dependency only where the standard library and its own code cannot
+        do the work. Name every crate or package the feature would need, and why.
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Before you send it
+      options:
+        - label: The feature keeps every default as safe as it is today.
+          required: true
+        - label: I searched the open issues and the roadmap for the same request.
+          required: true
