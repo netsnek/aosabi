@@ -52,11 +52,12 @@ http-body = { path = "../../third_party/rust/http-body", default-features = fals
 # The buffers of hyper's public interface, kept and pinned, whose requirement
 # names the version the register reviewed as its floor.
 bytes = { version = "1.12.1", default-features = false, features = ["std"] }
-# The TLS library behind the feature tls, under reason 3.1 of
-# docs/decisions/ADR-0024-dependencies.md. The requirement names the version the
-# register reviewed as its floor, and the default features are off, so the
-# provider is ring and not aws-lc-rs and no logging crate enters.
-rustls = { version = "0.23.45", optional = true, default-features = false, features = ["std", "ring"] }
+# The TLS library behind the feature tls, under a reason that admits a crate.
+# The requirement names the version the register reviewed as its floor, and the
+# default features are off, so the provider is ring and not aws-lc-rs and no
+# logging crate enters. The feature tls12 stays off, since the card speaks TLS
+# 1.3 alone.
+rustls = { version = "0.23.46", optional = true, default-features = false, features = ["std", "ring"] }
 
 # The one outside crate of a Linux card, behind the feature linux and for a
 # Linux target alone, so a build without the feature or for another target
