@@ -44,6 +44,7 @@
 //! | `.plugin(..)` | one element of `plugins` of `aosabi.config.ts`, in the order of the calls |
 //! | `.graphiql(..)`, `.landing_page(..)`, `.logger(..)`, `.masked_errors(..)`, `.graphql_endpoint(..)`, `.health_check_endpoint(..)`, `.multipart(..)` | the other keys of the configuration that Aosabi ports |
 //! | `.viewer(..)` | the key `viewer` of Aosabi |
+//! | `.max_tokens(..)` | the key `maxTokens` of Aosabi, the cap on the tokens of a request document |
 //!
 //! The plugins and the keys make the configuration the app carries, which
 //! `aosabi::serve_app` serves, so a project of the native index needs no
@@ -462,10 +463,28 @@ impl App {
     }
 
     /// Sets `multipart` of Yoga. The parser of uploads runs only when it is
-    /// `true`, the named divergence D49.
+    /// `true`, a named divergence.
     #[must_use]
     pub fn multipart(mut self, enabled: bool) -> Self {
         self.config().multipart = Some(enabled);
+        self
+    }
+
+    /// Sets `maxTokens`, the key of Aosabi that caps the tokens of a request
+    /// document, a named divergence.
+    ///
+    /// Every parse of a request document of the app takes the cap: the parse
+    /// of the engine over HTTP and `GraphTP`, and the parses of the mode
+    /// `--requests` and of any other road into the app, the second parses for
+    /// a subscription and for `@inContext` among them. An app that sets no cap
+    /// parses under 120,008 tokens, `REQUEST_TOKENS` of `aosabi-lang`. A
+    /// document of `max_tokens` tokens parses, and one of more answers the
+    /// syntax error the parser of graphql-js answers under `maxTokens` of the
+    /// same value, as one error with no data. No value lifts the cap, and the
+    /// largest admits every document of at most 4,294,967,295 bytes.
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: u32) -> Self {
+        self.config().max_tokens = Some(max_tokens);
         self
     }
 

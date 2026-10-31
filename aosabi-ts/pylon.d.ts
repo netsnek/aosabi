@@ -21,7 +21,7 @@
  */
 
 import type { MiddlewareHandler } from 'hono'
-import type { Env, Plugin } from './types/pylon/core/index.js'
+import type { AppConfig as PylonAppConfig, Env, Plugin } from './types/pylon/core/index.js'
 
 export {
   App,
@@ -45,7 +45,6 @@ export {
   createLogger,
   useNodeServer,
   useSentry,
-  defineConfig,
   getCookie,
   getSignedCookie,
   setCookie,
@@ -91,14 +90,30 @@ export type {
   Role,
   PluginRole,
   Plugin,
-  AppConfig,
-  AppConfigFactory,
   ID,
   Int,
   Float,
   FieldPolicy,
   PatchPolicy,
 } from './types/pylon/core/index.js'
+
+/**
+ * The configuration of an app, the keys of the AppConfig of types/pylon/core and maxTokens, a key of
+ * Aosabi: the cap on the tokens of a request document, which every parse of a request document of
+ * the app takes, 120,008 where the configuration leaves it out. A document of more tokens answers
+ * the syntax error the parser of graphql-js answers under a maxTokens of the same value. The cap is a
+ * whole number from 0 to 4294967295, and any other value fails the boot of the app, null among them,
+ * since no value lifts the cap.
+ */
+export type AppConfig = PylonAppConfig & {
+  maxTokens?: number
+}
+
+/** A factory of the configuration, which may answer a promise of it. */
+export type AppConfigFactory = () => AppConfig | Promise<AppConfig>
+
+/** Answers the configuration or the factory of one as it is, for aosabi.config.ts. */
+export declare function defineConfig(config: AppConfig | AppConfigFactory): AppConfig | AppConfigFactory
 
 /** The checks of requireAuth and authMiddleware of Pylon's canary, the roles a user must hold one of. */
 export type AuthRequireChecks = {

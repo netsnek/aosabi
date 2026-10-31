@@ -104,7 +104,8 @@ use homa::{
 
 use super::instances::{
     Instances,
-    NAMES, //
+    NAMES,
+    Switches, //
 };
 use crate::{
     homa_sim::{
@@ -166,16 +167,16 @@ const CONFIG: Config = Config {
 /// form.
 type Engine = Endpoint<(), Owned<()>, Compact>;
 
-/// Serves every instance over `GraphTP` in `dir` and answers the line of
-/// what it served.
+/// Serves every instance over `GraphTP` in `dir`, built under `switches`, and
+/// answers the line of what it served.
 ///
 /// # Errors
 ///
 /// Returns [`Failure::Data`] when an instance does not build or a socket
 /// cannot be bound, accepted or run.
-pub fn serve(dir: &Path) -> Result<Answer, Failure> {
+pub fn serve(dir: &Path, switches: Switches) -> Result<Answer, Failure> {
     let limits = limits::card(CARD).ok_or_else(|| Failure::Data(format!("no card {CARD}")))?;
-    let built = Instances::new().map_err(Failure::Data)?;
+    let built = Instances::with(switches).map_err(Failure::Data)?;
     let io_failure = |what: &str, error: &io::Error| Failure::Data(format!("{what}: {error}"));
     fs::create_dir_all(dir).map_err(|error| io_failure("the directory", &error))?;
     let stop = dir.join(STOP);

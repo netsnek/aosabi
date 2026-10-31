@@ -116,15 +116,16 @@ impl InContext {
 /// This stands where the hook `onExecute` of the plugin runs. The hook sees a
 /// parsed and validated document. The pipeline of the executor crate parses
 /// inside, so the document is parsed here a second time, and only when its
-/// text names the directive at all. A document that does not parse reaches
+/// text names the directive at all, under the cap `max_tokens` on its tokens
+/// that the pipeline parses it under. A document that does not parse reaches
 /// no resolver, so nothing is lost by leaving its context unset.
-pub fn apply_in_context(context: &Context, request: &Request<'_>) {
+pub fn apply_in_context(context: &Context, request: &Request<'_>, max_tokens: u32) {
     if !request.document.contains(DIRECTIVE_NAME) {
         return;
     }
     let options = ParseOptions {
         no_location: true,
-        ..ParseOptions::request()
+        ..ParseOptions::request_capped(max_tokens)
     };
     let Ok(document) = parse(request.document, options) else {
         return;

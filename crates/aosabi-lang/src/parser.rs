@@ -14,13 +14,14 @@
 //! [`parse`], [`parse_value`], [`parse_const_value`] and [`parse_type`] are
 //! the entry points, and [`Parser`] is the class of the reference with every
 //! `parseX` method in file order, each keeping its name in snake case. The
-//! control flow follows the TypeScript line by line, because the exit number
-//! of the milestone is byte equality of error text and locations, and every
-//! message is copied from the vendored source. The entry
-//! [`parse_value_within`] has no counterpart in the reference: it parses a
-//! value as [`parse_value`] does under a bound of the caller on the nesting of
-//! its lists and objects, which the reference leaves to the stack of its
-//! engine.
+//! control flow follows the TypeScript line by line, because the goal is byte
+//! equality of error text and locations, and every message is copied from the
+//! vendored source. The entry [`parse_value_within`] has no counterpart in the
+//! reference: it parses a value as [`parse_value`] does under a bound of the
+//! caller on the nesting of its lists and objects, which the reference leaves
+//! to the stack of its engine. The option [`ParseOptions::max_nesting`] has
+//! none either: it bounds the levels a document nests, which a served engine
+//! sets for every request through [`ParseOptions::request`].
 //!
 //! Four shapes of the reference read differently in Rust.
 //!
@@ -174,7 +175,9 @@ pub struct ParseOptions {
     /// fraction, a negative and an infinity included. The value the caller
     /// passes is compared with the count of tokens as a number and is printed
     /// into the message of the abort as it is, so it stays the double it is in
-    /// the reference.
+    /// the reference. A served engine parses every request under the cap of its
+    /// app, [`REQUEST_TOKENS`] where the app sets none, through
+    /// [`ParseOptions::request_capped`], a named divergence.
     pub max_tokens: Option<f64>,
 
     /// If enabled, the parser will understand and parse variable definitions
@@ -209,6 +212,11 @@ pub struct ParseOptions {
     /// answers the syntax error `Document nests deeper than <bound> levels.
     /// Parsing aborted.` at the first token that opens a level past the
     /// bound, as it answers the budget of `max_tokens`.
+    ///
+    /// The bound holds for every parse of these options, of a document, a value
+    /// or a type, and [`ParseOptions::request`] and
+    /// [`ParseOptions::request_capped`] set it to [`REQUEST_NESTING`]. A served
+    /// engine parses every request under that bound, a named divergence.
     pub max_nesting: Option<u32>,
 }
 
@@ -243,6 +251,12 @@ pub const REQUEST_NESTING: u32 = 1000;
 /// A document of more tokens answers the syntax error the parser of graphql-js
 /// answers under a budget of the same value, at the first token past it, a
 /// named divergence.
+///
+/// It is the cap of an app that sets none.
+/// The key `maxTokens` of the configuration, `.max_tokens(..)` in the chain
+/// of a Rust app, raises or lowers it for every parse of a request document
+/// of that app, which [`ParseOptions::request_capped`] takes.
+/// No value of the key lifts the cap.
 pub const REQUEST_TOKENS: u32 = 120_008;
 
 impl ParseOptions {
@@ -251,9 +265,24 @@ impl ParseOptions {
     /// They cap the tokens of the document at [`REQUEST_TOKENS`].
     #[must_use]
     pub const fn request() -> Self {
+        Self::request_capped(REQUEST_TOKENS)
+    }
+
+    /// Returns the options of [`ParseOptions::request`] with the cap
+    /// `max_tokens` on the tokens of the document in place of
+    /// [`REQUEST_TOKENS`], the cap an app sets with the key `maxTokens`.
+    ///
+    /// A document of `max_tokens` tokens parses, and the first token past
+    /// them aborts the parse with the syntax error of the budget, as the
+    /// parser of graphql-js answers under `maxTokens` of the same value. No
+    /// value leaves the parse without a cap. The largest, 4,294,967,295,
+    /// admits every document of at most as many bytes, since each token the
+    /// parser counts takes at least one byte of the document.
+    #[must_use]
+    pub const fn request_capped(max_tokens: u32) -> Self {
         Self {
             no_location: false,
-            max_tokens: Some(REQUEST_TOKENS as f64),
+            max_tokens: Some(max_tokens as f64),
             allow_legacy_fragment_variables: false,
             max_nesting: Some(REQUEST_NESTING),
         }

@@ -119,12 +119,13 @@ pub async fn answer(body: Rc<[u8]>) -> Vec<u8> {
 /// with the agent driven by the request loop of the module.
 async fn execute(service: &Service, request: &Request<'_>) -> Executed {
     let context = service_context();
-    apply_in_context(&context, request);
+    apply_in_context(&context, request, service.max_tokens());
     let context_value: Rc<dyn Any> = Rc::new(context.clone());
     let executor = GeneralExecutor {
         schema: Arc::clone(service.schema()),
         root_value: Arc::new(|| Value::Undefined),
         leaf_serializers: Some(Arc::clone(service.core().leaf_serializers())),
+        max_tokens: service.max_tokens(),
     };
     let prepared = run_with_context(context, || {
         prepare_request(

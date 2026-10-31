@@ -388,6 +388,11 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
             slots.push(PluginSlot::new(read.plugin));
         }
     }
+    let max_tokens = match reader.byte().ok_or(BROKEN)? {
+        0 => None,
+        1 => Some(reader.word().ok_or(BROKEN)?),
+        _ => return Err(String::from(BROKEN)),
+    };
     value::set_identity_map(identity);
     // A pass of the host made the root logger and set the line of each
     // request, which the boot keeps: `false` turns the line off and keeps the
@@ -403,6 +408,7 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
             logger
         },
         plugins: Some(PluginList::new(slots)),
+        max_tokens,
         ..AppConfig::default()
     };
     let options = HandlerOptions {
@@ -415,7 +421,7 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     };
     ROOTS.set(roots);
     #[cfg(feature = "execute")]
-    crate::execute::set_service(service(&schema).map_err(|error| error.to_string())?);
+    crate::execute::set_service(service(&schema, max_tokens).map_err(|error| error.to_string())?);
     let mut app = App::new(HostFragment).hosted_pipeline().into_app();
     app.use_boxed("*", seed());
     let booted = run(boot_engine(app, config, options));
@@ -479,10 +485,12 @@ async fn boot_engine(
 
 /// Returns the service of the app over the schema record `schema`, the
 /// schema, the roots and the type resolvers the handler of Yoga runs over,
-/// which the executor of a test build runs a request on below HTTP.
+/// under the cap `max_tokens` of the configuration where it sets one, which
+/// the executor of a test build runs a request on below HTTP.
 #[cfg(feature = "execute")]
 fn service(
     schema: &aosabi_core::boot::SchemaRecord,
+    max_tokens: Option<u32>,
 ) -> Result<aosabi_core::Service, aosabi_core::CreateSchemaError> {
     let mut build_side = aosabi_core::ResolverMap::default();
     for rule in schema.resolve_types {
@@ -491,10 +499,14 @@ fn service(
             aosabi_core::glue::resolve_type::type_resolver(rule),
         );
     }
-    aosabi_core::Service::builder(schema.type_defs)
+    let builder = aosabi_core::Service::builder(schema.type_defs)
         .roots(HostFragment.resolvers())
-        .resolvers(build_side)
-        .build()
+        .resolvers(build_side);
+    match max_tokens {
+        Some(max_tokens) => builder.max_tokens(max_tokens),
+        None => builder,
+    }
+    .build()
 }
 
 /// Reads the type resolvers of the form of the canary at the cursor of

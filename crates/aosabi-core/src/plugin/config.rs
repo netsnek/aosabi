@@ -34,6 +34,10 @@
 //! The key `viewer` is Aosabi's own and no key of the reference: `true` opens
 //! the plugin list with the viewer, which serves `/viewer`, the named divergence D48 of
 //! `docs/byte-equality.md` section 3.
+//! The key `maxTokens` is Aosabi's own and no key of the reference: the cap on
+//! the tokens of a request document, which every parse of a request document of
+//! the app takes, `REQUEST_TOKENS` of `aosabi-lang`, 120,008, where the key is
+//! absent, a named divergence. No value of the key lifts the cap.
 
 use core::future::Future;
 
@@ -74,6 +78,10 @@ pub struct AppConfig {
     /// `multipart` of Yoga, the parser of uploads only when `true`, the named
     /// divergence D49 of `docs/byte-equality.md` section 3.
     pub multipart: Option<bool>,
+    /// `maxTokens`, Aosabi's own key, the cap on the tokens of a request
+    /// document, `REQUEST_TOKENS` of `aosabi-lang` when absent, a named
+    /// divergence.
+    pub max_tokens: Option<u32>,
 }
 
 impl core::fmt::Debug for AppConfig {
@@ -87,6 +95,7 @@ impl core::fmt::Debug for AppConfig {
             .field("graphql_endpoint", &self.graphql_endpoint)
             .field("health_check_endpoint", &self.health_check_endpoint)
             .field("multipart", &self.multipart)
+            .field("max_tokens", &self.max_tokens)
             .finish_non_exhaustive()
     }
 }

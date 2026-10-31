@@ -254,7 +254,7 @@ static PROGRAM: Program = Program {
             name: "yoga",
             about: "Answer requests through the Yoga of the capture schemas in process",
             grammar: &yoga::GRAMMAR,
-            run: |matches| Ok(yoga::run(&YogaArgs::read(matches))),
+            run: |matches| Ok(yoga::run(&YogaArgs::read(matches)?)),
         },
         Command {
             name: "http",

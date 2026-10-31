@@ -196,7 +196,8 @@ pub fn build_schema(
 /// cache of the card, which changes what the cache keeps and no answer, and
 /// the validation and the bound on nesting of the build settings of
 /// [`crate::single_pass`], which change how a document is validated and no
-/// answer.
+/// answer. The key `maxTokens` of the configuration of `target`, Aosabi's own,
+/// sets the cap on the tokens of a request document the engine parses under.
 #[must_use]
 pub fn build_http_options(
     schema: Arc<aosabi_type::Schema>,
@@ -228,6 +229,9 @@ pub fn build_http_options(
     if let Some(multipart) = config.multipart {
         options.multipart = Some(multipart);
     }
+    // The cap on the tokens of a request document, Aosabi's own key
+    // `maxTokens`, a named divergence.
+    options.max_tokens = config.max_tokens;
     if let Some(plugins) = &config.plugins {
         options.plugins = plugins
             .slots()

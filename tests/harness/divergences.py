@@ -155,6 +155,73 @@ def upload_text(text: str) -> str:
     return text.replace(UPLOAD, UPLOAD_REFERENCE)
 
 
+#: The cap on the tokens of a request document a served engine parses where the app sets none, `REQUEST_TOKENS` of
+#: crates/aosabi-lang/src/parser.rs.
+REQUEST_TOKENS = 120_008
+
+
+def request_parse_options(options: dict | None = None, max_tokens: int = REQUEST_TOKENS) -> dict:
+    """Return the parser options `options` with the budget under which the reference parses a request
+    document as a served engine of the side under test parses it under the cap `max_tokens`.
+
+    A document of more tokens than the cap answers on the side the syntax error the parser of the reference answers
+    under that budget, at the first token past it.
+    The cap is `REQUEST_TOKENS` where the app sets none and the value of its key `maxTokens`, `.max_tokens(..)` of the
+    chain of a Rust app, where it sets one.
+    """
+    return dict(options or {}, maxTokens=max_tokens)
+
+
+#: The tokens of the lexical grammar of GraphQL, the ignored ones first: the byte order mark, white space, line
+#: terminators, commas and comments, then a block string, a string, the spread, the other punctuators, a number and
+#: a name.
+TOKEN = re.compile(
+    r'''
+  (?P<ignored>[\ufeff\t \n\r,]+|\#[^\n\r]*)
+| (?P<block>"""(?:\\"""|[^"]|"(?!""))*""")
+| (?P<string>"(?:\\.|[^"\\\n\r])*")
+| (?P<spread>\.\.\.)
+| (?P<punctuator>[!$&()\:=@\[\]{|}])
+| (?P<number>-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)
+| (?P<name>[_A-Za-z][_0-9A-Za-z]*)
+''',
+    re.X | re.S,
+)
+
+
+def count_tokens(text: str) -> int | None:
+    """Return the tokens of `text` the parser of graphql-js counts against its option `maxTokens`, or None for a
+    text that holds a character outside the lexical grammar.
+
+    Every token the lexer hands the parser counts, the end of the source left out, while white space, commas and
+    comments are no token the lexer hands it.
+    """
+    position, count = 0, 0
+    while position < len(text):
+        found = TOKEN.match(text, position)
+        if found is None:
+            return None
+        if found.lastgroup != "ignored":
+            count += 1
+        position = found.end()
+    return count
+
+
+def listed_document(tokens: int, head: str = "query", directive: str = "") -> str:
+    """Return a request document of `tokens` tokens whose parse is linear and which validation rejects.
+
+    The operation `head` declares a variable it never uses, whose default value is a list of empty lists of two
+    tokens each, with one list `[1]` of three in front where the items hold an odd count, and `directive` stands on
+    the operation when given. Posted at the cap of a request and past it, such documents test that cap.
+    """
+    before = head + "($v: [[Int]] = ["
+    after = "])" + (" " + directive if directive else "") + " { __typename }"
+    pairs, odd = divmod(tokens - count_tokens(before + after), 2)
+    document = before + "[1]" * odd + "[]" * (pairs - odd) + after
+    assert count_tokens(document) == tokens, (tokens, count_tokens(document))
+    return document
+
+
 #: The codings the compress() of the reference writes, ENCODING_TYPES of hono 4.11.9, and x-gzip, the alias of
 #: gzip (RFC 9110 section 8.4.1.3).
 CODED = ("gzip", "x-gzip", "deflate")

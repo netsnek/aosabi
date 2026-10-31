@@ -86,6 +86,7 @@ use aosabi_http::{
     Request,
     Response, //
 };
+use aosabi_lang::parser::REQUEST_TOKENS;
 use aosabi_type::{
     ObjMap,
     Schema, //
@@ -251,6 +252,10 @@ pub struct HttpOptions {
     /// pass leaves it to the rules, the bound of the card a build serves, and
     /// `aosabi_validate::pass::MAX_DEPTH` when absent. No answer depends on it.
     pub single_pass_max_depth: Option<u32>,
+    /// Aosabi only: the cap on the tokens of a request document the parse function of
+    /// the engine takes, the key `maxTokens` of the app, and `REQUEST_TOKENS` of
+    /// `aosabi-lang` when absent, a named divergence.
+    pub max_tokens: Option<u32>,
 }
 
 /// The state the function reads on every request, the server of Yoga, `YogaServer`.
@@ -489,20 +494,23 @@ fn masked_errors_opts(
 
 /// Returns the engine the hook layer runs first.
 ///
-/// The engine of Yoga is graphql-js with `normalizedExecutor`, and Aosabi
-/// installs the same engine with the single pass in the seat of the validator
-/// where `single_pass` is on or absent with [`SINGLE_PASS_DEFAULT`] on. That
-/// engine meets the refusal of introspection after the specified rules, which
-/// the server hands it, and the bound on nesting of the options.
+/// The engine of Yoga is graphql-js with `normalizedExecutor`, and Aosabi installs the
+/// same engine with the single pass in the seat of the validator where `single_pass`
+/// is on or absent with [`SINGLE_PASS_DEFAULT`] on. That engine meets the refusal of
+/// introspection after the specified rules, which the server hands it, and the bound
+/// on nesting of the options. Either engine parses under the cap on the tokens of the
+/// options, `REQUEST_TOKENS` when absent.
 fn engine(options: &HttpOptions) -> Engine {
+    let max_tokens = options.max_tokens.unwrap_or(REQUEST_TOKENS);
     let on = options.single_pass.unwrap_or(SINGLE_PASS_DEFAULT);
     if !on && options.single_pass_counts.is_none() {
-        return Engine::graphql();
+        return Engine::graphql_capped(max_tokens);
     }
     Engine::graphql_single_pass(SinglePass {
         on,
         max_depth: options.single_pass_max_depth.unwrap_or(MAX_DEPTH),
         extra_rule: Some(NO_SCHEMA_INTROSPECTION_CUSTOM_RULE),
         counts: options.single_pass_counts.clone(),
+        max_tokens,
     })
 }

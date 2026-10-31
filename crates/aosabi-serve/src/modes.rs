@@ -100,7 +100,8 @@ pub fn print_schema(build: &BuildOutput) -> ExitCode {
 }
 
 /// Answers the request lines of the file `path` through a service over the
-/// roots of `entry`.
+/// roots of `entry`, under the cap on the tokens of a request document its
+/// chain sets.
 ///
 /// An entry that answers an error ends with the abort of a configuration that
 /// throws at load, [`config_abort`], as the boot does.
@@ -120,11 +121,15 @@ pub fn answer_requests<E: IntoEntry>(
             .resolve_types
             .insert(String::from(rule.type_name), type_resolver(rule));
     }
-    let service = match Service::builder(build.schema)
+    let mut builder = Service::builder(build.schema)
         .roots(app.graphql().clone())
-        .resolvers(resolvers)
-        .build()
-    {
+        .resolvers(resolvers);
+    // The cap on the tokens of a request document the chain of the app sets,
+    // the key `maxTokens`, a named divergence.
+    if let Some(max_tokens) = app.config().and_then(|config| config.max_tokens) {
+        builder = builder.max_tokens(max_tokens);
+    }
+    let service = match builder.build() {
         Ok(service) => service,
         Err(error) => {
             eprintln!("{}", BootError::Schema(error));

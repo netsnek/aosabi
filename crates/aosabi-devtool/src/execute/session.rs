@@ -68,6 +68,7 @@ use aosabi_execute::{
         Value, //
     }, //
 };
+use aosabi_lang::REQUEST_TOKENS;
 use aosabi_type::{
     ObjMap,
     ResolverHandle,
@@ -293,6 +294,7 @@ fn plain_runner(table: &Table) -> Result<Runner, CreateSchemaError> {
         schema,
         root_value: Arc::new(|| Value::Undefined),
         leaf_serializers: None,
+        max_tokens: REQUEST_TOKENS,
     }))
 }
 

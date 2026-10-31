@@ -1681,7 +1681,7 @@ function writePlugins(record, plugins, handle) {
 // its plugins and its type resolvers, crates/aosabi-js/src/boot.rs. Each
 // function of the plan is the handle `handle` answers for it, an index of the
 // table of the boot. The text `ir` may be the schema record of that build in
-// place of the IR.
+// place of the IR. The key maxTokens of the configuration stands last.
 function bootRecord(schema, ir, config, mode, read, env, plan, handle) {
   const record = new Out();
   record.text(schema);
@@ -1707,7 +1707,26 @@ function bootRecord(schema, ir, config, mode, read, env, plan, handle) {
     writeJson(record, jsonCopy(sentry));
   }
   writePlugins(record, plan.plugins, handle);
+  writeMaxTokens(record, config.maxTokens);
   return record;
+}
+
+// Writes the key maxTokens of the configuration, the cap on the tokens of a
+// request document every parse of a request document of the app takes, a byte 0
+// where the configuration leaves it out, which keeps the cap of 120,008 tokens,
+// or 1 and the cap as a word, crates/aosabi-js/src/boot.rs. The cap is a whole
+// number from 0 to 4294967295, and any other value fails the boot, null among
+// them, since no value lifts the cap, a named divergence.
+function writeMaxTokens(record, cap) {
+  if (cap === undefined) {
+    record.byte(0);
+    return;
+  }
+  if (!Number.isInteger(cap) || cap < 0 || cap > 0xffffffff) {
+    throw new TypeError("the key maxTokens of the configuration takes a whole number from 0 to 4294967295");
+  }
+  record.byte(1);
+  record.word(cap);
 }
 
 // Writes the type resolvers of the form of the canary that typeResolversOf

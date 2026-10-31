@@ -1648,6 +1648,7 @@ mod delegation {
         JsObject,
         JsValue, //
     };
+    use aosabi_lang::parser::REQUEST_TOKENS;
     use aosabi_serve::runtime::Runtime;
 
     use super::{
@@ -2259,6 +2260,7 @@ mod delegation {
             schema,
             root_value: Arc::new(|| Value::Undefined),
             leaf_serializers: Some(Arc::clone(core.leaf_serializers())),
+            max_tokens: REQUEST_TOKENS,
         };
         let document = require(request, OP, "document")?;
         let variables = match request.get("variables") {

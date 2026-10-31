@@ -92,6 +92,7 @@ use aosabi_lang::{
     ast::OperationTypeNode,
     parser::{
         ParseOptions,
+        REQUEST_TOKENS,
         parse, //
     }, //
 };
@@ -205,6 +206,7 @@ impl Service {
             type_defs,
             roots: Resolvers::default(),
             resolvers: ResolverMap::default(),
+            max_tokens: REQUEST_TOKENS,
         }
     }
 
@@ -212,6 +214,14 @@ impl Service {
     #[must_use]
     pub const fn schema(&self) -> &Arc<Schema> {
         &self.executor.schema
+    }
+
+    /// Returns the cap on the tokens of a request document the service parses
+    /// under, the key `maxTokens` of the app or `REQUEST_TOKENS`, a named
+    /// divergence.
+    #[must_use]
+    pub const fn max_tokens(&self) -> u32 {
+        self.executor.max_tokens
     }
 
     /// Returns the SDL text the service was built from.
@@ -240,8 +250,8 @@ impl Service {
     #[must_use]
     pub fn execute(&self, request: &Request<'_>, options: AgentOptions) -> Executed {
         let context = service_context();
-        if !is_subscription(request) {
-            apply_in_context(&context, request);
+        if !is_subscription(request, self.max_tokens()) {
+            apply_in_context(&context, request, self.max_tokens());
         }
         let context_value: Rc<dyn Any> = Rc::new(context.clone());
         run_with_context(context, || {
@@ -266,8 +276,8 @@ impl Service {
     /// the drain, so the drain changes neither.
     pub(crate) fn execute_drained(&self, request: &Request<'_>, options: AgentOptions) -> Executed {
         let context = service_context();
-        if !is_subscription(request) {
-            apply_in_context(&context, request);
+        if !is_subscription(request, self.max_tokens()) {
+            apply_in_context(&context, request, self.max_tokens());
         }
         let context_value: Rc<dyn Any> = Rc::new(context.clone());
         let kept = RefCell::new(None);
@@ -343,15 +353,16 @@ fn setup_agent(agent: &Agent) {
 ///
 /// A subscription operation is written with the keyword `subscription`, so a
 /// text without it is answered with no parse. A text with it is parsed once
-/// more, and a document that does not parse is no subscription, because it
+/// more, under the cap `max_tokens` on its tokens that the executor parses it
+/// under, and a document that does not parse is no subscription, because it
 /// reaches no resolver.
-fn is_subscription(request: &Request<'_>) -> bool {
+fn is_subscription(request: &Request<'_>, max_tokens: u32) -> bool {
     if !request.document.contains("subscription") {
         return false;
     }
     let options = ParseOptions {
         no_location: true,
-        ..ParseOptions::request()
+        ..ParseOptions::request_capped(max_tokens)
     };
     parse(request.document, options).is_ok_and(|document| {
         operation_type(&document, request.operation_name) == Some(OperationTypeNode::Subscription)
@@ -373,6 +384,8 @@ pub struct ServiceBuilder {
     roots: Resolvers,
     /// The build side resolver map.
     resolvers: ResolverMap,
+    /// The cap on the tokens of a request document.
+    max_tokens: u32,
 }
 
 impl ServiceBuilder {
@@ -407,6 +420,18 @@ impl ServiceBuilder {
         self
     }
 
+    /// Sets the cap on the tokens of a request document, the key `maxTokens`
+    /// of the app, in place of `REQUEST_TOKENS`.
+    ///
+    /// Every parse of a request document of the service takes it, the parse of
+    /// the executor and the second parses for a subscription and for
+    /// `@inContext`, a named divergence.
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: u32) -> Self {
+        self.max_tokens = max_tokens;
+        self
+    }
+
     /// Builds the service.
     ///
     /// # Errors
@@ -425,6 +450,7 @@ impl ServiceBuilder {
             // a service never reads its source.
             root_value: Arc::new(|| Value::Undefined),
             leaf_serializers: Some(Arc::clone(core.leaf_serializers())),
+            max_tokens: self.max_tokens,
         };
         Ok(Service {
             type_defs: self.type_defs,
@@ -538,7 +564,7 @@ impl Execute for Service {
             operation_name,
             validate: true,
         };
-        if !is_subscription(&request) {
+        if !is_subscription(&request, self.max_tokens()) {
             let executed = Service::execute(self, &request, AgentOptions::default());
             return ServiceStream::One(Some(result_of(executed.outcome)));
         }

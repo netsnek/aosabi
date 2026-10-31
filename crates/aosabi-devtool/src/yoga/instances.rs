@@ -23,7 +23,9 @@
 //! instances of [`super::pass_probe`], `passReplace` and `passInvalidSchema`,
 //! which exist only under it. The switch of the request cache sets
 //! `parserAndValidationCache: false` where it is off, on the nine instances
-//! above. Without a switch every instance is the one above, whose engine
+//! above. The cap on the tokens of a request document sets the field
+//! `max_tokens` of the options of every instance, the probe instances among
+//! them. Without a switch every instance is the one above, whose engine
 //! follows the default of `graphql-over-http`. Every instance takes the bound on
 //! nesting of the card this build serves, `aosabi_core::single_pass::TARGET`,
 //! as a served build does.
@@ -90,6 +92,10 @@ pub struct Switches {
     /// Whether the request cache of Yoga is installed, `None` for the
     /// default, which installs it.
     pub cache: Option<bool>,
+    /// The cap on the tokens of a request document, the key `maxTokens` of
+    /// an app, `None` for the default of `graphql-over-http`, which is
+    /// `REQUEST_TOKENS` of `aosabi-lang`.
+    pub max_tokens: Option<u32>,
 }
 
 /// One instance and the counters of its engine.
@@ -169,14 +175,16 @@ impl Instances {
 
 impl Instance {
     /// Returns the instance `name` of `options` with the switch of the single
-    /// pass of `switches` and its counters, and with the bound on nesting of
-    /// the card this build serves, as `build_http_options` of `aosabi-core` sets it.
+    /// pass of `switches` and its counters, with the cap on the tokens of
+    /// `switches`, and with the bound on nesting of the card this build
+    /// serves, as `build_http_options` of `aosabi-core` sets it.
     fn create(name: &'static str, options: HttpOptions, switches: Switches) -> Self {
         let mut options = options;
         let counts = switches.single_pass.map(|_| Rc::new(PassCounts::default()));
         options.single_pass = switches.single_pass;
         options.single_pass_counts.clone_from(&counts);
         options.single_pass_max_depth = Some(single_pass::TARGET);
+        options.max_tokens = switches.max_tokens;
         Self {
             name,
             server: HttpServer::new(options),

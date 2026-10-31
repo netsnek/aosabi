@@ -141,6 +141,10 @@ pub struct GeneralExecutor {
     pub root_value: RootFactory,
     /// The serializers that see the executor value, by scalar name.
     pub leaf_serializers: Option<Arc<ObjMap<LeafSerializer>>>,
+    /// The cap on the tokens of a request document, `REQUEST_TOKENS` of
+    /// `aosabi-lang` unless the app sets its own with the key `maxTokens`, a
+    /// named divergence.
+    pub max_tokens: u32,
 }
 
 /// One request as a carrier hands it over.
@@ -243,7 +247,13 @@ fn check_request(
     executor: &GeneralExecutor,
     request: &Request<'_>,
 ) -> Result<DocumentNode, Executed> {
-    let document = match parse(request.document, ParseOptions::request()) {
+    // The nesting bound and the token cap of a request document, named
+    // divergences, keep a deep document off the end of the stack and bound
+    // its parse.
+    let document = match parse(
+        request.document,
+        ParseOptions::request_capped(executor.max_tokens),
+    ) {
         Ok(document) => document,
         Err(syntax_error) => return Err(errors_only(vec![syntax_error])),
     };
