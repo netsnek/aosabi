@@ -351,7 +351,7 @@ fn is_subscription(request: &Request<'_>) -> bool {
     }
     let options = ParseOptions {
         no_location: true,
-        ..ParseOptions::default()
+        ..ParseOptions::request()
     };
     parse(request.document, options).is_ok_and(|document| {
         operation_type(&document, request.operation_name) == Some(OperationTypeNode::Subscription)

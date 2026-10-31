@@ -30,7 +30,7 @@
 //! | [`js_string`] | no analogue | [`JsStringBuilder`], [`js_string::join`], [`js_string::to_string_lossy`] and [`js_string::number_to_string`], the string operations behind the message of an error |
 //! | [`block_string`] | `blockString.ts` | [`dedent_block_string_lines()`](block_string::dedent_block_string_lines), [`is_printable_as_block_string()`](block_string::is_printable_as_block_string) and [`print_block_string()`](block_string::print_block_string) |
 //! | [`lexer`] | `lexer.ts` | [`Lexer`](lexer::Lexer), the token readers and the token descriptions |
-//! | [`parser`] | `parser.ts` | [`parse()`], [`parse_value()`], [`parse_const_value()`], [`parse_type()`], [`ParseOptions`] and [`Parser`], and [`parse_value_within()`] with [`Nesting`] and [`ParseValueError`], a value under a bound on its nesting |
+//! | [`parser`] | `parser.ts` | [`parse()`], [`parse_value()`], [`parse_const_value()`], [`parse_type()`], [`ParseOptions`] and [`Parser`], and [`parse_value_within()`] with [`Nesting`] and [`ParseValueError`], a value under a bound on its nesting, [`REQUEST_NESTING`], the bound on the nesting of a request document, and [`REQUEST_TOKENS`], the cap on its tokens where the app sets none |
 //! | [`predicates`] | `predicates.ts` | the kind predicates over a [`NodeRef`] |
 //! | [`print_string`](mod@print_string) | `printString.ts` | [`print_string()`] |
 //! | [`printer`] | `printer.ts` | [`print()`] |
@@ -155,6 +155,8 @@ pub use crate::{
         ParseOptions,
         ParseValueError,
         Parser,
+        REQUEST_NESTING,
+        REQUEST_TOKENS,
         parse,
         parse_const_value,
         parse_type,

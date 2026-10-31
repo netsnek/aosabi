@@ -140,11 +140,13 @@ pub struct Engine {
     pub schema_seen: Option<SchemaSeenFn>,
 }
 
-/// Parses `source` as the parse function of the engine of Yoga parses it.
+/// Parses `source` as the parse function of the engine of Yoga parses it, under
+/// the bound on the nesting of a request document and the cap `max_tokens` on
+/// its tokens, named divergences.
 ///
 /// A parse error is the thrown `GraphQLError`.
 fn parse_document(source: &str) -> Result<Arc<DocumentNode>, Value> {
-    parse(source, ParseOptions::default())
+    parse(source, ParseOptions::request())
         .map(Arc::new)
         .map_err(|error| Value::from(ErrorObject::GraphQL(error)))
 }

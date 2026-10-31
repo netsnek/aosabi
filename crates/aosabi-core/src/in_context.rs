@@ -124,7 +124,7 @@ pub fn apply_in_context(context: &Context, request: &Request<'_>) {
     }
     let options = ParseOptions {
         no_location: true,
-        ..ParseOptions::default()
+        ..ParseOptions::request()
     };
     let Ok(document) = parse(request.document, options) else {
         return;

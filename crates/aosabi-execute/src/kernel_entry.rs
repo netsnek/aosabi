@@ -243,7 +243,7 @@ fn check_request(
     executor: &GeneralExecutor,
     request: &Request<'_>,
 ) -> Result<DocumentNode, Executed> {
-    let document = match parse(request.document, ParseOptions::default()) {
+    let document = match parse(request.document, ParseOptions::request()) {
         Ok(document) => document,
         Err(syntax_error) => return Err(errors_only(vec![syntax_error])),
     };

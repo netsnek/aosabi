@@ -153,7 +153,8 @@ use crate::{
 /// which is what the reference tests each one against, `noLocation !== true`,
 /// `allowLegacyFragmentVariables === true` and `maxTokens !== undefined`. The
 /// budget is a double, which has no total equality, so the type is `PartialEq`
-/// and not `Eq`.
+/// and not `Eq`. The member `max_nesting` is Aosabi's own, and its default,
+/// `None`, parses as the reference parses.
 ///
 /// Derived from graphql-js 16.12.0, src/language/parser.ts, MIT.
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
@@ -191,6 +192,72 @@ pub struct ParseOptions {
     ///
     /// The reference marks the option deprecated and removes it in v17.
     pub allow_legacy_fragment_variables: bool,
+
+    /// The most levels a document may nest, where each selection set, list
+    /// value, object value and list type the parser holds open is one level,
+    /// or `None` for no bound.
+    /// Aosabi only.
+    ///
+    /// A fragment spread counts as the inline fragment it stands for, so the
+    /// levels of the fragment it names count on from the level of the spread,
+    /// and a fragment that reaches itself through its spreads counts the
+    /// levels of every fragment that reaches it and that it reaches. Once the
+    /// document is read, the parser answers the same syntax error at the
+    /// first spread through which the document nests past the bound.
+    ///
+    /// The parser counts a level before it reads the token that opens it, and
+    /// answers the syntax error `Document nests deeper than <bound> levels.
+    /// Parsing aborted.` at the first token that opens a level past the
+    /// bound, as it answers the budget of `max_tokens`.
+    pub max_nesting: Option<u32>,
+}
+
+/// The bound on the levels of a document a served engine parses, the
+/// `max_nesting` of [`ParseOptions::request`].
+///
+/// A level costs the parse of a release build of the port 508 bytes of stack
+/// for a list type and up to 778 bytes for a selection set, so a request at the
+/// bound holds less than 800 KiB, inside the stack of 4 MiB of the module
+/// `core.wasm` and the stack of the main thread of a native host. No key of the
+/// configuration changes the bound. A document that nests deeper answers the
+/// syntax error `Document nests deeper than 1000 levels. Parsing aborted.` at
+/// the first token or fragment spread that passes the bound, a named
+/// divergence.
+///
+/// A fragment spread counts as the inline fragment it stands for, so the
+/// recursions of the validation and the execution that follow a spread, the
+/// collection of fields and the search for cycles of fragments among them, meet
+/// no more levels than the bound. A chain of fragments and a cycle of them at
+/// the bound answer as the reference answers them.
+pub const REQUEST_NESTING: u32 = 1000;
+
+/// The cap on the tokens of a document a served engine parses, the
+/// `max_tokens` of [`ParseOptions::request`].
+///
+/// The cap is four times the largest document the reference executes, in the
+/// recorded corpora and in the harness, the documents the harness writes at run
+/// time among them: the 30,002 tokens of the shapes `boom10000` and
+/// `boomlines10000` the harness posts to the reference of `exec-shapes-app`,
+/// the largest of the corpora the harness counts.
+///
+/// A document of more tokens answers the syntax error the parser of graphql-js
+/// answers under a budget of the same value, at the first token past it, a
+/// named divergence.
+pub const REQUEST_TOKENS: u32 = 120_008;
+
+impl ParseOptions {
+    /// Returns the options of the parse of a request document of a served engine.
+    /// They are the defaults with the bound [`REQUEST_NESTING`] on the nesting.
+    /// They cap the tokens of the document at [`REQUEST_TOKENS`].
+    #[must_use]
+    pub const fn request() -> Self {
+        Self {
+            no_location: false,
+            max_tokens: Some(REQUEST_TOKENS as f64),
+            allow_legacy_fragment_variables: false,
+            max_nesting: Some(REQUEST_NESTING),
+        }
+    }
 }
 
 /// Given a GraphQL source, parses it into a Document.
@@ -383,8 +450,11 @@ pub fn parse_type(
 /// own parsers without duplicating too much code, and keeps it part of the
 /// internal API. Every method is public as in the reference, the first three
 /// fields are the `_options`, `_lexer` and `_tokenCounter` members, the fourth
-/// holds the bound of [`parse_value_within`], which no other entry sets, and
-/// the fifth the selections of the selection sets the parser holds open.
+/// holds the bound of [`parse_value_within`], which no other entry sets, the
+/// fifth the selections of the selection sets the parser holds open, the sixth
+/// the levels it holds open, which [`ParseOptions::max_nesting`] bounds, and
+/// the seventh the levels each definition reaches and the fragment spreads it
+/// holds, which a parse under that bound records.
 ///
 /// Derived from graphql-js 16.12.0, src/language/parser.ts, MIT.
 pub struct Parser {
@@ -400,6 +470,44 @@ pub struct Parser {
     /// innermost last, each set moving its own into one shared slice when it
     /// closes, so the vector serves every set of the parse.
     selections: Vec<SelectionNode>,
+    /// The selection sets, list and object values and list types open where
+    /// the parser stands.
+    levels: u32,
+    /// The levels of the definitions and the spreads of a parse under
+    /// [`ParseOptions::max_nesting`], and `None` for a parse with no bound.
+    reach: Option<Reach>,
+}
+
+/// The levels each definition of a document opens and the fragment spreads
+/// it holds, which [`Parser::check_spreads`] reads once the document is read.
+#[derive(Default)]
+struct Reach {
+    /// Each definition in document order.
+    definitions: Vec<Defined>,
+    /// Each fragment spread in document order.
+    spreads: Vec<Spread>,
+}
+
+/// A definition of a document.
+struct Defined {
+    /// The name token of the fragment the definition defines, or `None` for
+    /// any other definition.
+    name: Option<TokenId>,
+    /// The deepest level the definition opens.
+    deepest: u32,
+}
+
+/// A fragment spread of a document.
+struct Spread {
+    /// The definition that holds the spread, its position in
+    /// [`Reach::definitions`].
+    definition: usize,
+    /// The levels open where the spread stands.
+    level: u32,
+    /// The token of the name the spread names.
+    name: TokenId,
+    /// The token `...` that opens the spread.
+    start: TokenId,
 }
 
 /// The bound of [`parse_value_within`] over one parse.
@@ -433,6 +541,8 @@ impl Parser {
             token_counter: 0,
             bound: None,
             selections: Vec::new(),
+            levels: 0,
+            reach: options.max_nesting.map(|_| Reach::default()),
         }
     }
 
@@ -469,16 +579,23 @@ impl Parser {
     /// Parses `Document : Definition+`.
     ///
     /// The token count of the document stays `None` here, [`parse`] fills it.
+    /// Under [`ParseOptions::max_nesting`] the document is then held to the
+    /// bound through its fragment spreads, which the reference has no
+    /// counterpart of.
     ///
     /// Derived from graphql-js 16.12.0, src/language/parser.ts, MIT.
     ///
     /// # Errors
     ///
     /// Returns the syntax error of the lexer or of a token that does not fit
-    /// the production.
+    /// the production, and the syntax error of the bound at the first spread
+    /// through which the document nests past it.
     pub fn parse_document(&mut self) -> Result<DocumentNode, Box<GraphQLError>> {
         let start = self.lexer.token;
         let definitions = self.many(TokenKind::Sof, Self::parse_definition, TokenKind::Eof)?;
+        if let Some(most) = self.options.max_nesting {
+            self.check_spreads(most)?;
+        }
         Ok(DocumentNode {
             loc: self.node(start),
             definitions,
@@ -520,6 +637,12 @@ impl Parser {
     /// shorthand query or of an extension, or of a keyword that starts no
     /// definition.
     pub fn parse_definition(&mut self) -> Result<DefinitionNode, Box<GraphQLError>> {
+        if let Some(reach) = self.reach.as_mut() {
+            reach.definitions.push(Defined {
+                name: None,
+                deepest: 0,
+            });
+        }
         if self.peek(TokenKind::BraceL) {
             return Ok(self.parse_operation_definition()?.into());
         }
@@ -758,11 +881,13 @@ impl Parser {
     /// the production.
     pub fn parse_selection_set(&mut self) -> Result<SelectionSetNode, Box<GraphQLError>> {
         let start = self.lexer.token;
+        self.open_level()?;
         let open = self.selections.len();
         if let Err(error) = self.open_selections() {
             self.selections.truncate(open);
             return Err(error);
         }
+        self.close_level();
         let selections: SharedSlice<SelectionNode> = self.selections.drain(open..).collect();
         Ok(SelectionSetNode {
             loc: self.node(start),
@@ -926,7 +1051,16 @@ impl Parser {
 
         let has_type_condition = self.expect_optional_keyword("on")?;
         if !has_type_condition && self.peek(TokenKind::Name) {
+            let name_token = self.lexer.token;
             let name = self.parse_fragment_name()?;
+            if let Some(reach) = self.reach.as_mut() {
+                reach.spreads.push(Spread {
+                    definition: reach.definitions.len().saturating_sub(1),
+                    level: self.levels,
+                    name: name_token,
+                    start,
+                });
+            }
             let directives = self.parse_directives(false)?;
             return Ok(FragmentSpreadNode {
                 loc: self.node(start),
@@ -978,8 +1112,10 @@ impl Parser {
         // Legacy support for defining variables within fragments changes
         // the grammar of FragmentDefinition:
         //   - fragment FragmentName VariableDefinitions? on TypeCondition Directives? SelectionSet
+        let name_token = self.lexer.token;
         if self.options.allow_legacy_fragment_variables {
             let name = self.parse_fragment_name()?;
+            self.name_definition(name_token);
             let variable_definitions = self.parse_variable_definitions()?;
             self.expect_keyword("on")?;
             let type_condition = self.parse_named_type()?;
@@ -996,6 +1132,7 @@ impl Parser {
             });
         }
         let name = self.parse_fragment_name()?;
+        self.name_definition(name_token);
         self.expect_keyword("on")?;
         let type_condition = self.parse_named_type()?;
         let directives = self.parse_directives(false)?;
@@ -1166,9 +1303,11 @@ impl Parser {
     /// the production, and the stop of a bound that refuses the list.
     pub fn parse_list(&mut self, is_const: bool) -> Result<ListValueNode, Box<GraphQLError>> {
         self.open_value(true)?;
+        self.open_level()?;
         let item = |parser: &mut Self| parser.parse_value_literal(is_const);
         let start = self.lexer.token;
         let values = self.any(TokenKind::BracketL, item, TokenKind::BracketR)?;
+        self.close_level();
         self.close_value(true);
         Ok(ListValueNode {
             loc: self.node(start),
@@ -1192,9 +1331,11 @@ impl Parser {
     /// the production, and the stop of a bound that refuses the object.
     pub fn parse_object(&mut self, is_const: bool) -> Result<ObjectValueNode, Box<GraphQLError>> {
         self.open_value(false)?;
+        self.open_level()?;
         let item = |parser: &mut Self| parser.parse_object_field(is_const);
         let start = self.lexer.token;
         let fields = self.any(TokenKind::BraceL, item, TokenKind::BraceR)?;
+        self.close_level();
         self.close_value(false);
         Ok(ObjectValueNode {
             loc: self.node(start),
@@ -1300,9 +1441,13 @@ impl Parser {
     /// the production.
     pub fn parse_type_reference(&mut self) -> Result<TypeNode, Box<GraphQLError>> {
         let start = self.lexer.token;
+        if self.peek(TokenKind::BracketL) {
+            self.open_level()?;
+        }
         let r#type: NullableTypeNode = if self.expect_optional_token(TokenKind::BracketL)? {
             let inner_type = self.parse_type_reference()?;
             self.expect_token(TokenKind::BracketR)?;
+            self.close_level();
             ListTypeNode {
                 loc: self.node(start),
                 r#type: Box::new(inner_type),
@@ -2587,6 +2732,137 @@ impl Parser {
         Ok(())
     }
 
+    /// Counts one more level open, a selection set, a list or an object value
+    /// or a list type, against the bound [`ParseOptions::max_nesting`],
+    /// before the parser reads the token that opens it.
+    ///
+    /// # Errors
+    ///
+    /// Returns the syntax error at that token where the level passes the
+    /// bound.
+    fn open_level(&mut self) -> Result<(), Box<GraphQLError>> {
+        self.levels = self.levels.saturating_add(1);
+        match self.options.max_nesting {
+            Some(most) if self.levels > most => Err(Box::new(syntax_error(
+                &self.lexer.source,
+                widen(self.token(self.lexer.token).start),
+                format!("Document nests deeper than {most} levels. Parsing aborted."),
+            ))),
+            _ => {
+                let levels = self.levels;
+                if let Some(defined) = self
+                    .reach
+                    .as_mut()
+                    .and_then(|reach| reach.definitions.last_mut())
+                {
+                    defined.deepest = defined.deepest.max(levels);
+                }
+                Ok(())
+            }
+        }
+    }
+
+    /// Records the token `name` as the name of the fragment the definition
+    /// the parser stands in defines.
+    fn name_definition(&mut self, name: TokenId) {
+        if let Some(defined) = self
+            .reach
+            .as_mut()
+            .and_then(|reach| reach.definitions.last_mut())
+        {
+            defined.name = Some(name);
+        }
+    }
+
+    /// Holds the document to the bound `most` through its fragment spreads.
+    ///
+    /// A spread counts as the inline fragment it stands for, so a spread at
+    /// level `s` of a fragment that reaches `d` levels reaches `s + d`. The
+    /// fragments of one name count as one, which reaches the deepest of them,
+    /// and a spread of a name no definition defines reaches no level. A
+    /// fragment that reaches itself through its spreads reaches the sum of the
+    /// deepest levels of every fragment of its cycles, and the most any spread
+    /// out of them reaches. The fragments are read in the order of their
+    /// strongly connected components, found by the algorithm of Tarjan on a
+    /// stack of its own.
+    ///
+    /// # Errors
+    ///
+    /// Returns the syntax error of the bound at the `...` of the first spread
+    /// in document order that reaches past it.
+    fn check_spreads(&mut self, most: u32) -> Result<(), Box<GraphQLError>> {
+        let Some(reach) = self.reach.take() else {
+            return Ok(());
+        };
+        if reach.spreads.is_empty() {
+            return Ok(());
+        }
+        // The fragments by name, each name once, with the deepest level of
+        // the definitions of that name.
+        let mut by_name: Vec<(&str, usize)> = reach
+            .definitions
+            .iter()
+            .enumerate()
+            .filter_map(|(at, defined)| defined.name.map(|name| (self.value_str(name), at)))
+            .collect();
+        by_name.sort_unstable();
+        let mut names: Vec<&str> = Vec::with_capacity(by_name.len());
+        let mut own: Vec<u32> = Vec::with_capacity(by_name.len());
+        let mut fragment_of: Vec<Option<usize>> = alloc::vec![None; reach.definitions.len()];
+        for (name, at) in by_name {
+            if names.last() != Some(&name) {
+                names.push(name);
+                own.push(0);
+            }
+            let fragment = names.len() - 1;
+            own[fragment] = own[fragment].max(reach.definitions[at].deepest);
+            fragment_of[at] = Some(fragment);
+        }
+        let targets: Vec<Option<usize>> = reach
+            .spreads
+            .iter()
+            .map(|spread| names.binary_search(&self.value_str(spread.name)).ok())
+            .collect();
+        // The spreads of each fragment, the level of each and the fragment
+        // it names, the spreads of fragment `f` at `first[f]..first[f + 1]`.
+        let mut first = alloc::vec![0usize; names.len() + 1];
+        for spread in &reach.spreads {
+            if let Some(Some(fragment)) = fragment_of.get(spread.definition) {
+                first[fragment + 1] += 1;
+            }
+        }
+        for at in 1..first.len() {
+            first[at] += first[at - 1];
+        }
+        let mut fill = first.clone();
+        let mut edges = alloc::vec![(0u32, None); first[names.len()]];
+        for (spread, &target) in reach.spreads.iter().zip(&targets) {
+            if let Some(&Some(fragment)) = fragment_of.get(spread.definition) {
+                edges[fill[fragment]] = (spread.level, target);
+                fill[fragment] += 1;
+            }
+        }
+        let reached = reached_levels(&own, &first, &edges);
+        for (spread, &target) in reach.spreads.iter().zip(&targets) {
+            if let Some(target) = target
+                && spread.level.saturating_add(reached[target]) > most
+            {
+                return Err(Box::new(syntax_error(
+                    &self.lexer.source,
+                    widen(self.token(spread.start).start),
+                    format!("Document nests deeper than {most} levels. Parsing aborted."),
+                )));
+            }
+        }
+        Ok(())
+    }
+
+    /// Counts a level closed again, the end of what [`Parser::open_level`]
+    /// counted.
+    fn close_level(&mut self) {
+        self.levels = self.levels.saturating_sub(1);
+    }
+
     /// Counts a list value, or an object value where `list` is false, closed
     /// again, the end of what [`Parser::open_value`] counted.
     fn close_value(&mut self, list: bool) {
@@ -2676,6 +2952,107 @@ fn budget_capacity(max_tokens: Option<f64>) -> Option<usize> {
     #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let whole = budget as usize;
     Some(whole.saturating_add(2))
+}
+
+/// Returns the levels each fragment reaches through its spreads.
+///
+/// `own` holds the deepest level each fragment opens itself, and the spreads
+/// of fragment `f` are `edges[first[f]..first[f + 1]]`, each the level of the
+/// spread and the fragment it names, if any. The strongly connected
+/// components are found by the algorithm of Tarjan with the stack of its
+/// calls in a vector, so a chain of any length costs no frame of the
+/// process, and each component is read once the components it reaches are
+/// read. A component of one fragment that spreads no fragment of its own
+/// reaches the most of its own levels and of the level of each spread with
+/// the levels the named fragment reaches. A cycle reaches the sum of the own
+/// levels of its fragments and the most a fragment it names outside it
+/// reaches, more than any path through it without a repeat reaches.
+fn reached_levels(own: &[u32], first: &[usize], edges: &[(u32, Option<usize>)]) -> Vec<u32> {
+    const UNSEEN: usize = usize::MAX;
+    let count = own.len();
+    let mut order = alloc::vec![UNSEEN; count];
+    let mut low = alloc::vec![0usize; count];
+    let mut on_stack = alloc::vec![false; count];
+    let mut done = alloc::vec![false; count];
+    let mut reached = alloc::vec![0u32; count];
+    let mut stack: Vec<usize> = Vec::new();
+    let mut calls: Vec<(usize, usize)> = Vec::new();
+    let mut next = 0usize;
+    for root in 0..count {
+        if order[root] != UNSEEN {
+            continue;
+        }
+        order[root] = next;
+        low[root] = next;
+        next += 1;
+        stack.push(root);
+        on_stack[root] = true;
+        calls.push((root, first[root]));
+        while let Some(&(fragment, edge)) = calls.last() {
+            if edge < first[fragment + 1] {
+                if let Some(call) = calls.last_mut() {
+                    call.1 += 1;
+                }
+                let Some(target) = edges[edge].1 else {
+                    continue;
+                };
+                if order[target] == UNSEEN {
+                    order[target] = next;
+                    low[target] = next;
+                    next += 1;
+                    stack.push(target);
+                    on_stack[target] = true;
+                    calls.push((target, first[target]));
+                } else if on_stack[target] {
+                    low[fragment] = low[fragment].min(order[target]);
+                }
+                continue;
+            }
+            calls.pop();
+            if let Some(&(caller, _)) = calls.last() {
+                low[caller] = low[caller].min(low[fragment]);
+            }
+            if low[fragment] != order[fragment] {
+                continue;
+            }
+            // The fragment roots a component, the fragments above it on the stack.
+            let from = stack
+                .iter()
+                .rposition(|&member| member == fragment)
+                .unwrap_or(0);
+            let members = &stack[from..];
+            let cyclic = members.len() > 1
+                || edges[first[fragment]..first[fragment + 1]]
+                    .iter()
+                    .any(|&(_, target)| target == Some(fragment));
+            let mut own_sum = 0u32;
+            let mut out = 0u32;
+            for &member in members {
+                own_sum = own_sum.saturating_add(own[member]);
+                for &(level, target) in &edges[first[member]..first[member + 1]] {
+                    if let Some(target) = target.filter(|&target| done[target]) {
+                        out = out.max(if cyclic {
+                            reached[target]
+                        } else {
+                            level.saturating_add(reached[target])
+                        });
+                    }
+                }
+            }
+            let levels = if cyclic {
+                own_sum.saturating_add(out)
+            } else {
+                own[fragment].max(out)
+            };
+            for &member in members {
+                on_stack[member] = false;
+                done[member] = true;
+                reached[member] = levels;
+            }
+            stack.truncate(from);
+        }
+    }
+    reached
 }
 
 /// Returns the count of tokens as the JavaScript number the reference compares.

@@ -149,6 +149,7 @@ impl ParseArgs {
             no_location: self.no_location,
             max_tokens: self.max_tokens,
             allow_legacy_fragment_variables: self.allow_legacy_fragment_variables,
+            max_nesting: None,
         }
     }
 

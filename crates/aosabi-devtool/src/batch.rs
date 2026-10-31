@@ -237,6 +237,7 @@ pub fn parse_options(request: &JsObject) -> Result<ParseOptions, String> {
             options.get("allowLegacyFragmentVariables"),
             Some(JsValue::Bool(true))
         ),
+        max_nesting: None,
     })
 }
 
