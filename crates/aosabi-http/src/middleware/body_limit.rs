@@ -68,10 +68,7 @@ use crate::{
         },
     },
     http_exception::HttpException,
-    web_app::{
-        MiddlewareFn,
-        RouteError, //
-    },
+    web_app::RouteError,
 };
 
 /// The bound of the default of the base pipeline, 1 MiB.
@@ -178,10 +175,9 @@ impl Stream for Bounded {
 }
 
 /// Returns the middleware `body_limit(options)`.
-#[must_use]
 pub fn body_limit<E: RouteError + From<HttpException>>(
     options: BodyLimitOptions<E>,
-) -> impl MiddlewareFn<E> {
+) -> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     let options = Rc::new(options);
     move |c: Context, next: Next<E>| -> LocalBoxFuture<'static, Result<Response, E>> {
         let options = Rc::clone(&options);
