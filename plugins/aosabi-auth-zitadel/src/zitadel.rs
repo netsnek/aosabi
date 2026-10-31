@@ -66,7 +66,10 @@ use aosabi_http::{
         set_cookie, //
     },
     parse_url,
-    utils::cookie::CookieOptions,
+    utils::cookie::{
+        CookieOptions,
+        SameSite, //
+    },
 };
 use aosabi_json::{
     JsObject,
@@ -594,10 +597,35 @@ fn request_url(c: &Context) -> Result<aosabi_http::Url, Thrown> {
     parse_url(&url, None).map_err(|_| invalid_url(&url))
 }
 
+/// Answers whether the request of `c` reached the app over https, which the cookies of the login
+/// mark `Secure`.
+///
+/// The request is one whose URL is `https:`, or whose first value of
+/// `x-forwarded-proto` is `https`, the field a proxy that ends TLS before
+/// the app writes.
+///
+/// A request over plain HTTP leaves `Secure` out.
+fn over_https(c: &Context) -> bool {
+    if c.req().url().starts_with("https:") {
+        return true;
+    }
+    c.req()
+        .header("x-forwarded-proto")
+        .and_then(|proto| {
+            proto
+                .split(',')
+                .next()
+                .map(|first| first.trim().eq_ignore_ascii_case("https"))
+        })
+        .unwrap_or(false)
+}
+
 /// Answers `GET <endpoint>/login`, the redirect to the authorization URL.
 ///
 /// The bootstrap runs first, then the verifier and its challenge are made,
-/// the cookie `aosabi_code_verifier` is set with `httpOnly` and `maxAge` 300,
+/// the cookie `aosabi_code_verifier` is set with `httpOnly`, `maxAge` 300,
+/// `SameSite=Lax` and
+/// `Secure` where [`over_https`] holds,
 /// and the answer redirects to the authorization URL with the scope, the
 /// challenge, `S256`, the `redirect_uri` of the origin of the request URL
 /// with the endpoint and `/callback`, and the state [`bound_state`] binds to
@@ -622,6 +650,8 @@ async fn login(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
         CookieOptions {
             http_only: true,
             max_age: Some(CODE_VERIFIER_MAX_AGE),
+            secure: over_https(&c),
+            same_site: Some(SameSite::Lax),
             ..CookieOptions::default()
         },
     )?;
@@ -688,6 +718,9 @@ fn cookie_text(value: &JsString) -> Result<&str, Thrown> {
 /// [`bound_state`], by the checks of the authorization response of the grant, so a `state` the
 /// login did not bind answers the `ClientError` `invalid response encountered`, the form the grant
 /// gives `unexpected "state" response parameter value`.
+///
+/// The session cookie carries `SameSite=Lax` as the cookie of the verifier does, and `Secure` where
+/// [`over_https`] holds.
 #[cfg_attr(
     not(any(feature = "host-crypto", all(unix, feature = "ring"))),
     expect(unreachable_code, reason = "this target has no signer")
@@ -735,6 +768,8 @@ async fn callback(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
         CookieOptions {
             http_only: true,
             max_age: Some(max_age),
+            secure: over_https(&c),
+            same_site: Some(SameSite::Lax),
             ..CookieOptions::default()
         },
     )?;
