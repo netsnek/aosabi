@@ -12,14 +12,15 @@
 //! `run_build_step`, `run_app_build_step`, `load_app` and the abort message
 //! with its exit.
 //!
-//! The build step imports the configuration, calls it when it is
-//! a factory, and stops the build with the constant head of its message and
-//! the cause when that throws, because the app would otherwise run with no
-//! plugins. A configuration of Aosabi throws by panicking, so the step runs
-//! `config()` under a panic hook that prints the pinned constant, then the
-//! payload of the panic as the cause, to standard error, and exits 1 from the
-//! hook, so the status is 1 under both panic strategies.
-//! The boot evaluates the configuration under the same hook.
+//! The build step imports the configuration, calls it when it is a factory,
+//! and stops the build with the constant head of its message and the cause
+//! when that throws, because the app would otherwise run with no plugins.
+//! Then it calls the `build` hook of every configured plugin once. A
+//! configuration of Aosabi throws by panicking, so the step runs `config()`
+//! under a panic hook that prints the pinned constant, then the payload of
+//! the panic as the cause, to standard error, and exits 1 from the hook, so
+//! the status is 1 under both panic strategies. The boot evaluates the
+//! configuration under the same hook.
 //!
 //! An app of the builder of the facade carries its configuration, the plugins
 //! and the options of the chain of its entry, so [`load_app`] evaluates the

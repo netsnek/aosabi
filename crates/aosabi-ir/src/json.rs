@@ -15,10 +15,11 @@
 //! the order the object literal created them and leaves out a key whose value
 //! is `undefined`. The shape is therefore the order of the literals in
 //! `toIR`, in `emptyIR` and in `entityFromDefinition` at `db/ir.ts:281-324`,
-//! with `sharedTable` set on an entity at `db/ir.ts:407`. [`to_js_value`]
-//! writes that order through the value model of `aosabi-json`, the only crate
-//! that writes JSON bytes. A `None` is an absent key and never `null`, an
-//! empty list is `[]` and an empty record is `{}`.
+//! with `sharedTable` last, set on an entity at `db/ir.ts:407`.
+//! [`to_js_value`] writes that order through the value model of
+//! `aosabi-json`, the only crate that writes JSON bytes. A `None` is an
+//! absent key and never `null`, an empty list is `[]` and an empty record is
+//! `{}`.
 //!
 //! | Type | Keys in the order written |
 //! | --- | --- |

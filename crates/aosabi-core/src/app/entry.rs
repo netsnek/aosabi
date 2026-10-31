@@ -156,7 +156,7 @@ impl<G: Fragment> IntoApp for App<G> {
 
 // `Composed` implements no `Fragment`, so the two implementations never
 // overlap, which the overlap check sees because the trait and the type are
-// both of this crate (risk 29 of the old page of the plan).
+// both of this crate.
 impl<P: 'static, C: Children> AppRoots for App<Composed<P, C>>
 where
     App<P>: IntoApp,

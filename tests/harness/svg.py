@@ -504,7 +504,7 @@ def _curves_cross(a: list, b: list) -> bool:
 
 
 def check(data, focus: str = None, budget: bool = True) -> Report:
-    """Checks one SVG against the invariants of step 11 of `51_viewer_core`.
+    """Checks one SVG against the invariants of a drawing.
 
     `focus` is the id of the focus box of an ego view, such as `TYPE::Order`,
     and is what the first ring rule is judged around. Without it the rule is

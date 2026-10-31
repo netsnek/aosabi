@@ -7,8 +7,8 @@ answer whole, cannot judge it. `StreamReader` writes one request over a
 connection of its own, parses the head once it arrived, undoes the chunked
 framing as the bytes come and splits the payload into frames on the blank line,
 each with the milliseconds after the request at which its last byte arrived. The
-arrival time is what the mask of a keepalive frame names and what the cadence
-cases of `40_sse` read.
+arrival time is what the mask of a keepalive frame names and what the cases of
+the keepalive cadence read.
 
 A stream whose payload is compressed cannot be split while it arrives, so its
 frames are split once the body is whole, with the arrival time of the byte that
@@ -410,9 +410,8 @@ def read_stream(endpoint: Endpoint, request: dict, extra_headers=(), timeout: fl
     A stream is read until its body ends, which follows the terminator, until
     the server closes it or until `timeout` seconds passed. With `close_after`
     the client closes the connection once that many frames after the prelude
-    that are no ping arrived, which is the client disconnect of cases S29 and
-    S30 of `40_sse`. An answer that is no stream is read to the end of its
-    framing.
+    that are no ping arrived, which is the client disconnect that a case
+    judges. An answer that is no stream is read to the end of its framing.
     """
     reader = StreamReader(endpoint, request_bytes(request, extra_headers), timeout)
     try:

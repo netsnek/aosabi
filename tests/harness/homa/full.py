@@ -11,9 +11,9 @@ and the fields HomaModule fills are filled as it fills them: `doff` as
 offset in words on DATA and 5 words on every other type (`homa_outgoing.c`
 lines 256, 257 and 516), every field it does not use 0, and the ACK always 80
 bytes (`homa_incoming.c` lines 1083 to 1093). The incast mark in bit 0 of the
-first pad byte of DATA is the design note's addition, which HomaModule reads
+first pad byte of DATA is the project's own addition, which HomaModule reads
 no byte of. The order in which a decoder checks a packet, and so which error
-it names first, is the reading of the track's close page for the full form.
+it names first, is the order of the crate for the full form.
 
 A packet is a dictionary whose `type` names it and whose other keys are the
 fields of the packet as the devtool writes them: `DATA` with `id`,

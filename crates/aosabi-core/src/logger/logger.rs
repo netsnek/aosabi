@@ -5,8 +5,7 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/logger.ts, Apache-2.0. Changed by the Aosabi authors.
  *
- * The environment is read through the alias table of docs/cli-and-targets.md
- * section 6.2.
+ * The environment is read through the alias table of `crate::app::env_alias`.
  */
 
 //! The runtime logger.

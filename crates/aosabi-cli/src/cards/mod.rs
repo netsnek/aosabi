@@ -2,9 +2,8 @@
 /*
  * aosabi-cli: the built in cards and their resolution.
  *
- * No analogue in the reference. The cards are the table of
- * docs/cli-and-targets.md section 5.0 as data. Each file of the directory says
- * what it holds.
+ * No analogue in the reference. Each file of the directory is one card and
+ * says what it holds.
  */
 
 //! The built in cards.
@@ -94,7 +93,7 @@ pub enum Profile {
     Release,
 }
 
-/// A carrier of ADR-0023.
+/// One of the six carriers.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Carrier {
     /// Network.
@@ -111,7 +110,7 @@ pub enum Carrier {
     LoRa,
 }
 
-/// A protocol of ADR-0023.
+/// One of the three protocols.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Protocol {
     /// HTTP(TCP).
@@ -172,7 +171,7 @@ impl Profile {
 }
 
 impl Carrier {
-    /// Returns the name of the carrier as ADR-0023 spells it.
+    /// Returns the proper name of the carrier, as the guides spell it.
     #[must_use]
     pub const fn name(self) -> &'static str {
         match self {
@@ -187,7 +186,7 @@ impl Carrier {
 }
 
 impl Protocol {
-    /// Returns the name of the protocol as ADR-0023 spells it.
+    /// Returns the name of the protocol, the layer below it in parentheses.
     #[must_use]
     pub const fn name(self) -> &'static str {
         match self {
@@ -237,8 +236,7 @@ pub fn by_name(name: &str) -> Option<&'static Card> {
     builtin::BUILTIN.iter().find(|card| card.name == name)
 }
 
-/// Returns whether `devices/` of `project` holds a file, a card the track
-/// installs.
+/// Returns whether `devices/` of `project` holds a file, an installed card.
 fn holds_a_card(project: &Project) -> bool {
     std::fs::read_dir(project.root.join(DEVICES_DIR)).is_ok_and(|entries| {
         entries

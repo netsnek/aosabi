@@ -11,12 +11,20 @@
 //!
 //! A [`Service`] is what `handler` builds below HTTP: the roots of an
 //! application run through the resolver wrapping, the seven bound scalars and
-//! the schema both enter. [`Service::execute`] runs one request through the one
-//! pipeline of the executor crate, inside a fresh [`Context`], the way a TypeScript
-//! service runs every request inside `asyncContext.run`. [`Service::subscribe`] runs a
-//! subscription the same way, inside a fresh context that carries the
-//! [`CarrierPolicy`] of the carrier that called, and answers its single result
-//! or its stream.
+//! the schema both enter. [`Service::execute`] runs one request through the
+//! one pipeline of the executor crate, inside a fresh [`Context`], the way a
+//! TypeScript service runs every request inside `asyncContext.run`. The
+//! context is the one of a synthetic
+//! `POST /graphql`, so `get_context()` answers below HTTP as it answers above
+//! it, and the bytes of every answer stay the same. [`Service::subscribe`]
+//! runs a subscription the same way, inside a fresh context that carries the
+//! [`CarrierPolicy`] of the carrier that called, and answers its single
+//! result or its stream.
+//!
+//! [`Execute`] for [`Service`] is the entry below HTTP a carrier calls: a
+//! query and a mutation answer one result, and a subscription answers
+//! [`ServiceStream::Events`], whose results a carrier reads one by one
+//! with the revision of the publish each came from.
 //!
 //! A service is `Send` and `Sync` and is shared between requests. Everything
 //! of one request, its agent, its context and its values, lives on the

@@ -10,13 +10,12 @@
 //!
 //! [`print_schema()`] renders every type and directive a schema defines as
 //! SDL, and [`print_introspection_schema()`] renders the specified
-//! directives and the introspection types instead. The build path
-//! never calls `printSchema`, because its SDL comes from a hand
-//! written printer over its own intermediate representation, and this port
-//! is the canonical second view that explains a byte difference
-//! semantically. The exit number of the milestone is byte equality of this
-//! output on fifty schemas, so each function follows its line of the
-//! reference and every literal is copied.
+//! directives and the introspection types instead. The build path never
+//! calls `printSchema`, because its SDL comes from a hand written printer
+//! over its own intermediate representation, and this port is the canonical
+//! second view that explains a byte difference semantically. The goal is
+//! byte equality of this output on fifty schemas, so each function follows
+//! its line of the reference and every literal is copied.
 //!
 //! A default value prints through [`ast_from_value()`], which turns the
 //! internal value of an argument or an input field into a value node by its

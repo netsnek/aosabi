@@ -32,9 +32,9 @@
 //!   build script of `server` refuses.
 //!
 //! The root of the workspace carries the release profile of the Aosabi
-//! workspace and the size profile of ADR-0025, since cargo reads the
-//! profiles of the root of a workspace alone and the service is a path
-//! dependency of it. The application's own `build.rs`, the one call
+//! workspace and the size profile for the smallest binary, since cargo
+//! reads the profiles of the root of a workspace alone and the service is
+//! a path dependency of it. The application's own `build.rs`, the one call
 //! `aosabi_build::declarations_main()`, stays in the application and runs
 //! when cargo compiles it, so no second one is written here.
 //!
@@ -139,8 +139,8 @@ pub fn glue_in_copy(root: &Path) -> PathBuf {
 /// `server-legacy` and `docker`.
 pub const LINUX_FEATURES: &[&str] = &["serve", "unix-socket", "deflate", "linux"];
 
-/// The release profile of the Aosabi workspace and the size profile of
-/// ADR-0025, as every twin carries them.
+/// The release profile of the Aosabi workspace and the size profile for the
+/// smallest binary, as every twin carries them.
 const PROFILES: &str = "[profile.release]
 lto = \"fat\"
 codegen-units = 1

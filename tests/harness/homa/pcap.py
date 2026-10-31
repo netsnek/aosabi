@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 """A reader of the capture files `tcpdump -w` writes, for the Homa packets of
-the raw IP and interop halves of `29_homa_raw` and the capture half of
+the runs over raw IP, of the interop runs and of the capture half of
 `05_homa_wire_full`.
 
 The file is the classic pcap format, a global header of 24 bytes and a record

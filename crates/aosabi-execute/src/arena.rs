@@ -105,7 +105,7 @@ const NEGATIVE_ZERO: u64 = (-0.0_f64).to_bits();
 const BYTES_PER_NODE: usize = 4;
 
 /// The most bytes the vectors a thread keeps between executions hold in all,
-/// 256 KiB in a Worker, the default of for a module of `wasm32`.
+/// 256 KiB in a module of `wasm32`.
 #[cfg(target_family = "wasm")]
 pub const KEPT_BYTES: usize = 256 * 1024;
 

@@ -154,7 +154,7 @@ pub enum TimerMode {
 ///
 /// The names hold for the serve layer of the Linux cards, whose runtime
 /// implements the trait over its heap of deadlines, and for the hosts of later
-/// milestones. The time is in milliseconds, so a timer of the agent waits for
+/// releases. The time is in milliseconds, so a timer of the agent waits for
 /// the milliseconds of its delay.
 pub trait HostClock {
     /// Returns the milliseconds of a monotonic clock of the host.

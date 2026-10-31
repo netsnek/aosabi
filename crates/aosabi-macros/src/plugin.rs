@@ -38,17 +38,16 @@
 //! A `roles` array is the literal form when it is empty or holds a string
 //! literal, and a `depends_on` array always is. Any other value of the three
 //! keys goes through the helper of its key, which wraps it in `Some`, so a
-//! computed value and the enum form `Strategy::Last` compile, and check C4 of
-//! `12_authoring_parity` reports a twin that writes the enum where its source
-//! writes the literal.
-//! The hook `on_execute` goes through its helper like every hook, whose
-//! closure answers the execute hooks of `on_execute_done(...)` or a `Result`
-//! of them.
+//! computed value and the enum form `Strategy::Last` compile, and a check of
+//! the authoring parity reports a twin that writes the enum where its source
+//! writes the literal. The hook `on_execute` goes through its helper like
+//! every hook, whose closure answers the execute hooks of
+//! `on_execute_done(...)` or a `Result` of them.
 //!
 //! `plugins![a, b]` expands to `Some(PluginList)` with one `PluginSlot` per
 //! element, which records the source text and the line of the element for
-//! the boot report of a served binary and for check C4 of
-//! `12_authoring_parity`.
+//! the boot report of a served binary and for a check of the authoring
+//! parity.
 
 use proc_macro2::TokenStream;
 use quote::{

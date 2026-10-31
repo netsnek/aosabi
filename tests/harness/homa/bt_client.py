@@ -42,7 +42,8 @@ DEVICE = "org.bluez.Device1"
 CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 PROPERTIES = "org.freedesktop.DBus.Properties"
 
-# The PSM of the channel, ADR-0023 section Fourth amendment.
+# The fixed PSM of the channel, which a device publishes in the PSM
+# characteristic.
 SPSM = 0x00E0
 
 

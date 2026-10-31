@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: MIT
-"""`61_oidc_login` and `63_zitadel_auth` serve `zitadel-login-app` and `zitadel-auth-app` on both sides with
-`OIDC_ISSUER` naming this issuer, `https://127.0.0.1:<port>`, so every request of the login routes and of the
-provider reaches a harness process on loopback and nothing else. The issuer is harness code and never a golden
-source: the golden is what the reference sends and answers.
+"""Aosabi harness: the mocked OIDC issuer both sides talk to, over HTTPS on 127.0.0.1.
+
+The notebooks serve `zitadel-login-app` and `zitadel-auth-app` on both sides with `OIDC_ISSUER` naming this issuer,
+`https://127.0.0.1:<port>`, so every request of the login routes and of the provider reaches a harness process on
+loopback and nothing else. The issuer is harness code and never a golden source: the golden is what the reference
+sends and answers.
 
 It is built on `http.server` and `ssl` of the standard library, and no Python package enters tests/pyproject.toml.
 The certificate of 127.0.0.1 and the CA come from tests/harness/tls.py, which the reference trusts through
@@ -13,24 +15,30 @@ one: under `hostile="answer"` it reads and records the request and sends the fir
 the answer before it closes the socket, and under `hostile="handshake"` it sends the first half of its first flight
 and closes.
 
-That closing issuer is the default and the issuer of `61_oidc_login` and `63_zitadel_auth`. Each request keeps its
-span, from the accept of its connection, or from the first byte of a later request on a kept connection, to the end
-of its answer, the close of the connection where the answer closes it, so the wait of a thread of the issuer for its
-turn counts to the issuer, where a span from the start of that thread booked it to the side. Where a notebook sets
-`watch` to a reader of the processor time of the side the issuer serves, each span also keeps that time at both of
-its ends, so the work of the side within the span, its part of each TLS handshake among it, is booked to the side
-and not to the issuer. `hold` keeps the answers of an endpoint until `release`, so every request a side sends
-meanwhile waits on one call to the issuer.
+The default issuer closes every connection, and the login routes and the provider talk to it. Three more modes stand
+beside it: `connection="keep-alive"` keeps a connection for the next request of its client and writes
+`connection: close` only on the answer to a request that asks to close, as a server of HTTP/1.1 keeps a connection,
+`tickets=2` sets `num_tickets` of the context to 2, the default of OpenSSL, so OpenSSL sends two TLS 1.3 session
+tickets after a full handshake and one after a resumed handshake, which a client resumes its next handshake with,
+and `host_name="issuer.localhost"` names the issuer by a host name with the certificate tests/harness/tls.py writes
+for it, so a side resolves the name before every connection it opens. Each request keeps its span, from the accept
+of its connection, or from the first byte of a later request on a kept connection, to the end of its answer, the
+close of the connection where the answer closes it, so the wait of a thread of the issuer for its turn counts to the
+issuer, where a span from the start of that thread booked it to the side. Where a notebook sets `watch` to a reader
+of the processor time of the side the issuer serves, each span also keeps that time at both of its ends, so the work
+of the side within the span, its part of each TLS handshake among it, is booked to the side and not to the issuer.
+`hold` keeps the answers of an endpoint until `release`, so every request a side sends meanwhile waits on one call
+to the issuer.
 
 The issuer answers each endpoint from its scenario, which a notebook sets with `control` in process or with a `POST`
 of JSON to the control endpoint `/__harness/control`, `{"scenario": ..., "challenge": ..., "hostile": ...}`, each
-key optional. The scenarios are those of the plan's tables: `ok`, `no_expiry`, `invalid_grant`, `id_token`,
-`id_token_bad_aud`, `wrong_issuer` and `discovery_500` of the login routes, and `introspect_ok`,
-`introspect_inactive`, `introspect_no_sub`, `introspect_401`, `introspect_400_json`, `introspect_jwt`,
-`userinfo_sub_mismatch`, `userinfo_challenge`, `userinfo_jwt`, `userinfo_not_json`, `roles_numeric`, `roles_string`,
-`roles_array` and `login_and_introspect` of the provider. The discovery of a login scenario names the endpoints the
-login routes reach, and the discovery of a provider scenario adds `introspection_endpoint`, `userinfo_endpoint` and
-the signing algorithms of a JWT answer, which oauth4webapi needs to read a JWT user info answer at all.
+key optional. The scenarios are `ok`, `no_expiry`, `invalid_grant`, `id_token`, `id_token_bad_aud`, `wrong_issuer`
+and `discovery_500` of the login routes, and `introspect_ok`, `introspect_inactive`, `introspect_no_sub`,
+`introspect_401`, `introspect_400_json`, `introspect_jwt`, `userinfo_sub_mismatch`, `userinfo_challenge`,
+`userinfo_jwt`, `userinfo_not_json`, `roles_numeric`, `roles_string`, `roles_array` and `login_and_introspect` of
+the provider. The discovery of a login scenario names the endpoints the login routes reach, and the discovery of a
+provider scenario adds `introspection_endpoint`, `userinfo_endpoint` and the signing algorithms of a JWT answer,
+which oauth4webapi needs to read a JWT user info answer at all.
 
 Beside them stands a scenario for each token and refusal of the capture of the login, so every observation of that
 capture runs against both sides: the ID tokens of `id_token_bad_iss`, `id_token_expired`, `id_token_no_iat` and
@@ -55,11 +63,14 @@ shape of Zitadel hold the audiences the code grant refuses, `id_token_aud_no_cli
 `id_token_aud_no_azp`, a list of two with no `azp`, and `id_token_azp_other`, an `azp` of another client, and
 `id_token_b64_lenient` holds a payload in the alphabet of base64 with `+`, `/`, white space and padding, which the
 forgiving decode of both sides takes. The scenarios of `MALFORMED` answer bytes no parser of a side takes, one or
-more for each parser of an answer and each form it refuses, which `61_oidc_budget` requires per parser file and
-form.
+more for each parser of an answer and each form it refuses, as a notebook requires per parser file and form.
 
-escapes as `\\ud800`, and `roles_value_of` answers an introspection whose roles
-claim holds an own key `valueOf`.
+Four scenarios serve the hostile inputs of the login: `surrogate_access_token`, `surrogate_token_type` and
+`surrogate_id_token` answer the token request with a lone surrogate in the access token, in the token type and in
+the payload of the
+ID token, which the JSON of the answer escapes as `\\ud800`, and
+`roles_value_of` answers an introspection whose roles claim holds an own key
+`valueOf`.
 
 Two scenarios hold U+212A KELVIN SIGN, whose lower case of `toLowerCase` is the ASCII `k`, in a type each side
 lowers before it compares: `token_type_kelvin` answers the token request with the token type `Bearer` and the sign,
@@ -70,20 +81,24 @@ JWT whose `typ` is `Application/To<U+212A>en-Introspection+JWT`, which lowers to
 The token and the introspection endpoint verify the client assertion before they answer: the signature with
 `openssl dgst -sha256 -verify` and the public half of the client key whose `kid` the header names, `exp - iat`
 against 60, `aud` against the issuer, an `nbf` that is the integer `iat`, the shape both libraries write, and the
-freshness. A side on the clock of the host writes the floor of an earlier time and never trips it, while a ceiling
-in the place of the floor or a tolerance in the place of a skew does. R25 of the audit adds an `exp` at or before
-the issuer's clock, which holds the past side, since `exp - iat` is held to 60, and a `jti` the issuer has seen in
-an earlier assertion, and the two catch a side whose clock reads 0. A request whose assertion fails answers 401
-`invalid_client`, and its record and the description of the answer say why. The record keeps the drawn `jti` beside
-the masked claims, so a notebook can show that each assertion draws its own. Every ID token, JWT introspection
-answer and JWT user info answer but those of the form of the capture and the ID token of `id_token_malformed`, which
-carries no signature of the key, is signed with `openssl dgst -sha256 -sign` and an RSA key the issuer writes per
-run under target/harness/issuer/.
+freshness. The window of `iat` is Zitadel's: an `iat` ahead of the issuer's clock is flagged, as the token endpoint
+of Zitadel refuses one from one or two seconds ahead for a client of the default clock skew of 0 and the
+introspection from two or three seconds ahead, the edge set by its rounding to the second. A side on the clock of
+the host writes the floor of an earlier time and never trips it, while a ceiling in the place of the floor or a
+tolerance in the place of a skew does. The issuer flags as well an `exp` at or before its clock, which holds the
+past side, since `exp - iat` is held to 60, and a `jti` it has seen in an earlier assertion, and the two catch a
+side whose clock reads 0. A request whose assertion fails answers 401 `invalid_client`, and its record and the
+description of the answer say why. The record keeps the drawn `jti` beside the masked claims, so a notebook can show
+that each assertion draws its own. The token endpoint checks PKCE, S256 of the posted `code_verifier` against the
+challenge a notebook handed it from the `Location` of a login, and answers 400 `invalid_grant` on a mismatch, so the
+PKCE binding runs end to end. Every ID token, JWT introspection answer and JWT user info answer but those of the
+form of the capture and the ID token of `id_token_malformed`, which carries no signature of the key, is signed with
+`openssl dgst -sha256 -sign` and an RSA key the issuer writes per run under target/harness/issuer/.
 
 Every request is recorded with its method, its target, its header lines in wire order and spelling, its body, the
 endpoint it reached, the scenario that answered it, and the outcome of the assertion and the PKCE check. A control
 request is recorded apart and never among the requests of a side. The issuer binds only the ports of `PORT_RANGES`,
-4655 to 4674 of `61_oidc_login` and 4940 to 4949 of `63_zitadel_auth`, plus the `port_offset` of the runner, or with
+4655 to 4674 for the login routes and 4940 to 4949 for the provider, plus the `port_offset` of the runner, or with
 `blocked` a port of `BLOCKED_PORTS`, the ports of the list of bad ports of the Fetch standard a user may bind, where
 a case puts the issuer that the fetch of each side refuses to reach.
 """
@@ -465,7 +480,7 @@ def client_assertion(client_key, audience: str, iat: int, exp: int | None = None
 
 def assertion_report(jws: str, client_keys, audience: str, work: Path, now: float | None = None,
                      seen=None) -> dict:
-    """The client assertion decoded, verified and masked, the rule of section The oracle of the plan.
+    """The client assertion decoded, verified and masked.
 
     The answer holds the header, the claims in their order with `jti`, `iat`,
     `nbf` and `exp` replaced by `<jti>`, `<iat>`, `<nbf>` and `<exp>`, the

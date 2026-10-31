@@ -2,20 +2,18 @@
 """Aosabi harness: a client of the protocol server over a child's standard input and output.
 
 The `mcp` command of the reference and `aosabi mcp` speak JSON-RPC 2.0 over the standard input and
-output of the process, one JSON message per line. `McpClient` starts one of
-them in a session of its own, writes one request per line and reads the next
-line the server writes as its answer, with the bytes kept as they came,
-because `70_mcp` compares every answer as bytes with its golden and with the
-live reference.
+output of the process, one JSON message per line. `McpClient` starts one of them in a session of
+its own, writes one request per line and reads the next line the server writes as its answer, with
+the bytes kept as they came, because a notebook compares every answer as bytes with its golden and
+with the live reference.
 
-A request is written as `json.dumps` with no space, in the key order the
-capture of the goldens wrote it, so the bytes a notebook sends equal the
-`request.bin` of a golden. The ids count from 1 per client, and a notification
-takes none. `raw` writes a line as it is given, such as a line that is no
-JSON, which the server consumes and answers with nothing. `sent` and `read`
-hold the whole transcript of the session, which `70_mcp` compares with capture
-row C75. `close` closes the input, reads what the server still writes, and
-ends the process group through `os.killpg`, so no child outlives a notebook.
+A request is written as `json.dumps` with no space, in the key order the capture of the goldens
+wrote it, so the bytes a notebook sends equal the `request.bin` of a golden. The ids count from 1
+per client, and a notification takes none. `raw` writes a line as it is given, such as a line that
+is no JSON, which the server consumes and answers with nothing. `sent` and `read` hold the whole
+transcript of the session, which a notebook compares with the transcript the capture recorded.
+`close` closes the input, reads what the server still writes, and ends the process group through
+`os.killpg`, so no child outlives a notebook.
 """
 
 from __future__ import annotations
@@ -30,7 +28,7 @@ import time
 from .paths import paths
 from .procs import _environment
 
-#: The protocol version the client of 70_mcp asks for.
+#: The protocol version the client asks for.
 PROTOCOL_VERSION = "2025-06-18"
 
 #: The client the `initialize` request names.

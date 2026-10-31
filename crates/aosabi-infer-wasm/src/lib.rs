@@ -11,10 +11,14 @@
 
 //! The module `infer.wasm` of the npm package `aosabi-build`.
 //!
-//! The command `aosabi build` of the package makes a `ts.Program` of an app and
-//! hands this module the questions of the inference to answer. Then it prints
-//! the schema text, writes the JSON form of the IR through `aosabi-ir`, writes
-//! `resolvers.js` and validates the schema text through the writers of
+//! The command `aosabi build` of the package makes a `ts.Program` of an app
+//! and hands this module the questions of the inference to answer. The module
+//! runs the inference of `aosabi-infer` over its trait `TypeSource`, whose
+//! every method is an import of the one block of the module `abi`, which the
+//! host answers lazily from the live `ts.TypeChecker` through three handle
+//! tables, one for types, one for symbols and one for call signatures. Then it
+//! prints the schema text, writes the JSON form of the IR through `aosabi-ir`,
+//! writes `resolvers.js` and validates the schema text through the writers of
 //! `aosabi-build`, so the bytes of `.aosabi/schema.graphql`, `ir.json` and
 //! `resolvers.js` are the bytes the Rust option writes for a twin.
 //!

@@ -16,8 +16,7 @@
 //! 16.12.0, the version the wire is pinned to, and of
 //! `utilities/stripIgnoredCharacters.ts` beside it. Every function keeps the
 //! graphql-js name in snake case and follows the TypeScript line by line,
-//! because the exit number of the milestone is byte equality of error text and
-//! locations.
+//! because the goal is byte equality of error text and locations.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |

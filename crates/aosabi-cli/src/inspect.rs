@@ -28,13 +28,14 @@
 //! build refuses is still inspected.
 //!
 //! [`command`] prints the model on standard output and nothing else, with the
-//! precedence above, and the JSON form with the gap of two spaces
-//! through [`to_string_with_gap`], so the bytes of `aosabi inspect --json`
-//! equal `target/aosabi/manifest.json` of a build of the same sources. `-e` and
-//! `-m` are accepted for their spelling and refused with `AO-C0104` for any
-//! value that is not the crate root of the package, the path of its `[lib]`
-//! table or cargo's default `src/lib.rs`, because the entry of an Aosabi
-//! service is its crate root. A value is read against the working directory.
+//! precedence above, and the JSON form with the gap of two spaces through
+//! [`to_string_with_gap`], so the bytes of `aosabi inspect --json` equal
+//! `target/aosabi/manifest.json` of a build of the same sources. `-e` and `-m`
+//! are accepted for their spelling and refused with `AO-C0104` for any value
+//! that is not the crate root of the package, the path of its `[lib]` table or
+//! cargo's default `src/lib.rs`, because the entry of an Aosabi service is its
+//! crate root. A value is read against the working directory. `--ddl` prints
+//! one newline, as no entity exists yet.
 //!
 //! A plain crate, whose roots no fragment of `graphql!` holds, needs no runner:
 //! [`inspect_app`] reads its source through `aosabi_build::introspect_source`,

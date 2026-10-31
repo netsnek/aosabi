@@ -23,8 +23,8 @@
 //! The three persistence positions, [`Field::column`], [`Field::relation`]
 //! and [`Entity::indexes`], are carried as an opaque [`JsValue`]. The printer
 //! reads none of them, so an entity that a reference test builds by hand
-//! replays without loss, and the database milestone types them when it ports
-//! their producer.
+//! replays without loss, and the database work types them when it ports their
+//! producer.
 //!
 //! [stringify]: https://tc39.es/ecma262/#sec-json.stringify
 
@@ -122,9 +122,9 @@ pub struct Field {
     /// The GraphQL arguments of a callable member, in the shape of
     /// [`Operation::args`].
     pub args: Option<Vec<Field>>,
-    /// The `ColumnSpec` of a persisted member, opaque.
+    /// The `ColumnSpec` of a persisted member, opaque for now.
     pub column: Option<JsValue>,
-    /// The `RelationSpec` of a relation member, opaque.
+    /// The `RelationSpec` of a relation member, opaque for now.
     pub relation: Option<JsValue>,
 }
 
@@ -143,7 +143,7 @@ pub struct Entity {
     pub primary_key: Option<String>,
     /// The interface names the type implements.
     pub implements: Vec<String>,
-    /// The `IndexSpec` list of the secondary indexes, opaque.
+    /// The `IndexSpec` list of the secondary indexes, opaque for now.
     pub indexes: Option<JsValue>,
     /// Whether the entity shares the physical table of another entity.
     pub shared_table: Option<bool>,

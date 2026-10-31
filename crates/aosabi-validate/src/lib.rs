@@ -12,8 +12,8 @@
 //! The crate is a literal translation of the validation directory of graphql-js
 //! 16.12.0, the version the wire is pinned to. Every function keeps the
 //! graphql-js name in snake case and follows the TypeScript line by line,
-//! because the exit number of the milestone is byte equality of the error text
-//! and the locations of every specified rule.
+//! because the goal is byte equality of the error text and the locations of
+//! every specified rule.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |

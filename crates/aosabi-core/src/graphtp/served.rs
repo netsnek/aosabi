@@ -6,10 +6,10 @@
  *
  * No analogue in the reference. A call runs the steps of the HTTP layer after
  * its request parse on the GraphQL server the boot mounted, and a call of an
- * app whose router holds more than the core takes the POST of steps 2 and 3
- * of docs/graphtp-in-aosabi.md section 3 through the fetch of the app. The
- * answer carries what step 4 of that section reads, with the substatus of
- * section 4 copied from the field of the Response the HTTP layer sets.
+ * app whose router holds more than the core takes the POST of the listener
+ * through the fetch of the app. The answer carries the status, the substatus
+ * copied from the field of the Response the HTTP layer sets, the media type
+ * and the body.
  */
 
 //! The fetch of a served build and of a carrier.
@@ -551,9 +551,9 @@ pub fn request(call: &Request) -> Rc<aosabi_http::Request> {
     let mut headers = Headers::new();
     for (name, value) in call.fields() {
         // The values are the two fixed types and a credential of visible
-        // ASCII, which the server of graphtp-homa checks by rule 6 of
-        // docs/graphtp.md section 5.3, so each is text the platform takes as
-        // a field, and a value past rule 6 travels as no credential does.
+        // ASCII, which the server of graphtp-homa checks, so each is text the
+        // platform takes as a field, and a value past that check travels as
+        // no credential does.
         if let Ok(value) = core::str::from_utf8(value) {
             let _ = headers.append(name, value);
         }

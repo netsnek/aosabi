@@ -82,7 +82,7 @@ exports its fetch handler over the app and the IR the glue exposes. So a Worker 
 `.aosabi/worker.mjs` as the `main` of its configuration of Wrangler, and a container runs
 `bun --preload aosabi/bun .aosabi/server.mjs`, as the quick start does. The glue reads
 `import.meta.url`, which workerd leaves undefined, so the configuration of Wrangler defines it, as
-section 12 of the guide shows for its example `hosts`.
+`examples/worker/wrangler.toml` shows.
 
 An entry the app writes itself takes the same files of the build. On a Worker it hands `worker()`
 the IR of `ir.json`:

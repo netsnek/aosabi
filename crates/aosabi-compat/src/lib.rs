@@ -50,7 +50,7 @@ pub struct Quirk {
     pub id: &'static str,
     /// What the reference does, in one sentence.
     pub what: &'static str,
-    /// The reference path and line range that decides it, under.
+    /// The reference path and line range that decides it, relative to a checkout of Pylon.
     pub source: &'static str,
     /// How well the entry is established.
     pub evidence: Evidence,
@@ -228,9 +228,9 @@ pub const QUIRKS: &[Quirk] = &[
     // Lives in `zitadel_principal` of
     // `plugins/aosabi-auth-zitadel/src/zitadel_auth.rs` over the tenant of the
     // principal of `aosabi-auth-contract`, an `Option<PrincipalId>` whose
-    // `None` stands for a tenant `null` and for no tenant alike. Pinned by step
-    // 2 of 63_zitadel_auth, which counts the lines of `principal` it reads
-    // alike under this id.
+    // `None` stands for a tenant `null` and for no tenant alike. Pinned by a
+    // check of the login through Zitadel, which counts the lines of `principal`
+    // it reads alike under this id.
     Quirk {
         id: "ZITADEL_TENANT_NULL_AS_ABSENT",
         what: "the provider sets the tenant of the principal to the answer of the tenant mapper as it is, so a mapper that answers null, a value outside the type string | number | undefined its option declares, gives the principal the tenant null beside the tenant undefined of a mapper that answers nothing, which the readers of the tenant in Pylon read alike and a reader of an application can tell apart",

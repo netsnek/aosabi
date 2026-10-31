@@ -70,7 +70,8 @@ use crate::{
     }, //
 };
 
-/// The names of the interfaces the printer drops, the `Set<string>`.
+/// The names of the interfaces the printer drops, the `Set<string>` of the
+/// reference.
 struct Dropped {
     /// The names in insertion order, as a JavaScript `Set` keeps them.
     names: IndexSet<String, KeyHasherBuilder>,
@@ -83,7 +84,8 @@ impl Dropped {
     }
 }
 
-/// The options of [`render_object_type`], the object literal type.
+/// The options of [`render_object_type`], the object literal type of the
+/// reference.
 #[derive(Clone, Copy)]
 struct ObjectOpts<'a> {
     /// The interface names the type implements.

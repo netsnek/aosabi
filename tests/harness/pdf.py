@@ -150,9 +150,9 @@ def record(pdf, work_dir) -> dict:
     """Returns the three levels of one PDF, the form of a `pdf.json` golden.
 
     The keys are `version`, `sha256` and `bytes` of the file, `text_sha256` and
-    `text`, the extracted text itself, which step 6 of 76_docs_pdf compares
-    against `pdf.json`, so a text mismatch can print what changed, then
-    `raster_dpi` and `pages`, the raster hash per page.
+    `text`, the extracted text itself, which a notebook compares against
+    `pdf.json`, so a text mismatch can print what changed, then `raster_dpi`
+    and `pages`, the raster hash per page.
     """
     data = Path(pdf).read_bytes()
     extracted = text(pdf)

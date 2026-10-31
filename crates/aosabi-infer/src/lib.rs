@@ -17,9 +17,8 @@
 //! five modules over one seam, the [`TypeSource`] trait, whose methods are
 //! named after the calls of the TypeScript checker. The modules translate
 //! their TypeScript sources literally, function by function and guard by
-//! guard, because the order in which the walk registers
-//! types is the order of the printed schema, and the exit number of the
-//! milestone is byte equality of that text.
+//! guard, because the order in which the walk registers types is the order of
+//! the printed schema, and the goal is byte equality of that text.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |

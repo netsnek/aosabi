@@ -43,11 +43,11 @@ exec-walk-location = []
 # carrier there, which JsObject wraps. Both crates sit in layer 1, so the
 # dependency reaches sideways inside one layer and never up.
 aosabi-json = { path = "../aosabi-json" }
-# The cell that holds the table of the line starts of a source, which the first
-# location request builds. A source lives in an `Arc` and crosses threads with
-# its document, so the cell is `Sync`, and the race cell needs no standard
-# library and no lock. A cell like it cannot be written without unsafe, and the
-# type layer keeps the crate pinned under reason 4 of ADR-0024 with the same
+# The cell that holds the table of the line starts of a source, which the
+# first location request builds. A source lives in an `Arc` and crosses
+# threads with its document, so the cell is `Sync`, and the race cell needs
+# no standard library and no lock. A cell like it cannot be written without
+# unsafe, and the type layer keeps the crate pinned with the same
 # requirement, so every deployed build already holds it and this line adds no
 # crate to any of them.
 once_cell = { version = "1.21.4", default-features = false, features = ["alloc"] }

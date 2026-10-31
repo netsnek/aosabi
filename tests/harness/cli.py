@@ -12,20 +12,23 @@ holds the four helpers they share.
   `cargo build --locked -p aosabi-cli` at the root. `reference` runs the vendored
   command line with the telemetry off and `LC_ALL=C` and `LANG=C`, because
   `inspect` sorts with `localeCompare`, which follows the process locale.
-- `parse_ts_registry` reads the TypeScript registry the `pull` command of the reference writes and
-  `parse_rs_registry` the Rust registry `aosabi pull` writes, each into the same
-  structure, with no help from the Rust side: the types in order with their kind
-  and members, each member with its type, its nullability and its arguments in
-  order, the delegate keys in order with their arguments and their return, and
-  the keys of `types` in order. `registry_differences` compares two of them after
-  `comparable`, which drops the roots the Rust registry writes no module for, and
-  reads the first, the reference's, through `lenient_records`, which makes a non
-  null member of a record whose type has no value for an absent member nullable,
-  the form the Rust registry writes it in, so a bare member of the Rust registry
-  shows as a difference.
+- `parse_ts_registry` reads the TypeScript registry the `pull` command of the
+  reference writes and `parse_rs_registry` the Rust registry `aosabi pull`
+  writes, each into the same structure, with no help from the Rust side: the
+  types in order with their kind and members, each member with its type, its
+  nullability and its arguments in order, the delegate keys in order with their
+  arguments and their return, and the keys of `types` in order.
+  `registry_differences` compares two of them after `comparable`, which drops
+  the roots the Rust registry writes no module for, and reads the first, the
+  reference's, through `lenient_records`, which makes a non null member of a
+  record whose type has no value for an absent member nullable, the form the
+  Rust registry writes it in, so a bare member of the Rust registry shows as a
+  difference. The Rust parser also reads the derive of a pull, the lines
+  `#[derive(...)]` and `#[aosabi(...)]` of each item, its `RemoteType` and its
+  `NeedsTarget`, into the member `derived`, which `comparable` leaves out and
+  `derived_differences` holds to the form it expects.
 - `hostile_server` is a server of one connection on 127.0.0.1 that answers a
-  request with one of the 15 malformed answers of step 5 of `70_pull`, named in
-  `HOSTILE_CASES`.
+  request with one of the 15 malformed answers named in `HOSTILE_CASES`.
 
 The structure of a registry is plain data, so a notebook prints it as JSON:
 
@@ -576,8 +579,17 @@ def parse_rs_registry(text: str) -> dict:
 
 
 def derived_differences(registry: dict) -> list:
-    """`NeedsTarget` stands beside every struct and enum a delegation can answer.
-    `registry` is what `parse_rs_registry` answers.
+    """Every place where the derived registry departs from the form of its derive, as one line each.
+
+    The form is this: an object and an interface with no implementation under
+    `#[derive(Aosabi)]` and `#[aosabi(remote)]` with a `RemoteType` that names
+    the file's `Registry` and its GraphQL name, a union and an interface with
+    implementations a payload enum under the same derive, an input object and an
+    enum under `#[derive(Aosabi)]`, every struct of `args` under
+    `#[derive(Aosabi)]` and `#[aosabi(arguments)]`, and a scalar outside the
+    twelve known ones an alias of `aosabi::Any`. `NeedsTarget` stands beside
+    every struct and enum a delegation can answer. `registry` is what
+    `parse_rs_registry` answers.
     """
     out = []
     derived = registry.get("derived", {"types": {}, "args": {}})
@@ -679,7 +691,7 @@ def registry_differences(left: dict, right: dict) -> list:
 
 # -- The hostile server -----------------------------------------------------------------------
 
-#: The 15 malformed answers of step 5 of 70_pull, in the order of the plan.
+#: The names of the 15 malformed answers of the hostile server.
 HOSTILE_CASES = (
     "truncated-status-line",
     "head-over-64k",

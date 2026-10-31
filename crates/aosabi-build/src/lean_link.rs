@@ -9,9 +9,9 @@
 //! A served binary of a Linux card aborts on a panic and never unwinds, so its
 //! unwind tables `.eh_frame`, `.eh_frame_hdr` and `.gcc_except_table` serve
 //! only the stack trace of a panic, which a shipped card then does not print,
-//! as a Worker and a microcontroller already do not. In the lead's check of
-//! that plan the lean link took 196,840 bytes of file and 198,060 loaded bytes
-//! off the served twin `errors-app-server` in the size profile.
+//! as a Worker and a microcontroller already do not. A check found that the
+//! lean link took 196,840 bytes of file and 198,060 loaded bytes off the served
+//! twin `errors-app-server` in the size profile.
 //!
 //! [`lean_link`] is the call of the build script of a server package that
 //! takes them out. It writes a linker script fragment of four lines,
@@ -78,7 +78,8 @@ use crate::{
 /// of the card the build script names, `server` or `server-legacy`.
 ///
 /// It is the route of a builder that links one package as both cards, as
-/// `17_framework_size` does, and an empty value counts as unset.
+/// the measure of the size of the framework does, and an empty value
+/// counts as unset.
 pub const LINUX_CARD_ENV: &str = "AOSABI_LINUX_CARD";
 
 /// The environment variable that picks the linker of the lean link of
@@ -137,8 +138,13 @@ const GCC_LD: &str = "gcc-ld";
 /// The symbols of an aarch64 link whose sections stay apart under identical
 /// code folding.
 ///
-/// They are the outline atomics `20_exec_cost` reads by name for its theorem
-/// T6, global symbols of the objects of `compiler_builtins`.
+/// They are the outline atomics that the cost model of the executor reads by
+/// name, global symbols of the objects of `compiler_builtins`. The fat link
+/// time optimization leaves every other function the model reads by name local
+/// to the one object it makes, whose global functions are `main` and
+/// `rust_eh_personality` alone, and LLD finds no local function for
+/// `--keep-unique`, so no other function stands on this list, and that section
+/// lists every fold of a function the model reads by name.
 const AARCH64_KEEP_UNIQUE: [&str; 4] = [
     "__aarch64_ldadd8_relax",
     "__aarch64_ldadd8_acq",

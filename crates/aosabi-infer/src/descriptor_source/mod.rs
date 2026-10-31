@@ -20,7 +20,7 @@
 //! | `present.rs` | the checker view of each node kind |
 //! | `assignable.rs` | `is_type_assignable_to`, the structural comparison |
 //! | `heritage.rs` | `get_heritage_declarations` |
-//! | `authoring.rs` | the authoring map of a build, the Rust half of `12_authoring_parity` |
+//! | `authoring.rs` | the authoring map of a build, the Rust half of the check of the authoring parity |
 //!
 //! # Handles
 //!

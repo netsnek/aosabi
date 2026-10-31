@@ -150,14 +150,17 @@ OWN_FIXTURES = (
 )
 
 #: The port the variant `down` of the boundary pair points the front at under
-#: `--jobs 1`. It is the last port of the range of 90_federation, which no case
-#: binds, so a delegation there meets a closed port, and a run with jobs shifts it
-#: by the `port_offset` of its slot as it shifts every port of the notebook.
+#: `--jobs 1`. It is the last port of the range of the federation notebook, which
+#: no case binds, so a delegation there meets a closed port, and a run with jobs
+#: shifts it by the `port_offset` of its slot as it shifts every port of the
+#: notebook.
 FEDERATION_DOWN_PORT = 4929
 
 
 def federation_variants(port_offset: int = 0) -> dict:
-    """Each changes the federation of the front and not its configuration, so the
+    """The variants of the boundary pair of the federation, their environment by name.
+
+    Each changes the federation of the front and not its configuration, so the
     overlay serves each as `default`, and the variant travels on both sides as the
     environment below, which the front reads at boot. The variant `headers` gives
     the federation its headers, and the variant `shared` adds the second
@@ -180,8 +183,8 @@ ENVIRONMENT_VARIANTS = {"federation-boundary-app": federation_variants}
 def variant_environment(name: str, variant: str, port_offset: int = 0) -> tuple[str, dict]:
     """The configuration and the environment one variant of a fixture serves with.
 
-    A variant of docs/harness.md section 8 or of `FIXTURE_VARIANTS` is the
-    configuration `AOSABI_CONFIG` names and adds no environment. A variant of
+    A variant of `VARIANTS` or of `FIXTURE_VARIANTS` is the configuration
+    `AOSABI_CONFIG` names and adds no environment. A variant of
     `ENVIRONMENT_VARIANTS` is served as the overlay's `default` with the
     environment of its table, whose ports `port_offset` shifts.
     """
@@ -305,9 +308,8 @@ def ca_environment(side: str, ca_cert) -> dict:
 
 
 def side_cwd(name: str, side: str, root=None) -> Path:
-    """The working directory a side of a fixture runs in: the stage of the reference,
-    or a directory of the twin under target/harness/issuer-cwd/, which a key file
-    may enter."""
+    """The working directory a side of a fixture of the login runs in: the stage of the reference,
+    or a directory of the twin under target/harness/issuer-cwd/, which a key file may enter."""
     if side == "reference":
         return stage_fixture(name, root)
     if side != "twin":
@@ -319,7 +321,9 @@ def side_cwd(name: str, side: str, root=None) -> Path:
 
 def issuer_environment(name: str, variant: str, side: str, issuer: str, tls_files, keys=None,
                        root=None) -> dict:
-    """`issuer` is the URL of the mocked issuer, `https://127.0.0.1:<port>`, which
+    """The environment of one side of an OIDC fixture, with the key files its variant asks written.
+
+    `issuer` is the URL of the mocked issuer, `https://127.0.0.1:<port>`, which
     both sides read as `OIDC_ISSUER`, `tls_files` the files of tls.py whose CA
     the side trusts, and `keys` the client keys, the key of the run first and,
     for `two_keys`, the key of `b.json` second, which defaults to the first.
@@ -405,12 +409,14 @@ def serve_development(name: str, port: int, variant: str = "default", env: dict 
 def serve_ts_side(name: str, port: int, host: str, module, variant: str = "default", node_env: str | None = "test",
               mode: str = "faithful", read: str = "get", root=None, timeout_s: float = 90.0, env=None,
               ready=None) -> Server:
-    """The side is the reference's own build of the fixture with only its import specifiers
-    rewritten, booted on the module `module` of `aosabi-js` through the staged
-    package `aosabi`, which tests/harness/ts1.py stages and serves. A variant and
-    `node_env` reach it as they reach `serve_reference`, through the configuration
-    overlay, and the variables of `env` and the readiness check `ready` as
-    `ts1.serve_judge` takes them.
+    """Serves the TypeScript side of a fixture in the judge mode on `host`, `workerd` or `bun`.
+
+    The side is the reference's own build of the fixture with only its import
+    specifiers rewritten, booted on the module `module` of `aosabi-js` through the
+    staged package `aosabi`. A variant and `node_env` reach it as they reach
+    `serve_reference`, through the configuration overlay, and the variables of
+    `env` and the readiness check `ready` as the server of the judge mode takes
+    them.
     """
     from . import ts1
 
@@ -433,7 +439,9 @@ def twin_layout(name: str, root=None) -> str:
 
 
 def is_served_twin(name: str, root=None) -> bool:
-    """The main a build generates for a twin in the scaffold layout calls one of them
+    """Whether a twin's server calls `aosabi::serve` or `aosabi::serve_app`, its two target forms.
+
+    The main a build generates for a twin in the scaffold layout calls one of them
     always, `aosabi::serve` with the configuration of `aosabi.config.rs` and
     `aosabi::serve_app` with the configuration the app of a twin without that file
     carries.

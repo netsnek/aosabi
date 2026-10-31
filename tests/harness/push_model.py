@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the push model, the rules of the kernel's publish module as code a notebook runs.
 
-The kernel's `publish` module has no reference, so its contract is the record of
-ADR-0017, which is the exception ADR-0008 grants every surface with no
+The kernel's `publish` module has no reference, so its contract is the project's
+own decision on server push and publish, as for every surface with no
 counterpart in the reference, and this module is where that contract is written
 as code. `aosabi-devtool push` runs the hub of `aosabi-kernel` over the same op
-lists with `u32` payloads and writes the same lines, so the notebook `40_pubsub`
-compares the two line by line. The model covers the hub and the allowlist alone,
-because the section queue, its sessions and `take_first` are withdrawn.
+lists with `u32` payloads and writes the same lines, so a notebook compares the
+two line by line. The model covers the hub and the allowlist alone, because the
+section queue, its sessions and `take_first` are withdrawn.
 
-The rules, in the words of the plan, section KERNEL:
+The rules the model follows:
 
 1. A publish increments the revision once, walks the slots in listen order, and
    every slot of the topic takes the payload with the new revision.
@@ -48,7 +48,7 @@ from __future__ import annotations
 
 import json
 
-#: The carriers of ADR-0023 in their order, by the name an op spells and the
+#: The six carriers in their fixed order, by the name an op spells and the
 #: proper name a refusal writes.
 CARRIERS = {
     "network": "Network",

@@ -24,6 +24,14 @@
 //! The key `logger` reaches Yoga through the spread and Yoga reads `logging`,
 //! so it is ignored there.
 //!
+//! The middleware answers through
+//! `yoga.fetch(c.req.raw, c.env, executionContext)`, the function
+//! [`answer`](fn@answer) of `graphql-over-http` over the server context of the
+//! environment and the execution context, calls `next()` when Yoga answers
+//! 404, sets `X-Pylon-Version` only when the version global is set, which only
+//! the pages plugin sets and which no fixture reaches, and answers
+//! `c.newResponse(response.body, response)`.
+//!
 //! The hot swap seam of development (source lines 353-361) has no
 //! reading, because a Rust server rebuilds its binary for a new schema.
 //!

@@ -15,8 +15,7 @@
 //! sits between the inference and every generated artifact. The inference
 //! fills it, the printer projects it to the text of `schema.graphql`, and its
 //! JSON form is `ir.json`. The printer is a literal translation, because the
-//! exit number of the milestone is byte equality of that text with the text
-//! the reference writes.
+//! goal is byte equality of that text with the text the reference writes.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |

@@ -110,7 +110,7 @@
 //! | [`RESOLVERS_FILE`] | `export const resolvers = `, the resolver of every union and interface as [`prepare_object_injection()`] writes them, and `"\n"` |
 //! | [`IR_FILE`] | `JSON.stringify(ir)` and one `"\n"` |
 //! | [`DESCRIPTORS_FILE`] | the dump of the descriptor graph and one `"\n"` |
-//! | [`AUTHORING_FILE`] | the authoring map of the build as [`authoring_json`] writes it, which check C2 of `12_authoring_parity` reads |
+//! | [`AUTHORING_FILE`] | the authoring map of the build as [`authoring_json`] writes it, which a check of the authoring parity reads |
 //!
 //! They land in [`ArtifactDirs::artifact_dir`], which is `target/aosabi/` of
 //! the workspace that builds, and a second copy of the schema lands in

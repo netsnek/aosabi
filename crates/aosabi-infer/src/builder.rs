@@ -9,8 +9,9 @@
  *
  * Nothing of that file outside `build` is translated. The TypeScript program
  * cache of `:23-56` has no counterpart, because no program is built here. The
- * entry discovery of `:233-345` and the root lookup of `:348-394` are
- * `TypeSource::type_of_root`.
+ * mapper helpers of `:74-231` and the `contributeIR` branch of `:411-423` and
+ * `:434-438` land with the database layer. The entry discovery of `:233-345`
+ * and the root lookup of `:348-394` are `TypeSource::type_of_root`.
  */
 
 //! The schema builder of the inference.

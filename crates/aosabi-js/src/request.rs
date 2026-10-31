@@ -62,28 +62,26 @@
 //! entry with all it holds. The table is a vector, searched by the number of
 //! the request, since a host holds a few requests in flight at once.
 //!
-//! The boot record picks one of two job modes. The first import of a request
-//! that runs on an agent adopts it: the agent tells the host of each job
-//! through the import `host_enqueue`, and the host answers with one microtask
-//! of its own that calls the export `run_job`, so each job of the agent runs as
-//! one microtask in the same queue as the app's own, in the order the agent
-//! enqueued them. The export grants the agent that one job and polls the
-//! request, so the job runs in the drain of the loop of its agent inside that
-//! poll, with the context of the request, the request that runs and the agent
-//! in place, as a job the agent drains itself runs. A settlement of a promise
-//! of the host runs the jobs it enqueues inside its own microtask, where V8
-//! runs the reaction of the `then` of `wrapResolver` on the promise the settled one stands
-//! for. A settlement a callback of the app makes inside an import rides on the
-//! answer of that import and takes effect as the import returns, so in the job
-//! of that call. Its reactions run at once, and the jobs they enqueue, the
-//! reactions of the consumer of the engine, wait for the microtask the host
-//! reserved at that call, where V8 queues the reactions of the promise of the
-//! app, which calls the export `resume`. A settlement through the resolving
-//! functions the host handed a thenable it adopts runs a level of reactions
-//! more at once, inside an import or in the microtask of the export `settle`,
-//! since the async function of a root reacts on such a settlement itself.
-//! In the fast mode a settlement drives the request at once, and the jobs of
-//! the agent run in the same turn.
+//! The boot record picks one of two job modes. In the faithful mode, the default, the host
+//! owns the queue of every agent the code of a request runs on. The first import of a request
+//! that runs on an agent adopts it: the agent tells the host of each job through the import
+//! `host_enqueue`, and the host answers with one microtask of its own that calls the export
+//! `run_job`, so each job of the agent runs as one microtask in the same queue as the app's
+//! own, in the order the agent enqueued them. The export grants the agent that one job and
+//! polls the request, so the job runs in the drain of the loop of its agent inside that poll,
+//! with the context of the request, the request that runs and the agent in place, as a job
+//! the agent drains itself runs. A settlement of a promise of the host runs the jobs it
+//! enqueues inside its own microtask, where V8 runs the reaction of the `then` of
+//! `wrapResolver` on the promise the settled one stands for. A settlement a callback of the
+//! app makes inside an import rides on the answer of that import and takes effect as the
+//! import returns, so in the job of that call. Its reactions run at once, and the jobs they
+//! enqueue, the reactions of the consumer of the engine, wait for the microtask the host
+//! reserved at that call, where V8 queues the reactions of the promise of the app, which
+//! calls the export `resume`. A settlement through the resolving functions the host handed a
+//! thenable it adopts runs a level of reactions more at once, inside an import or in the
+//! microtask of the export `settle`, since the async function of a root reacts on such a
+//! settlement itself. In the fast mode a settlement drives the request at once, and the jobs
+//! of the agent run in the same turn.
 //!
 //! An answer whose body is a stream, the events of a subscription or the parts
 //! of a multipart stream of a result processor of Yoga, or the body of a web

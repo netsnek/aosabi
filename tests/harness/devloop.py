@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: one development loop, its edits, its probes and its rebuilds.
 
-Step 5 of `70_cli` starts the `dev` command of the reference and `cargo aosabi dev` beside each other
-on explicit ports, edits one source on both sides and polls until the probe
-answers the changed schema. `start_dev` runs the command in a session of its
-own with its two streams in files under target/harness/devloop/, `edit` writes
-a source, `wait_for` polls a probe until it answers, `rebuilds` counts the
-lines `[dev] rebuilding` the supervisor of Aosabi prints, and `close` ends the
-whole process group through `os.killpg`, first with SIGINT, as a Ctrl C does,
-then with SIGKILL, so no child of either supervisor outlives a notebook.
+A test of the command line starts the `dev` command of the reference and
+`cargo aosabi dev` beside each other on explicit ports, edits one source on
+both sides and polls until the probe answers the changed schema. `start_dev`
+runs the command in a session of its own with its two streams in files under
+target/harness/devloop/, `edit` writes a source, `wait_for` polls a probe
+until it answers, `rebuilds` counts the lines `[dev] rebuilding` the
+supervisor of Aosabi prints, and `close` ends the whole process group through
+`os.killpg`, first with SIGINT, as a Ctrl C does, then with SIGKILL, so no
+child of either supervisor outlives a notebook.
 """
 
 from __future__ import annotations

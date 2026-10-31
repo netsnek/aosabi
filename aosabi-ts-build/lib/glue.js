@@ -20,13 +20,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import ts from 'typescript'
 
-/** The extensions of the sources the transpile takes from src/, transpile-app.ts:21. */
+/** The extensions of the sources the transpile takes from src/, transpile-app.ts:22. */
 const SRC_EXTS = ['.ts', '.tsx', '.mts', '.cts']
 
-/** The extensions a relative specifier resolves to, transpile-app.ts:22. */
+/** The extensions a relative specifier resolves to, transpile-app.ts:23. */
 const RESOLVE_EXTS = ['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs']
 
-/** The configuration files of an app in the order the build looks for them. */
+/** The configuration files of an app in the order the build looks for them, CONFIG_FILES of build-config.ts:4-9. */
 export const CONFIG_FILES = ['aosabi.config.ts', 'aosabi.config.mts', 'aosabi.config.js', 'aosabi.config.mjs']
 
 /** The entry of the package the glue imports. */
@@ -35,7 +35,7 @@ const ROOT_ENTRY = 'aosabi'
 /** The entry of the package whose default export is the fetch handler of a Worker over the glue. */
 const WORKER_ENTRY = 'aosabi/worker'
 
-/** Returns the configuration file of the app in `cwd`, or null, findConfigFile of build-config.ts:20-22. */
+/** Returns the configuration file of the app in `cwd`, or null, findConfigFile of build-config.ts:19-21. */
 export function findConfigFile(cwd) {
   return CONFIG_FILES.map(file => path.join(cwd, file)).find(file => fs.existsSync(file)) ?? null
 }
@@ -51,7 +51,7 @@ export function updateFileIfChanged(file, content) {
   return true
 }
 
-/** Returns every file under `dir` whose name `match` takes, in the order readdir answers, transpile-app.ts:24-38. */
+/** Returns every file under `dir` whose name `match` takes, in the order readdir answers, transpile-app.ts:25-39. */
 function walk(dir, match) {
   const out = []
   let entries
@@ -114,7 +114,7 @@ function specifierTransformer(importer) {
 
 /**
  * Transpiles the sources of the app in `cwd` into `outDir` and returns the files of the entry and
- * of the configuration there, transpileApp of transpile-app.ts:76-130 with ts.transpileModule.
+ * of the configuration there, transpileApp of transpile-app.ts:76-121 with ts.transpileModule.
  *
  * The entries are the files of `srcDir` with an extension of SRC_EXTS and the configuration file,
  * each written to the path it holds under `cwd` with the extension `.js` under `outDir`, so the

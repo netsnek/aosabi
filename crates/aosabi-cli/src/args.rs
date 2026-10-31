@@ -119,11 +119,11 @@ pub enum Command {
     Pull(PullArgs),
     /// `new`.
     New(NewArgs),
-    /// A command that lands with a later milestone or track row.
+    /// A command that lands with a later release or arrives with device cards.
     Later {
         /// The command as typed, its words joined by one space.
         command: String,
-        /// The milestone or the track row that lands it.
+        /// When it lands, with a later release or with device cards.
         lands: &'static str,
     },
     /// `-h`, `--help` or `help`, for the program or for one command.

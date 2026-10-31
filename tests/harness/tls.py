@@ -49,11 +49,11 @@ in that key order, and `write_key_file` writes the same record as the
 target/harness/ alone, which `client_key` asserts, so no key reaches a
 committed path.
 
-The key cases of `61_oidc_login` and `63_zitadel_auth` ask `client_key` for
-keys of other sizes and of more than two primes, which `bits` and `primes`
-name, and the PKCS#1 public half of a key, which `ClientKey.public_pkcs1`
-answers. `CLIENT_KEY_BITS` is the size of the key of a run, which every other
-case takes.
+The key cases of the login routes and of the provider ask `client_key` for keys
+of other sizes and of more than two primes, which `bits` and `primes` name, and
+the PKCS#1 public half of a key, which `ClientKey.public_pkcs1` answers.
+`CLIENT_KEY_BITS` is the size of the key of a run, which every other case
+takes.
 """
 
 from __future__ import annotations
@@ -134,7 +134,7 @@ class ClientKey:
         return (self.pkcs1 if form == "pkcs1" else self.pkcs8).read_text(encoding="ascii")
 
     def auth_key(self, form: str = "pkcs1") -> dict:
-        """The record of `AUTH_KEY` and of a key file, in the key order of the plan."""
+        """The record of `AUTH_KEY` and of a key file, in the key order `type`, `keyId`, `key`, `clientId`."""
         return {"type": "application", "keyId": self.key_id, "key": self.pem(form), "clientId": self.client_id}
 
     def auth_key_json(self, form: str = "pkcs1") -> str:

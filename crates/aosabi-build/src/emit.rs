@@ -92,11 +92,11 @@ use crate::{
     update_file_if_changed::update_file_if_changed, //
 };
 
-/// The file name of the schema text, which is the name the reference writes.
+/// The file name of the schema text, the name the reference writes.
 pub const SCHEMA_FILE: &str = "schema.graphql";
 
-/// The file name of the text copy of the resolvers, which is the name the
-/// reference writes.
+/// The file name of the text copy of the resolvers, the name the reference
+/// writes.
 pub const RESOLVERS_FILE: &str = "resolvers.js";
 
 /// The file name of the intermediate representation as JSON.

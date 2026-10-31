@@ -31,9 +31,11 @@
 //! oracle answers it.
 //!
 //! The `options` of `introspection_query` are the six flags of
-//! [`IntrospectionOptions`] by their names in the reference. The payload
-//! `query` is the text [`get_introspection_query()`] writes, the query `pull`
-//! posts when no option is named.
+//! [`IntrospectionOptions`] by their names in the reference. A flag the object
+//! names takes the truthiness of its value and an absent flag keeps its
+//! default, which is the spread over the defaults of the reference. The
+//! payload `query` is the text [`get_introspection_query()`] writes, the query
+//! `pull` posts when no option is named.
 
 use std::process::ExitCode;
 

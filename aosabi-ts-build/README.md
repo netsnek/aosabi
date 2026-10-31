@@ -57,8 +57,14 @@ npx aosabi migrate --reverse <dir>
   writes it on an object `env`, as the worker entry of a build sets the role. Each rename is one
   more edit of the log, which the reverse undoes as it undoes a specifier.
 - A specifier of the old package with no entry, such as `@getcronit/pylon/db`, stops the run with
-  the file, the line and the milestone that brings it, or the state that keeps it out where no milestone does,
-  and then nothing is written. A package whose specifiers the table maps, such as `hono`, stops on a
+  the file, the line and the later release that brings it, or the state that keeps it out where no
+  release does, and then nothing is written. So does a specifier with no row of a package Pylon
+  pulls in by default, such as `@envelop/core`, naming its package, which the list `pulled` of the
+  table names from the dependencies of Pylon's `package.json`, unless the `package.json` of the app,
+  the nearest one at or above `<dir>`, names that package as a dependency of its own and the table
+  maps no specifier of it, as an app that queries its database with `pg` names `pg`: then the
+  specifier is the app's own dependency, kept and listed in the log, since a package outside Pylon
+  stays the app's own. A package whose specifiers the table maps, such as `hono`, stops on a
   specifier with no row whatever the app names. Any other specifier, such as `node:fs`, a package of
   the app's own or a peer, is kept.
 - A name of a name row of the table, such as `getSignedCookie` of the root, stops the run in the same

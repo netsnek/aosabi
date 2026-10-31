@@ -116,8 +116,8 @@ pub const WRAPPER_FILE: &str = "rustc-std-source.sh";
 /// The flag the wrapper adds to a crate of the framework.
 pub const NO_DEBUG_TEXT: &str = "-Zfmt-debug=none";
 
-/// The flag the wrapper adds to a crate of the framework and to `core`,
-/// `alloc` and `std`.
+/// The flag the wrapper adds to a crate of the framework and to `core`, `alloc`
+/// and `std` to drop their location detail.
 pub const NO_LOCATION_DETAIL: &str = "-Zlocation-detail=none";
 
 /// The path of the source of the standard library in a sysroot, where the
@@ -148,7 +148,7 @@ pub struct SourceSet {
     pub per_crate: bool,
 }
 
-/// The set of the Linux cards, the with the options per crate.
+/// The set of the Linux cards, with the options per crate.
 pub const LINUX_SET: SourceSet = SourceSet {
     crates: "std,panic_abort",
     per_crate: true,

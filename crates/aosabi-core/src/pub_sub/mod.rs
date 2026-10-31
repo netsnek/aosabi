@@ -26,7 +26,7 @@
 //!
 //! # The rules
 //!
-//! The rules carry the numbers of the plan's section CORE, PUB SUB.
+//! The pub sub follows these rules.
 //!
 //! 1. The literal rule. [`PubSub::publish`] builds the argument list of the
 //!    reference, `[payload]` for a topic whose id is `()` and `[id,

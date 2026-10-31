@@ -2,8 +2,6 @@
 /*
  * aosabi-cli: the environment names the command line reads and the table of
  * their conventional aliases.
- *
- * The names and the aliases are those of docs/cli-and-targets.md section 6.2.
  */
 
 //! The environment and its aliases.

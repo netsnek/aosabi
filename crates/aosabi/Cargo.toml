@@ -18,14 +18,16 @@
 #                    "h2c" when it switches h2c on
 #   player           aosabi = { <aosabi>, features = ["serve", "unix-socket", "deflate", "linux"] }
 #   worker           aosabi = { <aosabi>, features = ["platform-coding"] }
+#   esp32c3-devkitm1 no facade
 #
-# The Linux pillar ships two cards, server linked with packed relocations for a
-# loader of glibc 2.36 or newer and server-legacy linked without them, the two
-# otherwise the same build, so both name the same features. A shipped card of
-# the three pillars holds at most 1 MiB with its application and without a
-# development tool, the framework aiming at 512 KiB, and the Linux web server
-# with TLS, HTTP/2 and OIDC at most 3 MiB, under the size profile. The plan and
-# the amendment reach this branch with the merge of main.
+# The feature deflate is the one content coding of the cards above, since
+# Aosabi codes no gzip. The Linux pillar ships two cards, server linked with
+# packed relocations for a loader of glibc 2.36 or newer and server-legacy
+# linked without them, the two otherwise the same build, so both name the same
+# features. A shipped card of the three pillars holds at most 1 MiB with its
+# application and without a development tool, the framework aiming at 512 KiB,
+# and the Linux web server with TLS, HTTP/2 and OIDC at most 3 MiB, under the
+# size profile.
 [package]
 name = "aosabi"
 version = "0.0.0"
@@ -91,12 +93,12 @@ bluetooth = ["dep:aosabi-carrier-bluetooth", "aosabi-carrier-bluetooth/linux"]
 # HTTP(TCP) of the same service, whose driver the boot runs under
 # AOSABI_HOMA_NETWORK with AOSABI_HOMA_PROTECTION. It is off by default, is a
 # dependency of a Linux target alone and enables the crate with its feature
-# homa-ip, and stage H5 adds the kernel path to it.
+# homa-ip, and the kernel path joins it later.
 homa-network = ["dep:aosabi-carrier-network", "aosabi-carrier-network/homa-ip"]
-# The carrier LoRa, which a card crate of the device card track that names LoRa
-# turns on for its bare metal image, and which leaves the driver of the SX1262
-# to the card crate's own dependency with its feature sx1262. It is off by
-# default and reaches no host build, so no card but a LoRa card links it.
+# The carrier LoRa, which a card crate that names LoRa turns on for its bare
+# metal image, and which leaves the driver of the SX1262 to the card crate's
+# own dependency with its feature sx1262. It is off by default and reaches no
+# host build, so no card but a LoRa card links it.
 lora = ["dep:aosabi-carrier-lora"]
 # The outbound HTTP call of a service, aosabi::fetch and FetchError, and on a
 # native target the client of aosabi-fetch, which serve hands the boot as the

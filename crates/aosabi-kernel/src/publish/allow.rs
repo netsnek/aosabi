@@ -4,8 +4,8 @@
  * each of them serves.
  *
  * No analogue in the reference. The allowlist exists on the smallest build, so
- * it uses core alone, and the carriers take the order of ADR-0023 with LoRa
- * the sixth.
+ * it uses core alone, and the carriers take their fixed order with LoRa the
+ * sixth.
  */
 
 //! The allowlist of a carrier.
@@ -17,7 +17,7 @@
 //!
 //! # The rule
 //!
-//! The rule carries the number of the plan's section KERNEL:
+//! This is rule 9 of the publish module:
 //!
 //! 9. The allowlist is consulted before a subscription runs, and a refusal
 //!    never reaches the executor. [`CarrierPolicy::NETWORK`] allows every
@@ -25,13 +25,13 @@
 //!    sets the policy of its other carriers, a depth of 1 and the fields its
 //!    link budget allows. `GraphTP` never drops, merges or reorders an event,
 //!    so the coalescing a depth causes is the publish primitive's alone, below
-//!    every protocol. The replay of `32_graphtp_replay` meets none, because
+//!    every protocol. The replay of the `GraphTP` goldens meets none, because
 //!    its one stream case, the golden `03d1b0055e5b` of `ticks`, publishes
 //!    nothing.
 
 use core::fmt;
 
-/// A carrier, in the order of ADR-0023, `LoRa` the sixth.
+/// A carrier, in the fixed order of the six, `LoRa` the sixth.
 ///
 /// The value is the place of the carrier in that order counted from 0, so a
 /// card names a carrier in one byte, and the six constants are every value
@@ -55,8 +55,8 @@ impl CarrierId {
 
     /// Returns the proper name, `Network`, `Unix Socket`, `USB`, `Bluetooth`, `Serial Line` or `LoRa`.
     ///
-    /// ADR-0023 writes each carrier as a proper name without an article, and
-    /// the refusal of [`write_refusal`] spells it so.
+    /// Each carrier is written as a proper name without an article, and the
+    /// refusal of [`write_refusal`] spells it so.
     #[must_use]
     pub const fn name(self) -> &'static str {
         match self.0 {

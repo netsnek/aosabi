@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 """Network namespaces joined by a veth pair inside a guest, the two hosts of
-the raw IP half of `29_homa_raw`.
+a run over raw IP.
 
 The crate's engine runs over raw sockets between two network namespaces of guest
 A, one of them with the queuing discipline of `qdisc.py` on its end of the veth

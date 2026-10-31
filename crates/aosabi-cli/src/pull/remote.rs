@@ -11,17 +11,20 @@
 
 //! The remote schema.
 //!
-//! [`fetch_schema`] posts `JSON.stringify({query: getIntrospectionQuery()})`
-//! as `application/json` through the `http://` only client of
-//! [`http`], which follows no redirect and bounds the connection at 5 seconds,
-//! the answer at 30 seconds, its head at 64 KiB and its body at 16 MiB, and
-//! refuses `https://` with `AO-C0501`. It reads the body with the reader of
-//! `aosabi-json`, refuses an answer that is no JSON, an answer that carries
-//! `errors` and an answer without `data`, as the plan asks, and builds the
-//! client schema with [`build_client_schema()`], whose type map keeps the order
-//! of `__schema.types`, which the registry walks. The scheme `https`, the
-//! redirects of 307 and 308, `errors` beside a `data`, the bounds and the
-//! codings are the divergences that `NOT_PORTED` of `aosabi-compat` names.
+//! In the reference, `generatePylonTypes` posts
+//! `JSON.stringify({query: getIntrospectionQuery()})` as `application/json` with
+//! `fetch` and builds the schema with `buildClientSchema(data)`.
+//! [`fetch_schema`] posts `JSON.stringify({query: getIntrospectionQuery()})` as
+//! `application/json` through the `http://` only client of [`http`], which
+//! follows no redirect and bounds the connection at 5 seconds, the answer at 30
+//! seconds, its head at 64 KiB and its body at 16 MiB, and refuses `https://`
+//! with `AO-C0501`. It reads the body with the reader of `aosabi-json`, refuses
+//! an answer that is no JSON, an answer that carries `errors` and an answer
+//! without `data`, and builds the client schema with [`build_client_schema()`],
+//! whose type map keeps the order of `__schema.types`, which the registry walks.
+//! The scheme `https`, the redirects of 307 and 308, `errors` beside a `data`,
+//! the bounds and the codings are the divergences that `NOT_PORTED` of
+//! `aosabi-compat` names.
 
 use aosabi_json::{
     JsObject,

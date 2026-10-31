@@ -14,8 +14,7 @@
 //! source lexes to its end the lexer returns the same end of file token for
 //! every further call. The token readers below follow the reference function by
 //! function and keep its names, and every syntax error message is the vendored
-//! text, because the exit number of the milestone is byte equality of error text
-//! and locations.
+//! text, because the goal is byte equality of error text and locations.
 //!
 //! Three shapes of the reference read differently in Rust.
 //!

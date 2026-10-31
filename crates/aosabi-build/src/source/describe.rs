@@ -120,14 +120,12 @@
 //!
 //! The roots are the parts the entry registers. A root is one object of the
 //! public members of every part in registration order, the twin of the root
-//! object literal of the index of a TypeScript service, whose members are
-//! arrow functions, as the
-//! derive path presents the root of a fragment of `graphql!` and the merged
-//! roots of `compose`. A name two parts hold is refused, as the plan's rule D4
-//! asks. A part with no public member registers nothing, so an empty root
-//! leaves no trace. Every construct the source cannot state is refused with
-//! the file and the line of the author, and the refusal says what to write in
-//! its place.
+//! object literal of the index of a TypeScript service, whose members are arrow
+//! functions, as the derive path presents the root of a fragment of `graphql!`
+//! and the merged roots of `compose`. A name two parts hold is refused. A part
+//! with no public member registers nothing, so an empty root leaves no trace.
+//! Every construct the source cannot state is refused with the file and the
+//! line of the author, and the refusal says what to write in its place.
 
 use std::rc::Rc;
 

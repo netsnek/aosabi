@@ -14,9 +14,11 @@
 
 //! The type mapping of the inference.
 //!
-//! [`TypeDefinitionBuilder::get_type_definition`] is `getTypeDefinition` of
-//! the reference, the function behind the thirty rows of the rule table. The
-//! reference writes it as one arrow function of 540 lines.
+//! [`TypeDefinitionBuilder::get_type_definition`] is `getTypeDefinition` of the
+//! reference. The reference writes it as one arrow function of 540 lines. Here
+//! each stretch of it is a private method, and the stretches run in the order
+//! of the reference, because an earlier test shadows a later one and a
+//! recursive call registers names as a side effect.
 //!
 //! # JavaScript semantics the port reproduces
 //!

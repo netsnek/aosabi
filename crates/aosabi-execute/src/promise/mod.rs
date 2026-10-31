@@ -62,8 +62,8 @@ pub mod ambient;
 pub mod combinators;
 pub mod future;
 pub mod host;
-// The plan of the crate names the file after the type it holds, as the
-// directory is named after the model.
+// The file is named after the type it holds, as the directory is named
+// after the model.
 #[expect(clippy::module_inception)]
 pub mod promise;
 pub mod timers;

@@ -402,7 +402,7 @@ fn root_binding(resolver: FieldResolverFn, subscribes: bool) -> FieldBinding {
 /// when no context is in place or none was set. A refused field throws the
 /// refusal synchronously, an original `GraphQLError` the executor locates at
 /// the field and the masking passes, so it reaches the caller as an error
-/// before the first yield. The rule is rule 9 of the plan's section KERNEL.
+/// before the first yield. It is rule 9 of the kernel's publish module.
 fn allowed(resolver: FieldResolverFn) -> FieldResolverFn {
     Arc::new(move |agent, source, args, context, info| {
         let policy = ambient_context().map_or(CarrierPolicy::NETWORK, |ctx| carrier_policy(&ctx));

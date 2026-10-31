@@ -17,18 +17,20 @@ with their file names and the checks they belong to.
 
 The formats are the ELF specification of the System V ABI and its aarch64
 supplement, the WebAssembly core specification, section Binary Format, and the
-v0 symbol format of Rust. The notebook 17_framework_size builds each probe a
-second time with `-C symbol-mangling-version=v0` and `strip = "none"` for these
-readers, so every function has a name to read.
+v0 symbol format of Rust. A notebook builds each probe a second time with
+`-C symbol-mangling-version=v0` and `strip = "none"` for these readers, so every
+function has a name to read.
 
-`variant` builds one variant of a card with a set of the levers of
-tests/harness/toolchain.py, the port of the driver variant.sh of the facts of
-that plan, and `elf_buckets` and `wasm_buckets` bucket a build by the fixed
-costs Rust adds over C, the port of its driver buckets.py, with no LLVM tool.
-The ELF reader gives the symbols a file imports from its shared libraries with
-their versions, and the wasm reader the addresses its code names, by which
-`wasm_data_items` attributes the data section to the functions that read it, and
-the target features of a module.
+A second edition of the size measurements adds these measures. `variant` builds
+one variant of a card with a set of the levers of tests/harness/toolchain.py,
+the port of the driver variant.sh of the size measurements, and `elf_buckets`
+and `wasm_buckets` bucket a build by the fixed costs Rust adds over C, the port
+of its driver buckets.py, with no LLVM tool. The ELF reader gives the symbols a
+file imports from its shared libraries with their versions, and the wasm reader
+the addresses its code names, by which `wasm_data_items` attributes the data
+section to the functions that read it, and the target features of a module.
+`generic_families` and `host_candidates` read the named families of the
+functions of a binary and the candidates that the host of a Worker holds.
 
 The routines a RISC-V image of the ESP32-C3 takes from the ROM of the chip are
 read here as well. `rom_script` reads the addresses a linker script of the ROM
@@ -1112,14 +1114,16 @@ def demangle(raw: str) -> str:
     return raw
 
 
-# The attribution. The one rule of the families that differs: a list of generic
-# arguments closes at its own `>` and never at the arrow `->`, and a `<` inside
-# a list opens a nested one, so `generic_family` gives one key to a family the
-# planning scripts split into several. The function `split_impl` ends a list the
-# same way and gives the subject and the trait of an impl. The crate of a
-# function differs in two narrow cases: `home_crate` gives an impl whose subject
-# has no first segment its trait's crate, and a name without a path the C
-# runtime and the entry.
+# The attribution. It follows the rules of an earlier measurement of the sizes,
+# so its rows compare with the numbers recorded there. The one rule of the
+# families that differs: a list of generic arguments closes at its own `>` and
+# never at the arrow `->`, and a `<` inside a list opens a nested one, so
+# `generic_family` gives one key to a family the scripts of that measurement
+# split into several. The function `split_impl` ends a list the same way and
+# gives the subject and the trait of an impl. The crate of a function differs in
+# two narrow cases: `home_crate` gives an impl whose subject has no first
+# segment its trait's crate, and a name without a path the C runtime and the
+# entry.
 
 WORKSPACE_CRATE = re.compile(r"\b(aosabi(?:_[a-z_]+)?|aoviewer_[a-z_]+|graphql_over_(?:http|graphtp)|in_context_app"
                              r"|errors_app[a-z_]*|size_(?:app|engine|facade|subset|hello)|graphtp|homa)\b")
@@ -1251,10 +1255,10 @@ def item_path(name: str) -> str:
     return generic_family(name)
 
 
-# The families of generic code the plan names. A function may belong to more
-# than one. The vector of entries of a map hands the index table its hashes
-# through the trait `Hashes` of the table, so a method of that trait counts for
-# the table whatever the type that implements it.
+# The named families of generic code. A function may belong to more than one.
+# The vector of entries of a map hands the index table its hashes through the
+# trait `Hashes` of the table, so a method of that trait counts for the table
+# whatever the type that implements it.
 HASHES_METHOD = " as aosabi_json::map::table::Hashes>::"
 FAMILIES = (
     ("the map of aosabi-json",
@@ -1270,7 +1274,7 @@ FAMILIES = (
     ("closures", lambda name: "{closure#" in name or "{closure:" in name),
 )
 
-# The groups of code that decide no answer or that the plan weighs one by one.
+# The groups of code that decide no answer or that are weighed one by one.
 GROUPS = (
     ("Debug", lambda name: " as core::fmt::Debug>::fmt" in name),
     ("<&T as Debug>::fmt", lambda name: name.startswith("<&") and " as core::fmt::Debug>::fmt" in name),
@@ -1286,8 +1290,8 @@ GROUPS = (
         r"(core::unicode::(unicode_data::(?!conversions::)|printable::)|core::char::methods::)", name))),
 )
 
-# The symbols exit line 4 of the plan holds no v0 names build to, unless the
-# close page names the call that keeps them.
+# The symbols of case conversion and float formatting, which a build should hold
+# no v0 name of unless a named call keeps them.
 EXIT_FOUR = re.compile(r"^(<str>::to_(lower|upper)case|alloc::str::<impl str>::to_(lower|upper)case"
                        r"|core::unicode::unicode_data::conversions::|core::fmt::float::"
                        r"|core::num::flt2dec::)")
@@ -2079,8 +2083,8 @@ def wasm_buckets(path) -> dict:
 
 
 #: The linker script of the lean link of aosabi-build, which a notebook gives a
-#: link itself where the build script of a tree does not act, as the part x86 of
-#: 17_framework_size does for a target before its lean link takes it.
+#: link itself where the build script of a tree does not act, as on x86 for a
+#: target before its lean link takes it.
 DISCARD_UNWIND = ("SECTIONS {\n  /DISCARD/ : { *(.eh_frame) *(.eh_frame_hdr) *(.gcc_except_table*) }\n}\n"
                   "INSERT AFTER .text;\n")
 #: The words of a failed build that a download over the network explains, so a later try may pass.

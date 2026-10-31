@@ -189,7 +189,7 @@ impl IntoGate for Result<()> {
 
 /// The gate of an app of the native layer, which answers the `Result` of the
 /// prelude of the facade, whose error throws as the thrown value of the engine,
-/// since the facade takes `Thrown` off its root of on.
+/// since the facade takes `Thrown` off its root.
 impl IntoGate for core::result::Result<(), Error> {
     fn into_gate(self) -> GateCall {
         GateCall::Done(self.map_err(Thrown::from))

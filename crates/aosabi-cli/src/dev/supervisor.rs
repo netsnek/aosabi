@@ -9,7 +9,10 @@
 
 //! The supervisor.
 //!
-//! A Rust service is a binary, so [`Supervisor`] runs it as a child and the restart is
+//! The reference compiles the schema in its own process, swaps it into the
+//! running app on a `src` edit, rebuilds the whole session on a change of the
+//! configuration, and runs one reload at a time behind a promise chain. A Rust
+//! service is a binary, so [`Supervisor`] runs it as a child and the restart is
 //! the whole reload:
 //!
 //! 1. The first build is steps 3 to 7 of `build` for the `server` card in
@@ -23,13 +26,17 @@
 //!    the served binary binds the port itself and prints nothing. The child
 //!    stays in the process group of the supervisor, so a Ctrl C ends both, and
 //!    its standard output goes to the standard error of the command line.
-//! 3. The first time it answers, the supervisor prints a box of its own, which
-//!    reads `Aosabi is up and running.` and
+//! 3. In the web role the supervisor posts `{"query":"{__typename}"}` to
+//!    `http://127.0.0.1:<port>/graphql` through the client of [`http`] every
+//!    100 ms until a 200 answers, the child exits or 30 seconds pass, the probe
+//!    rule of `tests/harness/procs.py`. When it first answers, the supervisor
+//!    prints a box of its own, which reads `Aosabi is up and running.` and
 //!    `Press Ctrl + C to stop the server.` in the frame `consola.box` draws,
-//!    and then `Aosabi running at http://localhost:<port>`, the line the
-//!    served binary prints outside development. The worker role probes
-//!    nothing and prints `[dev] worker started, watching src for changes`
-//!    once.
+//!    and then `Aosabi running at http://localhost:<port>`, the line the served
+//!    binary prints outside development. The reference's box ends in its issue
+//!    tracker and its feedback line, which would mislead an Aosabi user. The
+//!    worker role probes nothing and prints
+//!    `[dev] worker started, watching src for changes` once.
 //! 4. Every changed path prints `[dev] <kind> reload`, the character U+2014 and
 //!    the path relative to the root, and the highest kind
 //!    of a burst is kept. After 200 ms with no change, 150 ms in the worker

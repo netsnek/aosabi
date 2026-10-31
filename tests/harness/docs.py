@@ -75,7 +75,7 @@ INLINE_LINK = re.compile(r"\]\(\s*(<[^>\n]*>|[^\s()]*(?:\([^\s()]*\)[^\s()]*)*)(
 REFERENCE_DEFINITION = re.compile(r"^ {0,3}\[[^\]\n]+\]:[ \t]*(<[^>\n]*>|\S+)", re.MULTILINE)
 
 # An autolink, a scheme of 2 to 32 characters, a colon and no space or angle
-# bracket. It always leaves the tree, so its scheme is what step 20 of 75_docgen
+# bracket. It always leaves the tree, so its scheme is what `scheme_violations`
 # judges.
 AUTOLINK = re.compile(r"<([A-Za-z][A-Za-z0-9+.-]{1,31}:[^\s<>]*)>")
 

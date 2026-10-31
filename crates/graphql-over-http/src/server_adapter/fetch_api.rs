@@ -18,13 +18,12 @@
 //!   names no length and the length is not 0.
 //! - The platform gives the same type and no length header.
 //!
-//! The function writes the headers of the ponyfill on every platform, the named
-//! divergence D57 of `docs/byte-equality.md` section 3. So an answer whose body is
-//! a string carries its `content-length` on a Worker and on Bun as it does on Node,
-//! a compression applies its threshold of 1,024 bytes by that length, and an answer
-//! below the threshold goes out uncoded, where a TypeScript app on a Worker and on Bun codes
-//! every answer a client accepts coded, since the threshold of `compress()` reads
-//! that header alone.
+//! The function writes the headers of the ponyfill on every platform, a named
+//! divergence. So an answer whose body is a string carries its `content-length` on
+//! a Worker and on Bun as it does on Node, a compression applies its threshold of
+//! 1,024 bytes by that length, and an answer below the threshold goes out uncoded,
+//! where a TypeScript app on a Worker and on Bun codes every answer a client
+//! accepts coded, since the threshold of `compress()` reads that header alone.
 //!
 //! The body of either is a stream, which is what `response.body` answers, so a
 //! string body is a stream of one chunk here, and the app hands that stream to hono

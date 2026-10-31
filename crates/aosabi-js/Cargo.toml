@@ -1,9 +1,11 @@
-# The wrapper of the folder aosabi-ts drives it, and the engine reaches the
-# values of an app through the one import block of src/abi.rs. The same code
-# builds the native library of the engine for Bun on Linux under the feature
-# native below, the section The native engine for Bun on Linux of the same plan.
-# It is the module of the npm package aosabi, as graphtp-wasm is the module of
-# the npm package graphtp, and no feature of a device card. The crate is never
+# The module core.wasm of the npm package aosabi, the TypeScript option: the
+# engine with every default layer a TypeScript app can reach and no app, behind
+# the host boundary, as one cdylib for wasm32-unknown-unknown. The wrapper of
+# the folder aosabi-ts drives it, and the engine reaches the values of an app
+# through the one import block of src/abi.rs. The same code builds the native
+# library of the engine for Bun on Linux under the feature native below. It is
+# the module of the npm package aosabi, as graphtp-wasm is the module of the npm
+# package graphtp, and no feature of a device card. The crate is never
 # published, since the package carries its module and the platform packages of
 # aosabi-ts-native carry its libraries as build products.
 [package]
@@ -145,24 +147,25 @@ native = [
     "dep:graphql-over-http",
 ]
 # The feature trap makes a test build of the module, which traps on purpose when
-# it reads a string value of the host that is the marker of src/value.rs, so
-# 13_ts1_boundary can judge the second condition of the import block on a real
-# trap, inside the export fetch and inside the export settle. The module of the
-# package never takes it, and it adds no export line, no import and no crate.
+# it reads a string value of the host that is the marker of src/value.rs, so the
+# checks of the boundary of the TypeScript option can judge the second condition
+# of the import block on a real trap, inside the export fetch and inside the
+# export settle. The module of the package never takes it, and it adds no export
+# line, no import and no crate.
 trap = []
 # The feature execute makes a test build of the module whose request of the
 # method POST to the path /.ts1/execute answers the payload aosabi-devtool
-# execute answers for one request of the protocol of tests/sidecar/execute.mjs,
-# the result text of the executor of the engine over the app of the boot below
-# HTTP, so the side ts of 20_execute and of 31_http_errors judges the JavaScript
-# resolvers of a behaviour table and of a fixture on the module. The module of
-# the package never takes it, and it adds no export line, no import and no
-# crate.
+# execute answers for one request of the protocol of the executor sidecar, the
+# result text of the executor of the engine over the app of the boot below HTTP,
+# so the side ts of the checks of the executor and of the HTTP errors judges the
+# JavaScript resolvers of a behaviour table and of a fixture on the module. The
+# module of the package never takes it, and it adds no export line, no import
+# and no crate.
 execute = []
 # The feature print makes a test build of the module whose export
 # schema_record also prints the schema a schema record builds and the schema
-# its SDL builds, through the printer of aosabi-type, so 13_ts1_boundary can
-# hold the two to each other and to the SDL of the build for every fixture.
-# The module of the package never takes it, and it adds no export line, no
-# import and no crate.
+# its SDL builds, through the printer of aosabi-type, so the checks of the
+# boundary of the TypeScript option can hold the two to each other and to
+# the SDL of the build for every fixture. The module of the package never
+# takes it, and it adds no export line, no import and no crate.
 print = []

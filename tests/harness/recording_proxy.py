@@ -35,10 +35,10 @@ A mode answers in place of the remote:
 | `fail_once` | refuses the first introspection and forwards every request after it, case gw4-12 and the retry of gw1-17 |
 | `hostile_<n>` | answers a data request with the n-th of the fifteen malformed responses, cases gw4-13 to gw4-27 |
 | `down` | binds nothing, so the port is closed, case gw1-17 |
-| `redirect_<status>` |  |
-| `nested_<n>` |  |
-| `deep_error_<n>` |  |
-| `intro_<kind>_<n>` |  |
+| `redirect_<status>` | answers every request with the status, one of the five a fetch follows, and the relative `location` of the path under `/redirected`, and forwards a request to such a path at the path it names, a redirecting remote |
+| `nested_<n>` | answers a data request of the product with its title nested in n arrays, a remote answer as deep as the reader admits for n up to 997 |
+| `deep_error_<n>` | answers as `nested_<n>` with an error of the remote whose path follows the title down its n arrays |
+| `intro_<kind>_<n>` | forwards the introspection and answers the remote's schema with the crafted part `kind` of size n added |
 
 The introspection a federation sends first is forwarded in every mode but
 `fail_once`, `down`, `redirect_<status>` and `intro_<kind>_<n>`, so a mode
@@ -140,7 +140,9 @@ def _head(status_line: str, headers, body: bytes = b"", length: bool = True) -> 
 
 
 def hostile_responses() -> list:
-    """An entry of `None` closes the connection before a byte of the head. The
+    """The fifteen malformed responses, raw bytes, in the order of their numbers.
+
+    An entry of `None` closes the connection before a byte of the head. The
     body over 16 MiB is 16 MiB and 1 byte of valid JSON, so its length is the
     only thing wrong with it.
     """

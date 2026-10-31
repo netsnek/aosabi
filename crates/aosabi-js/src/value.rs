@@ -45,42 +45,41 @@
 //! objects, arrays and dates.
 //!
 //! The host meets a thenable while it walks a value it answers, as step 3 of
-//! `wrapResolver` meets it, and calls its `then` there, before it reads
-//! the next item. A promise of the realm of the host that the walk answers as
-//! the value takes the two callbacks that call the export `settle`, the form of
-//! the plan. Any other thenable takes the call of `wrapResolver` with one callback, which
-//! answers what `wrapResolver` answers for the value it receives. For a
-//! thenable it calls that `then` at once, inside the callback, with one
-//! callback of the same form and answers what that `then` answers. A promise of
-//! the realm of the host that the walk meets as an item of a list, or that a
-//! callback receives, takes the `then` of `Promise` itself with the
-//! callback of `wrapResolver` and a second callback, since no code of the app sees the count of
-//! the arguments of that `then`, so a field that waits on the promise it
-//! derives settles in the job that promise rejects in. The host maps an array
-//! as step 4 maps it, the array the walk meets and the one the callback
-//! receives, each item and each nested array the same way, so the `then` of a
-//! thenable item runs while the walk runs, and it answers the mapped array, or
-//! a promise of the host of all its items when one of them is a thenable, which
-//! the host makes with the steps of `Promise.all` and owns, so a field that
-//! waits on it settles in its job. A primitive and a `Date` come back as they
-//! are, as steps 1 and 2 answer them, and so does any other object, since the
-//! projection of the engine reads its members, as step 6 reads them there,
-//! through [`ObjectLike::read`] in the count and the order of the
-//! projection of `wrapResolver`. What the outer `then` answers is the value that crosses, and a
-//! promise of the host when that value is a thenable, which the host settles in
-//! the job the field of `wrapResolver` settles in wherever it can tell that job: a late call
-//! of the callback settles it with what the callback answers, at once or as the
-//! promise of the app adopts it, and a thenable of the app that the host adopts
-//! settles it through resolving functions of the host. A late call that code of
-//! the app makes inside an import, a resolver the engine calls among them,
-//! rides on the answer of that import, and the settlement takes effect as the
-//! import returns, in the job of that call. Its reactions, the step 3 the
-//! engine applies to the promise among them, run at once there, and the jobs
-//! they enqueue wait for the microtask the host reserves at the call, where V8
-//! queues the consumer of `wrapResolver`, and which calls the export `resume`. A settlement
-//! through the resolving functions the host handed a thenable it adopts runs
-//! the jobs those reactions enqueue at once as well, inside an import or in the
-//! microtask of the export `settle`, since the async function of a root
+//! `wrapResolver` meets it, and calls its `then` there, before it reads the next
+//! item. A promise of the realm of the host that the walk answers as the value
+//! takes the two callbacks that call the export `settle`. Any other thenable
+//! takes the call of `wrapResolver` with one callback, which answers what
+//! `wrapResolver` answers for the value it receives. For a thenable it calls that
+//! `then` at once, inside the callback, with one callback of the same form and
+//! answers what that `then` answers. A promise of the realm of the host that the
+//! walk meets as an item of a list, or that a callback receives, takes the `then`
+//! of `Promise` itself with the callback of `wrapResolver` and a second callback,
+//! since no code of the app sees the count of the arguments of that `then`, so a
+//! field that waits on the promise it derives settles in the job that promise
+//! rejects in. The host maps an array as step 4 maps it, the array the walk meets
+//! and the one the callback receives, each item and each nested array the same
+//! way, so the `then` of a thenable item runs while the walk runs, and it answers
+//! the mapped array, or a promise of the host of all its items when one of them
+//! is a thenable, which the host makes with the steps of `Promise.all` and owns,
+//! so a field that waits on it settles in its job. A primitive and a `Date` come
+//! back as they are, as steps 1 and 2 answer them, and so does any other object,
+//! since the projection of the engine reads its members, as step 6 reads them
+//! there, through [`ObjectLike::read`] in the count and the order of the
+//! projection of `wrapResolver`. What the outer `then` answers is the value that
+//! crosses, and a promise of the host when that value is a thenable, which the
+//! host settles in the job the field of `wrapResolver` settles in wherever it can
+//! tell that job: a late call of the callback settles it with what the callback
+//! answers, at once or as the promise of the app adopts it, and a thenable of the
+//! app that the host adopts settles it through resolving functions of the host. A
+//! late call that code of the app makes inside an import, a resolver the engine
+//! calls among them, rides on the answer of that import, and the settlement takes
+//! effect as the import returns, in the job of that call. Its reactions, the step
+//! 3 the engine applies to the promise among them, run at once there, and the
+//! jobs they enqueue wait for the microtask the host reserves at the call, where
+//! V8 queues the consumer of `wrapResolver`, and which calls the export `resume`.
+//! A settlement through the resolving functions the host handed a thenable it
+//! adopts runs the jobs those reactions enqueue at once as well, inside an import
+//! or in the microtask of the export `settle`, since the async function of a root
 //! hands that thenable its own resolving functions and reacts on the settlement
 //! itself. The shapes still open settle one job off the field of `wrapResolver`
 //! or answer another value, each for a reason no wrapper over the boundary can
@@ -2907,8 +2906,9 @@ fn skip(reader: &mut Reader<'_>, depth: usize) -> Option<()> {
 }
 
 /// Traps on purpose when `text` is the marker [`TRAP`], in a build with the
-/// feature `trap` alone, the test build of `13_ts1_boundary`, section 9,
-/// which judges that the host never calls a trapped instance again.
+/// feature `trap` alone, the test build with which the checks of the
+/// boundary of the TypeScript option judge that the host never calls a
+/// trapped instance again.
 #[cfg(feature = "trap")]
 fn trap_at(text: &JsString) {
     if text.as_str() == Some(TRAP) {

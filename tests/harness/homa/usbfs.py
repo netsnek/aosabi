@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 """A USB host over usbfs through `fcntl.ioctl`: bulk transfers, halts cleared
-and resets, the host side of the emulated half of `27_carrier_usb`.
+and resets, the host side of the USB carrier's emulated runs.
 
 In guest A the gadget of `aosabi-carrier-usb` runs on `dummy_hcd`, whose
 emulated host controller the guest's own USB core enumerates, so the device

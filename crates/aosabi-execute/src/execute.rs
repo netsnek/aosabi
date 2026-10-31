@@ -859,7 +859,7 @@ impl LeafRules {
 }
 
 /// The positions of the five specified scalars in [`specified_scalar_types`],
-/// the order of `specifiedScalarTypes`, `String` first.
+/// the order of `specifiedScalarTypes` of graphql-js, `String` first.
 const SPECIFIED_STRING: usize = 0;
 /// The position of `Int` in [`specified_scalar_types`].
 const SPECIFIED_INT: usize = 1;

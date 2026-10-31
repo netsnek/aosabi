@@ -10,14 +10,16 @@
 //!
 //! The inference of `aosabi-infer` asks every question about a type through the
 //! trait [`TypeSource`], whose 39 methods are named after the calls of the
-//! TypeScript checker. It answers for the types the roots of a plain crate
-//! reach, which the lowering of the module `describe` writes from the reader's
-//! model as the nodes of a descriptor graph, and the checker view of the
-//! descriptor source presents each node as the TypeScript checker presents the
-//! construct that means the same. So a struct answers as a class, a unit enum
-//! as a TypeScript `enum`, a payload enum as a union alias, `Option<T>` as a
-//! nullable, a list as an array, an `async fn` as a promise and a marker as a
-//! branded scalar, and the inference applies its rules unchanged.
+//! TypeScript checker. [`SourceTypes`] is the third implementation of the seam,
+//! beside the descriptor source of the derive path and the TypeScript source over
+//! the live checker. It answers for the types the roots of a plain crate reach,
+//! which the lowering of the module `describe` writes from the reader's model as
+//! the nodes of a descriptor graph, and the checker view of the descriptor source
+//! presents each node as the TypeScript checker presents the construct that means
+//! the same. So a struct answers as a class, a unit enum as a TypeScript `enum`,
+//! a payload enum as a union alias, `Option<T>` as a nullable, a list as an
+//! array, an `async fn` as a promise and a marker as a branded scalar, and the
+//! inference applies its rules unchanged.
 //!
 //! The rules of the source path live in the lowering and in no answer: the
 //! names of the rule of `names`, a Rust number by its width, every unit enum

@@ -148,7 +148,7 @@ pub(crate) fn struct_from_delegated(
 /// macro sees the spelling of a type and not the type, so two spread fields
 /// of one type written two ways, `users::User` and
 /// `crate::generated::users::User` or a type alias, would give two
-/// implementations of one trait and fail with E0119. The plan names one
+/// implementations of one trait and fail with E0119. The one implementation is
 /// `FromDelegated<Rec>` for the spread's type `Rec`, and the record a patch
 /// extends is taken to be the spread it writes first.
 ///

@@ -1,18 +1,17 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the boot of one side of a fixture, captured until readiness, a dump file or exit.
 
-A boot log is standard output and the status, so a boot is a process of its own
-whose output is kept from its first byte. The helper starts the reference through
-the built `server.mjs` or `worker.mjs` of the build folder of a stage of
-`tests/harness/fixtures.py`, and the twin through its server binary, and waits for
-the first of three things: the listen line on standard output,
-the listen line of the reference and
-`Aosabi running at http://localhost:<port>` of the side under test, divergence D53
-of docs/byte-equality.md section 3, the dump file `AOSABI_BOOT_DUMP` names, which
-the fixture's plugin of the last pass writes and which is the readiness of a worker
-boot that binds no port, or the end of the process, which is how a failing boot
-ends. It keeps standard output as it stood at that moment, ends a process still
-running with `SIGTERM` on both sides alike, and reads what came after.
+A boot log is standard output and the status, so a boot is a process of its own whose
+output is kept from its first byte. The helper starts the reference through the built
+`server.mjs` or `worker.mjs` of the build folder of a stage of
+`tests/harness/fixtures.py`, and the twin through its server binary, and waits for the
+first of three things: the listen line on standard output, the listen line of the
+reference and `Aosabi running at http://localhost:<port>` of the side under test, the
+dump file `AOSABI_BOOT_DUMP` names, which the fixture's plugin of the last pass writes
+and which is the readiness of a worker boot that binds no port, or the end of the
+process, which is how a failing boot ends. It keeps standard output as it stood at that
+moment, ends a process still running with `SIGTERM` on both sides alike, and reads what
+came after.
 
 The streams go to files under `target/harness/boot/`, never under the
 temporary directory of the system. The reference half of the boot report comes
@@ -37,9 +36,8 @@ from .masks import apply as apply_masks
 from .paths import paths
 from .procs import _environment, run
 
-#: The listen line of the serving plugin, whose port the mask `boot-port` replaces,
-#: with the name of the reference or of Aosabi, divergence D53 of
-#: docs/byte-equality.md section 3.
+#: The listen line of the serving plugin, whose port the mask `boot-port` replaces, with
+#: the name of the reference or of Aosabi, a named divergence.
 LISTEN = re.compile(rb"(?:Pylon|Aosabi) running at http://localhost:([0-9]+)")
 
 #: The listen line of the reference and the one of the side under test, a named
@@ -93,10 +91,9 @@ class Boot:
     def masked_as_reference(self, masks=None) -> bytes:
         """Standard output masked as `masked_stdout` gives it, the listen line written as the reference writes it.
 
-        A side under test writes `Aosabi running at` where the reference writes
-        its own name, divergence D53 of docs/byte-equality.md section 3,
-        so a comparison of its boot log with the reference's names that one
-        line and holds every other byte to the reference.
+        A side under test writes `Aosabi running at` where the reference writes its own
+        name, a named divergence, so a comparison of its boot log with the reference's
+        names that one line and holds every other byte to the reference.
         """
         return self.masked_stdout(masks).replace(LISTEN_AOSABI, LISTEN_REFERENCE)
 

@@ -26,10 +26,10 @@
 //! Fibonacci hash of the entry. It grows to keep a quarter of its slots
 //! empty, so a probe ends at an empty slot within the entries it holds.
 //!
-//! The crossings where a comparison of names turns from pairs to sorted
-//! lists, 8 arguments or input fields, 16 fields of one selection set and 64
-//! pairs of two sets, are those of SP1's `pass.rs`, the source the plan names
-//! for this file.
+//! The crossings where a comparison of names turns from pairs to sorted lists,
+//! 8 arguments or input fields, 16 fields of one selection set and 64 pairs of
+//! two sets, are those of the `pass.rs` of the prototype of the single pass,
+//! the source of this file.
 
 use alloc::vec::Vec;
 use core::{

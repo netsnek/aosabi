@@ -20,9 +20,9 @@
 //! | --- | --- | --- |
 //! | `stream` | `AoFrame`, delimited and prefixed, the re-export of `homa::stream` | in place under `client` and `homa` |
 //! | [`publish`] | the publish primitive, its fan out with the coalescing per slot, the allowlist of a carrier and the lock the environment supplies | in place, the hub under `alloc` |
-//! | [`execute_closed`] | the entry below HTTP |  |
-//! | [`cbor`] | the CBOR codec with its per operation integer key maps |  |
-//! | [`document_table`] | the persisted document table |  |
+//! | [`execute_closed`] | the entry below HTTP | in place, renamed `entry` in a later release |
+//! | [`cbor`] | the CBOR codec with its per operation integer key maps | Withdrawn, empty until a later release removes it |
+//! | [`document_table`] | the persisted document table | Withdrawn, empty until a later release removes it |
 //!
 //! The crate is `no_std`. The `alloc` feature is the heap of the cards that have one, the
 //! hub of [`publish`] is the one module behind it, and the crate builds and answers without

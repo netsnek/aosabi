@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: MIT
 """AoFrame in both forms, the framing of one Homa packet on a byte stream.
 
-The reference of `tests/notebooks/04_aoframe.ipynb` for `homa::stream`,
-sharing no code with it, written from the Homa design note, first version,
-section 5, and the readings the track's close page records for the bytes the
-note leaves open.
+The reference of `tests/notebooks/04_aoframe.ipynb` for `homa::stream`, sharing
+no code with it, written from the framing and the recorded readings of the bytes
+it leaves open.
 
 The delimited form, on a serial line and USB serial, is a zero byte, the COBS
 of the packet and its CRC-32C least significant byte first, and a zero byte.

@@ -4,8 +4,9 @@
  * coalescing per slot, the allowlist of a carrier and the lock the
  * environment supplies.
  *
- * No analogue in the reference, whose pub sub dispatches on an EventTarget. The
- * allowlist and the lock build without alloc, and the hub needs it.
+ * No analogue in the reference, whose pub sub dispatches on an EventTarget.
+ * The primitive is the rule below every protocol. The allowlist and the lock
+ * build without alloc, and the hub needs it.
  */
 
 //! The publish primitive of the kernel.
@@ -24,10 +25,10 @@
 //!
 //! # The rules
 //!
-//! The plan of the kernel numbers the rules of the module, and the push model of
-//! the harness states them in the same words. Rules 1 to 5 are the hub's and
-//! stand in its module doc, rule 9 is the allowlist's and stands in [`allow`],
-//! and rule 8 is the one of [`Revision`]:
+//! The rules of the module are numbered, and the push model of the harness
+//! states them in the same words. Rules 1 to 5 are the hub's and stand in its
+//! module doc, rule 9 is the allowlist's and stands in [`allow`], and rule 8
+//! is the one of [`Revision`]:
 //!
 //! 8. The revision rides on every delivered event for the pump and the devtool,
 //!    and it reaches no frame of HTTP(TCP) and no event of GraphTP(Homa), which

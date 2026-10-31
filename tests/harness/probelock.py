@@ -16,10 +16,11 @@ that cargo takes as compatible, and the version it moves to, the highest such
 one. `pin` hands each of them to a callable of the notebook, which runs
 `cargo update --offline --precise <version> -p <name>@<held>` over the probe,
 and reads the lock again, until no package drifts or a round moves none. The
-notebook runs the cargo call itself, so `00_environment` reads every cargo
-call of the committed notebooks where it stands. A package that no reference
-lock names, such as a dependency of a test of a vendored crate, stays at the
-version the cache gives it, since the tree has no version to hold it to.
+notebook runs the cargo call itself, so the notebook of the environment reads
+every cargo call of the committed notebooks where it stands. A package that no
+reference lock names, such as a dependency of a test of a vendored crate,
+stays at the version the cache gives it, since the tree has no version to hold
+it to.
 """
 
 from __future__ import annotations

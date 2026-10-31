@@ -24,11 +24,12 @@ through the variable AOSABI_SIZE_TOOLCHAIN or at that place. A cargo call runs a
 the rustup home with RUSTUP_TOOLCHAIN naming the pin or the path of the copy, never the default of the machine,
 which is another stable.
 
-The options. A build takes `RUSTC_BOOTSTRAP=1` only where a notebook measures it, in the environment of that one
-call, and a dev build takes no `-Z` flag and no bootstrap. A notebook takes the flags of a set from here, the cargo
-arguments of `Options.cargo_args`, the `--config` arguments of `Options.config`, the rustc flags of
-`Options.rustflags` and the flags the wrapper of Z24 adds, `NO_DEBUG_TEXT` and `NO_LOCATION_DETAIL`, and writes none
-of them again.
+The options. The class `Options` is one set of the size levers and what each takes per card, and `SHIPPED` holds the
+set each card takes at the switch `source`, decided card by card. A build takes `RUSTC_BOOTSTRAP=1` only where a
+notebook measures it, in the environment of that one call, and a dev build takes no `-Z` flag and no bootstrap. A
+notebook takes the flags of a set from here, the cargo arguments of `Options.cargo_args`, the `--config` arguments
+of `Options.config`, the rustc flags of `Options.rustflags` and the flags the wrapper per crate adds,
+`NO_DEBUG_TEXT` and `NO_LOCATION_DETAIL`, and writes none of them again.
 
 The switch. Every option of the standard library from source stands behind the switch `AOSABI_STD`, `prebuilt` by
 default or `source`, which the command line reads and the harness passes through. The command line gives a release
@@ -96,7 +97,8 @@ PREBUILT_FEATURES = "backtrace,panic-unwind"
 #: The feature of the standard library that picks the small algorithms of core, alloc and std.
 SMALL = "optimize_for_size"
 
-#: An empty value counts as unset, and unset is `prebuilt`.
+#: The switch the command line reads and the harness passes through. An empty value counts as unset, and unset is
+#: `prebuilt`.
 SWITCH = "AOSABI_STD"
 #: The value of the switch that builds the stock form on the prebuilt standard library of the pin.
 PREBUILT = "prebuilt"
@@ -238,7 +240,7 @@ def framework_crates(root) -> list[str]:
 
 @dataclass(frozen=True)
 class Options:
-    """One set of the levers of the plan, as a build the harness measures takes it.
+    """One set of the size levers, as a build the harness measures takes it.
 
     `build_std` is None for the prebuilt standard library, `std` or `core` for the crates of BUILD_STD, `features`
     the value of `-Zbuild-std-features` beside `small`, the feature `optimize_for_size`. `fmt_debug` is the value of
@@ -502,9 +504,9 @@ _READS_SWITCH = {}
 
 
 def reads_switch(program) -> bool:
-    """Returns whether the program of the command line at `program` reads the switch AOSABI_STD, which a command line
-    built from a tree before the close of round 1, the baseline of a notebook or `main` as merged among them, does
-    not, read once per file and its time of change."""
+    """Returns whether the program of the command line at `program` reads the switch AOSABI_STD, which a
+    command line built from a tree older than the switch, the baseline of a notebook or `main` as merged
+    among them, does not, read once per file and its time of change."""
     path = Path(program)
     try:
         stamp = path.stat()
