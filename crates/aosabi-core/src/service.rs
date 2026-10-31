@@ -126,8 +126,8 @@ use crate::{
     scalars::leaf_serializers, //
 };
 
-/// The one error a persisted operation answers until the document table exists.
-const PERSISTED_DOCUMENTS_PENDING: &str = "Persisted documents land at M12.";
+/// The one error a persisted operation answers, since no table of persisted documents exists.
+const PERSISTED_DOCUMENTS_REFUSED: &str = "The engine accepts no persisted document.";
 
 /// The unique fields cache, by the name of a possible type.
 type UniqueFields = IndexMap<String, Vec<String>, KeyHasherBuilder>;
@@ -517,8 +517,8 @@ impl Execute for Service {
     /// query and a mutation run through [`Service::execute`] and a
     /// subscription through the body of [`Service::subscribe`]. What the entry
     /// throws and a stalled run both answer as one error with no data, and a
-    /// persisted operation answers the one error that names the milestone of
-    /// the document table.
+    /// persisted operation answers the one error that says the engine accepts
+    /// no persisted document.
     fn execute(
         &self,
         operation: Operation<'_>,
@@ -530,7 +530,7 @@ impl Execute for Service {
             operation_name,
         } = operation
         else {
-            return ServiceStream::One(Some(one_error(PERSISTED_DOCUMENTS_PENDING)));
+            return ServiceStream::One(Some(one_error(PERSISTED_DOCUMENTS_REFUSED)));
         };
         let request = Request {
             document: text,

@@ -658,8 +658,9 @@ impl Execute for GeneralExecutor {
     /// operation runs through [`run_request`] and answers
     /// [`GeneralStream::One`]. A thrown value answers as a result with one
     /// error that carries its message, the `message` of an error and
-    /// `String(value)` of any other value. Both texts are texts of Aosabi and
-    /// of no reference.
+    /// `String(value)` of any other value. A persisted document answers with
+    /// one error, since the engine accepts no persisted document. Both texts
+    /// are texts of Aosabi and of no reference.
     fn execute(
         &self,
         operation: Operation<'_>,
@@ -671,7 +672,7 @@ impl Execute for GeneralExecutor {
             operation_name,
         } = operation
         else {
-            return GeneralStream::one(one_error("Persisted documents land at M12."));
+            return GeneralStream::one(one_error("The engine accepts no persisted document."));
         };
         let request = Request {
             document: text,

@@ -1,14 +1,16 @@
-# Layer 0. Documentation/architecture.md section 3.1 names the four things this crate holds
-# and nothing else: the closed executor, the persisted document table, the CBOR codec and
-# the framing. It compiles with no standard library and with allocation optional, so a bare
-# metal build links this and nothing above it. The crate holds its no_std shape ahead of
-# the executor, because the shape is cheap to hold from the start and expensive to
-# retrofit. The framing is AoFrame, which the crate homa holds and this crate re-exports,
-# so one implementation serves the kernel, the carrier crates and a client outside Aosabi.
+# Layer 0. The crate holds three things and nothing else, the framing, the
+# publish primitive and the entry below HTTP. The closed executor, the persisted
+# document table and the CBOR codec were withdrawn before any of them was built.
+# It compiles with no standard library and with allocation optional, so a bare
+# metal build links this and nothing above it. The crate holds that shape
+# because it is cheap to hold from the start and expensive to retrofit. The
+# framing is AoFrame, which the crate homa holds and this crate re-exports, so
+# one implementation serves the kernel, the carrier crates and a client outside
+# Aosabi.
 [package]
 name = "aosabi-kernel"
 version = "0.0.0"
-description = "Layer 0 of Aosabi: the closed executor, the persisted document table, the CBOR codec and the framing, with no standard library and allocation optional."
+description = "Layer 0 of Aosabi: the framing, the publish primitive and the entry below HTTP, with no standard library and allocation optional."
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true

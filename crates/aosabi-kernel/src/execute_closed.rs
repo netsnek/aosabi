@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: MIT
 /*
- * aosabi-kernel execute_closed: the executor entry below HTTP and the closed
- * executor.
+ * aosabi-kernel execute_closed: the executor entry below HTTP.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The entry of the form execute(operation,
+ * variables, context) is in place beside the general executor. The closed
+ * executor over a table of persisted documents, which the file is named for,
+ * was withdrawn.
  */
 
+//! The executor entry below HTTP.
+//!
 //! The module holds the entry traits a carrier calls an executor through,
 //! `execute(operation, variables, context)`, returning a result stream, with the HTTP
 //! handler as one caller and a pluggable encoder of a result. Every item is `core` only
@@ -13,7 +17,12 @@
 //! traits over its own variables, context and result. The first implementation is the
 //! general executor of `aosabi-execute`.
 //!
-//! The document table behind [`Operation::Persisted`] lands with it.
+//! The closed executor and the table of persisted documents behind
+//! [`Operation::Persisted`] were withdrawn with the CBOR codec, since a
+//! carrier sends the text of a document, which the engine parses and
+//! validates at run time. The general executor and the service answer an
+//! operation that names a persisted document with one error, since the engine
+//! accepts no persisted document.
 
 use core::{
     pin::Pin,
@@ -33,9 +42,9 @@ pub enum Operation<'a> {
         /// The name of the operation to run, when the document holds several.
         operation_name: Option<&'a str>,
     },
-    /// A document the device holds in its table, named by its id.
+    /// A persisted document named by its id, which every executor answers with one error.
     Persisted {
-        /// The id of the document in the table.
+        /// The id of the document.
         id: u32,
     },
 }

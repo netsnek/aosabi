@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 /*
- * aosabi-kernel cbor: the CBOR codec with its per operation integer key maps.
+ * aosabi-kernel cbor: the CBOR codec, withdrawn.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The codec was to carry the operations and the
+ * results of the framed carriers in CBOR with per operation integer key maps,
+ * and it was withdrawn with the closed executor and the persisted document
+ * table.
  */
 
-//! The module holds no item yet. What lands here is `encode`, `decode` and `KeyMap`: an
-//! encoder beside the JSON writer, a decoder for the framed carriers, and the per
-//! operation integer key map that the build step generates beside the SDL, so a field name
-//! never travels over a link budgeted in kilobytes a second. The wire format is CBOR as
-//! RFC 8949 defines it.
+//! The CBOR codec, withdrawn.
 //!
-//! [cbor]: https://www.rfc-editor.org/rfc/rfc8949
+//! The module holds no item. The transport is JSON, compressed where a
+//! carrier compresses it, and CBOR is withdrawn and not postponed, so no
+//! encoder, no decoder and no key map lands here.
