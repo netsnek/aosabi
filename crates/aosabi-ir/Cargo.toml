@@ -7,7 +7,7 @@ version = "0.0.0"
 description = "The intermediate representation of Aosabi: the model, its JSON shape, the SDL printer and the collation of the implements sort."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

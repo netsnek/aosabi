@@ -9,7 +9,7 @@ version = "0.0.0"
 description = "The auth root of Aosabi: the identity plugin, get_principal, authorize, require_role and the mapping of a forbidden error."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

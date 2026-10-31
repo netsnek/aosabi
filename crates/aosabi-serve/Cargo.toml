@@ -9,7 +9,7 @@ version = "0.0.0"
 description = "The engine of Aosabi: serve_with, the node server plugin, the runtime of one thread, the TCP listener, the protocol selection, the node handler and the Node adapter of @hono/node-server 1.19.9, with TLS and HTTP/2 behind features of the Linux cards."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

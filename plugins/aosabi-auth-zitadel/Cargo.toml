@@ -7,7 +7,7 @@ version = "0.0.0"
 description = "The Zitadel integration of Aosabi: zitadelLogin, zitadelAuth and the OIDC client subset the two reach."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

@@ -11,7 +11,7 @@ version = "0.0.0"
 description = "The core of Aosabi: the static type descriptors the derive macros emit, and behind the feature runtime the resolver wrapping, the context, the bound scalars and the service."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

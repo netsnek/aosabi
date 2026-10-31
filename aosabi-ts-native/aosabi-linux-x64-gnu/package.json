@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "The native library of the Aosabi engine for the npm package aosabi on Linux x86_64 with glibc, built from the crate aosabi-js for x86_64-unknown-linux-gnu and loaded by aosabi/bun over bun:ffi",
   "private": true,
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0",
   "author": "Florian Kleber <kleber@snek.at>",
   "os": [
     "linux"

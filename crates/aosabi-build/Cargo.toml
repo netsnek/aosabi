@@ -8,7 +8,7 @@ version = "0.0.0"
 description = "The build step of Aosabi: reads the descriptors of an application crate inside a build script, runs the schema inference, validates the schema and writes schema.graphql, resolvers.js, ir.json and descriptors.json when they change."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

@@ -4,7 +4,7 @@
   "description": "The Aosabi engine for an app written in TypeScript, compatible with Pylon v3 apps, the module core.wasm, the native library of its platform packages on Linux and a wrapper of plain ES modules over the real hono, its peer",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0",
   "author": "Florian Kleber <kleber@snek.at>",
   "exports": {
     ".": {

@@ -5,6 +5,7 @@
 name = "bookshelf"
 version = "0.0.1"
 edition = "2024"
+license = "MIT"
 publish = false
 
 # A service is a cargo workspace of its own, so it builds wherever it is
