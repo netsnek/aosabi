@@ -28,11 +28,14 @@
 //! | [`Bindings`](macro@Bindings) | a struct of bindings | `current()`, which reads each field from the environment of the context |
 //! | [`Variables`](macro@Variables) | a struct of context variables | one `Key` constant per field and `impl Variables` |
 //!
-//! Under the default features each one answers a compile error that names its
-//! native form, the plain Rust the builder of `aosabi-build` reads from the
-//! source with no attribute, derive or macro of Aosabi, and a derive or an
-//! attribute answers one error per key of `#[aosabi(..)]` its item carries
-//! before its own.
+//! Every macro of the table is a form of the derive path, which is retired for
+//! application code. Under the default features each one answers a compile
+//! error that names its native form, the plain Rust the builder of
+//! `aosabi-build` reads from the source with no attribute, derive or macro of
+//! Aosabi, and a derive or an attribute answers one error per key of
+//! `#[aosabi(..)]` its item carries before its own. The hidden feature
+//! `mirror`, which the facade turns on for the twins that wait for the
+//! TypeScript judge alone, keeps the expansions this file documents.
 //!
 //! The declaration list of a target is the file the build script of the crate
 //! writes, which calls `aosabi_build::declarations_main`, and it names the

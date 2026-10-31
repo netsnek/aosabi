@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-macros: plugin! and plugins!.
+ *
+ * No analogue on the reference side. The macro plugin! is the twin of a plugin
+ * written as an object literal, and plugins! is the twin of the array of the
+ * key plugins of a configuration.
  */
 
 //! `plugin!` and `plugins!`.

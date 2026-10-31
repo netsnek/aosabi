@@ -2,7 +2,9 @@
 /*
  * aosabi-core: the description of a member whose value is a function.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The description stands in for the first call
+ * signature the TypeScript checker reports for such a property, which the function
+ * branch of the walk reads.
  */
 
 //! The description of a function valued member, its parameters and its

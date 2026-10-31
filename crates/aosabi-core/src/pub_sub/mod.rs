@@ -70,7 +70,9 @@
 //!    [`Payload`] states.
 //! 7. The form of a card with the standard library. The `static` over
 //!    `std::sync::Mutex` with `Arc` payloads is the form of the cards with the
-//!    standard library and atomic read modify write.
+//!    standard library and atomic read modify write. The ESP32-C3 has
+//!    neither, and its form of the pub sub goes over the `Lock` of the
+//!    kernel with a critical section.
 
 mod pump;
 pub mod topic;
@@ -157,7 +159,8 @@ impl PubSub {
     ///
     /// A Rust author makes a value with `new`, so the native layer writes
     /// `static PUB_SUB: PubSub = PubSub::new();`, and the function is `const`
-    /// for that `static`.
+    /// for that `static`. The name of the reference,
+    /// [`experimental_create_pub_sub`], stays beside it.
     #[must_use]
     pub const fn new() -> Self {
         experimental_create_pub_sub()

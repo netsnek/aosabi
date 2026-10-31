@@ -1,8 +1,8 @@
-# The carrier Serial Line of layer 4, one carrier and one crate as
-# Documentation/architecture.md section 4.3 asks. It carries compact Homa packets in
-# delimited AoFrame over a UART, gives the values of the link as functions a device
-# card fills, and serves GraphTP(Homa) on a Linux tty through the GraphTP listener
-# as a local task of the runtime of aosabi-serve.
+# The carrier Serial Line of layer 4, one carrier and one crate. It carries
+# compact Homa packets in delimited AoFrame over a UART, gives the values of
+# the link as functions a device card fills, and serves GraphTP(Homa) on a
+# Linux tty through the GraphTP listener as a local task of the runtime of
+# aosabi-serve.
 [package]
 name = "aosabi-carrier-serial"
 version = "0.0.0"
@@ -30,6 +30,7 @@ linux = [
     "homa/alloc",
     "homa/stream-delimited",
 ]
+# The bare metal binding of the ESP32-C3, which arrives with device cards.
 bare = []
 
 [dependencies]

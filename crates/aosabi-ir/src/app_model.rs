@@ -34,8 +34,9 @@
 //! every level. A sort of one element never calls its comparator, so a list
 //! of fewer than two entries is never refused.
 //!
-//! A queue name may carry a character outside the alphabet of [`collate()`],
-//! so a model with two or more queues is refused with
+//! The queues wait until the end beside the database layer. A queue name may
+//! carry a character outside the alphabet of [`collate()`], so a model with
+//! two or more queues is refused with
 //! [`AppModelError::QueueSortLandsAtM10`].
 //!
 //! [sort]: https://tc39.es/ecma262/#sec-array.prototype.sort
@@ -287,10 +288,12 @@ pub fn canonicalize(mut ir: SchemaIr) -> Result<SchemaIr, CollateError> {
 /// Returns the JavaScript value of a model, the object `inspect --json`
 /// writes.
 ///
-/// The schema is [`to_js_value`] of the canonical IR, so every key keeps the
-/// place `JSON.stringify` gives it, because a spread that overwrites a key
-/// keeps the place of the key. A member of a row or a queue that is `None`
-/// is left out, as an undefined member is.
+/// The members are `version` with 1, `schema`, `authz` and `queues` in that
+/// order, the object literal of the reference. The schema is [`to_js_value`]
+/// of the canonical IR, so every key keeps the place `JSON.stringify` gives
+/// it, because a spread that overwrites a key keeps the place of the key. A
+/// member of a row or a queue that is `None` is left out, as an undefined
+/// member is.
 ///
 /// [copy]: https://tc39.es/ecma262/#sec-copydataproperties
 #[must_use]
@@ -323,7 +326,10 @@ pub fn app_model_to_sdl(model: &AppModel) -> Result<String, CollateError> {
 
 /// Renders the persistence layer of a model as Postgres DDL.
 ///
-/// Joins the DDL of every entity with a blank line.
+/// Joins the DDL of every entity with a blank line. The DDL of an entity
+/// lands with the database layer, which waits until the end, and a model
+/// with no entity is the empty string in the reference too, so the text is
+/// the empty string until then, whatever the model.
 #[must_use]
 pub fn app_model_to_ddl(_model: &AppModel) -> String {
     String::new()

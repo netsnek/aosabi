@@ -252,6 +252,11 @@ def boot_twin(name: str, port: int, variant: str = "default", node_env: str | No
               role: str | None = None, dump: bool = False, report: Path | None = None, env: dict | None = None,
               release: bool = True, root=None, timeout_s: float = 40.0) -> Boot:
     """Boots the built twin of a fixture under a role, the twin of both entries of the reference.
+
+    The worker entry of the reference is the twin's binary under `AOSABI_ROLE=worker`,
+    the name the twin reads alone, and `report` names the file the twin writes its boot
+    report into, which the boot waits for before it ends the process, since the twin
+    writes it after the moment of readiness.
     """
     label = "twin-%s-%s-%s-%s" % (name, variant, role or "unset", node_env or "unset")
     dump_path = (paths(root).target / "harness" / "boot" / (label + ".dump.json")) if dump else None

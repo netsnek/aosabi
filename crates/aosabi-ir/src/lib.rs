@@ -32,8 +32,11 @@
 //!
 //! `index.ts` of the reference exports four more files, `merge.ts`, `diff.ts`,
 //! `ddl.ts` and `dialect.ts`. None of them is translated and none has a stub.
-//! The helpers `tableSpecOf`, `pgIdent`, `joinTableName` and `joinColumn` and
-//! the migration types `TableSpec`, `TableColumn`, `PhysicalTable`,
+//! They land with the database layer, because the only caller of `mergeIR`, of
+//! `collapseInterfaceTwins` and of the two prune passes is the `contributeIR`
+//! branch of the builder, and no mapper exists before that release. The
+//! helpers `tableSpecOf`, `pgIdent`, `joinTableName` and `joinColumn` and the
+//! migration types `TableSpec`, `TableColumn`, `PhysicalTable`,
 //! `PhysicalSchema` and `ForeignKeyChange` of `ir.ts:87-225` land with them.
 //!
 //! # The shape of the port

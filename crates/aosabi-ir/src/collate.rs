@@ -3,7 +3,9 @@
  * aosabi-ir: the collation of the `implements` sort, the ICU root collation
  * restricted to the alphabet of a type name.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. The module stands in for the
+ * `localeCompare` call, which the reference hands to the ICU library of its
+ * runtime.
  */
 
 //! The collation of the printer.

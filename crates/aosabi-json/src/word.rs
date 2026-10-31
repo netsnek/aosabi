@@ -3,7 +3,9 @@
  * aosabi-json word: the word test that finds the bytes a scan of text stops
  * at, a word at a time.
  *
- * No analogue in the reference, whose scans run in the C++ of V8.
+ * No analogue in the reference, whose scans run in the C++ of V8. The test is
+ * the zero byte test over every lane of a word,
+ * https://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord.
  */
 
 //! The word test of a scan.

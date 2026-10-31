@@ -4,7 +4,8 @@
  * built with.
  *
  * No analogue in graphql-js, which gets each of them from the language it is
- * written in.
+ * written in. The reference sites are the template literals that quote the
+ * body and the one that prints a number.
  */
 
 //! The string operations behind the message of an error.

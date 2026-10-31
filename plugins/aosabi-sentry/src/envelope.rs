@@ -2,7 +2,10 @@
 /*
  * aosabi-sentry: the event a capture sends and the envelope that carries it.
  *
- * No analogue file on the reference side.
+ * No analogue file on the reference side. The formats are those of
+ * https://develop.sentry.dev/sdk/data-model/envelopes/ and
+ * https://develop.sentry.dev/sdk/data-model/event-payloads/, and the id is
+ * the one uuid4 of @sentry/core 8.55.0 mints.
  */
 
 //! `Event`, `Envelope`, `event_id` and the send of an envelope.

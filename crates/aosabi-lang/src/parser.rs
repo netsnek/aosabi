@@ -574,8 +574,11 @@ impl Parser {
     /// Parses the type system definition the keyword token `keyword` opens,
     /// or answers `None` where the keyword opens none.
     ///
-    /// It stands out of line, so a host that parses the executable documents
-    /// of requests alone compiles none of the type system parsers.
+    /// The first `switch` of `parseDefinition`, which compares the value with
+    /// strict equality, a code unit comparison on two strings, as a `str`
+    /// comparison reads. It stands out of line, so a host that parses the
+    /// executable documents of requests alone compiles none of the type system
+    /// parsers.
     ///
     /// # Errors
     ///
@@ -768,6 +771,9 @@ impl Parser {
     }
 
     /// Parses the selections of one selection set onto the vector of the open sets.
+    ///
+    /// The loop of `many` over `parseSelection`, between a brace that opens and
+    /// one that closes.
     fn open_selections(&mut self) -> Result<(), Box<GraphQLError>> {
         self.expect_token(TokenKind::BraceL)?;
         loop {

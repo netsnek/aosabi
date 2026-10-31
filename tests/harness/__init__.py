@@ -30,6 +30,32 @@ A notebook imports the last two by name.
 writes with `cargo generate-lockfile --offline` to the versions of the locks
 of the tree, so a package version that only the shared cargo cache holds
 reaches no probe.
+
+Three modules for the notebooks of the 70 band are reached as
+`from harness import cli, mcp, devloop`: `cli`, the runners of both command
+lines, the parsers of both registries of a pull and the hostile server, `mcp`,
+the client of the protocol server over a child's standard input and output, and
+`devloop`, one development loop with its edits, probes and rebuilds.
+
+Two modules a federation notebook imports are `harness.recording_proxy`, the
+proxy in front of one remote that records every outbound request and answers in
+the modes of the judging notebook, and `harness.remote_stub`, the remote that
+answers the delegation corpus with canned answers.
+
+`harness.toolchain` holds the one flag set of a shipped build of the standard
+library from source on the pin, `RUSTC_BOOTSTRAP=1`, the `-Z` flags and the
+features of the standard library per card and the remap of its source, with the
+private copy of the pin that tools/size_toolchain.py makes, and the remap every
+build of a twin takes through `fixtures.build_env`. Every call of the command
+line of a notebook at the switch AOSABI_STD at source takes the private copy of
+the pin as its toolchain, through `cli_toolchain` of `harness.toolchain` in
+`run` and `serve`, since the command line refuses the shared pin with no
+rust-src for now.
+
+One module is reached as `from harness import divergences`, the rewrites of the
+named divergences that change the bytes of an answer of the side under test by a
+fixed rule, which a comparison asserts and then reads as the reference writes
+them.
 """
 
 from . import (

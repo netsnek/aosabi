@@ -21,7 +21,8 @@
 //! the order of `schema-parser.ts:1001-1254`. That order is the whole contract
 //! of this module, because the order in which types are registered is the order
 //! of the blocks in the printed schema. The reference writes `parse` and
-//! `makeReferenceSchema` as two long functions with closures inside.
+//! `makeReferenceSchema` as two long functions with closures inside. Here each
+//! pass and each guard with a body is a private method.
 //!
 //! # JavaScript semantics the port reproduces
 //!

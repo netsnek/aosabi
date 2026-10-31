@@ -3,7 +3,10 @@
  * aosabi-validate pass after: the checks of the single pass that span the
  * document, which run after its last token.
  *
- * No analogue in the reference.
+ * No analogue in the reference. Each check answers a rule of graphql-js over
+ * the side structures the walk filled: the fragment names, the operation names,
+ * the fragment cycles, the unused fragments, the fragment spreads, the depths
+ * through fragments and the variables of each operation.
  */
 
 //! The checks after the last token of the single pass.

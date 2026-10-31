@@ -2,6 +2,8 @@
 /*
  * aosabi-execute path: the linked path of a response position.
  *
+ * This file re-exports the printPathArray of graphql-js from aosabi-type.
+ *
  * Derived from @graphql-tools/utils 11.0.0, cjs/Path.js, MIT.
  * Derived from graphql-js 16.12.0, src/jsutils/Path.ts, MIT.
  * Derived from graphql-js 16.12.0, src/jsutils/printPathArray.ts, MIT.

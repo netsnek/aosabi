@@ -9,7 +9,10 @@
 
 //! The descriptor source.
 //!
-//! The five translated modules never import this module.
+//! [`DescriptorSource`] presents each node of a [`Graph`] the way the
+//! TypeScript checker presents the type the twin of that node has on the
+//! TypeScript side, so the inference walks a Rust application as it walks a
+//! TypeScript one. The five translated modules never import this module.
 //!
 //! | File | Holds |
 //! | --- | --- |

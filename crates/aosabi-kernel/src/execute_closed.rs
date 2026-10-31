@@ -42,8 +42,9 @@ pub enum Operation<'a> {
 
 /// A stream of results.
 ///
-/// The shape is the one of a stream in the `futures` sense, written here because the
-/// kernel links nothing above `core`.
+/// A query and a mutation yield one result, and a subscription yields many
+/// results. The shape is the one of a stream in the `futures` sense, written
+/// here because the kernel links nothing above `core`.
 pub trait ResultStream {
     /// The result the stream yields.
     type Item;

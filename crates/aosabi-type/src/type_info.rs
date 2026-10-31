@@ -559,6 +559,10 @@ fn is_query_type(schema: &Schema, parent_type: &NamedType) -> bool {
 }
 
 /// Returns the type of `schema` that a type condition names.
+///
+/// A type condition is a named type node, and this is the `NAMED_TYPE` case of
+/// `typeFromAST`, which [`type_from_ast()`] answers for a type node of any
+/// shape.
 fn named_type_from_ast(schema: &Schema, node: &NamedTypeNode) -> Option<Type> {
     schema.get_type(node.name.value()).map(Type::from)
 }

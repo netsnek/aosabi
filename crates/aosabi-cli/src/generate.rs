@@ -15,10 +15,17 @@
 //! under `<target_dir>/aosabi/`, the directory the artifacts of the build script
 //! already use, with two members:
 //!
-//! - The lean link acts on the release build, which the command runs with
-//!   `-C panic=abort` and `--target`, and links a dev build as before. The
-//!   package names the facade with the features of its card, `serve`,
-//!   `unix-socket`, `deflate` and `linux` for the cards that serve on Linux.
+//! - `server`, the package `<name>-server`, whose build script calls the lean
+//!   link of its Linux card and writes the schema with
+//!   `aosabi_build::emit_from` over the entry of the service, and whose main is
+//!   the one call `aosabi::serve_app` with the configuration the app carries,
+//!   or `aosabi::serve` with the configuration of `aosabi.config.rs` for a
+//!   project that holds that file, a form retired for application code that the
+//!   hidden feature `mirror` of the facade alone keeps. The lean link acts on
+//!   the release build, which the command runs with `-C panic=abort` and
+//!   `--target`, and links a dev build as before. The package names the facade
+//!   with the features of its card, `serve`, `unix-socket`, `deflate` and
+//!   `linux` for the cards that serve on Linux.
 //! - `inspect`, the package `<name>-inspect`, whose main is the one call
 //!   `aosabi_build::inspect_from`, the runner `aosabi inspect` reads the
 //!   model with, which validates nothing, so it answers for a schema the

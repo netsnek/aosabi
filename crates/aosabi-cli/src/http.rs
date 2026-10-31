@@ -11,8 +11,13 @@
 //! The `http://` only client.
 //!
 //! `pull` posts the introspection query to a remote and the supervisor of
-//! `dev` posts `{__typename}` to its child, and both go through [`post`]. It
-//! blocks and starts no thread, so the command line needs no runtime for it.
+//! `dev` posts `{__typename}` to its child, and both go through [`post`]. No
+//! outbound client of the framework exists yet, so this module stands in for
+//! one: one request per connection over [`std::net::TcpStream`], 5 seconds to
+//! connect, 30 seconds for the whole answer, at most 64 KiB of head and at
+//! most 16 MiB of body, no redirect followed, and `https://` refused with
+//! `AO-C0501`. It blocks and starts no thread, so the command line needs no
+//! runtime for it.
 //!
 //! The request carries `Accept: */*`, the content type and the length that
 //! `fetch` of the reference sends for a JSON post, `Connection: close` in

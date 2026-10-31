@@ -2,6 +2,9 @@
 /*
  * aosabi-cli: the JSON-RPC lines of the protocol server.
  *
+ * The framing is one JSON message per line, a trailing carriage return
+ * dropped, and a newline after each message it writes.
+ *
  * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/shared/stdio.js, MIT.
  * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/server/stdio.js, MIT.
  * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/types.js, MIT.

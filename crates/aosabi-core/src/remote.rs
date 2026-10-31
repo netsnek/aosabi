@@ -3,7 +3,9 @@
  * aosabi-core: the contract of the registry aosabi pull writes for a remote
  * schema.
  *
- * No reference file.
+ * No reference file. The module is the Rust counterpart of the interface
+ * RemoteRegistry, which a pulled registry compiles against with nothing of the
+ * federation.
  */
 
 //! The contract of a pulled registry.
@@ -340,12 +342,13 @@ impl fmt::Debug for TypeName {
 /// A field with arguments on a remote object, the method signature of the
 /// reference registry.
 ///
-/// `A` is the arguments struct of the field and `R` what it returns. It is
-/// described as a callable with the parameters of `A` returning `R`, the method
-/// `orders(status?, limit?)` the reference writes, so a front that hands the
-/// member on presents it as the reference presents it. Its value is
-/// `undefined`, since the executor reads the member from the remote object a
-/// record keeps.
+/// `A` is the arguments struct of the field and `R` what it returns. The struct
+/// holds no value, since a pulled registry describes the remote and the
+/// federation makes the call. It is described as a callable with the parameters
+/// of `A` returning `R`, the method `orders(status?, limit?)` the reference
+/// writes, so a front that hands the member on presents it as the reference
+/// presents it. Its value is `undefined`, since the executor reads the member
+/// from the remote object a record keeps.
 pub struct Callable<A, R>(PhantomData<(A, R)>);
 
 impl<A, R> Callable<A, R> {

@@ -3,7 +3,9 @@
  * aosabi-execute arena: the answer of one execution as nodes, entries and bytes.
  *
  * No analogue in the reference, whose result is a tree of JavaScript objects
- * that JSON.stringify walks once the execution settled.
+ * that JSON.stringify walks once the execution settled. The bytes the writer
+ * of this module appends are those of JSON.stringify,
+ * https://tc39.es/ecma262/#sec-json.stringify.
  */
 
 //! The arena of the answer of one execution.

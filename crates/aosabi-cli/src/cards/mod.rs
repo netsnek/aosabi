@@ -9,12 +9,21 @@
 
 //! The built in cards.
 //!
-//! With no `--device` and no card in `devices/`, the card is `server`.
+//! A build resolves a card file once device cards land, and until then
+//! [`resolve`] knows the built in cards of [`builtin::BUILTIN`] by name and
+//! nothing else. With no `--device` and no card in `devices/`, the card is
+//! `server`. A path ending in `.png`, a `<publisher>/<name>` id and, with no
+//! `--device`, a card in `devices/` refuse with `AO-C0201`, since the build
+//! reads a card file once device cards land, and a name of no built in card
+//! refuses with `AO-C0202`.
 //!
 //! [`Card`] carries what a build learns from its card: the class, the target
 //! and profile, every carrier with its protocols, the encoding, what it
 //! compiles, whether it serves and the set of its release build at the switch
-//! `AOSABI_STD` at `source`.
+//! `AOSABI_STD` at `source`. The enums [`Carrier`] and [`Protocol`] carry the
+//! six carriers and the three protocols, `LoRa` and GraphTP(Homa) among them,
+//! although no built in card names `LoRa` or links GraphTP(Homa) on Network,
+//! so a card that adds them fills a row and renames nothing.
 
 use std::path::Path;
 

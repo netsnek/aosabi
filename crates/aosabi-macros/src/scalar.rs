@@ -2,7 +2,8 @@
 /*
  * aosabi-macros: `#[aosabi::scalar]`.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. A scalar newtype is the twin of a type
+ * the scalar table of the inference names.
  */
 
 //! `#[aosabi::scalar]`.

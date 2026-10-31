@@ -11,12 +11,14 @@
 
 //! The run time glue of a plain crate.
 //!
-//! The builder reads the source of the crate, and for every root, type and
-//! inherent block its roots reach it writes the same glue the derive and the
-//! resolvers attribute write on the derive path, into one generated module
-//! that the generated copy of the crate adds to its crate root. The module
-//! stands beside the items of the crate, so its implementations see every type
-//! the source states, and the application writes nothing.
+//! A plain crate holds no attribute, derive or macro of Aosabi, so no macro
+//! writes the glue of its types. The builder reads the source of the crate,
+//! and for every root, type and inherent block its roots reach it writes the
+//! same glue the derive and the resolvers attribute write on the derive path,
+//! into one generated module that the generated copy of the crate adds to its
+//! crate root. The module stands beside the items of the crate, so its
+//! implementations see every type the source states, and the application
+//! writes nothing.
 //!
 //! | Item | Glue |
 //! | --- | --- |
@@ -40,6 +42,14 @@
 //! `alloc` an argument of a generic use names go through the re-exports of the
 //! facade in `__private`, so a crate without the standard library takes the
 //! same glue.
+//!
+//! A struct with a public field has the static shape and the member writer,
+//! which the derive path gives a struct with no embedded base and no kept
+//! remote object, and the source path holds neither: its public fields are its
+//! data members in the order of the source, each by its key, and the shape
+//! names what each can hold through `member_of` of the glue over the read of
+//! the field, whose type the compiler infers, so the glue names no type of a
+//! field here either.
 
 use proc_macro2::{
     Span,

@@ -170,6 +170,9 @@ pub fn build_client(artifact_dir: &Path, schema_changed: bool) -> Result<BuiltCl
 
 /// Writes `new_content` to `path` unless the file already holds it, and
 /// answers whether it wrote.
+///
+/// A copy of `update_file_if_changed` of `aosabi-build`, so this crate does
+/// not depend on the build crate.
 fn update_file_if_changed(path: &Path, new_content: &str) -> io::Result<bool> {
     match fs::read(path) {
         Ok(current_content) if current_content == new_content.as_bytes() => return Ok(false),

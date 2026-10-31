@@ -164,7 +164,10 @@ pub type ObjMap<T> = IndexMap<String, T, KeyHasherBuilder>;
 
 /// The pointer the type layer shares a type and the scope of a builder through.
 ///
-/// It is `alloc::sync::Arc` while a schema is shared across threads.
+/// It is `alloc::sync::Arc` while a schema is shared across threads. The files
+/// the federation adds to the layer name this alias and never `Arc`, so a
+/// later move to `Rc`, for a target with no pointer atomics, changes the alias
+/// and none of them.
 pub type SharedType<T> = Arc<T>;
 
 /// The error of the type layer.
@@ -540,9 +543,10 @@ impl fmt::Debug for ScalarLiteralParser {
 
 /// A thunk, a function a type calls when it first needs the value.
 ///
-/// It is `Fn` and not `FnOnce`, because the reference calls a thunk that
-/// throws again on the next read, and it may throw, because a thunk built from
-/// SDL resolves type names and throws on an unknown one.
+/// The function form of `ThunkReadonlyArray` and `ThunkObjMap`. It is `Fn` and
+/// not `FnOnce`, because the reference calls a thunk that throws again on the
+/// next read, and it may throw, because a thunk built from SDL resolves type
+/// names and throws on an unknown one.
 pub type ThunkFn<T> = Box<dyn Fn() -> Result<T, DefinitionError> + Send + Sync>;
 
 /// A list, or a thunk that returns one.

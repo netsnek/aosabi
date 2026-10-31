@@ -9,7 +9,10 @@
 
 //! The registry.
 //!
-//! [`emit_registry`] renders the remote schema by this table:
+//! [`emit_registry`] writes the registry as Rust against the contract of
+//! `aosabi::remote`, with the derive `Aosabi` on every type, so a pulled type
+//! describes itself, keeps the remote object it is read from and names its
+//! registry. [`emit_registry`] renders the remote schema by this table:
 //!
 //! | Remote | Rust |
 //! | --- | --- |

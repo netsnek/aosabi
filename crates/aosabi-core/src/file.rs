@@ -7,7 +7,9 @@
 //!
 //! A `File` parameter of a resolver is the file of a multipart request, which the
 //! `File` scalar passes untouched, so the resolver reads it as the web `File` the
-//! form parser made. `name`, `size`, `type` and `lastModified` are properties of
+//! form parser made. The parser of `graphql-over-http` keeps the file as a host
+//! object of the variables, and the marker holds it, so the methods read the body
+//! through the marker. `name`, `size`, `type` and `lastModified` are properties of
 //! the web `File` and methods here, and `type` is the raw name `r#type`. A marker
 //! that holds no upload answers an empty file.
 

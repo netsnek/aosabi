@@ -175,6 +175,8 @@ fn render_implements(r#impl: Option<&[String]>, dropped: &Dropped) -> Result<Str
     Ok(format!(" implements {}", sorted.join(" & ")))
 }
 
+/// Sorts `names` the way `[...kept].sort((a, b) => a.localeCompare(b))` does.
+///
 /// The reference calls its comparator only when the list holds two or more
 /// names, so a list of one name is returned unchecked. Every name of a longer
 /// list takes part in at least one comparison of any comparison sort, so

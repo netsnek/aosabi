@@ -58,7 +58,9 @@ of graphql-js refuses for its escape `\\q` and nests n lists after it,
 `types`, n object types no field names, `dunder`, an object type named `__Mine`
 that no field names, `location`, a directive with a location graphql-js 16.12.0
 does not know, and `empty`, an object type with no field, a schema that builds
-and that every delegation refuses.
+and that every delegation refuses. The fifteen malformed responses are those a
+hostile server answers the pull of a remote schema with, each written here as
+raw bytes, so the proxy serves them with no server of its own.
 
 The proxy uses `http.server` and `http.client` of the standard library and
 nothing else, binds the loopback on its own explicit port, never zero, and

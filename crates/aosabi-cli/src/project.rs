@@ -15,7 +15,11 @@
 //! of its own build dependency `aosabi-build`. A service is one crate with one
 //! facade, so three refusals stand in front of every command that builds:
 //!
-//! - A facade named under `[build-dependencies]` alone is no normal dependency.
+//! - `AO-C0101` for a package that names no normal dependency `aosabi`, and for
+//!   a package of the derive path that names no build dependency
+//!   `aosabi-build`, which every application of that path names for the one
+//!   line `build.rs` of its declaration list. A facade named under
+//!   `[build-dependencies]` alone is no normal dependency.
 //! - `AO-C0102` for a package of the derive path whose library target does
 //!   not stand at `src/index.rs`, the entry of `docs/authoring.md` section 2.
 //! - `AO-C0103` for a package that names `aosabi` from two sources or at two
@@ -307,6 +311,9 @@ pub fn load(
             .iter()
             .any(|feature| matches!(feature, JsValue::String(feature) if feature.as_str() == Some(MIRROR)))
     });
+    // An older facade declares no feature mirror, and the derive path is its
+    // one path, so the two refusals hold against a facade that declares the
+    // feature alone.
     let retires = !mirror && declares_mirror(&metadata);
     if !plain && retires {
         return Err(codes::derive_path_retired(&name));

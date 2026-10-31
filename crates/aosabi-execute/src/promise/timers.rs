@@ -41,6 +41,9 @@
 //!    period, before the callback runs, and [`Agent::clear_timer`] inside the
 //!    callback stops it.
 //! 4. A cleared timer stays in the heap and is skipped when it is popped.
+//! 5. [`sleep`](crate::promise::sleep), [`tick`](crate::promise::tick) and
+//!    [`Agent::sleep`] keep their signatures, and [`Agent::set_timeout`]
+//!    returns the [`TimerId`], which its caller ignores.
 //!
 //! [`TimerMode::Virtual`]: crate::promise::TimerMode::Virtual
 //! [`TimerMode::Host`]: crate::promise::TimerMode::Host

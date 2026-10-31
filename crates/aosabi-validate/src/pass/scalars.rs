@@ -3,7 +3,8 @@
  * aosabi-validate pass scalars: the question the single pass asks a custom
  * scalar about a literal.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the question `isValidValueNode` asks a
+ * scalar, whether its `parseLiteral` takes the literal.
  */
 
 //! The custom scalars of the single pass.

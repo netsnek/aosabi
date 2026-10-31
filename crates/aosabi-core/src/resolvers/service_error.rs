@@ -15,9 +15,12 @@
 //! executor keeps the extensions of an original error that is a
 //! `GraphQLError`, so the three members reach the response.
 //!
-//! Two constructors make one. An application of the native layer writes
-//! [`ServiceError::msg`] with the builder methods [`ServiceError::code`],
-//! [`ServiceError::status`] and [`ServiceError::details`], so
+//! Two constructors make one. The engine's [`ServiceError::new`] takes the
+//! message and the extensions, the two arguments of the constructor of the
+//! reference, which the TypeScript option maps. An application of the native
+//! layer writes [`ServiceError::msg`] with the builder methods
+//! [`ServiceError::code`], [`ServiceError::status`] and
+//! [`ServiceError::details`], so
 //! `ServiceError::msg("Author not found").code("AUTHOR_NOT_FOUND").status(404)`
 //! is
 //! `new ServiceError('Author not found', {code: 'AUTHOR_NOT_FOUND', statusCode: 404})`.

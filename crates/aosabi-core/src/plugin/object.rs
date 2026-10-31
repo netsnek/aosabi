@@ -2,7 +2,9 @@
 /*
  * aosabi-core: a plugin written as an object literal.
  *
- * No analogue on the reference side as a file.
+ * No analogue on the reference side as a file. The object is the Rust form of
+ * a plugin literal, whose members are the eight members the reference defines
+ * and the hooks of Yoga, of envelop and of the server adapter.
  */
 
 //! `PluginObject` and the helpers `plugin!` names.

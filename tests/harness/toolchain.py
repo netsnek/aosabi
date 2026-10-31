@@ -103,6 +103,8 @@ FROM_SOURCE = "source"
 #: at both values. It lies inside `target/`, which every copy of a twin the harness and the notebooks write leaves
 #: out, so no copy takes the build of the other value with it.
 SOURCE_TARGET_DIR = "target/std-source"
+#: The variable of the speed verdict, `on` or `off`, which gives every set the feature `optimize_for_size` or takes
+#: it away, and keeps the set of the card where it is unset or empty.
 SMALL_SWITCH = "AOSABI_STD_SMALL"
 #: The command that adds the component rust-src to the pin, which a build at the switch source needs and no build
 #: runs.

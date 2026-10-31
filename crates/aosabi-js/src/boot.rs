@@ -2,7 +2,9 @@
 /*
  * aosabi-js boot: the boot of the app the host hands in.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It boots over aosabi_core::boot, the schema record
+ * of aosabi_core::boot::canary_schema_record and the schema build of
+ * aosabi_core::app::build_schema.
  */
 
 //! The boot of the app the host hands in.

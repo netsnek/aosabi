@@ -32,14 +32,18 @@
 //! | `zitadel_login` | the login routes of Zitadel, under the feature `auth-zitadel` |
 //!
 //! The prelude exports no macro, since an application of the native layer
-//! calls none.
+//! calls none. The forms of the derive path, `graphql!`, `json!` and the
+//! others, answer a compile error that names their native form under the
+//! default features, and the names that left the root of the facade, `Thrown`
+//! among them, stand under the hidden feature `mirror`.
 
 /// The answer of a resolver, a route, a gate or an entry of the native
 /// layer, whose error is [`Error`] unless it names another.
 ///
 /// It is the `Result` of the standard library with a default for its error,
 /// the form of `anyhow::Result`, so `?` throws every error that converts into
-/// [`Error`].
+/// [`Error`]. The root name `aosabi::Result` is this type, and the `Result`
+/// over `Thrown` of the derive path stands under the hidden feature `mirror`.
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 /// The JSON object and value under their Rust names, the names of

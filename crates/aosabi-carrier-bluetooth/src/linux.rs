@@ -5,7 +5,8 @@
  * and the channel, each served by the GraphTP listener as a local task of the
  * runtime of aosabi-serve.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The driver takes the shape of the drivers
+ * of serve_with.
  */
 
 //! The Linux driver of Bluetooth.
@@ -20,6 +21,17 @@
 //! pace, and the task arms a timer of the runtime at the instant the pace
 //! frees room, so the engine hands over the rest of a long answer one slot
 //! at a time and a short answer that comes meanwhile goes first.
+//!
+//! The channel serves each accepted socket with an endpoint and a listener of
+//! its own through `serve_accepted`, and its listening socket waits on a
+//! decision.
+//!
+//! [`driver`] is the driver `serve_with` starts, `Some` under
+//! `AOSABI_BLUETOOTH=<adapter>` until device cards land and resolve drivers,
+//! the GATT data path on unless the card switches the feature `gatt` off, with
+//! the bounds of the card `player` and the pace of the planning link,
+//! [`Pace::PLANNING`](crate::Pace::PLANNING), until device cards land and give
+//! the pace in the card's params.
 //!
 //! The feature `trace` gives the data path a [`GattTrace`] that a harness
 //! turns on before it hands the data path to [`serve_gatt_counted`] and reads
@@ -360,6 +372,9 @@ pub struct BluetoothListen {
     adapter: String,
 }
 
+/// The driver `serve_with` starts, `Some` under `AOSABI_BLUETOOTH=<adapter>`
+/// until device cards land and resolve drivers.
+///
 /// It captures nothing and reads its variable when the boot calls it, and
 /// the listener it answers serves the GATT data path over the fetch of the
 /// booted app it is handed, and the channel once its address module lands.

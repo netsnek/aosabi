@@ -16,8 +16,16 @@
 //! `--sdl` prints its SDL, else `--ddl` its DDL, else the model goes out as
 //! `JSON.stringify(model, null, 2)`, each followed by one newline.
 //!
-//! The runner validates nothing, so a service whose schema the build refuses is
-//! still inspected.
+//! [`inspect_app`] is the Rust form of that child: it runs steps 1 to 3 of
+//! `build` for the `server` card, which write the generated workspace and its
+//! derived lock, builds the inspect package `<name>-inspect` with `--locked`,
+//! the generated manifest and the target directory of the project and its
+//! output captured, runs it with `target/aosabi/inspect/model.json` as its one
+//! argument, reads the file with the reader of `aosabi-json`, reads its `ir`
+//! with [`aosabi_ir::from_js_value`] and forms the model with [`app_model`]
+//! over the empty `authz` and `queues` the runner writes until a later release
+//! harvests them. The runner validates nothing, so a service whose schema the
+//! build refuses is still inspected.
 //!
 //! [`command`] prints the model on standard output and nothing else, with the
 //! precedence above, and the JSON form with the gap of two spaces

@@ -2,6 +2,9 @@
 /*
  * aosabi-build: the rule that spells the GraphQL name of a Rust name on the
  * source path.
+ *
+ * The input name follows the property naming of
+ * crates/aosabi-infer/src/type_definition_builder.rs.
  */
 
 //! The names of the source path.
@@ -31,10 +34,10 @@
 //! gives from no other spelling, are written as the API spells them, and
 //! rustc's own lint allowance, `#[allow(non_snake_case)]` or
 //! `#[allow(non_camel_case_types)]`, keeps the build quiet where rustc warns.
-//! A GraphQL field or argument of lower case words joined by underscores and
-//! an enum value in upper camel case have no spelling on the source path,
-//! since the rule turns those very spellings into lower camel case and
-//! screaming snake case.
+//! No attribute of Aosabi takes part. A GraphQL field or argument of lower
+//! case words joined by underscores and an enum value in upper camel case
+//! have no spelling on the source path, since the rule turns those very
+//! spellings into lower camel case and screaming snake case.
 //!
 //! The rule acts on the source path alone. The derive path of the twins in
 //! `mirror` and of the registries `aosabi pull` writes keeps every name

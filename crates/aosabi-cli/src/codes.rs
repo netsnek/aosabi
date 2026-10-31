@@ -19,6 +19,12 @@
 //! The codes `AO-C` are the command line's own. `AO-R0105` is the design code
 //! of `docs/device-cards.md` section 6 for a host tool the card needs, which
 //! the command line uses for a missing standard library of the card's target.
+//!
+//! A code that no refusal issues any more leaves [`CODES`] and stands in
+//! [`RETIRED`] with its reason, and is never reused: `AO-C0403` refused
+//! `new --features auth` while the facade carried no `zitadel_auth`, and it
+//! carries it now under the feature `auth-zitadel`, so `new` writes that
+//! scaffold.
 
 use std::path::Path;
 
@@ -169,6 +175,10 @@ pub const RETIRED: &[Code] = &[Code {
 }];
 
 /// The names of the built in cards, as a refusal lists them.
+///
+/// They are the five cards of `BUILTIN` in `cards/builtin.rs`, `server`,
+/// `server-legacy`, `docker`, `worker` and `esp32c3-devkitm1`, with
+/// `server-legacy` as a second server card.
 pub const BUILTIN_CARD_NAMES: &str = "server, server-legacy, docker, worker and esp32c3-devkitm1";
 
 /// Returns the refusal of the package `package`, which is no Aosabi service,
@@ -305,6 +315,10 @@ pub fn source_unread(package: &str, error: &str) -> CliError {
 /// entry the generated workspace would name as the function `default`, and
 /// whose facade, one that declares the feature `mirror`, it names without
 /// that feature, `AO-C0106`.
+///
+/// The derive path is retired for application code, so the message names the
+/// native form of the entry, and the hint is the fix, since no flag of a
+/// command changes the outcome.
 #[must_use]
 pub fn derive_path_retired(package: &str) -> CliError {
     CliError::coded(
@@ -327,6 +341,11 @@ then remove build.rs and the [lib] path",
 /// Returns the refusal of the package `package`, whose `aosabi.config.rs`
 /// stands beside a facade, one that declares the feature `mirror`, it names
 /// without that feature, `AO-C0107`.
+///
+/// The file and `aosabi::serve` are retired for the configuration the chain of
+/// the entry carries, which `aosabi::serve_app` serves, so the message names
+/// that form, and the hint is the fix, since no flag of a command changes the
+/// outcome.
 #[must_use]
 pub fn config_retired(package: &str) -> CliError {
     CliError::coded(

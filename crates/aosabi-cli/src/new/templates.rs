@@ -9,7 +9,9 @@
 //! service and the specification of the facade filled in. A scaffold carries
 //! no `///` and no repository header.
 //!
-//! It holds the one import of the prelude, the root `Query` with an inherent
+//! The index is the native index, the crate root `src/lib.rs` by cargo's
+//! default, a plain crate with no attribute, derive or macro of Aosabi. It
+//! holds the one import of the prelude, the root `Query` with an inherent
 //! block whose method `hello` answers `Hello, world!`, and the entry `app`,
 //! which the builder finds by its return type and which answers
 //! `App::new().query(Query)`. An empty `Mutation` would register nothing,

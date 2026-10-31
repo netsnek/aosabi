@@ -2,7 +2,8 @@
 /*
  * aosabi-js plugin: the plugins of the app as plugins of the engine.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It holds the host plugin as a Plugin of
+ * aosabi-core, with its hooks over js_call.
  */
 
 //! The plugins of the app.

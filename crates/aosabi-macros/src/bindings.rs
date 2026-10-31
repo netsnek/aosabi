@@ -2,7 +2,8 @@
 /*
  * aosabi-macros: #[derive(Bindings)].
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The derive is the Rust form of the
+ * augmentation of the bindings of the context.
  */
 
 //! `#[derive(Bindings)]`.
@@ -10,7 +11,8 @@
 //! The derive implements `Bindings` with `current()`, which reads every
 //! field from the environment of the context of the running request under
 //! the name of the field. A field is `String`, which throws when the binding
-//! is not set, or `Option<String>`.
+//! is not set, or `Option<String>`. Any other type is refused, because the
+//! typed bindings of a platform land with a later release.
 
 use proc_macro2::TokenStream;
 use quote::quote;

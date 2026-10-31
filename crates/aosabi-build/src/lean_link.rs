@@ -27,17 +27,21 @@
 //! build. [`LinuxCard`] names them, and the lean link of `server` adds the
 //! packed relocations as well.
 //!
-//! At `gnu`, its default, the compiler driver links with the linker it finds
-//! and the switch adds nothing. At `lld` the build links with the LLD of the
-//! toolchain that compiles it, which the sysroot of a rustup toolchain, the pin
-//! and its private copy among them, carries under
-//! `lib/rustlib/<host>/bin/gcc-ld`, so no tool joins the build host, and a
-//! sysroot without `ld.lld` there ends the build with `cargo::error`. At `lld`
-//! the link folds identical code with `--icf=all`. Identical code folding gives
-//! functions of equal machine code one address. LLD keeps the address equality
-//! of data unless a link asks for `--ignore-data-address-equality`, so the fold
-//! removes code alone, and no crate that ships compares the address of a
-//! function.
+//! The switch [`LINKER_ENV`] picks the linker of the lean link of
+//! `aarch64-unknown-linux-gnu`. At `gnu`, its default, the compiler driver
+//! links with the linker it finds and the switch adds nothing. At `lld` the
+//! build links with the LLD of the toolchain that compiles it, which the
+//! sysroot of a rustup toolchain, the pin and its private copy among them,
+//! carries under `lib/rustlib/<host>/bin/gcc-ld`, so no tool joins the build
+//! host, and a sysroot without `ld.lld` there ends the build with
+//! `cargo::error`. At `lld` the link folds identical code with `--icf=all`.
+//! Identical code folding gives functions of equal machine code one address.
+//! LLD keeps the address equality of data unless a link asks for
+//! `--ignore-data-address-equality`, so the fold removes code alone, and no
+//! crate that ships compares the address of a function. The fold puts the names
+//! of the functions it removes at the address of the one it keeps, and the cost
+//! model of the executor reads functions by name, so the default stays `gnu`
+//! until it has read its counters under both links.
 //!
 //! The switch reaches `aarch64-unknown-linux-gnu` alone, the target whose folds
 //! section Folds lists and whose cards `20_exec_cost` and `20_exec_asm` read.
@@ -101,6 +105,12 @@ INSERT AFTER .text;
 ";
 
 /// The targets whose binaries the lean link takes.
+///
+/// On `x86_64-unknown-linux-gnu` the lean link keeps the .text of the served
+/// twin and of the probe `app` at its size and its address, its bytes the same
+/// but for the displacements into the writable segment it moves, the read only
+/// data byte equal and every answer under `qemu-x86_64-static` equal, the sweep
+/// a target passes before the lean link takes it.
 const LEAN_TARGETS: [&str; 2] = ["aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"];
 
 /// The one target whose lean link the switch [`LINKER_ENV`] reaches.

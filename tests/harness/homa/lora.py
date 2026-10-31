@@ -82,6 +82,11 @@ def max_frame(band: str, sf: int) -> int:
 
 def longest_response(band: str, sf: int) -> int:
     """Return the longest response of a card's link, from the rules that fix it.
+
+    It is 8,192 bytes at SF7 to SF9 in the band P, and elsewhere at most 2,048
+    bytes whose full packets and last packet take at most a quarter of the
+    hour's air of the band, each full packet carrying its packet less the 14
+    bytes of the header of a part.
     """
     if band == "P" and sf <= 9:
         return 8192

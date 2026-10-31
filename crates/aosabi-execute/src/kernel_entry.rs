@@ -36,7 +36,9 @@
 //! first encoder of a result, [`Encode`]. The kernel builds without an
 //! allocator, so the sink that grows, [`VecSink`], sits here.
 //!
-//! The module names `core` and `alloc` and no item of `std`.
+//! The module names `core` and `alloc` and no item of `std`. The schema and
+//! the factory of the root value are shared between threads, so they stay
+//! behind an `Arc`.
 //!
 //! [`Drive`]: crate::promise::Drive
 

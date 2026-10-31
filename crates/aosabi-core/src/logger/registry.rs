@@ -284,6 +284,8 @@ impl<F: Future> Future for WithLogger<F> {
 }
 
 /// Runs `future` with `log` as the scoped logger, `runWithLogger(log, fn)`.
+///
+/// Follows `runWithLogger` at `logger.ts:272`.
 pub fn run_with_logger<F: Future>(log: Logger, future: F) -> WithLogger<F> {
     WithLogger {
         log,

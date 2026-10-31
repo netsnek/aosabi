@@ -2,7 +2,8 @@
 /*
  * aosabi-core: the descriptor of a named type and the records it lists.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The records hold what the reference asks
+ * the checker of a class, an enum, a union alias and their members.
  */
 
 //! The descriptor of a named type and the records it lists.

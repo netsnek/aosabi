@@ -483,7 +483,16 @@ def _rust_object(name: str, fields: list, arguments: dict) -> dict:
 def parse_rs_registry(text: str) -> dict:
     """Reads the registry `aosabi pull` writes into the structure of this module.
 
-    `comparable` leaves `derived` out, since the reference writes no derive.
+    Beside the structure the reference's registry also has, the answer holds
+    `derived`, what the derive states on each item: for every type of `types` by
+    its GraphQL name, the traits of its `#[derive(...)]`, the keys of its
+    `#[aosabi(...)]`, its `RemoteType` with the registry and the `TYPENAME` it
+    names, whether `NeedsTarget` stands beside it, and for a scalar the type its
+    alias names, and for every struct of `args` its traits and keys. `comparable`
+    leaves `derived` out, since the reference writes no derive. A struct whose
+    `__typename` is `TypeName` is an object when the file writes its inherent
+    constant `TYPENAME` and an interface with no implementation when it does not,
+    and one whose `__typename` is `String` is an interface, the older form.
     """
     registry = _registry()
     items = _rust_items(_rust_tokens(text))

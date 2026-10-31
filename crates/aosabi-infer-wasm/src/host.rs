@@ -3,7 +3,8 @@
  * aosabi-infer-wasm host: the buffers the module shares with the host and the
  * reader and writer of the records that cross between them.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The buffers expose each range the host writes
+ * with write provenance, as crates/aosabi-js/src/host.rs does.
  */
 
 //! The buffers the host writes and reads, and the records that cross the

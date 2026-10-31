@@ -9,6 +9,14 @@
 
 //! The command `verify`.
 //!
+//! In the reference, `verifyApp` runs four checks in order, with standard
+//! output silenced while they run: first `build`, which builds into
+//! `./.pylon-verify` and removes it in `finally`, then `typecheck`,
+//! `tsc --noEmit` when a `tsconfig.json` and a local `tsc` exist, else
+//! `skip`, then `migrations`, the `db check` of the project runner when the
+//! build passed, and last the harvest of the model when the build passed,
+//! which no output of the command line prints.
+//!
 //! [`verify_app`] runs four checks in order with the output of every child
 //! captured and nothing printed until the verdict:
 //!

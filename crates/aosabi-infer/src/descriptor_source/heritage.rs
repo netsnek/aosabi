@@ -31,6 +31,9 @@
 //! and under its own identity where no key has, so whether a base arrives as
 //! the declared class or as a type beside it decides which key holds the
 //! derived classes and what an interface made from that key implements.
+//! Whether the reference files the bases of a chain of classes the way this
+//! presentation does is an open question, and no fact of this file. The
+//! inheritance cases pin it.
 //!
 //! The descriptor records the two relations of a twin and not whether the
 //! base of the TypeScript twin is a class or an interface. An `extends` entry

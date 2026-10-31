@@ -3,7 +3,9 @@
  * aosabi-validate pass: the single pass, which checks an executable document
  * against the field table of its schema in one walk over its tokens.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The pass answers for a document whether the
+ * specified rules accept it, and leaves every document it does not accept to
+ * those rules.
  */
 
 //! The single pass of the validation layer.

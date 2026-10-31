@@ -24,7 +24,7 @@
 //! | `profile` | `SPSM`, the UUIDs, `channel_max_packet`, `channel_profile`, `gatt_profile`, and `Pace`, the pace of the GATT data path, with `TX_DEPTH` and the planning link, core only |
 //! | `host` | the trait `LeHost`, the seam of a bare metal LE host, core only |
 //! | `linux` | the D-Bus client, `Gatt` held to the depth of its pace, `serve_gatt`, whose task wakes at the slots of that pace, `serve_channel` and `driver`, under the feature `linux` |
-//! | `bare` |  |
+//! | `bare` | the binding over the card's LE host under the feature `bare`, which arrives with device cards |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
 //! section 3. The judging notebook is

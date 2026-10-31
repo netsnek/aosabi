@@ -2,7 +2,9 @@
 /*
  * aosabi-carrier-unix: the listener of HTTP(Unix Socket).
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The listener is a stream socket in the
+ * runtime directory of the user and serves each socket through serve_stream of
+ * aosabi-serve.
  */
 
 //! `driver`, `serve_unix` and `UnixListen`.
@@ -23,13 +25,21 @@
 //! On Linux the kernel refuses a connect from a process that has no write
 //! permission on the socket file or no search permission on the directory, so
 //! the directory of mode 0700 and the file of mode 0600 admit the owning user
-//! and a process with the capability to override the permissions of a file. A
-//! server in a user namespace of its own reads no credential either, one that
-//! maps the owner among them, since the kernel gives every peer the namespace
-//! does not map, root of the host among them, the overflow uid, which the owner
-//! of the socket file takes as well where the namespace maps no uid. A build
-//! without the feature `linux` of `aosabi-serve`, and a development host on
-//! macOS, reads no credential, and the file system is the boundary alone.
+//! and a process with the capability to override the permissions of a file.
+//!
+//! A Linux card adds the check of the peer credential where
+//! `UnixStream::peer_uid` of `aosabi-serve` reads one, and a peer that runs as
+//! another user, or whose uid cannot be read, is closed at once with no byte,
+//! so the process with that capability is refused as well.
+//!
+//! A server in a user namespace of its own reads no credential, one that maps
+//! the owner among them, since the kernel gives every peer the namespace does
+//! not map, root of the host among them, the overflow uid, which the owner of
+//! the socket file takes as well where the namespace maps no uid. A server
+//! whose `/proc` hides the links of its namespaces reads no credential either,
+//! wherever it runs. A build without the feature `linux` of `aosabi-serve`, and
+//! a development host on macOS, reads no credential, and the file system is the
+//! boundary alone.
 //!
 //! Every socket that passes is served by `serve_stream` as the Unix variant
 //! of the stream type of `aosabi-serve` with the scheme `http`, so HTTP(Unix
@@ -267,8 +277,7 @@ impl UnixListen {
     /// Tells whether the peer of `stream` may be served: its uid is the owner
     /// of the socket file, or the server reads no credential, as a build
     /// without `linux`, a server in a PID namespace or a user namespace of its
-    /// own and a server whose `/proc` hides the links of its namespaces, of,
-    /// do.
+    /// own and a server whose `/proc` hides the links of its namespaces do.
     fn admits(&self, stream: &UnixStream) -> bool {
         match stream.peer_uid() {
             Ok(Some(uid)) => uid == self.user,

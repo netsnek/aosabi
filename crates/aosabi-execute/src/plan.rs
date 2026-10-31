@@ -560,6 +560,10 @@ impl Plan {
 
     /// Returns the root node of the operation of `exe_context` on `root_type`.
     ///
+    /// Plays the role of the `collectFields` call of `executeOperation` at
+    /// `execute.js:267`, made once per operation and root type and read by
+    /// every later execution of the plan.
+    ///
     /// A collection shares its field nodes through the cache of the plan
     /// while the plan may keep what it builds. The copies it adds there stay
     /// once the keeper admits their bytes, with the node, or alone for a
@@ -658,7 +662,9 @@ impl Plan {
 
     /// Returns the node of the subfields of `field` on `runtime_type`.
     ///
-    /// The field holds its field nodes, so a field and a runtime type name the
+    /// Plays the role of `collectSubfields` at `execute.js:28`, whose memo keys
+    /// a collection on the context, the return type and the field nodes. The
+    /// field holds its field nodes, so a field and a runtime type name the
     /// node, which the plan keeps for every later execution, and a node the
     /// plan does not keep is kept by the execution for its own later reads.
     /// The collection shares its field nodes as [`Plan::root`] says, the

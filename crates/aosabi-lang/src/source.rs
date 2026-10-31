@@ -397,6 +397,9 @@ impl From<JsString> for Source {
 }
 
 /// The reasons a [`Source`] refuses a location offset.
+///
+/// Each variant is one `devAssert` of the reference constructor, and the
+/// `Display` text is the message that assertion throws.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SourceError {
     /// The line of the offset is zero.

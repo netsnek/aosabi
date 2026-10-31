@@ -2,6 +2,9 @@
 /*
  * aosabi-carrier-lora radio: the radio a LoRa link runs on, its modulation
  * and the time on air of a payload.
+ *
+ * The time on air is the formula of the SX1261/2 datasheet, revision 1.2,
+ * section 6.1.4, page 41, and section 6.1.1.4, page 39.
  */
 
 //! The radio, the modulation and the time on air.
@@ -70,7 +73,7 @@ pub const MAX_PAYLOAD: usize = 255;
 pub struct Modulation {
     /// The spreading factor, 7 to 12.
     pub sf: u8,
-    /// The bandwidth in hertz, 125,000 on every link of the design note.
+    /// The bandwidth in hertz, 125,000 on every link of `Modulation::lorawan`.
     pub bandwidth_hz: u32,
     /// The coding rate, 1 for 4/5 to 4 for 4/8.
     pub coding_rate: u8,

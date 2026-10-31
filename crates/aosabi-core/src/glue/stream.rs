@@ -54,6 +54,9 @@
 //! stream and waits for the first `next`, once with a waker that does nothing
 //! when the field subscribes, and from the first `next` on on the agent of
 //! the stream.
+//!
+//! A stream the engine makes is read by the engine through its repeater, so
+//! polled from Rust it answers no item and ends.
 
 use core::{
     future::{

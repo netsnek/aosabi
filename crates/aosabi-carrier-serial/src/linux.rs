@@ -4,7 +4,8 @@
  * a tty in delimited AoFrame served by the GraphTP listener as a local task of
  * the runtime of aosabi-serve.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The driver has the shape of the drivers
+ * of serve_with.
  */
 
 //! The Linux driver of Serial Line.
@@ -20,9 +21,12 @@
 //! and stays up, and a client that restarts sends a CANCEL of handle 0 before
 //! its first OPERATION.
 //!
-//! It reads its variable when the boot calls it, and its [`SerialListen`]
-//! builds a listener over the fetch of the booted app it is handed, with the
-//! bounds of the card `player`, the Linux device card these drivers serve.
+//! [`driver`] is the driver `serve_with` starts, `Some` under
+//! `AOSABI_SERIAL=<tty>:<baud>` until a later release resolves drivers from a
+//! card. It reads its variable when the boot calls it, and its
+//! [`SerialListen`] builds a listener over the fetch of the booted app it is
+//! handed, with the bounds of the card `player`, the Linux device card these
+//! drivers serve.
 
 mod app;
 mod task;
@@ -384,6 +388,9 @@ fn line_of(value: &str) -> io::Result<(PathBuf, u32)> {
     Ok((PathBuf::from(path), baud))
 }
 
+/// The driver `serve_with` starts, `Some` under `AOSABI_SERIAL=<tty>:<baud>`
+/// until a later release resolves drivers from a card.
+///
 /// It captures nothing and reads its variable when the boot calls it, and
 /// the listener it answers builds its `GraphTP` listener over the fetch of the
 /// booted app it is handed.

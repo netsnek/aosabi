@@ -3,7 +3,11 @@
  * aosabi-carrier-bluetooth linux gatt: the GATT data path through BlueZ, the
  * service of Aosabi registered over D-Bus and one Homa packet an ATT value.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The service follows the GATT server API of
+ * BlueZ, doc/org.bluez.GattManager.rst, doc/org.bluez.GattService.rst,
+ * doc/org.bluez.GattCharacteristic.rst, doc/org.bluez.LEAdvertisingManager.rst
+ * and doc/org.bluez.LEAdvertisement.rst of BlueZ 5.87, read at
+ * https://github.com/bluez/bluez/tree/5.87/doc.
  */
 
 //! The GATT data path.

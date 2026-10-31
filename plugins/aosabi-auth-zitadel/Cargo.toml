@@ -1,3 +1,5 @@
+# The Zitadel integration, in two halves: zitadelLogin, the browser routes
+# that set the session cookie, and zitadelAuth, the provider that reads it.
 # Every request it sends goes through the network capability of aosabi-core,
 # so it names no client by name, and the facade names it behind its feature
 # auth-zitadel, which turns fetch on.

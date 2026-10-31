@@ -3,7 +3,8 @@
  * aosabi-js host: the buffers the module shares with the host and the tagged
  * record codec of every value that crosses the host boundary.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The records carry a string value in WTF-8 both
+ * ways, and the buffers keep the conditions of the import block.
  */
 
 //! The buffers the host writes and reads, and the records that cross the
@@ -446,6 +447,9 @@ impl<'a> Reader<'a> {
     /// Reads a length and that many bytes as WTF-8, a string value, the name
     /// or the message of an error or the key of a member of an error, so a
     /// lone surrogate crosses as itself.
+    ///
+    /// Safe code could skip this check, since `JsString` keeps its WTF-8 as a
+    /// rule of its own, so the read needs no unsafe code to go faster.
     pub fn string(&mut self) -> Option<JsString> {
         JsString::from_wtf8(self.bytes()?).ok()
     }

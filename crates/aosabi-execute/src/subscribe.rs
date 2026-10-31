@@ -33,7 +33,9 @@
 //! | `signal?.throwIfAborted()` and the `onSignalAbort` wrapper of `assertEventStream`, `:999` and `:1007-1019` | the server hands the executor no signal, as in [`execute`](mod@crate::execute) |
 //! | `schemaCoordinateInErrors`, the fourth argument of `locatedError` | Yoga never asks for it |
 //!
-//! The module names `core` and `alloc` and no item of `std`.
+//! The module names `core` and `alloc` and no item of `std`. The schema and
+//! the resolvers of a context are `Arc` based, and every value the
+//! module adds is shared through `Rc`.
 
 use alloc::{
     boxed::Box,

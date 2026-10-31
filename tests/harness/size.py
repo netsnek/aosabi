@@ -1,19 +1,19 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the families of a binary, read in Python.
 
-This module reads an ELF file, its program headers, its sections, its symbols
-and its relocations, and a wasm module, its sections, its code bodies and its
-name section. It demangles the names of Rust in the v0 scheme and in the legacy
-scheme. It decodes the aarch64 instructions `adrp` and `add` of `.text`, which
-name an address of the read only data, and `mov`, `bl`, `b` and `ret`, which
-carry a value to the call that takes it, and it decodes the bodies of a wasm
-module for their direct calls. Over those readers it attributes the bytes of a
-binary to crates, to the generic families of the standard library and of the
-map, to the code reachable only through a vtable or a function pointer, to
-`Debug`, to the float code of `core`, to the Unicode case tables, to the vtable
-slots of the validation rules, to the relocations by target, to the unwind
-tables and to the panic locations with their file names and the checks they
-belong to.
+The attribution of a binary runs without an LLVM tool. This module reads an ELF
+file, its program headers, its sections, its symbols and its relocations, and a
+wasm module, its sections, its code bodies and its name section. It demangles
+the names of Rust in the v0 scheme and in the legacy scheme. It decodes the
+aarch64 instructions `adrp` and `add` of `.text`, which name an address of the
+read only data, and `mov`, `bl`, `b` and `ret`, which carry a value to the call
+that takes it, and it decodes the bodies of a wasm module for their direct
+calls. Over those readers it attributes the bytes of a binary to crates, to the
+generic families of the standard library and of the map, to the code reachable
+only through a vtable or a function pointer, to `Debug`, to the float code of
+`core`, to the Unicode case tables, to the vtable slots of the validation rules,
+to the relocations by target, to the unwind tables and to the panic locations
+with their file names and the checks they belong to.
 
 The formats are the ELF specification of the System V ABI and its aarch64
 supplement, the WebAssembly core specification, section Binary Format, and the
@@ -30,8 +30,9 @@ their versions, and the wasm reader the addresses its code names, by which
 `wasm_data_items` attributes the data section to the functions that read it, and
 the target features of a module.
 
-`rom_script` reads the addresses a linker script of the ROM assigns,
-`absolute_symbols` the names such a script defines in a linked image,
+The routines a RISC-V image of the ESP32-C3 takes from the ROM of the chip are
+read here as well. `rom_script` reads the addresses a linker script of the ROM
+assigns, `absolute_symbols` the names such a script defines in a linked image,
 `riscv_targets` the targets of the direct calls and jumps of the code of the
 image, `archive_closure` the bytes an archive such as `compiler_builtins` would
 give a set of names through the relocations of its objects, and
@@ -1173,9 +1174,12 @@ def split_impl(name: str):
 def home_crate(name: str) -> str:
     """Return the crate whose source the function `name` comes from.
 
-    A name that is no path of Rust belongs to the runtime of Rust, to the
-    builtins of the compiler, to the machine outliner of LLVM, or to the C
-    runtime and the entry of the binary.
+    A plain path goes to its first segment and an impl `<T as Trait>::f` to
+    the crate of `T`, unless `T` is a primitive, where it goes to the crate
+    of `Trait`, as the attribution of the size measurement does. A name
+    that is no path of Rust belongs to the runtime of Rust, to the builtins
+    of the compiler, to the machine outliner of LLVM, or to the C runtime and
+    the entry of the binary.
     """
     if re.match(r"(__rust_|rust_eh_personality$|rust_begin_unwind$|rust_panic$)", name):
         return "std"
@@ -1395,6 +1399,11 @@ def _functions(pairs, top: int) -> dict:
 
 def a64_decode(word: int, pc: int):
     """Decode `word` at the address `pc` as one of the six instructions the attribution follows.
+
+    Returns `("adrp", rd, page)`, `("add", rd, rn, immediate)` for an add of an
+    immediate of 64 bits, `("mov", rd, rm)` for the move of one register of 64
+    bits to another, `("bl", target)`, `("b", target)` or `("ret",)`, and None
+    for every other instruction.
     """
     if word & 0x9F000000 == 0x90000000:
         immediate = ((word >> 5) & 0x7FFFF) << 2 | (word >> 29) & 3
@@ -1860,6 +1869,8 @@ def elf_families(path, top: int = 15) -> dict:
     return result
 
 
+# The kinds of the code reachable only through the table, as the size
+# measurement names them.
 TABLE_KINDS = ("validation rules and visitors", "closures, the resolvers, the hooks and the thunks",
                "formatting, Debug, Display and the fmt machinery", "drop glue", "other")
 
@@ -2248,6 +2259,7 @@ def wasm_target_features(module: Wasm) -> list[str]:
     return found
 
 
+# The families of generic code.
 
 #: The named families of Z0, each as the count of its instances and their bytes.
 Z0_FAMILIES = (
@@ -2363,6 +2375,8 @@ def section_sizes(path) -> Counter:
         sizes[section.name] += section.size
     return sizes
 
+
+# The routines of the ROM of the ESP32-C3.
 
 #: The section index of an absolute symbol.
 SHN_ABS = 0xFFF1

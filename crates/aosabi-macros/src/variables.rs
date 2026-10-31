@@ -2,7 +2,8 @@
 /*
  * aosabi-macros: #[derive(Variables)].
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The derive is the Rust form of the
+ * augmentation of the variables of the context.
  */
 
 //! `#[derive(Variables)]`.

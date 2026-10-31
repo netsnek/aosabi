@@ -2,7 +2,9 @@
 /*
  * aosabi-core request_stream: the request lines a twin answers without a socket.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The protocol is the batch form of
+ * crates/aosabi-devtool/src/batch.rs with the operation `execute` and the
+ * operations `subscribe`, `next` and `return`.
  */
 
 //! The request stream of a twin.

@@ -2,7 +2,10 @@
 /*
  * aosabi-core: the bindings and the variables of a context.
  *
- * No analogue on the reference side as a file.
+ * No analogue on the reference side as a file. The traits are the Rust form
+ * of the two augmentations of the context, `interface Bindings` and
+ * `interface Variables`, which an application extends by declaration
+ * merging.
  */
 
 //! `Bindings`, `FromBinding` and `Variables`.

@@ -3,7 +3,8 @@
  * aosabi-validate pass lang_feed: the feed of the single pass over the lexer
  * of the language layer.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The tokens are those of the lexer of
+ * aosabi-lang.
  */
 
 //! The feed of the single pass over the lexer of the language layer.

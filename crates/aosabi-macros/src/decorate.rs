@@ -3,7 +3,8 @@
  * aosabi-macros: #[decorate(expr)], taken off every site it belongs on and
  * handed to the glue in source order.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The attribute is the twin of a
+ * TypeScript decorator made by createDecorator.
  */
 
 //! `#[decorate(expr)]`.

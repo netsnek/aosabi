@@ -5,7 +5,8 @@
  * the tty of the ACM function, each served by the GraphTP listener as a local
  * task of the runtime of aosabi-serve.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The driver has the shape of the drivers of
+ * serve_with.
  */
 
 //! The Linux driver of USB.
@@ -18,6 +19,12 @@
 //! RESEND and a suspended bus is silence. [`serve_serial`] runs one endpoint
 //! over a [`GadgetTty`] in delimited `AoFrame`, whose link is up from the
 //! start and ends with the tty.
+//!
+//! [`driver`] is the driver `serve_with` starts, `Some` under
+//! `AOSABI_USB_FFS=<mount>`, `AOSABI_USB_ACM=<tty>` or both until a later
+//! release resolves drivers from a card, and its listener serves each function
+//! with a listener of its own over the fetch of the booted app, with the bounds
+//! of the card `player`.
 
 #[cfg(feature = "serial")]
 mod acm;
@@ -361,6 +368,9 @@ pub struct UsbListen {
     acm: Option<PathBuf>,
 }
 
+/// The driver `serve_with` starts, `Some` under `AOSABI_USB_FFS=<mount>`,
+/// `AOSABI_USB_ACM=<tty>` or both until a later release resolves drivers from a card.
+///
 /// It captures nothing and reads its variables when the boot calls it, and
 /// the listener it answers builds a `GraphTP` listener for each function over
 /// the fetch of the booted app it is handed.

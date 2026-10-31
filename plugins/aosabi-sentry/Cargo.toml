@@ -1,5 +1,5 @@
-# It sends an event through the network capability of aosabi-core and names no
-# crate outside the workspace.
+# The Sentry plugin. It sends an event through the network capability of
+# aosabi-core and names no crate outside the workspace.
 [package]
 name = "aosabi-sentry"
 version = "0.0.0"

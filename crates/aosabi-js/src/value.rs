@@ -3,42 +3,46 @@
  * aosabi-js value: the objects, functions and promises of the host as values
  * of the engine.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The stand ins go over the trait shapes of
+ * aosabi-execute, with a bound on the depth.
  */
 
 //! The values of the host as values of the engine.
 //!
 //! A JavaScript object stays on the host and stands in the engine as a
-//! [`JsObject`], an [`ObjectLike`] whose reads are imports. A function stands
-//! as a [`JsFunction`], a [`Function`] of the engine whose call hands `js_call`
-//! the arguments the engine has already put in the order of the schema. A
-//! promise stands as a [`JsPromise`], a promise of the engine whose resolving
-//! functions it keeps, waited for once and settled through the export `settle`
-//! in the microtask of the host the settlement runs in. A primitive, a `Date`
-//! and an array cross inline, an array that holds a thenable as the promise of
-//! all its items. A bigint and a symbol, which the engine holds no value of and
-//! which step 1 of `wrapResolver` passes on as they are, cross as one
-//! tag with a byte of their kind and the text `String` answers for them, which
-//! the module reads by the [`Position`] the value stands at in the schema. The
-//! answer of a call stands at the return type of the field the call resolves,
-//! which the resolve info of the call names, an item of a list at the item
-//! type, a member of an object of an object type at the type of its field, and
-//! the value a promise fulfils with at the place of the promise. At a leaf of
-//! `ID` or `GID`, whose `serialize` answers `String(value)`, the module reads
-//! the text, and an array there as the array `String` joins, a `TypeError` when
-//! a symbol stands among its items, as the join throws on a symbol. At any
-//! other place it reads a [`foreign`] stand in, a function whose every call
-//! answers another stand in. A function is the one value of the engine that the
-//! executor takes for no null and that the writer of JSON leaves out of an
-//! object and writes as `null` in a list, as `JSON.stringify` treats a symbol,
-//! and every scalar the engine specifies or binds but `ID`, `GID` and
-//! `JSON` answers it at a leaf as graphql-js answers a bigint and a symbol, so
-//! a bigint and a symbol answer so at a leaf, an item of a list among
-//! them, and as the whole value of `JSONObject`, and a symbol answers its
-//! JSON inside a value of the scalars `JSONObject`, `JSON` and `Any` and as the
-//! whole value of `Any`. A value of the engine crosses to the host as a record,
-//! the arguments of a call through [`push_arguments`] and every other value
-//! through [`host::encode`], so the host sees plain objects, arrays and dates.
+//! [`JsObject`], an [`ObjectLike`] whose reads are imports. A function stands as
+//! a [`JsFunction`], a [`Function`] of the engine whose call hands `js_call` the
+//! arguments the engine has already put in the order of the schema. A promise
+//! stands as a [`JsPromise`], a promise of the engine whose resolving functions
+//! it keeps, waited for once and settled through the export `settle` in the
+//! microtask of the host the settlement runs in. A primitive, a `Date` and an
+//! array cross inline, an array that holds a thenable as the promise of all its
+//! items. A bigint and a symbol, which the engine holds no value of and which
+//! step 1 of `wrapResolver` passes on as they are, cross as one tag with a byte
+//! of their kind and the text `String` answers for them, which the module reads
+//! by the [`Position`] the value stands at in the schema. The answer of a call
+//! stands at the return type of the field the call resolves, which the resolve
+//! info of the call names, an item of a list at the item type, a member of an
+//! object of an object type at the type of its field, and the value a promise
+//! fulfils with at the place of the promise. At a leaf of `ID` or `GID`, whose
+//! `serialize` answers `String(value)`, the module reads the text, and an array
+//! there as the array `String` joins, a `TypeError` when a symbol stands among
+//! its items, as the join throws on a symbol. At any other place it reads a
+//! [`foreign`] stand in, a function whose every call answers another stand in. A
+//! function is the one value of the engine that the executor takes for no null
+//! and that the writer of JSON leaves out of an object and writes as `null` in a
+//! list, as `JSON.stringify` treats a symbol, and every scalar the engine
+//! specifies or binds but `ID`, `GID` and `JSON` answers it at a leaf as
+//! graphql-js answers a bigint and a symbol, so a bigint and a symbol answer so
+//! at a leaf, an item of a list among them, and as the whole value of
+//! `JSONObject`, and a symbol answers its JSON inside a value of the scalars
+//! `JSONObject`, `JSON` and `Any` and as the whole value of `Any`. The shapes
+//! still open answer otherwise for a reason no record of the boundary can remove:
+//! a bigint that reaches the writer of JSON, where `JSON.stringify` throws, and a
+//! symbol as the whole value of the scalar `JSON`. A value of the engine crosses
+//! to the host as a record, the arguments of a call through [`push_arguments`]
+//! and every other value through [`host::encode`], so the host sees plain
+//! objects, arrays and dates.
 //!
 //! The host meets a thenable while it walks a value it answers, as step 3 of
 //! `wrapResolver` meets it, and calls its `then` there, before it reads
@@ -78,7 +82,9 @@
 //! the jobs those reactions enqueue at once as well, inside an import or in the
 //! microtask of the export `settle`, since the async function of a root
 //! hands that thenable its own resolving functions and reacts on the settlement
-//! itself. So the record holds a promise of the host whose `then` has run, and
+//! itself. The shapes still open settle one job off the field of `wrapResolver`
+//! or answer another value, each for a reason no wrapper over the boundary can
+//! remove. So the record holds a promise of the host whose `then` has run, and
 //! the module notes a [`JsPromise`] for it and calls no import.
 //!
 //! The host answers every read and every call with a completion: the byte

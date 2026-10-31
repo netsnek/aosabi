@@ -13,7 +13,7 @@
 //! stream of prefixed `AoFrame`, with an endpoint and a listener of its own,
 //! as the Unix Socket driver serves each accepted socket, so the channel's
 //! listener needs no index of a peer. The packet of the link follows the MPS
-//! of the peer by the k rule of the design note.
+//! of the peer by the k rule of `channel_max_packet`.
 //!
 //! Until then [`serve_channel`] answers `Unsupported` with that reason, and
 //! the Linux devices serve the GATT data path alone.

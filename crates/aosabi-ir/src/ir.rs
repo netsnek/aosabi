@@ -8,7 +8,7 @@
  * Apache-2.0. Changed by the Aosabi authors.
  *
  * The persistence vocabulary, the migration types and the identifier helpers
- * of :31-225 are not translated here.
+ * of :31-225 are not translated here. They land with the database layer.
  */
 
 //! The model of the intermediate representation.

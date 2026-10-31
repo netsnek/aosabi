@@ -2,7 +2,9 @@
 /*
  * aosabi-build: the two directories a build writes into.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. The reference writes into
+ * `.pylon/` of the working directory, and a cargo build has a target
+ * directory in its place.
  */
 
 //! The two directories a build writes into.

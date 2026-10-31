@@ -3,7 +3,9 @@
  * aosabi-js request: the pending table of the requests in flight and the two
  * job modes.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The records of a request and of its answer are those of the
+ * probe of the Worker, and the faithful job mode runs the jobs in the app's own microtask
+ * queue, over the queue a host owns of the agent of aosabi-execute.
  */
 
 //! The requests in flight.

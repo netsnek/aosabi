@@ -3,7 +3,10 @@
  * aosabi-carrier-lora model: the radio model of homa::sim as a radio of the
  * carrier.
  *
- * The devtool alone builds it.
+ * The model is the Radio of homa::sim, which has no Carrier of its own, because
+ * the carrier of LoRa is this crate's Lora over a radio, and this crate
+ * implements its Radio for the model's port under its feature model. The
+ * devtool alone builds it.
  */
 
 //! The model radio of the notebooks.

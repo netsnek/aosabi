@@ -3,7 +3,9 @@
  * aosabi-js context: the context of a request of the host in the engine and
  * the members of it the host calls.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The routes, the middleware and the context c of
+ * an app run in the real hono of the host, aosabi/pylon, and the engine keeps
+ * the context its own code runs a request of the host in.
  */
 
 //! The context of a request of the host.

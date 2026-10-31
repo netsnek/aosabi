@@ -55,6 +55,9 @@ pub fn type_from_ast(schema: &Schema, type_node: &TypeNode) -> Option<Type> {
 }
 
 /// Resolves the inner node of a non null type node.
+///
+/// The `LIST_TYPE` and `NAMED_TYPE` cases of the switch for a node that the
+/// grammar keeps nullable.
 fn nullable_type_from_ast(schema: &Schema, type_node: &NullableTypeNode) -> Option<Type> {
     match type_node {
         NullableTypeNode::ListType(node) => {

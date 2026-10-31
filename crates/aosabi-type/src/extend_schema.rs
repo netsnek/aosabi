@@ -238,7 +238,9 @@ pub fn extend_schema_impl(
 /// Extends a schema config by a document, with `bindings` laid over the
 /// types the builders make.
 ///
-/// With empty bindings it is [`extend_schema_impl`].
+/// The body of `extendSchemaImpl`, where each builder also reads the binding of
+/// the type or the field it builds. With empty bindings it is
+/// [`extend_schema_impl`].
 ///
 /// # Errors
 ///
@@ -344,6 +346,8 @@ pub(crate) fn extend_schema_impl_with_bindings(
 }
 
 /// The three root types a schema definition or extension names.
+///
+/// The `operationTypes` object, where a later spread overrides an earlier key.
 struct OperationTypes {
     query: Option<NamedType>,
     mutation: Option<NamedType>,
@@ -353,8 +357,11 @@ struct OperationTypes {
 /// The scope the builders of `extendSchemaImpl` close over.
 ///
 /// The type map is written once, after every named type of the document exists,
-/// and read by the thunks and by the root type lookups afterwards. The bindings
-/// are what the builders lay over the types and the fields they make.
+/// and read by the thunks and by the root type lookups afterwards. The standard
+/// type map is `stdTypeMap`, keyed by name over the specified scalars and the
+/// introspection types, where a specified scalar the bindings name is the bound
+/// copy of it. The bindings are what the builders lay over the types and the
+/// fields they make.
 // The three map fields keep the names `typeMap`, `stdTypeMap` and
 // `typeExtensionsMap` of the reference, which a reader of both files looks for.
 struct Scope {
@@ -365,6 +372,8 @@ struct Scope {
 }
 
 /// The definition of a type together with its extensions.
+///
+/// The list `allNodes`, which a thunk of a built type reads its members from.
 struct AllNodes {
     definition: TypeDefinitionNode,
     extensions: Vec<TypeExtensionNode>,
@@ -700,6 +709,9 @@ impl Scope {
     }
 
     /// Returns the interfaces thunk of an extended object or interface type.
+    ///
+    /// The `interfaces` thunk, where `old_interfaces` is `type.getInterfaces()`
+    /// of the type being extended.
     fn extended_interfaces(
         self: &Arc<Self>,
         extensions: Vec<TypeExtensionNode>,
@@ -718,6 +730,9 @@ impl Scope {
 
     /// Returns the fields thunk of an extended object or interface type
     /// named `type_name`.
+    ///
+    /// The `fields` thunk, with the field bindings of the type laid over the
+    /// result.
     fn extended_fields(
         self: &Arc<Self>,
         type_name: String,
@@ -756,6 +771,10 @@ impl Scope {
     }
 
     /// Returns the root types of the extended schema.
+    ///
+    /// The `operationTypes` object: the extended root types of the schema
+    /// first, then the schema definition, then every schema extension, each
+    /// overriding the keys before it.
     fn operation_types(
         &self,
         schema_config: &SchemaConfig,

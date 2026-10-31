@@ -2,7 +2,11 @@
 /*
  * aosabi-js log: the logger of the engine as the logger of the host.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The calls logger.info, getLogger, createLogger
+ * and runWithLogger of the app reach the logger of aosabi-core through the
+ * export logger, and the engine hands each line it renders back through the
+ * import host_write, a write of a stream and bytes under a name that no C
+ * library holds.
  */
 
 //! The logger of the host.

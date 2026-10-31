@@ -25,7 +25,11 @@
 //!
 //! The module uses `core` and `alloc` and no item of the standard library,
 //! shares the executor through `Rc` and holds no static, so a build of the
-//! crate without the standard library changes it in no line.
+//! crate without the standard library changes it in no line. The schema and
+//! the document go through the handles [`ExecutionArgs`] names, the alias
+//! [`SharedSchema`] of the schema and the `into()` of the document, an `Arc`
+//! of each today, and a move to `Rc` for a target with no pointer atomics
+//! changes those handles outside this file.
 
 use alloc::{
     rc::Rc,

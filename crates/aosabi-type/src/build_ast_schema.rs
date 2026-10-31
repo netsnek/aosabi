@@ -124,6 +124,9 @@ pub fn build_ast_schema(
 /// Builds a [`Schema`] from the ast of a schema document with `bindings`
 /// laid over its types.
 ///
+/// The body of `buildASTSchema`, where the builders also read the binding of
+/// each type and field they make, which is how the resolver map of
+/// `makeExecutableSchema` reaches a type that takes its hooks at construction.
 /// With empty bindings it is [`build_ast_schema`], and the other arguments are
 /// the same.
 ///

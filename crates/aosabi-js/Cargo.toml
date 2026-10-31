@@ -103,7 +103,10 @@ graphql-over-http = { path = "../graphql-over-http", features = ["host-results",
 
 # The same crates with the same features for the native library, which the
 # feature native takes, line for line those of wasm32 above, so the library
-# links the engine core.wasm links and nothing more.
+# links the engine core.wasm links and nothing more. The platform coding stays,
+# since Bun codes a body with its CompressionStream as a Worker does, and no
+# crate of the list names rustls, ring, webpki, untrusted or OpenSSL on a Linux
+# target.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 aosabi = { path = "../aosabi", features = ["platform-coding"], optional = true }
 aosabi-auth = { path = "../../plugins/aosabi-auth", features = ["host-errors"], optional = true }

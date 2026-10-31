@@ -13,7 +13,13 @@
 //!
 //! The index of a plain crate builds its app as one chain, `App::new()`, then
 //! `.query(Query)`, `.mutation(Mutation)` and `.subscription(..)` for the
-//! parts of its roots.
+//! parts of its roots. [`App`] is that builder, a type of its own beside the
+//! engine's `App` of `aosabi-core`, whose constructor from a fragment, `&mut`
+//! routes and tuple `compose` stay as they are for the twins of the derive
+//! path, for the boot of the TypeScript option and for `aosabi-devtool`. The
+//! root name `aosabi::App` and the module [`crate::prelude`] export the
+//! builder, and the twins that wait for the TypeScript judge reach the
+//! engine's app as `aosabi::mirror::App` under the hidden feature `mirror`.
 //!
 //! A part of a root is a value of any type with no lifetime. The builder
 //! keeps it once and the app lends it to each request as `&self`, so a part

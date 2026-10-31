@@ -9,8 +9,10 @@
 
 //! The core of Aosabi.
 //!
-//! The crate is the home of everything an application links at run time, which is
-//! the application, its plugin contract and its context.
+//! The crate is the home of everything an application links at run time, which
+//! is the application, its plugin contract and its context. The application is
+//! a web app of `aosabi-http`, whose GraphQL handler runs over Yoga of
+//! `graphql-over-http`, and the serving of it lands with `aosabi-serve`.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |

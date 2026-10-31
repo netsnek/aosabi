@@ -4,7 +4,9 @@
  * document and of the arguments of an execution, which the host reads
  * through the export ctx.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The members a view answers are those of the
+ * objects of graphql-js an app reads there: GraphQLResolveInfo, the nodes of
+ * the parser and the arguments of an execution.
  */
 
 //! The views the host makes of what the engine holds of a request.

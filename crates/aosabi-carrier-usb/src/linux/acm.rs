@@ -5,9 +5,7 @@
  * AoFrame.
  *
  * No analogue on the reference side. The tty is /dev/ttyGS<n> of the function
- * acm of the gadget's configfs, which the Homa design note, first version,
- * homa/design-v1.md section 3.3 in the design folder outside this repository,
- * carries in delimited AoFrame.
+ * acm of the gadget's configfs, which carries delimited AoFrame.
  */
 
 //! The serial function of the gadget.

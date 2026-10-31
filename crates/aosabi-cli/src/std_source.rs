@@ -8,10 +8,13 @@
 
 //! The switch `AOSABI_STD`.
 //!
-//! The switch reads `prebuilt` where it is unset or empty, the stock form on
-//! the prebuilt standard library of the toolchain, or `source`, and the
-//! command refuses any other value. A dev build reads no switch, so it takes
-//! no `-Z` flag and no `RUSTC_BOOTSTRAP` at any value.
+//! A card that builds its standard library from source does so on the pinned
+//! stable 1.95.0 with `RUSTC_BOOTSTRAP=1` in the environment of that build
+//! alone, the way of the Linux kernel, and no card takes a nightly. The switch
+//! reads `prebuilt` where it is unset or empty, the stock form on the prebuilt
+//! standard library of the toolchain, or `source`, and the command refuses any
+//! other value. A dev build reads no switch, so it takes no `-Z` flag and no
+//! `RUSTC_BOOTSTRAP` at any value.
 //!
 //! At `source` a release build of a card whose [`SourceSet`] the table of the
 //! built in cards names does four things.
@@ -24,16 +27,24 @@
 //!    `-Zbuild-std` and the features of `-Zbuild-std-features` in
 //!    [`BUILD_STD_ENV`] and [`BUILD_STD_FEATURES_ENV`], the variables cargo
 //!    reads them from, an empty list of features taking every feature away as
-//!    `-Zbuild-std-features=` does.
+//!    `-Zbuild-std-features=` does. The standard library then joins the link
+//!    time optimization of the card without the symbolizer of `std`. A list of
+//!    features the environment names itself stands, since cargo reads it from
+//!    there, which is how a build takes the feature `optimize_for_size` with no
+//!    edit of a card.
 //! 3. It gives cargo the target directory [`SOURCE_TARGET_DIR`] inside the
 //!    target directory of the project, one target directory per value of the
 //!    switch, so neither form builds the crates of the other again, while the
 //!    generated workspace and the artifacts of its build script stay in
 //!    `target/aosabi/`, whose paths the configuration of the project is named
 //!    by. The binary then goes where a build at `prebuilt` puts it, through a
-//!    copy under a new name that takes the place in one step, since cargo
-//!    links the binary there to its artifact under `deps/` and a write through
-//!    that link would change the artifact of the other value.
+//!    copy under a new name that takes the place in one step, since cargo links
+//!    the binary there to its artifact under `deps/` and a write through that
+//!    link would change the artifact of the other value.
+//! 4. For a card whose set holds the options per crate, it writes the wrapper
+//!    of rustc of [`wrapper`] beside the generated workspace and names it as
+//!    `RUSTC_WRAPPER` of the cargo call, chaining a wrapper the environment
+//!    names already.
 //!
 //! The remap of the source of the standard library stands in every release
 //! build at both values, after the other prefixes of the build ([`crate::build`]),
@@ -202,6 +213,9 @@ pub fn cargo_env(
     pairs
 }
 
+/// Returns the text of the wrapper of rustc that gives `crates` the options
+/// per crate, chained to the wrapper `chain` where one is named.
+///
 /// Cargo runs a wrapper as `<wrapper> <rustc> <arguments>`, and the script
 /// finds the unit's `--crate-name` and whether its command line holds
 /// `--target` in one pass over the arguments, so it needs no program beside

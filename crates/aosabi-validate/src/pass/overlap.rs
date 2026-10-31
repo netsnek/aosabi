@@ -4,7 +4,8 @@
  * pass, which compares the fields of one response key with a record of the
  * pairs it compared.
  *
- * No analogue of the file in the reference.
+ * No analogue of the file in the reference. It follows the graphql-js algorithm
+ * over the field plan of the walk in place of the syntax tree.
  */
 
 //! The rule for overlapping fields of the single pass.

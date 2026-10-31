@@ -3,10 +3,9 @@
  * aosabi-carrier-lora counter: the counters of the frames a link sends,
  * reserved in blocks in the storage of the card.
  *
- * The rule is that of the Homa design note, second version, homa/design.md
- * section 6.5, lines 1928 to 1979: a device reserves counters in blocks of
- * 1,024 in its storage capability and starts after the last reserved block at
- * boot, so a restart never reuses a nonce.
+ * The rule is that a device reserves counters in blocks of 1,024 in its
+ * storage capability and starts after the last reserved block at boot, so a
+ * restart never reuses a nonce.
  */
 
 //! The counters of a link and the storage that keeps them across restarts.
@@ -106,8 +105,8 @@ impl<S: CounterStore> Counters<S> {
     /// # Errors
     ///
     /// Returns the storage's error, and hands out no counter then.
-    // The name is the one of the plan's interface, and a counter whose store
-    // can fail answers a result and is no iterator.
+    // The name is the one of the designed interface of the crate, and a
+    // counter whose store can fail answers a result and is no iterator.
     #[expect(clippy::should_implement_trait)]
     pub fn next(&mut self) -> Result<u32, S::Error> {
         if self.next == u32::MAX {

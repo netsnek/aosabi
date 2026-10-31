@@ -126,10 +126,11 @@ type UniqueFields = IndexMap<String, Vec<String>, KeyHasherBuilder>;
 
 /// What lives as long as the service.
 ///
-/// A type lives as long as its schema, so the port keys the cache by the type
-/// name and keeps it with the service. The leaf serializers are the side table
-/// of the bound scalars, which the executor asks before the hook of the type
-/// layer.
+/// The unique fields cache is `uniqueFieldsCache` of the reference, which it
+/// keys by the type object. A type lives as long as its schema, so the port keys
+/// the cache by the type name and keeps it with the service. The leaf
+/// serializers are the side table of the bound scalars, which the executor asks
+/// before the hook of the type layer.
 pub struct CoreState {
     /// The unique fields cache.
     unique_fields: Mutex<UniqueFields>,

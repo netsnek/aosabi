@@ -2,6 +2,10 @@
 /*
  * aosabi-devtool ast_json: renders an abstract syntax tree as the value
  * JSON.stringify sees when graphql-js hands it its own tree.
+ *
+ * The key order of every node is the order of the object literal the reference
+ * parser builds it from, with loc last because Parser.node assigns it after
+ * the literal exists.
  */
 
 //! The tree the `parse` primitive writes.

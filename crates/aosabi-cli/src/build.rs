@@ -11,7 +11,9 @@
 
 //! The command `build`.
 //!
-//! The command runs these steps in order:
+//! In the reference, `build` runs three ordered steps, the server, the client
+//! when the schema changed, and the pages, and writes everything under
+//! `.pylon/`. The command runs these steps in order:
 //!
 //! 1. `.env`, the arguments and [`project::load`], with its refusals.
 //! 2. [`cards::resolve`], with its refusals.
@@ -66,26 +68,30 @@
 //! runs after the compile and a failing configuration leaves the schema of
 //! that build on disk.
 //!
-//! Cargo sets `CARGO_CFG_PANIC` from those flags and not from the profile, so
-//! the lean link the build script of the server package calls acts on that build
-//! for `aarch64-unknown-linux-gnu` and `x86_64-unknown-linux-gnu`, the targets
-//! it takes, and `--target` keeps the flags away from the build scripts and the
-//! proc macros. The last of several matching prefixes wins, so the project root,
-//! which may lie inside the workspace of its facade, stands after the other two.
-//! The source of the standard library in the sysroot, `lib/rustlib/src/rust`,
-//! which the component `rust-src` puts there and which may lie inside the
-//! workspace of a facade as well, maps to `/rustc/<commit>`, the path the
-//! prebuilt standard library names its source by, last, after the project root
-//! and the files of the generated copy of a plain crate, so a build on a
-//! toolchain with the component writes the panic locations of the inlined code
-//! of the standard library with the path a toolchain without it writes, and a
-//! build on a toolchain without it writes the bytes it wrote before. A rustc
-//! that names no commit takes no such remap. The flags of the environment of the
-//! command line stand before these in a build of a card on the host and stay out
-//! of the build of `docker`, whose builder stage passes none, so its build on
-//! the host compiles the parts its image compiles. The dev profile unwinds,
-//! keeps the unwind tables and adds no flag, since a remapped path reaches the
-//! diagnostics a developer reads as well.
+//! In the release profile the server package builds for the host named by
+//! `--target`, with `-C panic=abort` and `--remap-path-prefix` for the cargo
+//! home, the workspace of a path facade and the project root in
+//! `CARGO_ENCODED_RUSTFLAGS`. Cargo sets `CARGO_CFG_PANIC` from those flags and
+//! not from the profile, so the lean link the build script of the server package
+//! calls acts on that build for `aarch64-unknown-linux-gnu` and
+//! `x86_64-unknown-linux-gnu`, the targets it takes, and `--target` keeps the
+//! flags away from the build scripts and the proc macros. The last of several
+//! matching prefixes wins, so the project root, which may lie inside the
+//! workspace of its facade, stands after the other two. The source of the
+//! standard library in the sysroot, `lib/rustlib/src/rust`, which the component
+//! `rust-src` puts there and which may lie inside the workspace of a facade as
+//! well, maps to `/rustc/<commit>`, the path the prebuilt standard library names
+//! its source by, last, after the project root and the files of the generated
+//! copy of a plain crate, so a build on a toolchain with the component writes
+//! the panic locations of the inlined code of the standard library with the path
+//! a toolchain without it writes, and a build on a toolchain without it writes
+//! the bytes it wrote before. A rustc that names no commit takes no such remap.
+//! The flags of the environment of the command line stand before these in a
+//! build of a card on the host and stay out of the build of `docker`, whose
+//! builder stage passes none, so its build on the host compiles the parts its
+//! image compiles. The dev profile unwinds, keeps the unwind tables and adds no
+//! flag, since a remapped path reaches the diagnostics a developer reads as
+//! well.
 //!
 //! A release build of a card whose set the table of the built in cards names
 //! reads the switch `AOSABI_STD` of [`crate::std_source`], and at `source`

@@ -4,7 +4,9 @@
  * JSON form the parse primitive writes.
  *
  * No analogue in the reference, where a tree that went through JSON is a plain
- * object the printer walks as it is.
+ * object the printer walks as it is. The node shapes are those of the AST of
+ * graphql-js, and the printer that reads the result tolerates the same absent
+ * keys as the printer of graphql-js.
  */
 
 //! The reader of the `ast` field of a `print` request.

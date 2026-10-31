@@ -137,8 +137,8 @@ impl Hasher for KeyHasher {
 /// seven bits of the hash, so keys chosen to agree in the tag as well add on top
 /// of that a comparison of the key for each of them on every probe that passes
 /// them. A cap on the count of keys of one object in the JSON reader would bound
-/// both costs. A key the client does not know leaves it no way to choose such
-/// keys.
+/// both costs. The reader caps no key count. A key the client does not know
+/// leaves it no way to choose such keys.
 #[derive(Clone, Copy)]
 pub struct KeyState {
     /// The two words of the key, read little endian from its sixteen bytes.
@@ -219,7 +219,9 @@ impl fmt::Debug for KeyState {
 /// library safe Rust offers that as an atomic type alone, since every other type
 /// of `core` with interior mutability is not `Sync`. This crate ships on the
 /// ESP32-C3, and a crate that ships there uses no atomic type, not even a load
-/// or a store.
+/// or a store. So a build without the standard library hashes with the fixed key
+/// until a later release, which builds the runtime of that card, decides how the
+/// randomness of the card keys its maps.
 ///
 /// # Errors
 ///

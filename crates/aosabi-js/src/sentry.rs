@@ -4,7 +4,8 @@
  * aosabi-sentry, the plugin useSentry, Sentry.init of aosabi/sentry/node and
  * the client of a request.
  *
- * No analogue file in the reference.
+ * No analogue file in the reference. The client of a request is the Toucan the
+ * middleware of @hono/sentry 1.2.2 sets under the key sentry.
  */
 
 //! The Sentry of an app of the TypeScript option.

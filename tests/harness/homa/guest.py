@@ -242,6 +242,11 @@ def peer_roots() -> list:
     """Return the roots of the other worktrees of the repository this tree
     belongs to, the main checkout among them, read from the git metadata
     without running git, or an empty list where `SHARE_PEERS` is false.
+
+    A linked worktree's `.git` is a file that names its directory under
+    `<common>/worktrees/`, whose file `commondir` names the common directory,
+    and each directory under `<common>/worktrees/` holds in `gitdir` the path
+    of the `.git` file of its worktree.
     """
     if not SHARE_PEERS:
         return []

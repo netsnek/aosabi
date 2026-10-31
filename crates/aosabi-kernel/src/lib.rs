@@ -3,7 +3,10 @@
  * aosabi-kernel: layer 0 of Aosabi, the core a bare metal build links and
  * nothing above it.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The crate holds the framing, which it names
+ * from the crate homa, the publish primitive, and the entry below HTTP, which
+ * a later release renames entry, compiles with no standard library and with
+ * allocation optional, and nothing in it reaches up into a layer above.
  */
 
 //! Layer 0 of Aosabi.

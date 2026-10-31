@@ -8,13 +8,14 @@
 
 //! `App`.
 //!
-//! [`App::new`] stores the run time roots of the fragment, [`App::gate`] wraps
-//! each of them in an async function that awaits the gate first, and
-//! [`App::compose`] records each child and merges its roots one level deep, a
-//! child's member taking the place of the parent's member of the same name and
-//! keeping its position, `{...into[kind], ...map}`. The fragment type is a tag
-//! for the build, and [`IntoApp::into_app`] erases it, so the boot, a setup and
-//! `execute_config` all see one type.
+//! An app is a web app of `aosabi-http` with a GraphQL fragment, a plugin chain
+//! and a boot. [`App::new`] stores the run time roots of the fragment,
+//! [`App::gate`] wraps each of them in an async function that awaits the gate
+//! first, and [`App::compose`] records each child and merges its roots one level
+//! deep, a child's member taking the place of the parent's member of the same
+//! name and keeping its position, `{...into[kind], ...map}`. The fragment type is
+//! a tag for the build, and [`IntoApp::into_app`] erases it, so the boot, a setup
+//! and `execute_config` all see one type.
 //!
 //! The base pipeline is registered on `*` once, at the boot and not in the
 //! constructor: the coding layer, the async context bind, the access logger under

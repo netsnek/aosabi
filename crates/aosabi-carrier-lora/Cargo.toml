@@ -1,8 +1,9 @@
-# The carrier LoRa of layer 4, one carrier and one crate as Documentation/architecture.md
-# section 4.3 asks. It carries one compact Homa packet in one LoRa packet, sealed with
-# ChaCha20-Poly1305 behind a header of the link and the counter, and keeps the air of its
-# radio inside the duty cycle of its band. Every LoRa card builds it bare metal through a
-# card crate of the device card track, and the devtool builds its model on the host.
+# The carrier LoRa of layer 4, one carrier and one crate. It carries one
+# compact Homa packet in one LoRa packet, sealed with ChaCha20-Poly1305 behind
+# a header of the link and the counter, and keeps the air of its radio inside
+# the duty cycle of its band. Every LoRa card builds it bare metal through a
+# card crate, which arrives with device cards, and the devtool builds its
+# model on the host.
 [package]
 name = "aosabi-carrier-lora"
 version = "0.0.0"

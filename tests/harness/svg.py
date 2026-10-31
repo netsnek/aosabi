@@ -280,7 +280,10 @@ def path_points(d: str, step_px: float = None) -> list:
     """Returns the sampled points of a path in absolute or relative commands.
 
     Without `step_px`, straight segments contribute their end points and cubic
-    segments `SAMPLES_PER_SEGMENT` points each. The first and the last point
+    segments `SAMPLES_PER_SEGMENT` points each. With it, every segment is
+    sampled so two neighbouring points lie at most `step_px` apart along the
+    curve: a straight segment by its length, and a cubic segment by 3 times its
+    longest control leg, which bounds its speed. The first and the last point
     are the two ends of the path.
     """
     tokens = PATH_TOKEN.findall(d)

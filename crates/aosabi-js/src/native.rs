@@ -3,7 +3,9 @@
  * aosabi-js native: the functions of the host the native library takes at
  * boot in place of the import block of the module.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The table holds the host's functions as typed
+ * extern "C" fn pointers at boot, so no import shares a name with an export
+ * and no unsafe block exists.
  */
 
 //! The table of the functions of the host in the native library.

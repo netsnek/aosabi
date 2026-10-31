@@ -7,6 +7,9 @@
 
 //! The table of the built in cards.
 //!
+//! Five cards ship with the command line, among them `server-legacy`, a second
+//! server card:
+//!
 //! | Card | Class | Carriers and protocols | Compiles | Target and profile |
 //! | --- | --- | --- | --- | --- |
 //! | `server` | server | Network with HTTP(TCP), Unix Socket with HTTP(Unix Socket) | the generated server package with `serve`, `unix-socket`, `deflate` and `linux`, with the lean link and packed relocations in a release build for `aarch64-unknown-linux-gnu` and `x86_64-unknown-linux-gnu` by the linker of the host, and in every release build a copy stripped by the `rust-objcopy` of the toolchain in `target/aosabi/dist/`, the binary it ships | the host, dev or release under `--release` |
@@ -22,7 +25,15 @@
 //! the benchmark harness's and no product of `cargo aosabi build`.
 //!
 //! The field `source` holds the set a release build takes at the switch
-//! `AOSABI_STD` at `source` ([`crate::std_source`]).
+//! `AOSABI_STD` at `source` ([`crate::std_source`]). The cards `server`,
+//! `server-legacy` and `docker` take [`LINUX_SET`], the standard library from
+//! source without its symbolizer with the options per crate, which keeps the
+//! speed of stock on the native card. The card `worker` builds stock at every
+//! value, since the set of the Worker runs two of 64 request shapes slower
+//! than stock in workerd, which takes it off the card until its cause is
+//! found. The card `esp32c3-devkitm1` compiles the kernel crates alone, and
+//! its image, which takes the set of its release image, is built once device
+//! cards land.
 
 use crate::{
     cards::{

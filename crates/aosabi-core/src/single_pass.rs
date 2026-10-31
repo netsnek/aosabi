@@ -4,16 +4,18 @@
  * validation a build serves with and the bound on nesting of each card.
  *
  * No analogue in the reference, which validates every document with its rules
- * and bounds no nesting.
+ * and bounds no nesting. The settings are a choice each build makes when it
+ * compiles, and the bounds of the cards are defaults that live in this file.
  */
 
 //! The build settings of the single pass and the bound on nesting of each
 //! card.
 //!
-//! Two variables of the environment of the build set them, and a crate reads
-//! each with `option_env!` when it compiles, so no setting reaches a running
-//! process, and cargo compiles that crate and the crates after it again when
-//! the value changes:
+//! A build chooses its validation and the bound on nesting of the single pass
+//! when it compiles. Two variables of the environment of the build set them,
+//! and a crate reads each with `option_env!` when it compiles, so no setting
+//! reaches a running process, and cargo compiles that crate and the crates
+//! after it again when the value changes:
 //!
 //! | Setting | Values | Unset | Read by |
 //! | --- | --- | --- | --- |

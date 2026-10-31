@@ -27,6 +27,11 @@
 //! [`get_context`] replaces the environment of the context with the one of
 //! the runtime before it answers, the process on Node and the bindings of the
 //! platform on workerd, as `getContext` does with `env(ctx)`.
+//!
+//! The head of the request is plain data, so a carrier that is no HTTP
+//! connection, GraphTP(Homa) among them, builds the same context from its
+//! own head, and a resolver reads the caller the same way whatever the
+//! protocol.
 
 use core::{
     any::Any,

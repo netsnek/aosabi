@@ -1,10 +1,16 @@
-# The facade, layer 5. Documentation/architecture.md section 3 names it the one
-# crate a service depends on. It holds no code of its own but the function serve
-# and the macro build_output.
+# The facade, layer 5. Documentation/architecture.md section 3 names it the one crate a
+# service depends on. It holds no code of its own but the function serve and
+# the macro build_output. It carries the descriptor types, the macros, the
+# application with its plugins, context, logger and authoring run time, and
+# the service below HTTP with the request stream of a twin, which stay until
+# the twins move to the entry.
 #
 # Its defaults are the translation alone, the web layer of aosabi-http and the
 # Yoga layer with the executor, which every card links, and the engine that
-# serves sockets is a feature the package of a card names.
+# serves sockets is a feature the package of a card names. The feature lines of
+# the cards, which the server crate of every served twin writes by hand, and
+# the package cargo aosabi generates for a card writes once device cards
+# arrive:
 #
 #   server, server-legacy, docker
 #                    aosabi = { <aosabi>, features = ["serve", "unix-socket", "deflate", "linux"] }
@@ -36,11 +42,17 @@ workspace = true
 [features]
 # The translation alone, which every card links.
 default = []
-# The feature keeps the macros and create_decorator at their paths,
-# aosabi::serve beside serve_app, Lazy and the module remote, the contract of
-# the registries of aosabi pull, and the names of the engine in the module json,
-# and reaches the rest through the module mirror, aosabi::mirror::App among
-# them.
+# The forms of the derive path for the twins and the cases that wait for the
+# TypeScript judge, a hidden feature no application names. Those forms are
+# retired for application code: under the default features every macro of
+# aosabi-macros, json!, the macros of the federation and create_decorator
+# answer a compile error that names the native form, and the engine's app, the
+# Result over Thrown, Thrown, Unchecked, JsObject, JsValue, Lazy and the module
+# remote stand outside the root. The feature keeps the macros and
+# create_decorator at their paths, aosabi::serve beside serve_app, Lazy and the
+# module remote, the contract of the registries of aosabi pull, and the names
+# of the engine in the module json, and reaches the rest through the module
+# mirror, aosabi::mirror::App among them.
 mirror = ["aosabi-macros/mirror"]
 # The engine that serves sockets, whose aosabi-serve names aosabi-http with
 # node-server, and the file server serve_static over the file system provider

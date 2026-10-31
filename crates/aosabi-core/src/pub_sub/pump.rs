@@ -3,8 +3,8 @@
  * aosabi-core pub_sub pump: the task that moves an event from the hub into
  * the repeater of its subscriber.
  *
- * The pump awaits each push, so a backlog waits in the hub, bounded and
- * coalesced.
+ * No analogue in the reference, whose listener pushes every event at once. The
+ * pump awaits each push, so a backlog waits in the hub, bounded and coalesced.
  */
 
 //! The pump from the hub into a subscriber's repeater.

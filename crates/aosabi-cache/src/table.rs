@@ -2,6 +2,9 @@
 /*
  * aosabi-cache table: the slab, the index and the lists of recency of the
  * request side cache.
+ *
+ * The keys are those of Yoga, the text, the schema object, the names of the
+ * rules and the document.
  */
 
 //! The table of documents and verdicts.

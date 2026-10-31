@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT
 /*
- * No analogue on the reference side.
+ * aosabi-carrier-network network: what a card names for GraphTP(Homa) on
+ * Network, read from the environment until a later release resolves it from
+ * the card, and the profile and the configuration of the card's endpoint.
+ *
+ * No analogue on the reference side. The values of the Network profile are
+ * HomaModule's at commit 50d65305, which homa::Profile::network gives.
  */
 
 //! What a card names for `GraphTP`(Homa) on Network.
@@ -9,7 +14,10 @@
 //! the crate's kernel module, the [`Protection`] of the path under Homa, which
 //! has no default because Homa carries no security of its own, whether the
 //! path is required or optional, the Homa processes of the host, which share
-//! its link and its `max_incoming` equally, and the MTU of the path.
+//! its link and its `max_incoming` equally, and the MTU of the path. Until a
+//! later release resolves the card, [`HomaNetwork::from_env`] reads them from
+//! the environment, `AOSABI_HOMA_NETWORK` and `AOSABI_HOMA_PROTECTION` first,
+//! in the form of `AOSABI_UNIX_SOCKET=1`.
 //!
 //! The Homa port of a service is its HTTP port, 3000 by the port rule of the
 //! serving plugin, so one service is one port of the host on both protocols. A
@@ -233,6 +241,11 @@ impl HomaNetwork {
         }
     }
 
+    /// Reads `AOSABI_HOMA_NETWORK=ip:<port>` or `kernel:<port>` and
+    /// `AOSABI_HOMA_PROTECTION`, until a later release resolves them from the
+    /// card, with `AOSABI_HOMA_REQUIRED`, `AOSABI_HOMA_PROCESSES`,
+    /// `AOSABI_HOMA_BIND` and `AOSABI_HOMA_MTU` beside them.
+    ///
     /// A path of `ip` alone takes the HTTP port of the port rule. No
     /// protection named is a refusal, never a default.
     ///

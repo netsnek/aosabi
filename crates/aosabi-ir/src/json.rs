@@ -3,7 +3,9 @@
  * aosabi-ir: the JSON shape of the model, the bytes `JSON.stringify(ir)`
  * writes and the reader that takes them back.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. The key orders follow the
+ * object literals of `toIR`, of `emptyIR`, and of `entityFromDefinition` with
+ * the assignment of `sharedTable`.
  */
 
 //! The JSON shape of the model.

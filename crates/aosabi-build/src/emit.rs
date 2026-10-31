@@ -37,6 +37,10 @@
 //! of the type resolvers generated from the model that writes
 //! `resolvers.js`, and [`NAME_FILE`], the package name of the application
 //! crate, which names the socket of HTTP(Unix Socket).
+//!
+//! The write order is fixed, `schema.graphql`, `resolvers.js`, `ir.json`,
+//! `descriptors.json`, `authoring.json` and then the copy in `OUT_DIR`, and
+//! nothing is written before the schema is valid.
 
 use std::{
     env,
@@ -655,11 +659,13 @@ pub fn emit_schema(
 
 /// Returns the text of [`RESOLVERS_FILE`] for `built`.
 ///
-/// That object maps the name of every union and of every interface with a
-/// field to an object whose one key `__resolveType` holds the type resolver,
-/// and a build with neither writes `export const resolvers = {}` and one
-/// newline. The parser gives every union and every interface a resolver before
-/// it answers, so no value is undefined.
+/// The text is `export const resolvers = `, the object the parser returns from
+/// `getResolvers` as [`prepare_object_injection()`] writes it, and one
+/// newline. That object maps the name of every union and of every interface
+/// with a field to an object whose one key `__resolveType` holds the type
+/// resolver, and a build with neither writes `export const resolvers = {}` and
+/// one newline. The parser gives every union and every interface a resolver
+/// before it answers, so no value is undefined.
 #[must_use]
 pub fn resolvers_js(built: &Built) -> String {
     let resolvers: Vec<(&str, Injected<'_>)> = built

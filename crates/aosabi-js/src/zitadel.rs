@@ -3,7 +3,8 @@
  * aosabi-js zitadel: the Zitadel layer of the app over aosabi-auth-zitadel.
  *
  * No analogue in the reference, whose subpath auth/zitadel runs openid-client
- * in the process of the app.
+ * in the process of the app. It is the layer aosabi/auth/zitadel, with
+ * zitadelPrincipal, zitadelAuth and zitadelLogin as markers over the crate.
  */
 
 //! The Zitadel layer of the app.

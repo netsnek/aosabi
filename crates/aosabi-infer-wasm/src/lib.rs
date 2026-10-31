@@ -4,7 +4,9 @@
  * the schema inference of Aosabi over the live checker of typescript behind
  * the host boundary of the author mode of the TypeScript option.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the second type source of aosabi-infer,
+ * whose methods the host answers from the ts.TypeChecker of a ts.Program it
+ * made with the compiler options of the reference's builder.
  */
 
 //! The module `infer.wasm` of the npm package `aosabi-build`.

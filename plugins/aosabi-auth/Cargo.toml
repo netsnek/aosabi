@@ -1,7 +1,7 @@
-# It binds the principal of a request through the identity plugin and gates
-# a call on it. It names no crate outside the workspace and sits behind no
-# feature of the facade, because every service imports the auth root
-# without an install and the linker keeps none of it when a service calls
+# The auth root. It binds the principal of a request through the identity
+# plugin and gates a call on it. It names no crate outside the workspace and
+# sits behind no feature of the facade, because every service imports the auth
+# root without an install and the linker keeps none of it when a service calls
 # none of it.
 [package]
 name = "aosabi-auth"

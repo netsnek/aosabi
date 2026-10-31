@@ -19,6 +19,11 @@ workspace = true
 proc-macro = true
 
 [features]
+# The macros of the derive path answer a compile error that names their
+# native form under the default features, since they are retired for
+# application code, and this hidden feature keeps their expansions for the
+# twins and the cases that wait for the TypeScript judge, which turn it on
+# through the feature of the same name of the facade alone.
 mirror = []
 
 [dependencies]

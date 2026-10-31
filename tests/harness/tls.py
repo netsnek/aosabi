@@ -35,8 +35,14 @@ issuer of tests/harness/mock_issuer.py. The name resolves to 127.0.0.1 through
 answers every name under `localhost.` with the loopback addresses, so no step
 needs root.
 
-The reference reads either form through `crypto.createPrivateKey`.
-`ClientKey.auth_key` answers the record `AUTH_KEY` carries,
+The module also holds the client key of the run, which `client_key` writes and
+`generate` writes beside the certificates when its caller asks: a 2048 bit RSA
+key in the PKCS#1 form, `client.pkcs1.pem`, the form a key file of Zitadel
+carries, the same key in the PKCS#8 form, `client.pkcs8.pem`, and its public
+half, `client.pub.pem`, which the mocked issuer of tests/harness/mock_issuer.py
+verifies each client assertion with. The reference reads either form through
+`crypto.createPrivateKey`. `ClientKey.auth_key` answers the record `AUTH_KEY`
+carries,
 `{"type":"application","keyId":"test-key-1","key":"<PEM>","clientId":"test-client"}`
 in that key order, and `write_key_file` writes the same record as the
 `key.json` a side reads from its working directory. A client key lives under

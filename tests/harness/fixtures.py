@@ -14,13 +14,18 @@ reads it. HTTP(Unix Socket) gets a fresh runtime directory of mode 0700 under
 target/harness/.
 
 A twin is built the way its layout asks. A twin with a `server/` crate of its own
-is a cargo workspace, built with `cargo build --locked` in its directory. The
-binary sits in the twin's `target/` under the name of its server package,
-`<package>-server` for a generated one, at `target/debug/` in the dev profile and
-at `target/<host>/release/` in the release profile, because a release build of the
-command line passes `--target` with the host for the lean link. A helper that is
-handed no cargo runs the cargo of the rustup home, `rustup_cargo`, so a notebook
-builds a twin through `build_twin` and names no cargo of its own.
+is a cargo workspace, built with `cargo build --locked` in its directory. A twin
+in the layout the scaffold of `aosabi new` writes is one package whose server
+package `cargo aosabi build` generates under its `target/aosabi/`, built with
+`target/debug/cargo-aosabi build --locked --manifest-path <twin>/Cargo.toml` from
+the root, after `cargo build --locked -p aosabi-cli` once per kernel. Every twin
+of the tree takes that layout. The binary sits in the twin's `target/` under the
+name of its server package, `<package>-server` for a generated one, at
+`target/debug/` in the dev profile and at `target/<host>/release/` in the release
+profile, because a release build of the command line passes `--target` with the
+host for the lean link. A helper that is handed no cargo runs the cargo of the
+rustup home, `rustup_cargo`, so a notebook builds a twin through `build_twin` and
+names no cargo of its own.
 
 The opt ins `tls` and `h2c` of the card server stay out of a build of the byte
 contract, because h2c answers the preface of HTTP/2 that Node refuses with 400. A
@@ -31,12 +36,19 @@ for a Unix target names them, the form an application that wants them writes unt
 the card names them. The copy keeps the lock of the twin, so the lock check of
 `cargo aosabi build` holds it to the same pins.
 
-`issuer_environment` writes what one side of a variant needs: `OIDC_ISSUER`, the
-CA variable of the side, and `AUTH_KEY` or the key files the variant asks for in
-the working directory of the side, from the client key of tests/harness/tls.py.
-The working directory of the reference is its stage, and that of the twin is a
-directory of its own under target/harness/issuer-cwd/, which `serve_twin` takes as
-`cwd`, because a key file never enters tests/fixtures/rs/.
+A side that sends to the HTTPS port of the mock Sentry ingest trusts the test CA
+of tests/harness/tls.py through one variable of its environment,
+`NODE_EXTRA_CA_CERTS` on the reference and `AOSABI_EXTRA_CA_CERTS` on the twin,
+which `ca_environment` writes.
+
+The two fixtures of the login, `zitadel-login-app` and `zitadel-auth-app`, talk to
+the mocked issuer of tests/harness/mock_issuer.py. `issuer_environment` writes
+what one side of a variant needs: `OIDC_ISSUER`, the CA variable of the side, and
+`AUTH_KEY` or the key files the variant asks for in the working directory of the
+side, from the client key of tests/harness/tls.py. The working directory of the
+reference is its stage, and that of the twin is a directory of its own under
+target/harness/issuer-cwd/, which `serve_twin` takes as `cwd`, because a key file
+never enters tests/fixtures/rs/.
 
 Entries that run at once under `tests/run.py --jobs` can stage one fixture
 together, so the stage writes its links under a lock of its directory and each
@@ -51,8 +63,17 @@ A build on a toolchain with the component rust-src writes the panic locations of
 the standard library with the path the prebuilt one carries, and a build without
 the component writes the bytes it wrote before.
 
-A later build at `prebuilt` puts its own binary back, since cargo links the
-artifact of a binary to that place on every build, a fresh one included.
+A release build of the layout of the scaffold also takes the switch `AOSABI_STD`,
+which the command line reads: at `prebuilt`, the default, the harness adds
+nothing, and at `source` `switch_env` of tests/harness/toolchain.py gives the
+build the private copy of the pin, on which the command line builds the card
+`server` with the set of that card into the target directory `target/std-source/`
+of the project, one target directory per value, inside `target/`, which every copy
+of a twin leaves out, and puts its binary where a build at `prebuilt` puts its
+own, under `target/<host>/release/`, which `twin_binary`, the notebooks and the
+harness modules of other runs read. A later build at `prebuilt` puts its own
+binary back, since cargo links the artifact of a binary to that place on every
+build, a fresh one included.
 """
 
 from __future__ import annotations
@@ -97,6 +118,11 @@ FIXTURE_VARIANTS = {
     "zitadel-providers-app": ("default", "unused_first", "second_first", "per_request", "streamed"),
 }
 
+#: How each variant of the two fixtures of the login hands both sides the client
+#: key: `pkcs1` and `pkcs8` in `AUTH_KEY`, `file` as `key.json` in the working
+#: directory, `files_ab` as `a.json` and `b.json` there, `bad_json` as an
+#: `AUTH_KEY` that is no JSON, and `none` as neither, and the same for the
+#: variants of zitadel-providers-app.
 KEY_SOURCES = {
     "zitadel-login-app": {"default": "pkcs1", "endpoint": "pkcs1", "http_issuer": "pkcs1", "bad_key": "bad_json",
                           "key_file": "file", "no_key": "none", "pkcs8_key": "pkcs8"},
@@ -133,7 +159,9 @@ FEDERATION_DOWN_PORT = 4929
 def federation_variants(port_offset: int = 0) -> dict:
     """Each changes the federation of the front and not its configuration, so the
     overlay serves each as `default`, and the variant travels on both sides as the
-    environment below, which the front reads at boot.
+    environment below, which the front reads at boot. The variant `headers` gives
+    the federation its headers, and the variant `shared` adds the second
+    federation of one URL with a headers function of its own.
     """
     return {
         "default": {},
@@ -458,7 +486,9 @@ def opt_in_dir(name: str, opt_ins, root=None) -> Path:
     The copy holds the manifest with the paths of the facade and of the build side
     made relative to it, the lock, the build script, `src/`, the configuration and
     `twin.toml`, each written only where its bytes changed, so cargo keeps its
-    build of the copy.
+    build of the copy. A file the copy holds outside its `target/` and the twin no
+    longer does goes, such as the build script and the index a twin drops when it
+    moves to the native index, so the copy holds the twin as it stands.
     """
     source = twin_dir(name, root)
     base = paths(root).root
@@ -551,10 +581,15 @@ def build_twin(name: str, cargo=None, release: bool = True, root=None, timeout_s
 def generated_manifest(name: str, root=None, cargo=None, opt_ins=()) -> Path:
     """The manifest of the workspace `cargo aosabi build` generates for a twin of the scaffold layout.
 
-    A notebook builds the server package of that workspace with cargo itself where
-    it needs a profile the command line does not build, such as `size`, with
-    `--target-dir` the twin's `target/`, so the build script writes the artifacts
-    where the command line writes them.
+    The twin is built in the dev profile first, which writes the workspace and its
+    derived lock as the twin stands, since a workspace an earlier tree wrote can
+    hold another layout, the build side of the derive path where the twin is now a
+    plain crate, or a lock the twin's manifest no longer matches, and a build that
+    changes nothing takes a fraction of a second. A notebook builds the server
+    package of that workspace with cargo itself where it needs a profile the
+    command line does not build, such as `size`, with `--target-dir` the twin's
+    `target/`, so the build script writes the artifacts where the command line
+    writes them.
     """
     directory = opt_in_dir(name, opt_ins, root) if opt_ins else twin_dir(name, root)
     build_twin(name, cargo, release=False, root=root, opt_ins=opt_ins, check=False)
@@ -599,7 +634,10 @@ def serve_twin(name: str, port: int, variant: str = "default", node_env: str | N
     directory of `side_cwd` that holds the key file of a variant. A variant
     reaches the twin as it reaches the reference, the configuration in
     `AOSABI_CONFIG` and the environment of a variant of `ENVIRONMENT_VARIANTS`
-    last, its ports shifted by `port_offset`.
+    last, its ports shifted by `port_offset`. A twin reads `AOSABI_CONFIG` in its
+    own code: the function `config` of its `aosabi.config.rs`, or the entry of a
+    twin in the native index, whose chain carries the configuration of the
+    variant.
     """
     overlay, variant_env = variant_environment(name, variant, port_offset)
     full = {"PORT": str(port), "AOSABI_CONFIG": overlay, "NODE_ENV": node_env}

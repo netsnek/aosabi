@@ -972,6 +972,9 @@ fn field_def_of(
 }
 
 /// Returns the type of `schema` that a type condition names.
+///
+/// A type condition is a named type node, and this is the `NAMED_TYPE` case of
+/// `typeFromAST`.
 fn named_type_from_ast(schema: &Schema, node: &NamedTypeNode) -> Option<NamedType> {
     schema.get_type(node.name.value()).cloned()
 }

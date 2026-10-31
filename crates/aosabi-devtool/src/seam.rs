@@ -3,7 +3,9 @@
  * aosabi-devtool seam: the input, output and exit code rules the language,
  * type and validation primitives share.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The error shapes it writes are the toJSON
+ * shape of graphql-js for a GraphQLError and message alone for a plain Error,
+ * which is what the oracle of graphql-js writes for the same two values.
  */
 
 //! The shared seam of the language, type and validation primitives.

@@ -2,6 +2,10 @@
 /*
  * aosabi-build: the lowering of the roots of a plain crate into the dump of a
  * descriptor graph, the types the third type source answers for.
+ *
+ * The lowering describes the declarations of a crate as the macros of
+ * crates/aosabi-macros/src/ describe them for the derive path, here read from
+ * the plain source.
  */
 
 //! The lowering of a plain crate.
@@ -811,6 +815,9 @@ impl Lowering<'_> {
             "Number" => self.primitive("number"),
             "Promise" => self.wrapped(arguments, "promise", text, site),
             "Repeater" => self.wrapped(arguments, "repeater", text, site),
+            // A value no Rust type states, a null or a value of another type
+            // under the type of a cast, which a twin keeps for now, is the node
+            // of its type, as the boxed link of the derive path describes it.
             "Result" | "Unchecked" => self.wrapped(arguments, "", text, site),
             PAYLOAD => self.refuse_type(site, refuse_payload_place(text, &site.key)),
             _ => self.refuse_type(site, refuse_facade(text, &site.key)),

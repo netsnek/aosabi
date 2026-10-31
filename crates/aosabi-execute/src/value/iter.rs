@@ -46,8 +46,11 @@ use crate::{
 
 /// Returns whether `value[Symbol.asyncIterator]` is a function.
 ///
-/// An object of the value model has the method when
-/// [`ObjectLike::async_iterator`] answers one, and no other value has it.
+/// Reproduces `isAsyncIterable` of `@envelop/core`, of `@graphql-tools/utils` and
+/// of graphql-yoga, which all read
+/// `typeof value[Symbol.asyncIterator] === 'function'` on an object. An object of
+/// the value model has the method when [`ObjectLike::async_iterator`] answers
+/// one, and no other value has it.
 #[must_use]
 pub fn is_async_iterable(value: &Value) -> bool {
     match value {

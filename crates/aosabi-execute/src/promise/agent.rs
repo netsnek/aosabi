@@ -14,8 +14,11 @@
 //! wheel, the spawned futures, the ambient hooks and the trace. A clone is the
 //! same agent.
 //!
-//! Every other build of the crate holds none of its fields and none of its
-//! paths.
+//! Behind the feature `host-queue`, which the module of the npm package
+//! `aosabi`, `crates/aosabi-js`, and the core probe of the TypeScript option
+//! enable, a host that runs the microtask queue of the app takes the queue of
+//! an agent and runs each job as one microtask of its own. Every other build
+//! of the crate holds none of its fields and none of its paths.
 
 use alloc::{
     boxed::Box,

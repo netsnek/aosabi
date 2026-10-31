@@ -426,6 +426,11 @@ pub struct ReadableStream {
 
 impl ReadableStream {
     /// Creates the stream of `source` on `agent` and runs `start`, `new ReadableStream(source)`.
+    ///
+    /// Translation of `SetUpReadableStreamDefaultController` of the WHATWG
+    /// Streams standard: `start` runs now on the agent, and the reaction of
+    /// its promise, a job of the agent, marks the stream started and pulls if
+    /// the stream wants a chunk.
     #[must_use]
     pub fn new(agent: &Agent, source: Box<dyn UnderlyingSource>) -> Self {
         let state = Rc::new(RefCell::new(StreamState {

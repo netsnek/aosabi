@@ -4,7 +4,9 @@
  * topics live in the pub sub of the engine.
  *
  * No analogue in the reference, whose createPubSub of @graphql-yoga/subscription 5.0.5
- * dispatches the events of its topics on an EventTarget of the process.
+ * dispatches the events of its topics on an EventTarget of the process. It is the
+ * marker over experimental_create_pub_sub of aosabi-core, the port of that
+ * createPubSub over the hub of the kernel.
  */
 
 //! The pub subs of the app in the pub sub of the engine.

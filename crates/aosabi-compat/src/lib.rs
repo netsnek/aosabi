@@ -24,7 +24,9 @@
 //! out, each with its reason.
 //!
 //! Byte equality with Pylon is a phase of the project, so an entry may carry
-//! the condition on which it drops and what Aosabi does then.
+//! the condition on which it drops and what Aosabi does then. Each of those
+//! drops once byte equality with Pylon is no longer the acceptance rule of its
+//! surface.
 
 #![no_std]
 

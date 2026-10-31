@@ -2,7 +2,8 @@
 /*
  * aosabi-carrier-bluetooth host: the seam of a bare metal LE host, core only.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The trait is asynchronous, and the LE
+ * host of a card implements it once device cards land.
  */
 
 //! The seam of a bare metal LE host.

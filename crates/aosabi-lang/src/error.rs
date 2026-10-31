@@ -88,6 +88,9 @@ use crate::{
 pub type GraphQLErrorExtensions = JsObject;
 
 /// Custom formatted extensions of an error.
+///
+/// The same shape as [`GraphQLErrorExtensions`], which is what the reference
+/// declares.
 pub type GraphQLFormattedErrorExtensions = JsObject;
 
 /// One segment of the path into the execution response.
@@ -593,8 +596,10 @@ pub fn format_error(error: &GraphQLError) -> GraphQLFormattedError {
 /// Produces a `GraphQLError` representing a syntax error, containing useful
 /// descriptive information about the syntax error's position in the source.
 ///
-/// The description is a JavaScript string, because three descriptions of the
-/// lexer quote the body up to a leading surrogate.
+/// `source` is the document, `position` the UTF-16 code unit offset the lexer
+/// or the parser stopped at and `description` the text after the
+/// `Syntax Error: ` prefix. The description is a JavaScript string, because
+/// three descriptions of the lexer quote the body up to a leading surrogate.
 ///
 /// Derived from graphql-js 16.12.0, src/error/syntaxError.ts, MIT.
 #[must_use]
