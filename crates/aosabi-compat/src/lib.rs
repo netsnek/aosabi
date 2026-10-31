@@ -69,7 +69,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/app/pylon-handler.ts:185",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the boot report and of inspect, and then the boot leaves config.plugins as the application wrote it, so config_plugins_after_boot of the boot report lists each plugin once, while the arrays of each pass stay in their own fields",
+            "once byte equality with Pylon is no longer the acceptance rule of the boot report and of inspect, and then the boot leaves config.plugins as the application wrote it, so config_plugins_after_boot of the boot report lists each plugin once, while the arrays of each pass stay in their own fields",
         ),
     },
     Quirk {
@@ -141,7 +141,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/core/define-pylon.ts:278-288",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a returned Repeater is left unprojected, so an object typed payload streams",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a returned Repeater is left unprojected, so an object typed payload streams",
         ),
     },
     Quirk {
@@ -150,7 +150,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/plugins/use-in-context.ts:19",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then @inContext applies to a subscription as to a query",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then @inContext applies to a subscription as to a query",
         ),
     },
     Quirk {
@@ -159,7 +159,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/plugins/use-graphql-error-logger.ts:14-37",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a subscription error writes the graphql error line",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a subscription error writes the graphql error line",
         ),
     },
     Quirk {
@@ -168,7 +168,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "node_modules/.pnpm/@graphql-yoga+subscription@5.0.5/node_modules/@graphql-yoga/subscription/cjs/create-pub-sub.js:13-14",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a null payload is published beside its id",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a null payload is published beside its id",
         ),
     },
     Quirk {
@@ -177,7 +177,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/core/gateway.ts:907-914 with node_modules/.pnpm/@graphql-tools+wrap@11.1.9_graphql@16.12.0/node_modules/@graphql-tools/wrap/dist/index.cjs:2342-2362",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the introspection request carries no field the headers function answers for no context",
+            "once byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the introspection request carries no field the headers function answers for no context",
         ),
     },
     Quirk {
@@ -186,7 +186,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "node_modules/.pnpm/@graphql-tools+executor-http@3.1.0_@types+node@20.19.33_graphql@16.12.0/node_modules/@graphql-tools/executor-http/dist/index.cjs:751-760 with node_modules/.pnpm/@graphql-tools+utils@11.0.0_graphql@16.12.0/node_modules/@graphql-tools/utils/cjs/errors.js:27-36 and node_modules/.pnpm/graphql@16.12.0/node_modules/graphql/error/GraphQLError.js:85-89 and :122-129",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then a remote error at the front carries the locations of the front's field, as a local error does",
+            "once byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then a remote error at the front carries the locations of the front's field, as a local error does",
         ),
     },
     Quirk {
@@ -195,7 +195,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/core/gateway.ts:916-932 with node_modules/.pnpm/@graphql-tools+delegate@12.0.9_graphql@16.12.0/node_modules/@graphql-tools/delegate/dist/index.cjs:1704-1740",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the force transform runs last among the request transforms, as the comment of the reference says, and a forced argument overrides one that needs wrote",
+            "once byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the force transform runs last among the request transforms, as the comment of the reference says, and a forced argument overrides one that needs wrote",
         ),
     },
     Quirk {
@@ -204,7 +204,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/core/gateway.ts:695-718 and :755-760",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then strict looks up a patch for the types below the root alone",
+            "once byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then strict looks up a patch for the types below the root alone",
         ),
     },
     Quirk {
@@ -213,7 +213,7 @@ pub const QUIRKS: &[Quirk] = &[
         source: "packages/pylon/src/cli/pull/index.ts:29-35 and :55-68 with packages/pylon/src/core/gateway.ts:244-256 and :356-397",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then a Date argument goes out as the text the bound Date scalar writes, its toISOString, and the remote answers data",
+            "once byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then a Date argument goes out as the text the bound Date scalar writes, its toISOString, and the remote answers data",
         ),
     },
     Quirk {
@@ -428,7 +428,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the reading of the answer of the introspection by its member data alone, vendor/pylon/packages/pylon/src/cli/pull/index.ts:46-47, so the reference builds the schema of a usable data whatever the member errors beside it holds, null, an empty list or errors",
-        reason: "aosabi pull refuses an answer that carries the member errors, so an answer with a usable data and errors beside it pulls on the reference and fails on aosabi, while an answer without a usable data fails on both sides, in buildClientSchema on the reference, and the entry drops on the owner's word that pull reads data alone as the reference reads it",
+        reason: "aosabi pull refuses an answer that carries the member errors, so an answer with a usable data and errors beside it pulls on the reference and fails on aosabi, while an answer without a usable data fails on both sides, in buildClientSchema on the reference, and the entry drops once pull reads data alone as the reference reads it",
     },
     NotPorted {
         what: "the bounds the fetch of Node puts on the post of pylon pull, 10 seconds to connect, 300 seconds for the head and for each pause of the body, a head of at most the 16,384 bytes of http.maxHeaderSize and no bound on the body, vendor/pylon/node_modules/.pnpm/undici@7.22.0/node_modules/undici/lib/core/connect.js:53 and lib/dispatcher/client.js:64-70 and :253-254, the same code in the undici 7.18.2 that node v24.13.0 bundles for its fetch",
@@ -436,7 +436,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the content codings of the fetch of pylon pull, which asks for gzip and deflate in accept-encoding and decodes an answer coded with gzip, deflate, br or zstd, vendor/pylon/node_modules/.pnpm/undici@7.22.0/node_modules/undici/lib/web/fetch/index.js:1514-1518 and :2211-2234, the same code in the undici 7.18.2 that node v24.13.0 bundles for its fetch",
-        reason: "the http:// only client of aosabi-cli sends no accept-encoding and refuses an answer with a coding other than identity, so a remote that codes its answer all the same pulls on the reference and fails on aosabi, and the entry drops on the owner's word that the client of pull asks for and decodes the codings of the fetch of Node",
+        reason: "the http:// only client of aosabi-cli sends no accept-encoding and refuses an answer with a coding other than identity, so a remote that codes its answer all the same pulls on the reference and fails on aosabi, and the entry drops once the client of pull asks for and decodes the codings of the fetch of Node",
     },
     NotPorted {
         what: "the prompts of create-pylon and its flags -i, --no-install, -y and -pm, vendor/pylon/packages/create-pylon/src/index.ts:27-33 and :44-46, and its prompts at :66, :86, :112, :137, :156 and :181",
@@ -452,7 +452,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the runtime and the React bindings of the query package, vendor/pylon/packages/pylon/src/query/runtime/ and vendor/pylon/packages/pylon/src/query/react/",
-        reason: "they run in the browser, and Aosabi ships no client, see docs/decisions/ADR-0016-server-only.md",
+        reason: "they run in the browser, and Aosabi ships no client",
     },
     NotPorted {
         what: "the four configuration file names pylon.config.ts, pylon.config.mts, pylon.config.js and pylon.config.mjs the build looks for, vendor/pylon/packages/pylon/src/cli/builder/bundler/build-config.ts:4-9",
