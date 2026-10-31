@@ -5,6 +5,8 @@
  *
  * The engine of the single pass, Engine::graphql_single_pass, has no analogue in
  * the reference.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/plugins/use-engine.js, MIT.
  */
 
 //! `use_engine`.

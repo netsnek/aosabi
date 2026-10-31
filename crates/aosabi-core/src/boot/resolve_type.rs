@@ -3,8 +3,8 @@
  * aosabi-core boot resolve_type: the type resolver of every union and
  * interface of a model.
  *
- * Derived from Pylon 2.0.0-canary-20260206115650 and 2.9.5 by Nico Schett,
- * packages/pylon/src/cli/builder/schema/schema-parser.ts and
+ * Derived from Pylon 2.0.0-canary-20260206115650 and 3.0.0-canary by Nico
+ * Schett, packages/pylon/src/cli/builder/schema/schema-parser.ts and
  * @getcronit/pylon-dev 2.0.0-canary-20260206115650, Apache-2.0.
  * Changed by the Aosabi authors.
  */

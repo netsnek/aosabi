@@ -4,6 +4,12 @@
  * delegation calls.
  *
  * Derived from @graphql-tools/utils 11.0.0, cjs, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/errors.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/getResponseKeyFromInfo.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/rootTypes.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/getOperationASTFromRequest.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/astFromValueUntyped.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/implementsAbstractType.js, MIT.
  */
 
 //! The helpers of `@graphql-tools/utils`, `create_graphql_error`,

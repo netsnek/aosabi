@@ -2,6 +2,9 @@
 /*
  * aosabi-type: the walk with type information over the edit path.
  *
+ * The edit walk itself is the one of aosabi_lang::visitor_edit, whose hooks
+ * this file implements.
+ *
  * Derived from graphql-js 16.12.0, src/utilities/TypeInfo.ts, MIT.
  * Derived from graphql-js 16.12.0, src/language/visitor.ts, MIT.
  */

@@ -2,8 +2,10 @@
 /*
  * aosabi-serve: the Fetch request built from the neutral request of aosabi-http.
  *
- * Derived from hono 1.19.9, dist/request.js, MIT.
- * Derived from hono 1.19.9, dist/server.js, MIT.
+ * The bundle server.js holds the same newRequest.
+ *
+ * Derived from @hono/node-server 1.19.9, dist/request.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/server.js, MIT.
  *
  * It carries the quirks Q54_NODE_ADAPTER_URL, Q55_NODE_ADAPTER_HEADERS and
  * Q56_NODE_ADAPTER_BODY_METHODS of docs/byte-equality.md section 13.1.

@@ -3,6 +3,8 @@
  * aosabi-http: the check Node runs over a record, and the two messages of its
  * validators.
  *
+ * Derived from node v24.13.0, lib/_http_outgoing.js, MIT.
+ *
  * It carries the quirk Q59_NODE_RECORD_CHECK_500 of docs/byte-equality.md
  * section 13.1.
  */
@@ -81,6 +83,8 @@ impl core::error::Error for RecordError {}
 /// ``^_`a-zA-Z-0-9!#$%&'*+.|~``, the `tokenRegExp` of `_http_common.js:214`,
 /// and a value is refused when it holds a byte other than tab, 0x20 to 0x7E
 /// and 0x80 to 0xFF, the `headerCharRegex` of `_http_common.js:257`.
+///
+/// Derived from node v24.13.0, `lib/_http_outgoing.js`, MIT.
 ///
 /// # Errors
 ///

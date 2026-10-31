@@ -3,8 +3,8 @@
  * graphql-over-http: the Response of the Fetch API that Yoga and the server adapter
  * make.
  *
- * Derived from whatwg-node 0.8.5, cjs/Response.js, MIT.
- * Derived from whatwg-node 0.8.5, cjs/Body.js, MIT.
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/Response.js, MIT.
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/Body.js, MIT.
  */
 
 //! `new_response`, the `new fetchAPI.Response(body, init)` of Yoga.

@@ -2,8 +2,9 @@
 /*
  * aosabi-core: the environment an application reads.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/get-env.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/get-env.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  */
 
 //! `get_env` and `EnvView`.

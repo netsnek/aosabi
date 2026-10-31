@@ -1534,6 +1534,8 @@ mod idna {
     }
 
     /// Returns the Punycode encoding of `input`, RFC 3492 section 6.3.
+    ///
+    /// Derived from ada 3.3.0, MIT.
     // The names of the bindings are the ones of RFC 3492 section 6.
     #[expect(clippy::many_single_char_names)]
     fn punycode_encode(input: &[char]) -> Option<String> {
@@ -1594,6 +1596,8 @@ mod idna {
     ///
     /// A code point that is no scalar value is refused here, where ada keeps it and its mapping
     /// refuses it as disallowed.
+    ///
+    /// Derived from ada 3.3.0, MIT.
     // The names of the bindings are the ones of RFC 3492 section 6.
     #[expect(clippy::many_single_char_names)]
     fn punycode_decode(input: &str) -> Option<Vec<char>> {
@@ -1688,6 +1692,8 @@ mod idna {
     /// the classes L, EN, ES, CS, ET, ON, BN or NSM. Any other is read as a right to left label
     /// with the classes R, AL, AN, EN, ES, CS, ET, ON, BN or NSM up to that code point, which is
     /// R, AL, EN or AN, and not both EN and AN.
+    ///
+    /// Derived from ada 3.3.0, MIT.
     fn valid_label(label: &[char]) -> bool {
         let Some(&first) = label.first() else {
             return true;
@@ -1745,6 +1751,8 @@ mod idna {
     /// Returns `domain` in ASCII, domain to ASCII of the URL Standard with `beStrict` false.
     ///
     /// The result is refused when it is empty or holds a forbidden domain code point.
+    ///
+    /// Derived from ada 3.3.0, MIT.
     pub(super) fn domain_to_ascii(domain: &str) -> Result<String, UrlError> {
         let result = to_ascii(domain).ok_or(UrlError)?;
         if result.is_empty() || result.chars().any(is_forbidden_domain_code_point) {
@@ -1769,6 +1777,8 @@ mod idna {
     /// decoding. Any other domain is mapped as a whole, where a disallowed code point refuses
     /// it, and normalized to form C, and then each label that starts with `xn--` is checked by
     /// its decoding, an ASCII label is kept, and any other is checked and encoded in Punycode.
+    ///
+    /// Derived from ada 3.3.0, MIT.
     fn to_ascii(domain: &str) -> Option<String> {
         if domain.is_ascii() {
             let lower = domain.to_ascii_lowercase();

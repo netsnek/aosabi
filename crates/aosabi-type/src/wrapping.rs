@@ -5,6 +5,7 @@
  *
  * Derived from @graphql-tools/wrap 11.1.9, dist/index.cjs, MIT.
  * Derived from @graphql-tools/utils 11.0.0, cjs/mapSchema.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/rewire.js, MIT.
  * Derived from @graphql-tools/utils 11.0.0, cjs/astFromType.js, MIT.
  */
 

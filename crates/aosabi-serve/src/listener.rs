@@ -2,7 +2,7 @@
 /*
  * aosabi-serve: the TCP listener of a served binary.
  *
- * Derived from hono 1.19.9, dist/server.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/server.js, MIT.
  */
 
 //! `TcpListen`.

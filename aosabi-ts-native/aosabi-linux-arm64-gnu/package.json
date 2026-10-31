@@ -20,6 +20,11 @@
   },
   "files": [
     "libaosabi.so",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE",
+    "LICENSE-APACHE",
+    "LICENSE-BSD-3-Clause",
+    "LICENSE-BSL-1.0",
+    "LICENSE-Unicode-3.0"
   ]
 }

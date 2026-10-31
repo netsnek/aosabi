@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-hooks: the trait of a plugin and the payloads of its hooks.
+ *
+ * The file carries no code of Envelop, and its hooks follow the type Plugin of
+ * @envelop/types 5.2.1 as the orchestrator of @envelop/core 5.5.1 reads it,
+ * the hook names onPluginInit, onEnveloped, onSchemaChange, onContextBuilding,
+ * onParse, onValidate, onExecute and onSubscribe, and the answer
+ * { onNext, onEnd } of a done hook, OnExecuteDoneHookResult.
  */
 
 //! The trait of a plugin and the payloads of its hooks.

@@ -8,8 +8,8 @@
  * GraphTP, which no file of the reference has and which only the port of Yoga
  * sets (docs/graphtp-in-aosabi.md section 4).
  *
- * Derived from hono 1.19.9, dist/listener.js, MIT.
- * Derived from hono 1.19.9, dist/response.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/response.js, MIT.
  *
  * It carries the quirks Q52_NODE_ADAPTER_CACHED_LENGTH,
  * Q53_HONO_TEXT_DEFAULT_SPACE and Q57_HONO_HEAD_FROM_GET of

@@ -2,12 +2,16 @@
 /*
  * aosabi-json number table: the powers of five Ryu multiplies by, as its small table.
  *
+ * Derived from ryu-js 1.0.3, Apache-2.0 OR BSL-1.0.
+ *
  * The numbers of the table are not copied. The crate computes them when it
  * compiles, from the definition of the full table of Ryu, and checks at
  * compile time that the multiplier this file returns equals that definition
  * for every index a double reaches.
  *
- * Derived from ryu-js 1.0.3, ., Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/d2s_small_table.rs, Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/d2s.rs, Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/common.rs, Apache-2.0 OR BSL-1.0.
  */
 
 //! The powers of five of Ryu, in its small table.

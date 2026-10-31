@@ -3,9 +3,9 @@
  * aosabi-hooks: Aosabi's hook layer, the plugins of a GraphQL request and the
  * order their hooks run in.
  *
- * The answers follow @envelop/core 5.5.1.
- * Each module names the file of it that it follows in its own header. This
- * file holds the module list.
+ * The answers follow @envelop/core 5.5.1. A module whose code follows a file
+ * of it names that file in its own header, and the table below names what each
+ * module follows. This file holds the module list.
  */
 
 //! Aosabi's hook layer.

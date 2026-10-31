@@ -3,8 +3,9 @@
  * auth.js: the entry aosabi/auth of the package aosabi, the gates of the
  * capability tier on the principal of a request.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/index.ts and
- * packages/pylon/src/auth/authz.ts, Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/index.ts and packages/pylon/src/auth/authz.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  *
  * The functions as the build of the reference writes them. The principal is the value
  * the provider of the identity plugin answered, which its middleware set on

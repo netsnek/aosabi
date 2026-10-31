@@ -4,9 +4,16 @@
  * of the step aosabi build, server.mjs with the entry aosabi, the Worker entry worker.mjs, schema.mjs
  * and the IR of the build.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts,
+ * packages/pylon/src/cli/builder/bundler/transpile-app.ts and 2 more files of
+ * Pylon, Apache-2.0. Changed by the Aosabi authors.
+ *
+ * In server.mjs the specifier of the root is mapped to aosabi, and two lines expose the IR of the
+ * build as globalThis.__AOSABI_IR__, which the entries aosabi/bun and aosabi/worker of the package
+ * hand the engine. Each file of src/ and the configuration takes its file under .aosabi/ through
+ * ts.transpileModule, with every import kept and a relative specifier given the extension a module of
+ * the platform resolves.
  */
 
 import fs from 'node:fs'

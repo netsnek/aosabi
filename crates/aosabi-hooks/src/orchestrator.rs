@@ -2,6 +2,8 @@
 /*
  * aosabi-hooks: the orchestrator, which runs the hooks of every plugin in
  * their order.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/orchestrator.js, MIT.
  */
 
 //! The orchestrator.

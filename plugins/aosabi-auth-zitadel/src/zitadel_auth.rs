@@ -2,8 +2,9 @@
 /*
  * aosabi-auth-zitadel zitadel_auth: the provider half.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/zitadel.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/zitadel.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The options with their four mappers, the reader of the token,
  * zitadelPrincipal and zitadelAuth.

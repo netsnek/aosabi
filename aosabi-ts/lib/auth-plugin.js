@@ -3,9 +3,9 @@
  * auth-plugin.js: the entry aosabi/auth/plugin of the package aosabi, the
  * identity plugin useIdentity.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/plugin.ts
- * and packages/pylon/src/auth/authz.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/plugin.ts and packages/pylon/src/auth/authz.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  */
 import { ENGINE_HOOK } from "./core.js";
 import { PRINCIPAL_KEY } from "./auth-contract.js";

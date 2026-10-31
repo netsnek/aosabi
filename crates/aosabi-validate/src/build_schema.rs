@@ -2,6 +2,12 @@
 /*
  * aosabi-validate: the schema builders of the type layer with the SDL
  * validation of this crate handed in.
+ *
+ * The crate completes the builders, whose bodies are in aosabi-type, with
+ * its SDL validation.
+ *
+ * Derived from graphql-js 16.12.0, src/utilities/buildASTSchema.ts, MIT.
+ * Derived from graphql-js 16.12.0, src/utilities/extendSchema.ts, MIT.
  */
 
 //! The schema builders with their SDL validation.

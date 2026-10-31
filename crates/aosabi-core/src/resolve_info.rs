@@ -3,7 +3,7 @@
  * aosabi-core resolve_info: the store a resolver reads its info and its
  * selected fields from.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/resolve-info.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */

@@ -2,7 +2,8 @@
 /*
  * graphql-over-http: the request parsers and the choice of one.
  *
- * Each file of the directory names the file of Yoga it translates.
+ * The last parser whose matcher accepts the request wins. Each file of the
+ * directory names the file of Yoga it translates.
  *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/use-request-parser.js, MIT.
  * Derived from graphql-yoga 5.18.0, cjs/server.js, MIT.

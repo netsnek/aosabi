@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: the plugin type of Yoga with the payload of every hook.
  *
- * Derived from graphql-yoga 5.18.0, cjs/plugins/types.js, MIT.
+ * A plugin of Yoga carried over reads the same.
+ *
+ * Derived from graphql-yoga 5.18.0, typings/plugins/types.d.ts, MIT.
  */
 
 //! `HttpPlugin` and the payloads of its hooks.

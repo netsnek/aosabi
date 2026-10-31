@@ -8,7 +8,7 @@
  * encodeBase64Url and decodeBase64Url of oauth4webapi 3.8.4,
  * build/index.js:41-92, epochTime of build/index.js:441-443, the input of
  * signJwt of build/index.js:540-547, and validateJwt of
- * build/index.js:1710-1782.
+ * build/index.js:1710-1782, under the licence MIT.
  */
 
 //! `base64url_encode`, `base64url_decode`, `encode_compact` and

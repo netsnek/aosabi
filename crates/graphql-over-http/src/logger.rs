@@ -2,7 +2,7 @@
 /*
  * graphql-over-http: the Yoga logger.
  *
- * Derived from graphql-yoga 2.0.1, cjs/index.js, MIT.
+ * Derived from @graphql-yoga/logger 2.0.1, cjs/index.js, MIT.
  */
 
 //! The logger of Yoga.

@@ -3,7 +3,7 @@
  * aosabi-infer: the schema builder, which reads the three roots of an
  * application, runs the parser and assembles the schema text.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/builder.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *

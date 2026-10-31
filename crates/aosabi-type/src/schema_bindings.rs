@@ -3,7 +3,8 @@
  * aosabi-type: the hooks a caller binds to the types of a schema while the
  * schema is built.
  *
- * No analogue in graphql-js.
+ * No analogue in graphql-js. Here both apply within the build, as typed
+ * overlays.
  *
  * Derived from @graphql-tools/schema 10.0.31, cjs/addResolversToSchema.js, MIT.
  */

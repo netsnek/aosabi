@@ -2,8 +2,9 @@
 /*
  * aosabi-auth-zitadel zitadel: the login half and the shared bootstrap.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/zitadel.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/zitadel.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The options, the reader of the auth key, the import of the private key, the
  * bootstrap cached per issuer and zitadelLogin with its routes login, logout

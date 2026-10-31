@@ -2,9 +2,11 @@
 /*
  * aosabi-scalars: the JSON scalar.
  *
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
  * Aosabi binds the scalar object itself under the name JSON.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/scalars/json/JSON.js, MIT.
  */
 
 //! The `JSON` scalar.

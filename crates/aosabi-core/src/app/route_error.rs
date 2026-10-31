@@ -1,7 +1,11 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT AND Apache-2.0
 /*
  * aosabi-core: the thrown value as the error of a route, and the error of a
  * plugin that fails during its setup.
+ *
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * No analogue on the reference side for the first, where a route throws a
  * JavaScript value and hono reads it.

@@ -2,9 +2,8 @@
 /*
  * aosabi-lang: the GraphQL language layer of Aosabi.
  *
- * This file holds the data model the lexer, the parser and the printer share:
- * the source, the location arithmetic, the kind enums, the token, the abstract
- * syntax tree and the GraphQL error.
+ * This file holds the module list, the names the crate exports at its root and
+ * the type SharedSlice.
  *
  * Derived from graphql-js 16.12.0, src/language, MIT.
  * Derived from graphql-js 16.12.0, src/error, MIT.

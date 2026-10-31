@@ -2,6 +2,8 @@
 /*
  * aosabi-http: the environment of a request as the runtime gives it.
  *
+ * It covers the runtimes node and workerd, with the key read from the build.
+ *
  * Derived from hono 4.11.9, dist/helper/adapter/index.js, MIT.
  */
 

@@ -3,6 +3,10 @@
  * graphql-over-http: the cache of parsed and validated documents, the step of
  * the function that stands in the hook layer.
  *
+ * The keys of the cache are the text, the rule names, the schema and the
+ * document, as in Yoga, and its bound is 1,024 documents. The documents and the
+ * verdicts live in the table of the crate aosabi-cache.
+ *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/use-parser-and-validation-cache.js, MIT.
  * Derived from graphql-yoga 5.18.0, cjs/utils/create-lru-cache.js, MIT.
  */

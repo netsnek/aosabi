@@ -3,8 +3,9 @@
  * aosabi-federation: the transform that adds the needs selection to the
  * delegated field.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  */
 
 //! The transform that injects the `needs` selection, [`InjectNeedsTransform`].

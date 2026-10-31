@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-hooks: the plugin that masks unexpected errors.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/plugins/use-masked-errors.js, MIT.
  */
 
 //! `use_masked_errors` and the default mask.

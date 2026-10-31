@@ -3,7 +3,7 @@
  * aosabi-sentry: the middleware of @hono/sentry, which reports the error of a
  * route.
  *
- * Derived from hono 1.2.2, dist/index.js, MIT.
+ * Derived from @hono/sentry 1.2.2, dist/index.js, MIT.
  */
 
 //! `sentry`, `get_sentry` and the context variable `sentry`.

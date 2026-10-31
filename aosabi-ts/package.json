@@ -60,7 +60,12 @@
     "strings.wasm",
     "strings.wasm.sha256",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE",
+    "LICENSE-APACHE",
+    "LICENSE-BSD-3-Clause",
+    "LICENSE-BSL-1.0",
+    "LICENSE-Unicode-3.0"
   ],
   "peerDependencies": {
     "hono": "^4.13.14"

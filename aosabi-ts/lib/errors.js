@@ -3,7 +3,7 @@
  * errors.js: the error classes of the package aosabi, GraphQLError, ServiceError, createGraphQLError
  * and ForbiddenError, which stamp the private brand the module reads through the import js_error.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/define-pylon.ts and
  * packages/pylon/src/auth/errors.ts, Apache-2.0. Changed by the Aosabi authors.
  *
@@ -13,6 +13,8 @@
  * Derived from graphql-js 16.12.0, src/error/GraphQLError.ts, MIT.
  * Derived from graphql-js 16.12.0, src/language/location.ts, MIT.
  * Derived from graphql-js 16.12.0, src/language/printLocation.ts, MIT.
+ *
+ * Derived from @graphql-tools/utils 10.11.0, cjs/errors.js, MIT.
  */
 
 // A masking that tells a GraphQLError from any other error with instanceof

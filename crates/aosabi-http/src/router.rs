@@ -3,6 +3,7 @@
  * aosabi-http: the trie router with the method rule of the smart router.
  *
  * Derived from hono 4.11.9, dist/router/trie-router/router.js, MIT.
+ * Derived from hono 4.11.9, dist/router/trie-router/node.js, MIT.
  * Derived from hono 4.11.9, dist/router/smart-router/router.js, MIT.
  */
 

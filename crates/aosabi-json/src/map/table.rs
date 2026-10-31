@@ -9,6 +9,10 @@
  * slot where the group holds another empty slot and records every entry again
  * where the group is full. A map of at most SMALL entries keeps no table, and
  * allocates no group until it holds more entries or reserves room for more.
+ *
+ * Derived from hashbrown 0.17.1, src/control/group/generic.rs, MIT.
+ * Derived from hashbrown 0.17.1, src/control/tag.rs, MIT.
+ * Derived from hashbrown 0.17.1, src/raw.rs, MIT.
  */
 
 //! The index table of [`super::IndexMap`].

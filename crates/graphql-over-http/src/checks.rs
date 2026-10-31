@@ -3,6 +3,11 @@
  * graphql-over-http: the request checks of the function.
  *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-check-method-for-graphql.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-check-graphql-query-params.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-limit-batching.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-prevent-mutation-via-get.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-http-validation-error.js, MIT.
  */
 
 //! The request checks.

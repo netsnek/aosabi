@@ -3,9 +3,11 @@
  * aosabi-sentry: the plugin that reports the errors of a GraphQL execution to
  * Sentry.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/plugins/use-sentry.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * Derived from @envelop/sentry 8.0.0, MIT.
  */
 
 //! `use_sentry`, `SentryPluginOptions` and `default_skip_error`.

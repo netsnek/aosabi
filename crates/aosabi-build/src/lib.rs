@@ -4,7 +4,7 @@
  * crate and turns the descriptors of an application crate into the schema
  * files.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts and
  * packages/pylon/src/cli/builder/update-file-if-changed.ts, Apache-2.0.
  * Changed by the Aosabi authors.

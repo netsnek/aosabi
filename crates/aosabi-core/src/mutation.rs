@@ -2,8 +2,9 @@
 /*
  * aosabi-core: the mutation wrapper and its user errors.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/mutation.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/mutation.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  */
 
 //! `mutation`, `UserError` and `to_user_errors`.

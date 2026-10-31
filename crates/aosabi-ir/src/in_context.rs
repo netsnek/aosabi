@@ -3,7 +3,7 @@
  * aosabi-ir: the SDL of the `@inContext` directive, the tail every emitted
  * schema carries.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/in-context.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
@@ -22,8 +22,9 @@
 
 /// The SDL of the `@inContext` directive.
 ///
-/// The text ends without a newline, because the literal file carries none, and
-/// the build appends the newline that `schema.graphql` ends in. The literal
-/// stays in the crate directory that `NOTICE` declares for it, which is why the
-/// path leaves this crate.
+/// Its value is the text of the literal file, the evaluated string of the
+/// constant. The text ends without a newline, because the literal file
+/// carries none, and the build appends the newline that `schema.graphql` ends
+/// in. The literal stays in the crate directory that `NOTICE` declares for
+/// it, which is why the path leaves this crate.
 pub const IN_CONTEXT_SDL: &str = include_str!("../../aosabi-core/src/in_context.graphql");

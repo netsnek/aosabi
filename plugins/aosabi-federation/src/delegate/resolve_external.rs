@@ -4,6 +4,7 @@
  * objects the outer executor reads.
  *
  * Derived from @graphql-tools/delegate 12.0.9, dist/index.cjs, MIT.
+ * Derived from graphql-js 16.12.0, src/error/locatedError.ts, MIT.
  */
 
 //! The resolution of a delegated value, `resolve_external_value` and the

@@ -2,7 +2,11 @@
 /*
  * aosabi-sentry: the Sentry client of one request.
  *
- * Derived from toucan-js 4.1.1, ., MIT.
+ * Derived from toucan-js 4.1.1, MIT.
+ *
+ * Derived from toucan-js 4.1.1, dist/index.cjs.js, MIT.
+ * Derived from @sentry/core 8.9.2, cjs/scope.js, MIT.
+ * Derived from @sentry/utils 8.9.2, cjs/eventbuilder.js, MIT.
  */
 
 //! `Toucan`, `ToucanOptions` and `RequestDataOptions`.

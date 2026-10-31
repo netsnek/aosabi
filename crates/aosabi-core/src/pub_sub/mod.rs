@@ -3,7 +3,7 @@
  * aosabi-core pub_sub: experimental_create_pub_sub over the hub of the
  * kernel.
  *
- * Derived from graphql-yoga 5.0.5, cjs/create-pub-sub.js, MIT.
+ * Derived from @graphql-yoga/subscription 5.0.5, cjs/create-pub-sub.js, MIT.
  */
 
 //! The pub sub of `@graphql-yoga/subscription`.

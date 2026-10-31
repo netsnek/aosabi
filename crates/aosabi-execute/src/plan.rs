@@ -2,7 +2,12 @@
 /*
  * aosabi-execute plan: the field plan of a document under a schema.
  *
- * No analogue in the reference.
+ * No analogue in the reference for the plan. The field plan keeps across the
+ * requests of one document what the memoize3 around collectSubfields keeps for
+ * one execution, and the fragment map the memoize1 around
+ * getFragmentsFromDocument keeps for one document.
+ *
+ * Derived from @graphql-tools/executor 1.5.1, cjs/execution/execute.js, MIT.
  */
 
 //! The field plan of a document under a schema.

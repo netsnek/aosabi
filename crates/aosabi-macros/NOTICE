@@ -1,0 +1,27 @@
+aosabi-macros
+Copyright (c) 2026 Florian Kleber
+
+The crate aosabi-macros is a part of Aosabi, https://github.com/netsnek/aosabi,
+and is licensed under the MIT License. This file names the work of others that
+the crate carries or derives code or data from, with the license of each. It
+adds attribution and no condition to the license of the crate. The texts of the
+licenses are those of LICENSE for MIT and LICENSE-APACHE for Apache-2.0, beside
+this file.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Other projects
+==============
+
+Project: TypeScript
+URL: https://github.com/microsoft/TypeScript
+Packages: typescript 5.9.3
+License: Apache-2.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+The file of the crate derived from the code of TypeScript is src/jsdoc.rs.

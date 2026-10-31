@@ -2,8 +2,12 @@
 /*
  * aosabi-core context: the request context and the ambient cell it lives in.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/context.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/context.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
+ *
+ * The two AsyncLocalStorage instances of the reference, the one of this file
+ * and the one of the resolve info, share the one ambient cell of this file.
  */
 
 //! The request context.

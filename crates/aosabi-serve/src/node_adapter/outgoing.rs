@@ -3,7 +3,7 @@
  * aosabi-serve: the answer of the Node adapter as the neutral answer of
  * aosabi-http.
  *
- * Derived from hono 1.19.9, dist/listener.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
  * It carries the quirks Q49 to Q52, Q58 and Q59 of docs/byte-equality.md
  * section 13.1, the adapter's halves of them.

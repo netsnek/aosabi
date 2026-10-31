@@ -2,8 +2,7 @@
 /*
  * aosabi-cli: the table of the built in cards.
  *
- * No analogue in the reference. The rows are those of docs/cli-and-targets.md
- * section 5.0.
+ * No analogue in the reference.
  */
 
 //! The table of the built in cards.

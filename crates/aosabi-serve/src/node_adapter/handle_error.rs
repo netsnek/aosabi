@@ -3,7 +3,7 @@
  * aosabi-serve: the answers of the Node adapter to a request it cannot build,
  * a fetch that rejects and a head Node refuses.
  *
- * Derived from hono 1.19.9, dist/listener.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
  * It carries the half of the adapter of the quirk Q59_NODE_RECORD_CHECK_500
  * of docs/byte-equality.md section 13.1.

@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: the multipart parser of a form data body.
  *
- * Derived from node v24.13.0, deps/undici/src/lib/web/fetch/formdata-parser.js, MIT.
+ * Derived from undici 7.18.2, lib/web/fetch/formdata-parser.js, MIT.
+ * Derived from undici 7.18.2, lib/web/fetch/data-url.js, MIT.
+ * Derived from undici 7.18.2, lib/web/fetch/util.js, MIT.
  */
 
 //! `FormData` and the multipart parser.

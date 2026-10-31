@@ -4,6 +4,8 @@
  *
  * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/shared/stdio.js, MIT.
  * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/server/stdio.js, MIT.
+ * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/types.js, MIT.
+ * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/shared/protocol.js, MIT.
  */
 
 //! The JSON-RPC lines.

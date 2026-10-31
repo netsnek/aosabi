@@ -1,0 +1,97 @@
+aosabi-core
+Copyright (c) 2026 Florian Kleber
+
+The crate aosabi-core is a part of Aosabi, https://github.com/netsnek/aosabi,
+and is licensed under the MIT License. This file names the work of others that
+the crate carries or derives code or data from, with the license of each. It
+adds attribution and no condition to the license of the crate. The texts of the
+licenses are those of LICENSE for MIT and LICENSE-APACHE for Apache-2.0, beside
+this file.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Pylon
+=====
+
+Project: Pylon
+URL: https://github.com/getcronit/pylon
+Packages: @getcronit/pylon 3.0.0-canary, create-pylon 1.1.4,
+  @getcronit/pylon-dev 2.0.0-canary-20260206115650
+License: Apache-2.0
+Copyright 2024 Nico Schett
+
+The code of Pylon that this crate carries was written by Nico Schett, as git
+blame of Pylon's history reads it. The files of the crate translated from
+Pylon's code are src/app/application.rs, src/app/execute_config.rs,
+src/app/handler.rs, src/app/plugin_order.rs, src/app/request_id.rs,
+src/app/route_error.rs, src/boot/ir.rs, src/boot/resolve_type.rs,
+src/context.rs, src/create_schema.rs, src/decorator.rs, src/descriptor/entry.rs,
+src/get_env.rs, src/glue/decorate.rs, src/glue/mutation.rs,
+src/glue/resolve_type.rs, src/in_context.rs, src/logger/logger.rs,
+src/logger/pretty.rs, src/mutation.rs, src/plugin/config.rs,
+src/plugin/middleware.rs, src/plugin/mod.rs,
+src/plugins/graphql_error_logger.rs, src/plugins/in_context.rs,
+src/resolve_info.rs, src/resolvers/get_selected_fields.rs, src/resolvers/mod.rs,
+src/resolvers/resolvers_to_graphql_resolvers.rs, src/resolvers/service_error.rs,
+src/resolvers/view.rs, src/resolvers/wrap_resolver.rs, src/scalars/date.rs,
+src/scalars/gid.rs, src/scalars/id.rs, src/scalars/mod.rs and
+src/scalars/number.rs. Every file of Aosabi that carries code added to Pylon on
+or after 2024-05-29, the day Pylon took the Apache License 2.0, names Apache-2.0
+in its SPDX line, as MIT AND Apache-2.0 where Aosabi's own code is mixed in,
+credits Nico Schett and Pylon in its header and says that the Aosabi authors
+changed it.
+
+The crate keeps Pylon's bytes, and so no SPDX line, in the files
+src/in_context.graphql and src/number_scalar_messages.rs.
+
+Pylon ships the NOTICE file below, reproduced as it reads at the commit Aosabi
+follows:
+
+    Pylon
+    Copyright 2024 Nico Schett <nico.schett@cronit.io>
+
+    This product includes software developed at
+    cronit (https://www.cronit.io/).
+
+
+Other projects
+==============
+
+Project: GraphQL Tools
+URL: https://github.com/ardatan/graphql-tools
+Packages: @graphql-tools/utils 11.0.0, @graphql-tools/executor 1.5.1,
+  @graphql-tools/schema 10.0.31, cross-inspect 1.0.1
+License: MIT
+Copyright (c) 2020 The Guild, Inc.
+
+Project: GraphQL Yoga
+URL: https://github.com/graphql-hive/graphql-yoga
+Packages: graphql-yoga 5.18.0, @graphql-yoga/subscription 5.0.5,
+  @graphql-yoga/logger 2.0.1, @graphql-yoga/plugin-disable-introspection 2.19.0
+License: MIT
+Copyright (c) 2018-2020 Graphcool
+Copyright (c) 2020-2021 Prisma
+Copyright (c) 2021- The Guild
+
+Project: Repeater
+URL: https://github.com/repeaterjs/repeater
+Packages: @repeaterjs/repeater 3.0.6
+License: MIT
+Copyright 2019 Brian Kim
+
+Project: Sentry SDK for JavaScript
+URL: https://github.com/getsentry/sentry-javascript
+Packages: @sentry/node 8.55.0, @sentry/core 8.55.0, @sentry/utils 8.9.2
+License: MIT
+Copyright (c) 2019-2024 Functional Software, Inc. dba Sentry
+
+Project: TypeScript
+URL: https://github.com/microsoft/TypeScript
+Packages: typescript 5.9.3
+License: Apache-2.0
+Copyright (c) Microsoft Corporation. All rights reserved.

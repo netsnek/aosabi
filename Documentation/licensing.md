@@ -18,7 +18,9 @@ line. The comment style follows the language of the file:
 A file that carries no SPDX line, such as a document, a test fixture or a data file, is licensed
 under the MIT License, unless section 4 names it with another license or it belongs to a fork of
 section 6. A manifest states its license in its own field, `license` in a `Cargo.toml` or a
-`package.json`.
+`package.json`, which names the licenses of the files of its package, so a package that holds
+code of Pylon names `MIT AND Apache-2.0`. An npm package that ships a module or a library built
+from crates of the repository names the licenses of what that build links as well.
 
 ## 2. The license texts
 
@@ -44,13 +46,15 @@ that license asks:
 /*
  * auth.js: the entry aosabi/auth of the package aosabi.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett, packages/pylon/src/auth/index.ts
+ * and packages/pylon/src/auth/authz.ts, Apache-2.0. Changed by the Aosabi authors.
  */
 ```
 
-[NOTICE](../NOTICE) credits them as well and reproduces the NOTICE file of Pylon. Every other file
-of Aosabi is licensed under the MIT License, but for the files that section 4 names.
+[NOTICE](../NOTICE) credits them as well and reproduces the NOTICE file of Pylon. Such headers and
+NOTICE name the code of Pylon at commit `2653a81` by the release it is published as, 3.0.0-canary,
+while `packages/pylon/package.json` of Pylon reads 2.9.5 at that commit. Every other file of Aosabi
+is licensed under the MIT License, but for the files that section 4 names.
 
 ## 4. Files that keep the bytes of another project
 
@@ -79,11 +83,28 @@ project of each.
 Parts of Aosabi are written after the code of other projects, mostly as translations into Rust.
 Such a file says so in a short attribution comment in its header, in the form `Derived from
 <project> <version>, <file>, <license>`, and carries the SPDX line of Aosabi, `MIT`, unless
-section 3 gives it Pylon's license. [NOTICE](../NOTICE) names every project Aosabi derives code
+section 3 gives it Pylon's license or it translates code under the Apache License 2.0.
+[NOTICE](../NOTICE) names every project Aosabi derives code
 from, with its version, its license and the copyright lines of its license file, as those licenses
 ask. Where a project is licensed under the BSD 2-Clause, the BSD 3-Clause, the Boost Software
-License 1.0 or the Unicode License V3, which ask for their notice alone as MIT does, NOTICE keeps
-that notice and LICENSES/other keeps the text.
+License 1.0 or the Unicode License V3, which ask for their notice alone as MIT does, or under the
+zlib License, NOTICE keeps that notice and LICENSES/other keeps the text. The zlib License asks as
+well that a changed version of its source be marked as changed, which the line Derived from of
+each such file does. A file that translates code under the Apache License 2.0 of a project other
+than Pylon, as the JSDoc parser of TypeScript, names that license in its SPDX line beside MIT, and
+its line Derived from marks it as changed.
+
+An npm package leaves the repository alone, so each one that carries work of others ships a
+`NOTICE` of its own beside its `LICENSE`. It names only the projects whose work the files of the
+package and the builds it ships carry, and the package ships the text of each license it names
+other than MIT beside it, such as `LICENSE-APACHE`.
+
+A crate may leave the repository alone as well, published or copied, so each crate that holds
+code of Pylon, holds code derived from a project under a license other than MIT or declares such
+a license ships a `NOTICE` of its own, a copy of the `LICENSE` of the repository and the text of
+each other license it names. Its `NOTICE` names the
+projects whose work the files of the crate carry, credits the authors of the code of Pylon in the
+crate and names the files that carry that code.
 
 The test data that the tests copy whole from other projects keeps its own license, never reaches a
 crate, a build or a package, and is named in NOTICE as well.

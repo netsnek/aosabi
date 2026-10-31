@@ -3,12 +3,16 @@
  * aosabi-cli: the command mcp, the protocol server over standard input and
  * output.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/mcp.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts and packages/pylon/src/cli/mcp.ts,
  * Apache-2.0. Changed by the Aosabi authors.
  *
  * Each file of the directory names the part it translates.
  *
  * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs, MIT.
+ * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/types.js, MIT.
+ * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/server/index.js, MIT.
+ * Derived from @modelcontextprotocol/sdk 1.29.0, dist/cjs/shared/protocol.js, MIT.
  */
 
 //! The command `mcp`.

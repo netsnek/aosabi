@@ -4,8 +4,9 @@
  * the package aosabi, as markers over
  * the crate aosabi-federation of the engine.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The symbol of a policy and pass, and, the class of a configured federation
  * with its delegate, passthrough and createGateway. This file holds what the

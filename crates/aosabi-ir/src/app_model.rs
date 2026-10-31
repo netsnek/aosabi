@@ -2,8 +2,8 @@
 /*
  * aosabi-ir: the canonical application model that inspect prints.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/inspect.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/inspect.ts, Apache-2.0. Changed by the Aosabi authors.
  *
  * The model and the passes inspectApp runs after the harvest. It sits in
  * this crate because it is a pure function of the intermediate

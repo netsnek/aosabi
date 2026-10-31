@@ -2,10 +2,11 @@
 /*
  * aosabi-ir: the intermediate representation and its SDL printer.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/ir/index.ts, Apache-2.0. Changed by the Aosabi authors.
  *
  * This file holds the module list and the names the crate exports at its root.
+ * The root re-exports a part of the names of index.ts, some of them renamed.
  */
 
 //! The intermediate representation of Aosabi.

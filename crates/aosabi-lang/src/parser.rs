@@ -2,6 +2,9 @@
 /*
  * aosabi-lang: the parser, from a source to a document, a value or a type.
  *
+ * The two token description helpers live in lexer.rs beside the punctuator test
+ * they depend on.
+ *
  * Derived from graphql-js 16.12.0, src/language/parser.ts, MIT.
  * Derived from graphql-js 16.12.0, src/language/directiveLocation.ts, MIT.
  */

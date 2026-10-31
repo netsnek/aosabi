@@ -2,8 +2,11 @@
 /*
  * aosabi-cli: the command inspect.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ *
+ * The schema under --sdl, else the DDL under --ddl, else the model as JSON with
+ * an indent of two, each with a newline.
  */
 
 //! The command `inspect`.

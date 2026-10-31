@@ -2,8 +2,9 @@
 /*
  * aosabi-core: the member middleware of a plugin and the value it hands up.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/index.ts and
- * packages/pylon/src/app/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/index.ts and packages/pylon/src/app/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `PluginMiddleware`, `ValueMiddlewareFn` and `IntoMiddlewareValue`.

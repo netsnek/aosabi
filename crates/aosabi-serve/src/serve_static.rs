@@ -3,7 +3,11 @@
  * aosabi-serve: the provider over the file system that serve_static of
  * aosabi-http reads a static file through.
  *
- * Derived from hono 1.19.9, dist/serve-static.js, MIT.
+ * The file plays the role of the platform half of serveStatic of
+ * @hono/node-server, whose steps the middleware of aosabi-http holds, and
+ * keeps the warning of a missing root as it reads.
+ *
+ * Derived from @hono/node-server 1.19.9, dist/serve-static.js, MIT.
  */
 
 //! The file system provider of `serve_static`.

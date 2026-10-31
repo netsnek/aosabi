@@ -1,10 +1,6 @@
-// SPDX-License-Identifier: MIT AND Apache-2.0
+// SPDX-License-Identifier: MIT
 /*
  * aosabi-core scalars json_object: the bound `JSONObject` scalar.
- *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
- * Changed by the Aosabi authors.
  *
  * Binds `JSONObjectResolver` of graphql-scalars as it stands.
  */

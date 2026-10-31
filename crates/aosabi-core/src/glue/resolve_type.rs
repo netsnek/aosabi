@@ -3,7 +3,7 @@
  * aosabi-core glue resolve_type: the type resolution of a union or an
  * interface.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/schema-parser.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *

@@ -4,7 +4,7 @@
  * normalized description of an application that every generated artifact is
  * projected from.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/ir.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett, packages/pylon/src/ir/ir.ts,
  * Apache-2.0. Changed by the Aosabi authors.
  *
  * The persistence vocabulary, the migration types and the identifier helpers

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-hooks: the map from a parsed document to its source text.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/document-string-map.js, MIT.
  */
 
 //! `DocumentStringMap`.

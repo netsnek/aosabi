@@ -2,8 +2,12 @@
 /*
  * graphql-over-http: the one function that answers a GraphQL request over HTTP.
  *
+ * The adapter runs every onRequest until one ends the response, then the
+ * request handler, then every onResponse, and the hooks of an app run in that
+ * order here.
+ *
  * Derived from graphql-yoga 5.18.0, cjs/server.js, MIT.
- * Derived from whatwg-node 0.10.18, cjs/createServerAdapter.js, MIT.
+ * Derived from @whatwg-node/server 0.10.18, cjs/createServerAdapter.js, MIT.
  */
 
 //! [`answer`], Yoga's five jobs as straight code.

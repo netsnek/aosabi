@@ -3,7 +3,7 @@
  * aosabi-core resolvers view: the projection of a resolver as a view of
  * the selection.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/define-pylon.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */

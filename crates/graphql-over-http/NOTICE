@@ -1,0 +1,53 @@
+graphql-over-http
+Copyright (c) 2026 Florian Kleber
+
+The crate graphql-over-http is a part of Aosabi,
+https://github.com/netsnek/aosabi, and is licensed under the MIT License. This
+file names the work of others that the crate carries or derives code or data
+from, with the license of each. It adds attribution and no condition to the
+license of the crate. The texts of the licenses are those of LICENSE for MIT and
+LICENSE-BSD-3-Clause for BSD-3-Clause, beside this file.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Other projects
+==============
+
+Project: GraphQL Yoga
+URL: https://github.com/graphql-hive/graphql-yoga
+Packages: graphql-yoga 5.18.0, @graphql-yoga/subscription 5.0.5,
+  @graphql-yoga/logger 2.0.1, @graphql-yoga/plugin-disable-introspection 2.19.0
+License: MIT
+Copyright (c) 2018-2020 Graphcool
+Copyright (c) 2020-2021 Prisma
+Copyright (c) 2021- The Guild
+
+Project: graphql-js
+URL: https://github.com/graphql/graphql-js
+Packages: graphql 16.12.0
+License: MIT
+Copyright (c) GraphQL Contributors
+
+Project: undici
+URL: https://github.com/nodejs/undici
+Packages: undici 7.18.2
+License: MIT
+Copyright (c) Matteo Collina and Undici contributors
+
+Project: V8
+URL: https://chromium.googlesource.com/v8/v8
+Packages: V8 13.6
+License: BSD-3-Clause
+Copyright 2014, the V8 project authors. All rights reserved.
+
+Project: whatwg-node
+URL: https://github.com/ardatan/whatwg-node
+Packages: @whatwg-node/server 0.10.18, @whatwg-node/node-fetch 0.8.5,
+  @whatwg-node/fetch 0.10.13, @whatwg-node/promise-helpers 1.3.2
+License: MIT
+Copyright (c) 2023 Arda TANRIKULU

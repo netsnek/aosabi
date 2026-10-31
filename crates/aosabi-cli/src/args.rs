@@ -3,9 +3,12 @@
  * aosabi-cli: the command grammar of the two programs, their argument structs
  * and their usage texts.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts and
- * packages/create-pylon/src/index.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts and packages/create-pylon/src/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
+ *
+ * Derived from commander 12.1.0, lib/command.js, MIT.
+ * Derived from commander 12.1.0, lib/help.js, MIT.
  */
 
 //! The command grammar.

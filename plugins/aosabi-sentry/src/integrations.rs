@@ -3,8 +3,15 @@
  * aosabi-sentry: the integrations of init that write into the scope of a
  * request, the scope itself and the request data it carries.
  *
- * Derived from @sentry/node 8.55.0, build/cjs, MIT.
+ * Both write into the scope of a request.
+ *
  * Derived from @sentry/core 8.55.0, build/cjs, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/breadcrumbs.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils-hoist/requestdata.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils-hoist/string.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils-hoist/severity.js, MIT.
+ * Derived from @sentry/core 10.38.0, build/cjs/utils/request.js, MIT.
+ * Derived from @sentry/node 8.55.0, build/cjs, MIT.
  */
 
 //! The scope of a request, its request data and the breadcrumbs of the

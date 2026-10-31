@@ -6,9 +6,12 @@
  * engine keeps for the request, and the options of the last Sentry.init of
  * aosabi/sentry/node, which the boot of the engine takes.
  *
- * Derived from toucan-js 4.1.1, ., MIT.
- * Derived from @sentry/core 8.9.2, ., MIT.
- * Derived from @sentry/node 8.55.0, ., MIT.
+ * Derived from @sentry/node 8.55.0, MIT.
+ *
+ * Derived from @sentry/node 8.55.0, build/cjs/sdk/api.js, MIT.
+ * Derived from toucan-js 4.1.1, MIT.
+ * Derived from @sentry/core 8.9.2, MIT.
+ * Derived from @sentry/node 8.55.0, build/cjs/sdk/index.js, MIT.
  */
 
 // The calls of the op SENTRY of the export ctx, crates/aosabi-js/src/sentry.rs.

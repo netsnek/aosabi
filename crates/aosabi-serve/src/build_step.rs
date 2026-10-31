@@ -2,7 +2,7 @@
 /*
  * aosabi-serve: the build step and the abort of a configuration that throws.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/bundler.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *

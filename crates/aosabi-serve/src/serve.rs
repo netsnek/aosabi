@@ -3,9 +3,15 @@
  * aosabi-serve: the boot the generated entry runs, and the serving of one
  * stream.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * The server bootstrap and the worker bootstrap the build writes, in seven steps
+ * over the runtime and the Node connection, with the boot failure and the worker
+ * entry. The two bootstraps load the configuration and call it when it is a
+ * factory, run the first pass, the handler and the last pass, and for the worker
+ * both passes with no handler under a timer of 1 << 30 milliseconds.
  */
 
 //! `serve_with`, `serve_app_with` and `serve_stream`.

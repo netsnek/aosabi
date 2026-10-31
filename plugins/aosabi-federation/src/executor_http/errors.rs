@@ -2,8 +2,10 @@
 /*
  * aosabi-federation: the errors of a failed fetch and of an aborted request.
  *
+ * That rejection hands on the error of the socket of Node.
+ *
  * Derived from @graphql-tools/executor-http 3.1.0, dist/index.cjs, MIT.
- * Derived from whatwg-node 0.8.5, cjs/fetchNodeHttp.js, MIT.
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/fetchNodeHttp.js, MIT.
  */
 
 //! The errors of the HTTP executor, `coerce_fetch_error` and

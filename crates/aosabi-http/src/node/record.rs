@@ -2,8 +2,11 @@
 /*
  * aosabi-http: the record of the Node adapter over neutral lines.
  *
- * Derived from hono 1.19.9, dist/utils.js, MIT.
- * Derived from hono 1.19.9, dist/listener.js, MIT.
+ * The cached path writes Content-Length with capitals and the object path
+ * writes content-length in lower case.
+ *
+ * Derived from @hono/node-server 1.19.9, dist/utils.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
  * It carries the half of aosabi-http of the quirk Q49_NODE_ADAPTER_RECORD of
  * docs/byte-equality.md section 13.1.

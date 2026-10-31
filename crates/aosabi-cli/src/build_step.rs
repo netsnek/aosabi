@@ -3,8 +3,7 @@
  * aosabi-cli: the build step, the one run of the built binary under
  * AOSABI_BUILD=1.
  *
- * No analogue in the reference. The step is the one of docs/cli-and-targets.md
- * section 3.3.
+ * No analogue in the reference.
  */
 
 //! The build step.

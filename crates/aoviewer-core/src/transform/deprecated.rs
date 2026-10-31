@@ -6,8 +6,8 @@
  * The rule that a deprecation filter never deletes a type it empties is a
  * translation of graphql-voyager src/introspection/introspection.ts:208-250 at
  * commit 656b8ddb4e7bec958d7300e2d737f632c7b5ba30, MIT, copyright
- * IvanGoncharov, whose notice travels in NOTICE section 4. A description line
- * that starts with the tag marks its member.
+ * IvanGoncharov, as the entry GraphQL Voyager of NOTICE names. A description
+ * line that starts with the tag marks its member.
  */
 
 //! The deprecation marks.

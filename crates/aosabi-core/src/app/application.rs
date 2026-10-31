@@ -2,8 +2,8 @@
 /*
  * aosabi-core: the application, compose and the base pipeline.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/app/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/app/index.ts, Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `App`.

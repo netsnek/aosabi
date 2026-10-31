@@ -4,7 +4,7 @@
  *
  * Derived from hono 4.11.9, dist/middleware/serve-static/index.js, MIT.
  * Derived from hono 4.11.9, dist/middleware/serve-static/path.js, MIT.
- * Derived from hono 1.19.9, dist/serve-static.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/serve-static.js, MIT.
  */
 
 //! `serve_static`.
@@ -556,6 +556,8 @@ fn validate_integer(value: f64, name: &str) -> Result<(), String> {
 ///
 /// An integer beyond 2^32 in magnitude is written with `_` between each group
 /// of three digits from the right, and any other number as `String` writes it.
+///
+/// Derived from node v24.13.0, lib/internal/errors.js, MIT.
 ///
 /// [errors.js]: https://github.com/nodejs/node/blob/v24.13.0/lib/internal/errors.js
 fn out_of_range(name: &str, range: &str, input: f64) -> String {

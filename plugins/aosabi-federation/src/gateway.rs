@@ -3,8 +3,9 @@
  * aosabi-federation: the configured federation and the delegation of a typed
  * field.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The cache of remote schemas, and, the class of a configured federation with
  * createGateway.

@@ -2,11 +2,12 @@
 /*
  * aosabi-core resolvers: the resolver wrapping.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/define-pylon.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * One file per part. Each file names its own line range.
+ * One file per part. Each file names its own line range, and the table below
+ * names the lines of each module.
  */
 
 //! The resolver wrapping.

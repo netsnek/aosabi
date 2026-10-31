@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-http: the Fetch Headers of a request and an answer.
+ *
+ * Derived from undici 7.18.2, MIT.
  */
 
 //! The Fetch `Headers`.

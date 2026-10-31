@@ -2,8 +2,10 @@
 /*
  * aosabi-core boot ir: the part of the build model a boot reads.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/ir.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett, packages/pylon/src/ir/ir.ts,
  * Apache-2.0. Changed by the Aosabi authors.
+ *
+ * This file holds the types of the build model and the reader of its JSON text.
  */
 
 //! [`Ir`], the part of the build model a boot reads.

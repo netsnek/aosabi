@@ -4,7 +4,7 @@
  * its printed query.
  *
  * Derived from @graphql-tools/executor-common 1.0.6, dist/index.cjs, MIT.
- * Derived from envelop 5.5.1, cjs/document-string-map.js, MIT.
+ * Derived from @envelop/core 5.5.1, cjs/document-string-map.js, MIT.
  */
 
 //! The serialization of a request, `serialize_execution_request`.

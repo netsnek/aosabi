@@ -2,7 +2,7 @@
 /*
  * aosabi-execute handle_maybe_promise: the one helper that continues a value or a promise of it.
  *
- * Derived from whatwg-node 1.3.2, cjs/index.js, MIT.
+ * Derived from @whatwg-node/promise-helpers 1.3.2, cjs/index.js, MIT.
  */
 
 //! The continuation of a value that may be a promise.

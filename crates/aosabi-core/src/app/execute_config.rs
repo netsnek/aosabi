@@ -2,8 +2,9 @@
 /*
  * aosabi-core: the boot of an app, the loader and the plugin order.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/app/pylon-handler.ts and
+ * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */
 

@@ -3,9 +3,12 @@
  * aosabi-federation: the GraphQL multipart request body of a request with
  * files.
  *
+ * The boundary is eleven digits of base 36.
+ *
  * Derived from @graphql-tools/executor-http 3.1.0, dist/index.cjs, MIT.
- * Derived from whatwg-node 0.8.5, cjs/FormData.js, MIT.
- * Derived from whatwg-node 0.8.5, cjs/Body.js, MIT.
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/FormData.js, MIT.
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/Body.js, MIT.
+ * Derived from extract-files 13.0.0, MIT.
  */
 
 //! The multipart body of a request that carries files,

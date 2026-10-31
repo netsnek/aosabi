@@ -2,9 +2,12 @@
 /*
  * aosabi-scalars: the four graphql-scalars scalars Aosabi binds.
  *
- * This file holds the value model the hooks share and the module table.
+ * The module error translates createGraphQLError of graphql-scalars, js_string
+ * translates a clause of ECMA-262, and js_date translates clauses of ECMA-262
+ * and the date reader of V8. This file holds the value model the hooks share
+ * and the module table.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, MIT.
  */
 
 //! The scalar library of Aosabi.

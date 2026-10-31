@@ -2,7 +2,7 @@
 /*
  * aosabi-http: the Fetch Request a Node request becomes.
  *
- * Derived from hono 1.19.9, dist/request.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/request.js, MIT.
  */
 
 //! The Fetch `Request`.

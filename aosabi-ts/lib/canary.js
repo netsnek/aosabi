@@ -6,9 +6,12 @@
  * the canary builds, and the reader of the type resolvers of the form the
  * generator of the canary writes into the glue of its build.
  *
- * Derived from Pylon 2.0.0-canary-20260206115650 by Nico Schett,
- * @getcronit/pylon-dev 2.0.0-canary-20260206115650, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 2.0.0-canary-20260206115650 and
+ * 3.0.0-canary-20260206115650 by Nico Schett, @getcronit/pylon
+ * 3.0.0-canary-20260206115650 and @getcronit/pylon-dev
+ * 2.0.0-canary-20260206115650, Apache-2.0. Changed by the Aosabi authors.
+ *
+ * Derived from hono 4.11.9, dist/helper/adapter/index.js, MIT.
  */
 
 // The canary keeps the auth state of a request in the context under the key

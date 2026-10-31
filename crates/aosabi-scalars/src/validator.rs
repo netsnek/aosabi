@@ -2,13 +2,15 @@
 /*
  * aosabi-scalars: the RFC 3339 checks of the date time scalar.
  *
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
  * The three regular expressions of that file are written out as readers over
  * the bytes of the string, one function per group of the expression, because
  * every class the expressions use is ASCII and a JavaScript expression
  * without the `u` flag reads one code unit at a time, so a byte that is not
  * ASCII matches nothing in either reading.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/scalars/iso-date/validator.js, MIT.
  */
 
 //! The RFC 3339 validators of the date time scalar.

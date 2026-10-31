@@ -3,8 +3,9 @@
  * aosabi-federation: the argument policy of a patched type, its allowed and
  * its forced arguments.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  */
 
 //! The argument policies of the patched types, [`FieldPolicy`] and

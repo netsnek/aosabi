@@ -3,8 +3,8 @@
  * aosabi-federation: Federation, the port of the reference's federation and of
  * the delegation it runs on.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/index.ts, Apache-2.0. Changed by the Aosabi authors.
  *
  * The root exports of the federation. This file holds the module list.
  */

@@ -2,8 +2,11 @@
 /*
  * aosabi: the builder of the app of the native index of a plain crate.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/app/index.ts and
- * packages/pylon/src/core/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/app/index.ts and packages/pylon/src/core/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
+ *
+ * The builder carries the routes Hono gives the app.
  */
 
 //! The builder of an app.

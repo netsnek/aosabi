@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: the plugin type of the server adapter.
  *
- * Derived from whatwg-node 0.10.18, cjs/plugins/types.js, MIT.
+ * Its hooks are onRequest, onResponse and onDispose.
+ *
+ * Derived from @whatwg-node/server 0.10.18, typings/plugins/types.d.ts, MIT.
  */
 
 //! `ServerAdapterPlugin`.

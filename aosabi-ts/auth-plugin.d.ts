@@ -3,7 +3,7 @@
  * auth-plugin.d.ts: the types of the entry aosabi/auth/plugin of the package, the identity plugin
  * useIdentity of lib/auth-plugin.js.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, its source, Apache-2.0.
+ * Derived from Pylon 3.0.0-canary by Nico Schett, its source, Apache-2.0.
  * Changed by the Aosabi authors.
  */
 

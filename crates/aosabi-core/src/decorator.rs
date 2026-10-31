@@ -2,9 +2,12 @@
 /*
  * aosabi-core: the decorators.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/create-decorator.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * A decorator runs its callback first with the arguments, and its rejection
+ * stops the call.
  */
 
 //! `Decorator`, `DecoratorArgs` and `create_decorator`.

@@ -2,11 +2,13 @@
 /*
  * aosabi-scalars: the error a scalar hook throws.
  *
- * The RangeError beside it is not from that file: it is the error V8 throws
- * from Date.prototype.toISOString, which the DateTimeISO serialize hook lets
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
+ * The RangeError of this file is the error V8 throws from
+ * Date.prototype.toISOString, which the DateTimeISO serialize hook lets
  * through untouched.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/error.js, MIT.
  */
 
 //! The errors of the scalar hooks.

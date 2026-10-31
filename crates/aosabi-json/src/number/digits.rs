@@ -2,6 +2,8 @@
 /*
  * aosabi-json number digits: the decimal digits of an integer, two at a time.
  *
+ * Derived from ryu-js 1.0.3, Apache-2.0 OR BSL-1.0.
+ *
  * The raw pointer writes of the original are writes into a slice here, and the
  * tables of the hundred digit pairs and of the powers of ten are computed when
  * the crate compiles. The digits of an integral double below 2^53, integer,
@@ -9,7 +11,8 @@
  * block of eight digits by one multiply high and one correction where the digit
  * writer of Ryu divides by 10^8.
  *
- * Derived from ryu-js 1.0.3, ., Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/pretty/mantissa.rs, Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/pretty/exponent.rs, Apache-2.0 OR BSL-1.0.
  */
 
 //! The decimal digits of an integer.

@@ -2,8 +2,9 @@
 /*
  * aosabi-auth-zitadel: the Zitadel integration of Aosabi.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/zitadel.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/zitadel.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * This file holds the module list.
  */

@@ -2,6 +2,8 @@
 /*
  * aosabi-http: the 63 reasons of Node and the reason of a status.
  *
+ * Derived from node v24.13.0, lib/_http_server.js, MIT.
+ *
  * It carries the quirk Q60_NODE_REASON_TABLE of docs/byte-equality.md section
  * 13.1.
  */
@@ -23,6 +25,8 @@
 ///
 /// The reason of 418 is `I'm a Teapot` and the one of 413 is
 /// `Payload Too Large`, as Node spells them.
+///
+/// Derived from node v24.13.0, `lib/_http_server.js`, MIT.
 pub const STATUS_CODES: [(u16, &str); 63] = [
     (100, "Continue"),
     (101, "Switching Protocols"),
@@ -90,6 +94,8 @@ pub const STATUS_CODES: [(u16, &str); 63] = [
 ];
 
 /// Returns the reason Node writes for `status`, `unknown` for a status its table lacks.
+///
+/// Derived from node v24.13.0, `lib/_http_server.js`, MIT.
 #[must_use]
 pub fn status_text(status: u16) -> &'static str {
     match STATUS_CODES.binary_search_by_key(&status, |&(code, _)| code) {

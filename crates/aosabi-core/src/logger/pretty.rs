@@ -2,7 +2,7 @@
 /*
  * aosabi-core: the pretty formatter of the runtime logger.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/logger-pretty.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */

@@ -2,7 +2,7 @@
 /*
  * graphql-over-http: the refusal of every introspection field but __typename.
  *
- * Derived from graphql-yoga 2.19.0, cjs/index.js, MIT.
+ * Derived from @graphql-yoga/plugin-disable-introspection 2.19.0, cjs/index.js, MIT.
  * Derived from graphql-js 16.12.0, src/validation/rules/custom/NoSchemaIntrospectionCustomRule.ts, MIT.
  */
 

@@ -3,7 +3,7 @@
  * aosabi-ir: the SDL printer, the projection of an IR to the GraphQL schema
  * text that an Aosabi build writes.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/sdl.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett, packages/pylon/src/ir/sdl.ts,
  * Apache-2.0. Changed by the Aosabi authors.
  */
 

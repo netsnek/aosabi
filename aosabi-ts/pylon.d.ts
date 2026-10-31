@@ -3,7 +3,7 @@
  * pylon.d.ts: the types of the entry aosabi/pylon of the package, Pylon's names and shapes under
  * Aosabi's own names for the names of lib/pylon.js.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, its source, Apache-2.0.
+ * Derived from Pylon 3.0.0-canary by Nico Schett, its source, Apache-2.0.
  * Changed by the Aosabi authors.
  *
  * Every declaration is Pylon's. This file re-exports the names lib/pylon.js exports and the types of

@@ -3,8 +3,9 @@
  * aosabi-core glue mutation: the run time of an entry under mutation(...)
  * and the payload a method of the native layer answers.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/mutation.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/mutation.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  */
 
 //! `mutation_wrapper` and [`MutationPayload`].

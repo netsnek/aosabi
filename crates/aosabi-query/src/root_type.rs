@@ -2,7 +2,7 @@
 /*
  * aosabi-query: the root type of the generated client, the text of types.ts.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/query/build/root-type.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */

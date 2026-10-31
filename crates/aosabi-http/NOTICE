@@ -1,0 +1,57 @@
+aosabi-http
+Copyright (c) 2026 Florian Kleber
+
+The crate aosabi-http is a part of Aosabi, https://github.com/netsnek/aosabi,
+and is licensed under the MIT License. This file names the work of others that
+the crate carries or derives code or data from, with the license of each. It
+adds attribution and no condition to the license of the crate. The texts of the
+licenses are those of LICENSE for MIT and LICENSE-Unicode-3.0 for Unicode-3.0,
+beside this file.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Other projects
+==============
+
+Project: Ada
+URL: https://github.com/ada-url/ada
+Packages: ada 3.3.0
+License: MIT
+Offered: Apache-2.0 OR MIT
+Copyright 2023 Yagiz Nizipli and Daniel Lemire
+
+Project: Hono
+URL: https://github.com/honojs/hono
+Packages: hono 4.11.9
+License: MIT
+Copyright (c) 2021 - present, Yusuke Wada and Hono contributors
+
+Project: Node.js
+URL: https://github.com/nodejs/node
+Packages: node 24.13.0
+License: MIT
+Copyright Node.js contributors. All rights reserved.
+Copyright Joyent, Inc. and other Node contributors. All rights reserved.
+
+Project: Node.js Adapter for Hono
+URL: https://github.com/honojs/node-server
+Packages: @hono/node-server 1.19.9
+License: MIT
+Copyright (c) 2022 - present, Yusuke Wada and Hono contributors
+
+Project: undici
+URL: https://github.com/nodejs/undici
+Packages: undici 7.18.2
+License: MIT
+Copyright (c) Matteo Collina and Undici contributors
+
+Project: Unicode Character Database
+URL: https://www.unicode.org/
+Packages: UCD and UTS 46 16.0.0
+License: Unicode-3.0
+Copyright © 1991-2024 Unicode, Inc.

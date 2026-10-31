@@ -3,8 +3,11 @@
  * aosabi-cli: the commands that land with a later milestone or track, each
  * answering the row that lands it.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ *
+ * The commands keep the names of the reference, the sixteen sub commands of
+ * db among them in their order.
  */
 
 //! The commands of later milestones.

@@ -2,8 +2,12 @@
 /*
  * aosabi-sentry: the Sentry client of init, its scopes and its spans.
  *
- * Derived from @sentry/node 8.55.0, ., MIT.
  * Derived from @sentry/core 8.55.0, build/cjs, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/scope.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils/applyScopeDataToEvent.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils/prepareEvent.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/baseclient.js, MIT.
+ * Derived from @sentry/node 8.55.0, MIT.
  */
 
 //! `init`, `Client`, `Scope`, `Span`, `capture_exception`, `with_scope` and

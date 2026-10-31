@@ -2,6 +2,8 @@
 /*
  * aosabi-http: the bytes of a header value under the first write.
  *
+ * Derived from node v24.13.0, lib/_http_outgoing.js, MIT.
+ *
  * It carries the quirk Q58_NODE_ENCODING_FIRST_WRITE of docs/byte-equality.md
  * section 13.1.
  */

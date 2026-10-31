@@ -3,7 +3,7 @@
  * aosabi-build: the validation that runs before a build writes a byte, and
  * the message of a schema that fails it.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *

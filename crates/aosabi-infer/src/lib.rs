@@ -3,7 +3,7 @@
  * aosabi-infer: the schema inference, which turns the types of an application
  * into the intermediate representation and the schema text.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/, Apache-2.0.
  * Changed by the Aosabi authors.
  *

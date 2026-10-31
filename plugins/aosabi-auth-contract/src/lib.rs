@@ -2,8 +2,9 @@
 /*
  * aosabi-auth-contract: the authorization contract of Aosabi.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/contract.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/contract.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The subpath auth/contract. The re-exports below carry its export list of
  * contract.ts:11-19 plus the Rust items the seam and the checks need,

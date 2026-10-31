@@ -3,7 +3,7 @@
  * aosabi-build: the entry of a build script and of a program that is no build
  * script, and the emitter that validates a schema and writes the artifacts.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *

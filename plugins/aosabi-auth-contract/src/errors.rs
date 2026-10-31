@@ -3,7 +3,8 @@
  * aosabi-auth-contract: the error an application throws when a caller lacks a
  * permission.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/errors.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/errors.ts and packages/pylon/src/auth/authz.ts,
  * Apache-2.0. Changed by the Aosabi authors.
  */
 

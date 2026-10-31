@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
  * graphql-over-graphtp answer: what the listener answers for what the app
- * answered, step 4 of the listener.
+ * answered.
  *
- * No analogue in the reference. The cases and their order are those of
- * docs/graphtp.md section 7, step 4, and docs/graphtp-in-aosabi.md section 3,
- * step 4.
+ * No analogue in the reference.
  */
 
 //! What an answer of the app becomes.

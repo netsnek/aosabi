@@ -2,9 +2,11 @@
 /*
  * aosabi-scalars: the Void scalar.
  *
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
  * Aosabi binds the scalar object itself under the name Void.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/scalars/Void.js, MIT.
  */
 
 //! The `Void` scalar.

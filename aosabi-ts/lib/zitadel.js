@@ -5,8 +5,9 @@
  * zitadelAuth and zitadelLogin over the crate aosabi-auth-zitadel of the
  * engine.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/zitadel.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/zitadel.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The reading of the token, the bootstrap of the issuer with its cache, the
  * discovery, the introspection, the user info and the roles run in the engine,

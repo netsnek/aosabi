@@ -5,10 +5,10 @@
  * This file holds the module list and the names the crate exports at its
  * root.
  *
- * Derived from @graphql-tools/executor 1.5.1, ., MIT.
- * Derived from @graphql-tools/utils 11.0.0, ., MIT.
- * Derived from whatwg-node 1.3.2, ., MIT.
- * Derived from @repeaterjs/repeater 3.0.6, ., MIT.
+ * Derived from @graphql-tools/executor 1.5.1, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, MIT.
+ * Derived from @whatwg-node/promise-helpers 1.3.2, MIT.
+ * Derived from @repeaterjs/repeater 3.0.6, MIT.
  */
 
 //! The execution layer of Aosabi.
