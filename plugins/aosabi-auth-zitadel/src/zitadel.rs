@@ -24,6 +24,8 @@
 //! failed bootstrap answers 500 before the 400 of a missing code. Every other
 //! failure is no `HTTPException`, so the root answers it with 500.
 //!
+//! The callback holds the `state` of its query to the state its login bound to the verifier cookie.
+//!
 //! The bootstrap is shared by the provider and the login routes. It reads the auth key, imports its
 //! private key, and discovers the issuer with the key as the client authentication. One cache of
 //! this thread holds the bootstraps. The provider and the routes each keep the slot the cache gave
@@ -84,8 +86,7 @@ use crate::{
         authorization::{
             build_authorization_url,
             calculate_pkce_code_challenge,
-            random_pkce_code_verifier,
-            random_state, //
+            random_pkce_code_verifier, //
         },
         client_auth::{
             PrivateKeyJwt,
@@ -93,7 +94,8 @@ use crate::{
         },
         code_grant::{
             AuthorizationCodeGrantChecks,
-            authorization_code_grant, //
+            authorization_code_grant,
+            validate_auth_response, //
         },
         discovery::{
             discovery,
@@ -101,7 +103,9 @@ use crate::{
         },
         errors::{
             CodedTypeError,
-            ERR_INVALID_ARG_TYPE, //
+            ERR_INVALID_ARG_TYPE,
+            OauthError,
+            error_handler, //
         },
     },
 };
@@ -557,6 +561,20 @@ const CODE_VERIFIER_MAX_AGE: f64 = 300.0;
 /// The life of the cookie of the access token when the answer names no `expires_in`, in seconds.
 const AUTH_MAX_AGE: f64 = 3600.0;
 
+/// The text the state of a login hashes before its
+/// verifier.
+const STATE_BINDING: &str = "state of ";
+
+/// Returns the state a login binds to `code_verifier`, the base64url of the SHA-256 of
+/// [`STATE_BINDING`] and the verifier.
+///
+/// # Errors
+///
+/// Returns the `TypeError` of a target with no digest.
+fn bound_state(code_verifier: &str) -> Result<String, OauthError> {
+    calculate_pkce_code_challenge(&format!("{STATE_BINDING}{code_verifier}"))
+}
+
 /// The issuer, the key path and the endpoint the three routes share.
 #[derive(Debug)]
 struct Routes {
@@ -582,7 +600,8 @@ fn request_url(c: &Context) -> Result<aosabi_http::Url, Thrown> {
 /// the cookie `aosabi_code_verifier` is set with `httpOnly` and `maxAge` 300,
 /// and the answer redirects to the authorization URL with the scope, the
 /// challenge, `S256`, the `redirect_uri` of the origin of the request URL
-/// with the endpoint and `/callback`, and a random state.
+/// with the endpoint and `/callback`, and the state [`bound_state`] binds to
+/// the verifier.
 #[cfg_attr(
     not(any(feature = "host-crypto", all(unix, feature = "ring"))),
     expect(unreachable_code, reason = "this target has no signer")
@@ -607,7 +626,7 @@ async fn login(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
         },
     )?;
     let redirect_uri = format!("{}{}/callback", request_url(&c)?.origin(), routes.endpoint);
-    let state = random_state()?;
+    let state = bound_state(&code_verifier)?;
     let url = build_authorization_url(
         &config,
         &[
@@ -664,6 +683,11 @@ fn cookie_text(value: &JsString) -> Result<&str, Thrown> {
 /// `expires_in`, 3600 where that is absent or 0, and redirects to `/`. An
 /// access token with a lone surrogate answers the `URIError` of
 /// [`cookie_text`], as `setCookie` throws it.
+///
+/// The callback holds its query to the state the login bound to the verifier cookie,
+/// [`bound_state`], by the checks of the authorization response of the grant, so a `state` the
+/// login did not bind answers the `ClientError` `invalid response encountered`, the form the grant
+/// gives `unexpected "state" response parameter value`.
 #[cfg_attr(
     not(any(feature = "host-crypto", all(unix, feature = "ring"))),
     expect(unreachable_code, reason = "this target has no signer")
@@ -691,6 +715,9 @@ async fn callback(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
         return Err(HttpException::new(400, Some(String::from("Missing code verifier"))).into());
     };
     let cb_url = request_url(&c)?;
+    let bound = bound_state(&code_verifier)?;
+    validate_auth_response(&config, &cb_url.search_params(), Some(&bound))
+        .map_err(error_handler)?;
     let checks = AuthorizationCodeGrantChecks {
         pkce_code_verifier: Some(code_verifier),
         expected_state: Some(String::from(state)),
