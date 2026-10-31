@@ -362,11 +362,11 @@ pub fn config_retired(package: &str) -> CliError {
 /// Returns the refusal of the verb `command` of the device card track, which
 /// lands at the track row `lands`, `AO-C0201`.
 #[must_use]
-pub fn card_track_verb(command: &str, lands: &str) -> CliError {
+pub fn card_track_verb(command: &str) -> CliError {
     CliError::coded(
         AO_C0201,
         format!(
-            "`{command}` arrives with the device card track at {lands}, and until then a build names one of the built in cards {BUILTIN_CARD_NAMES}"
+            "`{command}` arrives with device cards, and until then a build names one of the built in cards {BUILTIN_CARD_NAMES}"
         ),
     )
     .with_hint("cargo aosabi build --device server")
@@ -520,11 +520,11 @@ pub fn registry_collision(name: &str) -> CliError {
     )
 }
 
-/// Returns the refusal of the command `command`, which lands with the later
-/// milestone `lands`, `AO-C0601`, with no hint, since no command of this
-/// build carries it.
+/// Returns the refusal of the command `command`, which lands with `lands`, a
+/// later release, `AO-C0601`, with no hint, since no command of this build
+/// carries it.
 #[must_use]
-pub fn later_milestone(command: &str, lands: &str) -> CliError {
+pub fn later_release(command: &str, lands: &str) -> CliError {
     CliError::coded(
         AO_C0601,
         format!("`{command}` lands with {lands}, and this build of aosabi does not carry it"),

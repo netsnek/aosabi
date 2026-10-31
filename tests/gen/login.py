@@ -265,15 +265,15 @@ def login_runs() -> list:
 
     q = "?code=c1&state=s1"
     add("login-default-ok", "default", [
-        _login("lg-01", "lg-01", "ok", "302, the Location with the parameters of fact 8 in their order, the verifier "
+        _login("lg-01", "lg-01", "ok", "302, the Location with its parameters in their order, the verifier "
                "cookie, one discovery request"),
-        _login("lg-02", "lg-02", "ok", "no second discovery, fact 2", hands_challenge=False),
+        _login("lg-02", "lg-02", "ok", "no second discovery", hands_challenge=False),
         Step("lg-03", "lg-03", "ok", get("lg-03", "/auth/logout"), "302 to / and aosabi-auth=; Max-Age=0; Path=/"),
         _callback("lg-04", "lg-04", "ok", "", "400 Missing authorization code or state", "lg-01", cookie=False),
         _callback("lg-05", "lg-05", "ok", "?code=c1", "400 Missing authorization code or state", "lg-01",
                   cookie=False),
         _callback("lg-06", "lg-06", "ok", q, "400 Missing code verifier", "lg-01", cookie=False),
-        _callback("lg-07", "lg-07", "ok", q, "the token request of facts 12 and 13, 302 to / and "
+        _callback("lg-07", "lg-07", "ok", q, "the token request, 302 to / and "
                   "aosabi-auth=<token>; Max-Age=120; Path=/; HttpOnly", "lg-01"),
         _callback("lg-12", "lg-12", "ok", q + "&session_state=x1", "the extra parameter in the token body",
                   "lg-01"),
@@ -286,7 +286,7 @@ def login_runs() -> list:
     ])
     for case, scenario, pins in (
         ("lg-08", "no_expiry", "Max-Age=3600"),
-        ("lg-09", "invalid_grant", "500 and the log record of fact 15"),
+        ("lg-09", "invalid_grant", "500 and its log record"),
         ("lg-10", "id_token", "302 with a valid ID token in the answer"),
         ("lg-11", "id_token_bad_aud", "500 for an ID token of another audience"),
     ):
@@ -305,11 +305,11 @@ def login_runs() -> list:
                hands_challenge=False),
     ])
     add("login-default-wrong_issuer-callback", "default", [
-        _callback("lg-24", "lg-24", "wrong_issuer", "", "500 and not 400, the bootstrap runs before the query, "
-                  "fact 10", "lg-24", cookie=False),
+        _callback("lg-24", "lg-24", "wrong_issuer", "", "500 and not 400, the bootstrap runs before the query "
+                  "is read", "lg-24", cookie=False),
     ])
     add("login-http_issuer", "http_issuer", [
-        _login("lg-30", "lg-30", "ok", "500 and no request at the issuer, fact 5", hands_challenge=False),
+        _login("lg-30", "lg-30", "ok", "500 and no request at the issuer", hands_challenge=False),
     ])
     add("login-bad_key", "bad_key", [
         _login("lg-31", "lg-31", "ok", "500 and Error reading AUTH_KEY. Make sure it is valid JSON.",
@@ -327,8 +327,8 @@ def login_runs() -> list:
                hands_challenge=False),
     ])
     add("login-pkcs8_key", "pkcs8_key", [
-        _login("lg-35-login", "lg-35", "ok", "the login under the PKCS#8 key of fact 4"),
-        _callback("lg-35-callback", "lg-35", "ok", q, "the PKCS#8 key of fact 4 signing the assertion",
+        _login("lg-35-login", "lg-35", "ok", "the login under the PKCS#8 key"),
+        _callback("lg-35-callback", "lg-35", "ok", q, "the PKCS#8 key signing the assertion",
                   "lg-35-login"),
     ])
     add("login-hostile", "default", [

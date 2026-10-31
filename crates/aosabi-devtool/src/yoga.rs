@@ -133,7 +133,7 @@ use self::instances::{
 const NAME: &str = "yoga";
 
 /// The milestone the primitive lands at.
-const LANDS_AT: &str = "M5";
+const LANDS_AT: &str = "http";
 
 /// The origin a URL given as a path is completed with.
 const ORIGIN: &str = "http://localhost";

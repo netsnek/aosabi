@@ -104,7 +104,7 @@ use crate::{
 const NAME: &str = "push";
 
 /// The milestone the primitive lands at.
-const LANDS_AT: &str = "M6";
+const LANDS_AT: &str = "pubsub";
 
 /// The largest depth of a slot, a `u16`.
 const U16: u32 = 0xffff;

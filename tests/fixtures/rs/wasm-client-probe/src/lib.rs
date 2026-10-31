@@ -224,7 +224,7 @@ fn exchange(len: u32, mode: u32) -> u32 {
 /// `AoFrame`, delimited for a `mode` of 0 and prefixed otherwise.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, the default of owner question 20 of the M5 plan"
+    reason = "a wasm export needs its symbol name"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn homa_probe_send(len: u32, mode: u32) -> u32 {
@@ -235,7 +235,7 @@ pub extern "C" fn homa_probe_send(len: u32, mode: u32) -> u32 {
 /// role, framed as `mode` names, and returns the bytes of the response read.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, the default of owner question 20 of the M5 plan"
+    reason = "a wasm export needs its symbol name"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn homa_probe_exchange(len: u32, mode: u32) -> u32 {

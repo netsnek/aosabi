@@ -229,8 +229,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "homa-ip";
 
-/// The stage the primitive lands at.
-const LANDS_AT: &str = "H4";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "homa";
 
 /// The command line of the `homa-ip` primitive.
 pub static GRAMMAR: Grammar = Grammar {

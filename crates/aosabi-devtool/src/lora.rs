@@ -115,8 +115,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "lora";
 
-/// The stage of the Homa track the primitive lands at.
-pub const LANDS_AT: &str = "H6";
+/// The area the primitive lands at.
+pub const LANDS_AT: &str = "homa";
 
 /// The channel of a pairing that names none, 869.525 MHz in the band P.
 const DEFAULT_FREQUENCY: u32 = 869_525_000;

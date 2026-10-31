@@ -182,7 +182,7 @@ pub(crate) struct HeaderCaseMap(HeaderMap<Bytes>);
 /// extensions has every line written as the map spells it and in the order
 /// its lines were appended, a name at two places written at both and the
 /// repeated lines of one name kept apart, as Node's `writeHead` stores them
-/// (quirk Q28).
+/// (quirk `NODE_RECORD_VERBATIM`).
 #[cfg(all(
     any(feature = "client", feature = "server"),
     feature = "http1",

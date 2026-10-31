@@ -447,17 +447,17 @@ COMPRESS_THRESHOLD = 1024
 GRAPHQL_TYPES = ("application/json", "application/graphql-response+json")
 
 
-def d57_names(named: list, ours, host) -> list:
-    """Return the names `named` of a served answer with those of divergence D57 named `D57`.
+def uncoded_names(named: list, ours, host) -> list:
+    """Return the names `named` of a served answer with those of an uncoded small answer named `uncoded-small`.
 
-    `named` are the differences `ts1.judge_served` names where the side under
+    `named` are the differences the judge of a served answer names where the side under
     test answers as the reference on Node and the reference on its host does not, each opening
     with its field, and `ours` and `host` are the answers of the side and of
     the reference's build on the host, answers of `http.py`. The function writes the
     Content-Length of every answer whose body is a string on every platform,
     so compress() leaves an answer below 1,024 bytes uncoded where the reference on a
     Worker and on Bun codes it, and the answer carries its length where
-    the reference's there carries none. A name is D57 when the side's answer is one of
+    the reference's there carries none. A name is `uncoded-small` when the side's answer is one of
     the regular processor and the field is its coding, none on the side and
     one on the host with a body below the threshold, or its length, the length
     of its body on the side and none on the host, or on an answer of HEAD, which
@@ -478,7 +478,7 @@ def d57_names(named: list, ours, host) -> list:
     for entry in named:
         field = entry.split(" ", 1)[0]
         if (field == "content-encoding" and uncoded) or (field == "content-length" and length):
-            entry = "D57 " + entry
+            entry = "uncoded-small " + entry
         labelled.append(entry)
     return labelled
 
@@ -714,8 +714,8 @@ def multipart_reasons(reference, ours, accept) -> list | None:
     return reasons
 
 
-def served_d59(answer, accept):
-    """Return the answer `answer` of the reference served on Node, an answer of `http.py`, as the function answers it, D59.
+def served_without_multipart(answer, accept):
+    """Return the answer `answer` of the reference served on Node, an answer of `http.py`, as the function answers it.
 
     A 406 lists no multipart/mixed in its field accept. An answer of the
     processor of multipart/mixed becomes the event stream of
@@ -757,8 +757,8 @@ def in_process_event_stream(expected: dict) -> dict:
     return {"status": status, "status_text": status_text, "headers": headers, "body": event_stream_body(chunks)}
 
 
-def in_process_d59(request_headers: dict, expected: dict) -> dict:
-    """Return the recorded answer `expected` of an in process case, `{status, status_text, headers, body}`, as the function answers it, D59.
+def in_process_without_multipart(request_headers: dict, expected: dict) -> dict:
+    """Return the recorded answer `expected` of an in process case, `{status, status_text, headers, body}`, as the function answers it.
 
     A 406 lists no multipart/mixed in its field accept. An answer of the
     processor of multipart/mixed becomes the event stream of

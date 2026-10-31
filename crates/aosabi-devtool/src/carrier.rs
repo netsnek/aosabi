@@ -148,8 +148,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "carrier";
 
-/// The stage the primitive lands at.
-const LANDS_AT: &str = "H3";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "homa";
 
 /// The card a request that names none serves.
 const DEFAULT_CARD: &str = "test-graphtp";

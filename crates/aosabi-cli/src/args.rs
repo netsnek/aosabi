@@ -936,12 +936,7 @@ fn later_command(word: &str, operands: &[Arg], unknown: &[Arg]) -> Result<Comman
         });
     }
     let texts: Vec<String> = operands.iter().map(|arg| arg.text.clone()).collect();
-    let all: Vec<String> = texts
-        .iter()
-        .cloned()
-        .chain(unknown.iter().map(|arg| arg.text.clone()))
-        .collect();
-    match later::resolve(word, &texts, &all) {
+    match later::resolve(word, &texts) {
         Some(Resolved::Later { command, lands }) => Ok(Command::Later { command, lands }),
         Some(Resolved::UnknownSub(name)) => {
             let subs: Vec<&str> = later::row(word)

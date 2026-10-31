@@ -185,8 +185,18 @@ Worker gives no file system, so there it serves no file.
 
 ## The entry `aosabi/pylon`
 
-The root `aosabi`, the file `lib/index.js`, re-exports the entry, so an import of the root keeps
-working.
+The file `lib/pylon.js` holds the names of Pylon's root whose engine item exists: the class `App`,
+Pylon's class `Pylon` under Aosabi's name, and `app`, `executeConfig`, `handler` and `currentRole`,
+`getContext`, `setContext`, `getEnv`, `getResolveInfo`, `getLocale` and `getInContext`,
+`createDecorator`, `mutation`, `ServiceError`, the logger calls `getLogger`, `logger`,
+`runWithLogger`, `getRootLogger` and `createLogger`, the plugins `useNodeServer` and `useSentry` as
+markers, `defineConfig` and the cookie helpers of `hono/cookie`, and beside them, from
+`lib/canary.js`, the three names of the root of Pylon's canary that a build of the canary imports,
+`requireAuth` and `authMiddleware` over the auth state of the context and `useAuth`, whose OIDC path
+throws an error that names its waiting for the connection over the OIDC client of the engine, which
+a later release makes. The functions `requireAuth` and `authMiddleware` refuse a state with no user
+with the status 401 and the message `Authentication required`. The root `aosabi`, the file
+`lib/index.js`, re-exports the entry, so an import of the root keeps working.
 
 The class `App` is a Hono of the real hono, and the first pass of `executeConfig` installs the
 base pipeline on it in hono's own code: `compress()`,

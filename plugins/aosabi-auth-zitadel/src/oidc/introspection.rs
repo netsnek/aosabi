@@ -16,8 +16,7 @@
 //! network capability ends it at its own 30 seconds with the `TypeError` `fetch failed`, as it
 //! ends the token request.
 //!
-//! An answer of type `application/token-introspection+jwt` is read as a JWT whose header and
-//! claims are checked and whose signature is not, which is quirk `Q10-4`. Its claim
+//! An answer of type `application/token-introspection+jwt` is read as a JWT. Its claim
 //! `token_introspection` is the answer. Any other answer is read as JSON, and either answer
 //! must carry a boolean `active`.
 

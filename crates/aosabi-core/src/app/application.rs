@@ -19,13 +19,13 @@
 //!
 //! The base pipeline is registered on `*` once, at the boot and not in the
 //! constructor: the coding layer, the async context bind, the access logger under
-//! `except(['/__aosabi/*'], ...)`, divergence
-//! D54, the onion of the plugin middleware and the error handler.
-//! [`App::realize`] then mounts each child at its base path or `/`, depth first,
-//! once, so the pipeline stands before every route of the tree. A route an app
-//! registers on the served root before the boot runs behind the pipeline as well,
-//! since the boot moves it behind the pipeline in the order of the router,
-//! divergence D75. The TypeScript option runs it before the pipeline.
+//! `except(['/__aosabi/*'], ...)`, a named divergence, the onion of the plugin
+//! middleware and the error handler. [`App::realize`] then mounts each child at
+//! its base path or `/`, depth first, once, so the pipeline stands before every
+//! route of the tree. A route an app registers on the served root before the boot
+//! runs behind the pipeline as well, since the boot moves it behind the pipeline
+//! in the order of the router, a named divergence. The TypeScript option runs it
+//! before the pipeline.
 //!
 //! The native builder of the facade, `aosabi::App`, which the index of a plain
 //! crate builds, registers the parts of its roots as values of any type, and
@@ -840,8 +840,8 @@ impl<G> App<G> {
 
     /// Installs the base pipeline of the served root once, `installBasePipeline()`.
     ///
-    /// The routes the app registered before it then run behind it, divergence
-    /// D75.
+    /// The routes the app registered before it then run behind it, a named
+    /// divergence.
     pub fn install_base_pipeline(&mut self) {
         let registered = self.inner.web.routes().len();
         if self.inner.base_pipeline_installed {
@@ -918,12 +918,12 @@ impl<G> App<G> {
                 dispatch_plugins(middleware, 0, c, next)
             });
             async move {
-                // The default body limit of a Rust service, hono's bodyLimit
-                // with 1 MiB held to every read of a body that no body limit
-                // of the app takes, runs in this entry around the rest of it,
-                // behind the access logger, which logs its 413, so
-                // `app.routes` lists the entries of the TypeScript pipeline,
-                // divergence D76. The TypeScript option has none.
+                // The default body limit of a Rust service, hono's bodyLimit with
+                // 1 MiB held to every read of a body that no body limit of the
+                // app takes, runs in this entry around the rest of it, behind the
+                // access logger, which logs its 413, so `app.routes` lists the
+                // entries of the TypeScript pipeline, a named divergence. The
+                // TypeScript option has none.
                 let value =
                     aosabi_http::middleware::body_limit::behind_default_body_limit(&c, value);
                 if let Some(response) = value.await? {

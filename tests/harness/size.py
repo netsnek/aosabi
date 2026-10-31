@@ -2261,8 +2261,10 @@ def wasm_target_features(module: Wasm) -> list[str]:
 
 # The families of generic code.
 
-#: The named families of Z0, each as the count of its instances and their bytes.
-Z0_FAMILIES = (
+
+#: The named families of generic code, each as the count of its instances and
+#: their bytes.
+NAMED_FAMILIES = (
     ("GraphQLError::new", lambda name: generic_family(name) == "<aosabi_lang::error::GraphQLError>::new"),
     ("enter_for_kind", lambda name: generic_family(name) == "aosabi_lang::visitor::enter_for_kind"),
     ("leave_for_kind", lambda name: generic_family(name) == "aosabi_lang::visitor::leave_for_kind"),
@@ -2289,26 +2291,26 @@ HOST_CANDIDATES = (
                                             r"|iso_string|to_iso|Intl|DateTime")),
     ("new URL, aosabi_http::fetch::url", re.compile(r"aosabi_http::fetch::url")),
     ("the conversions between UTF-8 and UTF-16", re.compile(r"utf16|utf_16|Utf16|EncodeUtf16|DecodeUtf16")),
-    ("the crypto of M7b, ring, rsa, sha2 and the signer of aosabi-auth-zitadel",
+    ("the crypto of the login of Zitadel, ring, rsa, sha2 and the signer of aosabi-auth-zitadel",
      re.compile(r"(^|[<\s(&])(ring|rsa|sha2|hmac|untrusted)::|aosabi_auth_zitadel::crypto")),
 )
 
 
-def z0_families(pairs, top: int = 30) -> dict:
-    """Return the families of Z0 over the pairs `pairs` of a demangled name and a size.
+def generic_families(pairs, top: int = 30) -> dict:
+    """Return the families of generic code over the pairs `pairs` of a demangled name and a size.
 
     The thirty largest functions, the closures by the function they belong
     to, the closures of aosabi-execute by size, among them the bodies of its
     async fns, which a v0 name writes as a closure of the fn, the instances of
     the stable sort of core split into those made for a type of a workspace
     crate, those the standard library makes for its symbolizer and the rest,
-    and the named families of Z0_FAMILIES.
+    and the named families of NAMED_FAMILIES.
     """
     pairs = sorted(pairs, key=lambda pair: (-pair[1], pair[0]))
     parents = defaultdict(lambda: [0, 0])
     execute = []
     split = {"made for a workspace type": [0, 0], "made for the symbolizer of std": [0, 0], "other": [0, 0]}
-    named = {label: [0, 0] for label, _ in Z0_FAMILIES}
+    named = {label: [0, 0] for label, _ in NAMED_FAMILIES}
     for name, size in pairs:
         family = generic_family(name)
         if "{closure#" in family:
@@ -2322,7 +2324,7 @@ def z0_families(pairs, top: int = 30) -> dict:
                    else "made for a workspace type" if WORKSPACE_CRATE.search(name) else "other")
             split[key][0] += 1
             split[key][1] += size
-        for label, match in Z0_FAMILIES:
+        for label, match in NAMED_FAMILIES:
             if match(name):
                 named[label][0] += 1
                 named[label][1] += size

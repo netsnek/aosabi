@@ -15,8 +15,12 @@
 //! listener needs no index of a peer. The packet of the link follows the MPS
 //! of the peer by the k rule of `channel_max_packet`.
 //!
-//! Until then [`serve_channel`] answers `Unsupported` with that reason, and
-//! the Linux devices serve the GATT data path alone.
+//! The listening socket of the channel binds an L2CAP socket to an LE
+//! address, a `sockaddr_l2` of the family `AF_BLUETOOTH` that neither the
+//! standard library nor `socket2` builds without `unsafe`, and the address
+//! module for it waits on a decision. Until then [`serve_channel`] answers
+//! `Unsupported` with that reason, and the Linux devices serve the GATT data
+//! path alone.
 
 use alloc::{
     boxed::Box,
@@ -63,13 +67,16 @@ use crate::profile::{
 };
 
 /// Why the channel does not serve on Linux yet.
-pub const CHANNEL_WAITS: &str = "the L2CAP address of the channel waits on the owner's answer to \
-                                 decision P2 of the plan of the Homa track, items H3-EXC, H3-L2S \
-                                 and H3-L2CAP";
+pub const CHANNEL_WAITS: &str = "the L2CAP address of the channel waits on a decision, since \
+                                 neither the standard library nor socket2 builds a sockaddr_l2 \
+                                 without unsafe code";
 
 /// Serves the channel on the adapter `adapter` with the PSM published in the
 /// characteristic of `gatt`, one accepted socket at a time with a listener
 /// that `listener` builds.
+///
+/// The Linux socket of the channel waits on a decision, so the future
+/// answers an error of the kind `Unsupported` that names it.
 #[must_use]
 pub fn serve_channel(
     adapter: &str,

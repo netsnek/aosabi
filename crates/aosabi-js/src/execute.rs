@@ -3,7 +3,10 @@
  * aosabi-js execute: the executor of the engine over the app of the boot,
  * below HTTP, in a test build of the module.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the side the notebooks judge in place
+ * of aosabi-devtool execute on their side ts, over the same protocol as the
+ * executor sidecar, which runs normalizedExecutor of @graphql-tools/executor
+ * 1.5.1 under Yoga.
  */
 
 //! The executor of the engine below HTTP, the feature `execute`.
@@ -76,7 +79,7 @@ use aosabi_lang::js_string::to_string_lossy;
 pub const PATH: &str = "/.ts1/execute";
 
 /// The message of a request whose body is no request of the protocol.
-const NOT_A_REQUEST: &str = "the body is no request of the protocol of tests/sidecar/execute.mjs";
+const NOT_A_REQUEST: &str = "the body is no request of the protocol of the executor sidecar";
 
 /// The message of a request that ends with its result pending, the text of
 /// `aosabi-devtool execute`.

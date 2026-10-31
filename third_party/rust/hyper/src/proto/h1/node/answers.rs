@@ -4,9 +4,10 @@
  * application code runs.
  *
  * Translation of socketOnError of Node 24.13.0, lib/_http_server.js:899-951.
- * It holds quirk Q36 of docs/byte-equality.md section 13.1.
+ * It holds the quirk NODE_FIXED_REFUSALS.
  */
-//! The four fixed answers of Node and the rule that writes them or ends the connection, quirk Q36.
+//! The four fixed answers of Node and the rule that writes them or ends the connection, quirk
+//! `NODE_FIXED_REFUSALS`.
 
 use super::parse::Refusal;
 
@@ -25,7 +26,8 @@ const PAYLOAD_TOO_LARGE: &[u8] = b"HTTP/1.1 413 Payload Too Large\r\nConnection:
 pub(crate) const REQUEST_TIMEOUT: &[u8] =
     b"HTTP/1.1 408 Request Timeout\r\nConnection: close\r\n\r\n";
 
-/// Returns the fixed answer to `refusal`, which carries no `Date` (quirk Q36).
+/// Returns the fixed answer to `refusal`, which carries no `Date` (quirk
+/// `NODE_FIXED_REFUSALS`).
 pub(crate) fn fixed(refusal: Refusal) -> &'static [u8] {
     match refusal {
         Refusal::Invalid(_) => BAD_REQUEST,
@@ -40,7 +42,7 @@ pub(crate) fn fixed(refusal: Refusal) -> &'static [u8] {
 /// flight has not written its head, the condition
 /// `!this._httpMessage || !this._httpMessage._headerSent` of
 /// `lib/_http_server.js:929-930`, and `oldest_started` tells whether the
-/// oldest answer in flight has written its head (quirk Q36).
+/// oldest answer in flight has written its head (quirk `NODE_FIXED_REFUSALS`).
 pub(crate) fn written(oldest_started: Option<bool>) -> bool {
     oldest_started != Some(true)
 }

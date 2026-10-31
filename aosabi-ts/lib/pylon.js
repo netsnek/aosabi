@@ -744,8 +744,8 @@ function serveNode(target, options) {
 // X-Pylon-Version where the version global is set, and answers the response of
 // the engine over the prepared header fields of c. Every other request goes on
 // to the routes of the app, where Pylon's Yoga answers the plugins of its
-// server on any path, its health check and its preflight among them, divergence
-// D56 of docs/byte-equality.md of the Aosabi repository.
+// server on any path, its health check and its preflight among them, a named
+// divergence.
 export const handler = (options, target = app) => {
   target[HANDLER] = options;
   return async (c, next) => {
@@ -959,16 +959,15 @@ const FIELD = { VALUE: 0, TEXT: 1 };
 // Error.prototype.toString answers for that name and that message in place of a
 // stack that is a string, as the engine writes the stack of an error on every
 // host. The frames of a stack name the source files of the app and of its
-// packages, so no record of the side carries them, divergence D83 of
-// docs/byte-equality.md of the Aosabi repository (row QD-272 of the rated
-// table). The line is the text before the first frame of a stack V8 formats for
-// the error itself, with its name and its message as they were at the first
-// read of the stack. A stack the error took from another error, as a
-// GraphQLError holds the stack of its originalError, the case copied of D83, or
-// a stack first read before the name or the message of its error changed,
-// begins with another text, which Pylon's record keeps and the side's does not.
-// A stack that is no string stays as the error holds it, so a record leaves out
-// the stack of an error that holds none, as Pylon's does.
+// packages, so no record of the side carries them, a named divergence. The line
+// is the text before the first frame of a stack V8 formats for the error
+// itself, with its name and its message as they were at the first read of the
+// stack. A stack the error took from another error, as a GraphQLError holds the
+// stack of its originalError, or a stack first read before the name or the
+// message of its error changed, begins with another text, which Pylon's record
+// keeps and the side's does not. A stack that is no string stays as the error
+// holds it, so a record leaves out the stack of an error that holds none, as
+// Pylon's does.
 function normalError(error) {
   const name = error.name;
   const message = error.message;

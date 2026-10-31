@@ -44,9 +44,7 @@
 //! an hour, which therefore has no reading.
 //!
 //! A kept value is a function of its key alone while two rules hold, which the
-//! plugin relies on and the check of section 7 of
-//! `tests/notebooks/60_request_cache.ipynb` holds over the workspace and the
-//! fixtures of the matrix:
+//! plugin relies on:
 //!
 //! 1. A validation rule reads only its context, the schema, the document and
 //!    the rules, and no `thread_local!` or `static` with interior mutability.

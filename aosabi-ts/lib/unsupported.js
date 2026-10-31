@@ -17,7 +17,7 @@ const ORIGIN = '@getcronit/pylon/'
  */
 function unsupported(name, subpaths) {
   const where = subpaths.map(subpath => ORIGIN + subpath).join(' and ')
-  const message = name + ' of ' + where + ' has no engine item in aosabi before M9'
+  const message = name + ' of ' + where + ' has no engine item in aosabi until a later release'
   const stand = function () {
     throw new Error(message)
   }

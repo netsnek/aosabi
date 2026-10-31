@@ -103,8 +103,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "plugins";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M7";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "plugins";
 
 /// The most polls a pass may take, since every setup of a line answers at once.
 const POLLS: usize = 1024;

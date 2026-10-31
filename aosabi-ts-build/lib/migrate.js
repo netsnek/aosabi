@@ -398,7 +398,7 @@ function classify(specifier, own = new Set()) {
 /** Returns why the row `row` of the table keeps a specifier or a name out of the package aosabi. */
 function reason(row) {
   if (row.why) return row.why
-  if (row.until) return 'has no engine item in aosabi before ' + row.until
+  if (row.until) return 'has no engine item in aosabi until ' + row.until
   if (row.record) return 'is left aside by ' + row.record + ' of the Aosabi repository'
   if (row.state) return 'has no entry of aosabi, ' + row.state
   return 'has no entry of aosabi'
@@ -1177,7 +1177,7 @@ function report(log) {
     out,
     'marked by --mark-unsupported, a flag of the harness:',
     log.marked.map(entry => {
-      return `${entry.file}:${entry.line}: '${entry.from}' becomes '${entry.to}', no engine item before ${entry.until}`
+      return `${entry.file}:${entry.line}: '${entry.from}' becomes '${entry.to}', no engine item until ${entry.until}`
     })
   )
   section(
@@ -1233,10 +1233,10 @@ function report(log) {
  * initializer is a namespace, as `names` gives them, and so does a member of a plugin named as a
  * hook of `HOOKS`, which `hookOf` and `pluginsOf` give, while a member of that name of any other
  * object literal is kept and listed. Each stop names its file, its line and what keeps it out, a
- * milestone, a record, a state, a package or the hooks the engine runs, and so does a file of the
- * list files of the table whose new name is taken, and then no file is written. Otherwise the log
- * .aosabi/migrate.json is written first, the changed files after it and the renames last, so the
- * reverse finds the log of every file the run changed or renamed.
+ * later release, a record, a state, a package or the hooks the engine runs, and so does a file of
+ * the list files of the table whose new name is taken, and then no file is written. Otherwise the
+ * log .aosabi/migrate.json is written first, the changed files after it and the renames last, so
+ * the reverse finds the log of every file the run changed or renamed.
  */
 export function migrate(dir, options = {}) {
   const mark = Boolean(options.mark)

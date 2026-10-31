@@ -176,7 +176,7 @@ use crate::{
 const NAME: &str = "execute";
 
 /// The milestone the primitive lands at.
-const LANDS_AT: &str = "M4";
+const LANDS_AT: &str = "execute";
 
 /// The operations of the protocol that reach aosabi-execute.
 const OPERATIONS: &Operations = &[

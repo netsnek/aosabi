@@ -41,8 +41,8 @@ impl Parsers {
     /// `application/graphql` and forms, in that order.
     ///
     /// The multipart parser stands in the list where `multipart` holds, which
-    /// the function passes for the option `multipart: true` alone, the named
-    /// divergence D49, where Yoga puts it in unless the option is `false`.
+    /// the function passes for the option `multipart: true` alone, a named
+    /// divergence, where Yoga puts it in unless the option is `false`.
     #[must_use]
     pub fn new(multipart: bool) -> Self {
         let mut parsers: Vec<(RequestMatcher, RequestParser)> = Vec::with_capacity(5);

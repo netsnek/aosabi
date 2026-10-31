@@ -59,12 +59,12 @@ pub struct Quirk {
     pub drops: Option<&'static str>,
 }
 
-/// The reproduced behaviour of the reference, in identifier order.
+/// The reproduced behaviour of the reference, in the order the register took it in.
 ///
 /// The length of this slice is the count the environment notebook checks.
 pub const QUIRKS: &[Quirk] = &[
     Quirk {
-        id: "Q01_DUPLICATE_PLUGIN_WRITEBACK",
+        id: "DUPLICATE_PLUGIN_WRITEBACK",
         what: "the configuration step writes the built plugin array back onto the configuration, so the four always on plugins appear twice in config.plugins after boot",
         source: "packages/pylon/src/app/pylon-handler.ts:185",
         evidence: Evidence::Proven,
@@ -73,70 +73,70 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q04_LANDING_VERSION_STRING",
+        id: "LANDING_VERSION_STRING",
         what: "the landing page renders the Pylon package version, which is 2.9.5 at the reference commit",
         source: "packages/pylon/src/plugins/use-unhandled-route.ts:3",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q07_NO_DEPRECATED",
+        id: "NO_DEPRECATED",
         what: "there is no @deprecated support, the JSDoc tag folds into the description",
         source: "packages/pylon/src/cli/builder/schema/type-definition-builder.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q08_EMPTY_INPUT_PLACEHOLDER",
+        id: "EMPTY_INPUT_PLACEHOLDER",
         what: "an input object with no fields renders a single placeholder field named _ of type String",
         source: "packages/pylon/src/ir/sdl.ts:111",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q09_INPUT_UNION_FIRST_MEMBER",
+        id: "INPUT_UNION_FIRST_MEMBER",
         what: "a union in input position warns and collapses to its first member",
         source: "packages/pylon/src/cli/builder/schema/type-definition-builder.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q11_IN_CONTEXT_EM_DASH",
+        id: "IN_CONTEXT_EM_DASH",
         what: "the @inContext directive description carries the code point U+2014",
         source: "packages/pylon/src/core/in-context.ts:41",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q13_VIEWER_ALWAYS_ON",
+        id: "VIEWER_ALWAYS_ON",
         what: "the viewer plugin slot survives graphiql: false and cannot be disabled, so it is always first in the array. Aosabi keeps the slot with the aoviewer plugin in it under its own key viewer: true alone, divergence D48, which keeps the array and the hook order equal under that key. The page that route serves is out of contract",
         source: "packages/pylon/src/app/pylon-handler.ts:146-150",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q14_DESCRIPTION_VERBATIM",
+        id: "DESCRIPTION_VERBATIM",
         what: "descriptions are inserted with no escaping and no re-indentation",
         source: "packages/pylon/src/ir/sdl.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q15_INPUT_DESCRIPTION_FROM_TYPE",
+        id: "INPUT_DESCRIPTION_FROM_TYPE",
         what: "an input field description comes from the field's type symbol while an output field description comes from the property symbol",
         source: "packages/pylon/src/cli/builder/schema/type-definition-builder.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q16_UNLABELED_REST_DROPPED",
+        id: "UNLABELED_REST_DROPPED",
         what: "an unlabeled rest parameter warns and is dropped. Not expressible in Rust, kept so the register is complete",
         source: "packages/pylon/src/cli/builder/schema/schema-parser.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q61_SUBSCRIPTION_OBJECT_PAYLOAD_PROJECTED",
+        id: "SUBSCRIPTION_OBJECT_PAYLOAD_PROJECTED",
         what: "the root resolver projects what a function returns onto the selected fields of an object return type, so a Repeater returned for an object typed subscription field becomes a plain object and the answer is the error Subscription field must return Async Iterable. Received: {}.",
         source: "packages/pylon/src/core/define-pylon.ts:278-288",
         evidence: Evidence::Proven,
@@ -145,7 +145,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q62_IN_CONTEXT_NOT_ON_SUBSCRIPTION",
+        id: "IN_CONTEXT_NOT_ON_SUBSCRIPTION",
         what: "the plugin useInContext reads @inContext in onExecute alone, which a subscription never reaches, so the directive declared on SUBSCRIPTION sets no locale and no context for one",
         source: "packages/pylon/src/plugins/use-in-context.ts:19",
         evidence: Evidence::Proven,
@@ -154,7 +154,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q63_ERROR_LOGGER_SILENT_ON_SUBSCRIPTION",
+        id: "ERROR_LOGGER_SILENT_ON_SUBSCRIPTION",
         what: "the plugin useGraphqlErrorLogger hooks onExecute alone, so an error of a subscription writes no graphql error line",
         source: "packages/pylon/src/plugins/use-graphql-error-logger.ts:14-37",
         evidence: Evidence::Proven,
@@ -163,7 +163,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q64_PUBSUB_NULLISH_PAYLOAD_TAKES_ID",
+        id: "PUBSUB_NULLISH_PAYLOAD_TAKES_ID",
         what: "publish takes args[1] ?? args[0] ?? null as the payload, so a null payload published beside an id delivers the id itself as the payload",
         source: "node_modules/.pnpm/@graphql-yoga+subscription@5.0.5/node_modules/@graphql-yoga/subscription/cjs/create-pub-sub.js:13-14",
         evidence: Evidence::Proven,
@@ -172,7 +172,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q77_FEDERATION_INTROSPECTION_HEADERS",
+        id: "FEDERATION_INTROSPECTION_HEADERS",
         what: "the introspection request of a federation carries the headers its headers function answers for no context, so a function that forwards a header of the caller sends that header empty",
         source: "packages/pylon/src/core/gateway.ts:907-914 with node_modules/.pnpm/@graphql-tools+wrap@11.1.9_graphql@16.12.0/node_modules/@graphql-tools/wrap/dist/index.cjs:2342-2362",
         evidence: Evidence::Proven,
@@ -181,7 +181,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q78_FEDERATION_REMOTE_ERROR_NO_LOCATIONS",
+        id: "FEDERATION_REMOTE_ERROR_NO_LOCATIONS",
         what: "a remote error reaches the client of the front with its message, its extensions and the front path and without locations, because the HTTP executor rebuilds it through createGraphQLError, and the GraphQLError of graphql 16 takes no locations from its options",
         source: "node_modules/.pnpm/@graphql-tools+executor-http@3.1.0_@types+node@20.19.33_graphql@16.12.0/node_modules/@graphql-tools/executor-http/dist/index.cjs:751-760 with node_modules/.pnpm/@graphql-tools+utils@11.0.0_graphql@16.12.0/node_modules/@graphql-tools/utils/cjs/errors.js:27-36 and node_modules/.pnpm/graphql@16.12.0/node_modules/graphql/error/GraphQLError.js:85-89 and :122-129",
         evidence: Evidence::Proven,
@@ -190,7 +190,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q79_FEDERATION_FORCE_BEFORE_NEEDS",
+        id: "FEDERATION_FORCE_BEFORE_NEEDS",
         what: "the force transform runs before the needs transform, so an argument that needs.__args writes on a forced field reaches the remote, contrary to the comment of the reference beside the list",
         source: "packages/pylon/src/core/gateway.ts:916-932 with node_modules/.pnpm/@graphql-tools+delegate@12.0.9_graphql@16.12.0/node_modules/@graphql-tools/delegate/dist/index.cjs:1704-1740",
         evidence: Evidence::Proven,
@@ -199,7 +199,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q80_FEDERATION_STRICT_ROOT_TYPES",
+        id: "FEDERATION_STRICT_ROOT_TYPES",
         what: "a strict federation refuses every delegation unless it patches the root types, because the patch transform appends __typename to the root selection set as well and strict then meets the root type",
         source: "packages/pylon/src/core/gateway.ts:695-718 and :755-760",
         evidence: Evidence::Proven,
@@ -208,7 +208,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q83_FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT",
+        id: "FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT",
         what: "a Date argument of a delegation reaches the remote as the empty object {}, the value of its variable and an item or a member {} inside a list or an input object, because pylon pull types a remote Date argument as the global Date and astFromJSValue writes an object through Object.entries, which a Date answers with no entry, so a Pylon remote refuses the variable and the front answers that refusal at the delegated field",
         source: "packages/pylon/src/cli/pull/index.ts:29-35 and :55-68 with packages/pylon/src/core/gateway.ts:244-256 and :356-397",
         evidence: Evidence::Proven,
@@ -217,7 +217,7 @@ pub const QUIRKS: &[Quirk] = &[
         ),
     },
     Quirk {
-        id: "Q84_FEDERATION_REDIRECT_CARRIES_HEADERS",
+        id: "FEDERATION_REDIRECT_CARRIES_HEADERS",
         what: "a delegation that meets a redirect of the status 301, 302, 303, 307 or 308 sends its method, its body and every header of the request again to the location, the authorization a headers function forwards among them, to another origin as well and from https to http as well, and a 303 keeps the method POST, because the fetch of @whatwg-node/node-fetch 0.8.5 builds the next request from the old one",
         source: "node_modules/.pnpm/@whatwg-node+node-fetch@0.8.5/node_modules/@whatwg-node/node-fetch/cjs/fetchNodeHttp.js:84-100 with cjs/utils.js:52-54",
         evidence: Evidence::Proven,
@@ -232,7 +232,7 @@ pub const QUIRKS: &[Quirk] = &[
     // 2 of 63_zitadel_auth, which counts the lines of `principal` it reads
     // alike under this id.
     Quirk {
-        id: "Q85_ZITADEL_TENANT_NULL_AS_ABSENT",
+        id: "ZITADEL_TENANT_NULL_AS_ABSENT",
         what: "the provider sets the tenant of the principal to the answer of the tenant mapper as it is, so a mapper that answers null, a value outside the type string | number | undefined its option declares, gives the principal the tenant null beside the tenant undefined of a mapper that answers nothing, which the readers of the tenant in Pylon read alike and a reader of an application can tell apart",
         source: "packages/pylon/src/auth/zitadel.ts:39-40 and :128",
         evidence: Evidence::Proven,
@@ -242,10 +242,12 @@ pub const QUIRKS: &[Quirk] = &[
     },
 ];
 
-/// They are recorded so that nothing reuses them and so that a reader who
-/// meets an id in another document finds out where it went.
+/// The identifiers that are retired, `VIEWER_STRAY_BRACE` with the `/viewer` decision.
+///
+/// They are recorded so that nothing reuses them, each with what it named and
+/// why it is retired.
 pub const RETIRED: &[(&str, &str)] = &[(
-    "Q02_VIEWER_STRAY_BRACE",
+    "VIEWER_STRAY_BRACE",
     "the unmatched closing brace inside the Voyager stylesheet. Retired with docs/decisions/ADR-0009-aoviewer-owns-viewer.md, because Aosabi carries no Voyager text",
 )];
 

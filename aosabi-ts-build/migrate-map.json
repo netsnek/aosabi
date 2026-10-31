@@ -25,63 +25,63 @@
       "specifier": "@getcronit/pylon",
       "entry": "aosabi/pylon",
       "engine": ["aosabi-core", "graphql-over-http", "aosabi-hooks", "aosabi-http", "aosabi-federation"],
-      "lands": "T5"
+      "lands": "0.1.0"
     },
     {
       "specifier": "@getcronit/pylon/auth",
       "entry": "aosabi/auth",
       "engine": ["aosabi-auth", "aosabi-auth-contract"],
-      "lands": "T5"
+      "lands": "0.1.0"
     },
     {
       "specifier": "@getcronit/pylon/auth/plugin",
       "entry": "aosabi/auth/plugin",
       "engine": ["aosabi-auth"],
-      "lands": "T5"
+      "lands": "0.1.0"
     },
     {
       "specifier": "@getcronit/pylon/auth/contract",
       "entry": "aosabi/auth/contract",
       "engine": ["aosabi-auth-contract"],
-      "lands": "T5"
+      "lands": "0.1.0"
     },
     {
       "specifier": "@getcronit/pylon/auth/zitadel",
       "entry": "aosabi/auth/zitadel",
       "engine": ["aosabi-auth-zitadel"],
-      "lands": "T9"
+      "lands": "0.1.0"
     },
     {
       "specifier": "graphql-yoga",
       "entry": "aosabi",
       "engine": ["aosabi-execute", "graphql-over-http"],
-      "lands": "T6"
+      "lands": "0.1.0"
     },
     {
       "specifier": "graphql",
       "entry": "aosabi/graphql",
       "engine": ["aosabi-lang", "aosabi-type"],
-      "lands": "T5"
+      "lands": "0.1.0"
     },
     {
       "specifier": "@sentry/node",
       "entry": "aosabi/sentry/node",
       "engine": ["aosabi-sentry"],
-      "lands": "T7"
+      "lands": "0.1.0"
     }
   ],
   "stops": [
-    {"specifier": "@getcronit/pylon/db", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/db/plugin", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/queues", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/pages", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/pages/plugin", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/query", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/ir", "until": "M9", "mark": true},
-    {"specifier": "@getcronit/pylon/queues/plugin", "until": "M9", "mark": false},
-    {"specifier": "@getcronit/pylon/queues/run-worker", "until": "M9", "mark": false},
-    {"specifier": "@getcronit/pylon/pages/dev", "until": "M9", "mark": false},
-    {"specifier": "@getcronit/pylon/pages/index.css", "until": "M9", "mark": false},
+    {"specifier": "@getcronit/pylon/db", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/db/plugin", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/queues", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/pages", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/pages/plugin", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/query", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/ir", "until": "a later release", "mark": true},
+    {"specifier": "@getcronit/pylon/queues/plugin", "until": "a later release", "mark": false},
+    {"specifier": "@getcronit/pylon/queues/run-worker", "until": "a later release", "mark": false},
+    {"specifier": "@getcronit/pylon/pages/dev", "until": "a later release", "mark": false},
+    {"specifier": "@getcronit/pylon/pages/index.css", "until": "a later release", "mark": false},
     {
       "specifier": "@getcronit/pylon/query/build",
       "until": null,
@@ -97,21 +97,21 @@
   ],
   "names": [],
   "renames": [
-    {"specifier": "@getcronit/pylon", "name": "Pylon", "to": "App", "lands": "S2 of LEAN1"},
-    {"specifier": "@getcronit/pylon", "name": "PylonConfig", "to": "AppConfig", "lands": "S1 of LEAN1"},
-    {"specifier": "@getcronit/pylon", "name": "PylonConfigFactory", "to": "AppConfigFactory", "lands": "S1 of LEAN1"},
-    {"specifier": "@getcronit/pylon", "name": "PylonOptions", "to": "AppOptions", "lands": "S1 of LEAN1"},
-    {"specifier": "@getcronit/pylon", "name": "PylonRole", "to": "Role", "lands": "S1 of LEAN1"}
+    {"specifier": "@getcronit/pylon", "name": "Pylon", "to": "App", "lands": "0.1.0"},
+    {"specifier": "@getcronit/pylon", "name": "PylonConfig", "to": "AppConfig", "lands": "0.1.0"},
+    {"specifier": "@getcronit/pylon", "name": "PylonConfigFactory", "to": "AppConfigFactory", "lands": "0.1.0"},
+    {"specifier": "@getcronit/pylon", "name": "PylonOptions", "to": "AppOptions", "lands": "0.1.0"},
+    {"specifier": "@getcronit/pylon", "name": "PylonRole", "to": "Role", "lands": "0.1.0"}
   ],
   "variables": [
-    {"name": "PYLON_ROLE", "to": "AOSABI_ROLE", "lands": "S1 of LEAN1"},
-    {"name": "PYLON_DEV", "to": "AOSABI_DEV", "lands": "S1 of LEAN1"},
-    {"name": "PYLON_DEBUG", "to": "AOSABI_DEBUG", "lands": "S1 of LEAN1"},
-    {"name": "PYLON_LOG_FORMAT", "to": "AOSABI_LOG_FORMAT", "lands": "S1 of LEAN1"}
+    {"name": "PYLON_ROLE", "to": "AOSABI_ROLE", "lands": "0.1.0"},
+    {"name": "PYLON_DEV", "to": "AOSABI_DEV", "lands": "0.1.0"},
+    {"name": "PYLON_DEBUG", "to": "AOSABI_DEBUG", "lands": "0.1.0"},
+    {"name": "PYLON_LOG_FORMAT", "to": "AOSABI_LOG_FORMAT", "lands": "0.1.0"}
   ],
   "kept": [
-    {"package": "hono", "why": "the peer of the package aosabi, the real hono under the class App of aosabi/pylon", "lands": "S2 of LEAN1"},
-    {"package": "@hono/node-server", "why": "the Node adapter of hono, which an app on Node installs itself", "lands": "S2 of LEAN1"}
+    {"package": "hono", "why": "the peer of the package aosabi, the real hono under the class App of aosabi/pylon", "lands": "0.1.0"},
+    {"package": "@hono/node-server", "why": "the Node adapter of hono, which an app on Node installs itself", "lands": "0.1.0"}
   ],
   "pulled": [
     "@envelop/core",

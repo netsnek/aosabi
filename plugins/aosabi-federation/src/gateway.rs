@@ -613,8 +613,8 @@ where
 /// gets the four transforms in the array order of the reference, which
 /// `Transformer::new` reverses, so the request passes the patch, the force, the
 /// inline and the needs transforms in that order. That order is quirk
-/// `Q79_FEDERATION_FORCE_BEFORE_NEEDS`, where the comment of the reference says
-/// the force transform runs last. A synchronous throw of the delegation is the
+/// `FEDERATION_FORCE_BEFORE_NEEDS`, where the comment of the reference says the
+/// force transform runs last. A synchronous throw of the delegation is the
 /// rejection of the call, and any other answer is awaited, as
 /// `await delegateToSchema(...)` awaits it. The slot of the remote schema is
 /// kept until the answer settles, so the subschema configuration the proxying

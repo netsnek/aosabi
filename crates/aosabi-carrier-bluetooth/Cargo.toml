@@ -36,9 +36,13 @@ linux = [
 # The GATT data path, RX written without response and TX notified, one Homa
 # packet an ATT value.
 gatt = []
+# The L2CAP LE credit based channel in prefixed AoFrame, whose Linux socket
+# waits for its address module.
 # The service that publishes its PSM is the one of the GATT data path, so the
 # channel brings it.
 channel = ["gatt", "homa/stream-prefixed"]
+# The bare metal binding over the card's LE host, which arrives with device
+# cards.
 bare = []
 # The trace of the GATT data path, which a harness turns on: the time on the
 # realtime clock and the compact header of every packet send hands to the bus

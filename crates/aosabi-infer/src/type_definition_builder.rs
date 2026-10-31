@@ -844,8 +844,8 @@ impl<'s, S: TypeSource> TypeDefinitionBuilder<'s, S> {
     /// Collects a union of object types, and collapses every other union to
     /// `JSON` or to its first member, `type-definition-builder.ts:510-610`.
     ///
-    /// The collapse is quirk `Q09_INPUT_UNION_FIRST_MEMBER`. `required` of
-    /// `:512` compares the length of a list with itself and is always true.
+    /// The collapse is quirk `INPUT_UNION_FIRST_MEMBER`. `required` of `:512`
+    /// compares the length of a list with itself and is always true.
     fn get_union_type_definition(
         &mut self,
         r#type: S::Type,

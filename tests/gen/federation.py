@@ -450,9 +450,10 @@ def transform_requests(count: int = COUNTS["transforms"], seed: int = SEED) -> l
     field with files where an input takes `File`, a needs map, policies and a
     context. The two named cases come first: `dg-force-needs`, a need with
     `__args` on the field a policy forces, which reaches the remote because the
-    policy runs before the need (quirk Q10-5), and `dg-needs-typename`, a nested
-    need under a patched type, whose selection set carries no `__typename`
-    because the patch transform ran before the need was added.
+    policy runs before the need (the quirk `FEDERATION_FORCE_BEFORE_NEEDS`), and
+    `dg-needs-typename`, a nested need under a patched type, whose selection set
+    carries no `__typename` because the patch transform ran before the need was
+    added.
     """
     rng = Rng(seed)
     first = [

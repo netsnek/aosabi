@@ -19,7 +19,7 @@
 //! `handleResponseError` answers: the error on standard error, the status 500
 //! with the reason the failed call left, `Content-Type: text/plain`, the body
 //! `Error: <message>` and the end of the connection (N14, quirk
-//! `Q59_NODE_RECORD_CHECK_500`).
+//! `NODE_RECORD_CHECK_500`).
 
 use aosabi_http::{
     fetch::response::Response,
@@ -55,7 +55,7 @@ pub fn handle_fetch_error(error_name: &str) -> Response {
 /// The error goes to standard error as `console.error` writes it,
 /// `writeHead(500, { "Content-Type": "text/plain" })` keeps the reason the
 /// failed call of the first `status` set, `end` writes `Error: ` and `message`
-/// as a string, and the socket is destroyed, quirk `Q59_NODE_RECORD_CHECK_500`.
+/// as a string, and the socket is destroyed, quirk `NODE_RECORD_CHECK_500`.
 #[must_use]
 pub fn handle_response_error(message: &str, status: u16) -> NodeOutgoing {
     eprintln!("TypeError: {message}");

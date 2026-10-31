@@ -341,7 +341,7 @@ impl fmt::Display for DocsError {
             }
             Self::Device { path } => write!(
                 f,
-                "--device {} needs the device chapter, which DC8 of the device card track lands",
+                "--device {} needs the device chapter, which arrives with device cards",
                 path.display()
             ),
             Self::NoPdf { compile_line } => write!(
@@ -361,7 +361,7 @@ impl fmt::Display for DocsError {
             }
             Self::Since(inner) => write!(f, "the schema of --since does not load, {inner}"),
             Self::SvgOutlines => f.write_str(
-                "--svg-text outlines needs the font face that M13 vendors, so the SVG keeps its text",
+                "--svg-text outlines needs the font face that a later release vendors, so the SVG keeps its text",
             ),
             Self::Tree(e) => {
                 f.write_str("the core draws no tree of the model, ")?;

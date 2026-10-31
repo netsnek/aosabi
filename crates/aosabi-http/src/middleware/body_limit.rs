@@ -206,8 +206,8 @@ pub fn body_limit<E: RouteError + From<HttpException>>(
 
 /// Returns the future `rest` behind the default body limit of the base
 /// pipeline, which holds every read of the body of the request of `c` to
-/// [`DEFAULT_MAX_SIZE`] where no body limit of the app takes its place,
-/// divergence D76.
+/// [`DEFAULT_MAX_SIZE`] where no body limit of the app takes its place, a named
+/// divergence.
 ///
 /// The bound is made before `rest` is first polled. Where a read passed it,
 /// the answer `rest` answers, or the error it answers, gives way to hono's

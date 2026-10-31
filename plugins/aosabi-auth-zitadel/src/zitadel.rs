@@ -24,13 +24,10 @@
 //! failed bootstrap answers 500 before the 400 of a missing code. Every other
 //! failure is no `HTTPException`, so the root answers it with 500.
 //!
-//! The bootstrap is shared by the provider and the login routes. It reads the
-//! auth key, imports its private key, and discovers the issuer with the key
-//! as the client authentication. The key path is no part of the key, so a
-//! second caller with the same issuer and another key path shares the first
-//! key, which is quirk `Q10-3`. The provider and the routes each keep the
-//! slot the cache gave their first call, so a later call reads its slot with
-//! no lookup.
+//! The bootstrap is shared by the provider and the login routes. It reads the auth key, imports its
+//! private key, and discovers the issuer with the key as the client authentication. One cache of
+//! this thread holds the bootstraps. The provider and the routes each keep the slot the cache gave
+//! their first call, so a later call reads its slot with no lookup.
 
 use core::{
     cell::{

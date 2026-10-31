@@ -521,29 +521,29 @@ def provider_runs() -> list:
     add("auth-default-introspect_ok", "default", [
         ask("z-01", "z-01", ok, [], "null and no request at the issuer", "{me{id}}"),
         ask("z-02", "z-02", ok, _bearer("t1"), "the principal, one discovery, one introspection and one user info "
-            "request with the bodies of facts 21 and 22"),
+            "request with their bodies"),
         Step("z-18", "z-18", ok, None, "scope=openid+email+profile first and the client assertion verified with the "
              "key of the run", checks="z-02"),
-        ask("z-03", "z-03", ok, [], "the query token of fact 18", target="/graphql?token=t1"),
+        ask("z-03", "z-03", ok, [], "the query token", target="/graphql?token=t1"),
         ask("z-04", "z-04", ok, [("Cookie", "aosabi-auth=t1")], "the cookie token"),
         ask("z-05", "z-05", ok, [("Authorization", "Basic x"), ("Cookie", "aosabi-auth=t1")],
             "the cookie, because the header is no Bearer"),
-        ask("z-06", "z-06", ok, [("Authorization", "Bearer"), ("Cookie", "aosabi-auth=t1")], "null, fact 18"),
+        ask("z-06", "z-06", ok, [("Authorization", "Bearer"), ("Cookie", "aosabi-auth=t1")], "null"),
         ask("z-14-without", "z-14", ok, _bearer("t1"), "FORBIDDEN without the role", "{adminOnly}"),
         ask("z-14-with", "z-14", ok, _bearer("t-admin"), "ok with the role", "{adminOnly}"),
         ask("z-19-first", "z-19", ok, _bearer("t1"), "an introspection and a user info request"),
         ask("z-19-second", "z-19", ok, _bearer("t1"), "two more, because the reference caches nothing per token"),
-        ask("z-24", "z-24", ok, [("Authorization", "Bearer a b")], "the token a, fact 18"),
+        ask("z-24", "z-24", ok, [("Authorization", "Bearer a b")], "the token a"),
         ask("z-25", "z-25", ok, [("Authorization", "Bearer  x")], "null and no request at the issuer"),
     ])
     for case, scenario, token, pins, document in (
         ("z-07", "introspect_inactive", "t2", "null", me),
         ("z-08", "introspect_no_sub", "t3", "null and no user info request", me),
-        ("z-09", "introspect_401", "t4", "500 and {\"error\":\"Internal Server Error\"}, fact 23", me),
+        ("z-09", "introspect_401", "t4", "500 and {\"error\":\"Internal Server Error\"}", me),
         ("z-10", "userinfo_sub_mismatch", "t5", "500", me),
         ("z-11", "userinfo_challenge", "t6", "500, the WWW-Authenticate challenge", me),
         ("z-12", "userinfo_jwt", "t7", "the principal from an unverified JWT user info answer, Q10-4", me),
-        ("z-13", "roles_numeric", "t8", "the roles [\"1\", \"2\", \"admin\"], fact 20", "{me{id roles}}"),
+        ("z-13", "roles_numeric", "t8", "the roles [\"1\", \"2\", \"admin\"]", "{me{id roles}}"),
     ):
         add("auth-default-" + scenario, "default", [ask(case, case, scenario, _bearer(token), pins, document)])
     add("auth-mapped", "mapped", [
@@ -587,7 +587,7 @@ def provider_runs() -> list:
              "302 and the cookie aosabi-auth holding the token of the scenario",
              (("verifier", "z-29-login", "aosabi_code_verifier"),)),
         ask("z-30", "z-30", both, [("Cookie", "aosabi-auth={session}")], "the principal of the introspected token, "
-            "and one discovery for the login and the provider together, fact 2", "{me{id roles email}}",
+            "and one discovery for the login and the provider together", "{me{id roles email}}",
             carry=(("session", "z-29-callback", "aosabi-auth"),)),
         Step("z-31-logout", "z-31", both, get("z-31-logout", "/auth/logout", [("Cookie", "aosabi-auth={session}")]),
              "the cookie aosabi-auth deleted as in lg-03", (("session", "z-29-callback", "aosabi-auth"),)),

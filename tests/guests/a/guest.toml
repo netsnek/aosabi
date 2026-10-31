@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: MIT
 # Guest A of the harness: the Fedora 43 cloud image on its own kernel, for the
 # emulated carriers of 26, 27 and 28, the namespaces and the queuing
-# discipline of 29_homa_raw, the helper homa-raw and the crate's kernel module
-# of stage H5. The host has neither tc nor dummy_hcd, so they run here.
+# discipline of the checks of Homa over raw IP, the helper homa-raw and the
+# kernel module of the crate homa. The host has neither tc nor dummy_hcd, so
+# they run here.
 
 name = "A"
 description = "Fedora 43 cloud image with its kernel-devel, the rustc its kernel names, iproute-tc, bluez with btvirt, dummy_hcd and tcpdump"

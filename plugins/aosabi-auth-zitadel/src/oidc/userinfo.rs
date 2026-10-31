@@ -14,10 +14,9 @@
 //! must carry no `WWW-Authenticate` challenge, answer 200 and hold a string `sub` equal to the
 //! expected subject.
 //!
-//! An answer of type `application/jwt` is read as a JWT whose claims are checked and whose
-//! signature is not, which is quirk `Q10-4`. Its `alg` must be one the discovery names in
-//! `userinfo_signing_alg_values_supported`, since the client names none and the check has no
-//! default, so without that list the answer is refused.
+//! An answer of type `application/jwt` is read as a JWT. Its `alg` must be one the discovery
+//! names in `userinfo_signing_alg_values_supported`, since the client names none and the check
+//! has no default, so without that list the answer is refused.
 
 use aosabi_core::{
     Thrown,

@@ -281,7 +281,7 @@ pub enum PluginSource {
 ///
 /// The reference writes `'first'` onto a plugin object that states no
 /// strategy and writes the built array back onto the configuration (quirk
-/// `Q01_DUPLICATE_PLUGIN_WRITEBACK`). The strategy lives in a cell a clone of
+/// `DUPLICATE_PLUGIN_WRITEBACK`). The strategy lives in a cell a clone of
 /// the slot shares, so the write of one pass is read by the next as the
 /// write on the object is.
 #[derive(Clone)]

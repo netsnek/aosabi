@@ -57,14 +57,14 @@ export {
   passthrough,
 } from './types/pylon/core/index.js'
 
-// The names of graphql-yoga an app imports beside Pylon, which the root aosabi re-exports, where
-// aosabi migrate points the specifier graphql-yoga. The class Repeater comes from the declaration
-// file of @repeaterjs/repeater 3.0.6 under types/@repeaterjs/repeater/, which tools/provenance
-// writes as a vendored literal of @repeaterjs/repeater, MIT, so the checker of the step aosabi build
-// finds the type a subscription of an app annotates in a file whose name holds @repeaterjs, the test
-// of Pylon's inference for a stream, and the values createGraphQLError and createPubSub and the type
-// YogaInitialContext, the context Yoga hands a plugin, are re-exported from graphql-yoga by its bare
-// specifier, as the declarations of Pylon under types/pylon/ import it.
+// The names of graphql-yoga an app imports beside Pylon, which the root aosabi re-exports, where aosabi
+// migrate points the specifier graphql-yoga. The class Repeater comes from the declaration file of
+// @repeaterjs/repeater 3.0.6 under types/@repeaterjs/repeater/, a vendored literal of
+// @repeaterjs/repeater, MIT, so the checker of the step aosabi build finds the type a subscription of an
+// app annotates in a file whose name holds @repeaterjs, the test of Pylon's inference for a stream, and
+// the values createGraphQLError and createPubSub and the type YogaInitialContext, the context Yoga hands
+// a plugin, are re-exported from graphql-yoga by its bare specifier, as the declarations of Pylon under
+// types/pylon/ import it.
 export { Repeater } from './types/@repeaterjs/repeater/repeater.js'
 export { createGraphQLError, createPubSub } from 'graphql-yoga'
 export type { YogaInitialContext } from 'graphql-yoga'

@@ -353,7 +353,7 @@ impl ChunkSize {
             pos: 0,
             len: 0,
         };
-        // Node writes the size in lower case, quirk Q31.
+        // Node writes the size in lower case, quirk NODE_CHUNK_HEX_LOWER.
         if cfg!(feature = "node-chunk-hex") {
             write!(&mut size, "{len:x}\r\n")
         } else {

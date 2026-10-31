@@ -106,8 +106,8 @@ pub fn render_type(t: &TypeRef) -> String {
 /// two spaces at field level.
 ///
 /// The text is inserted verbatim, with no escaping and no indentation of its
-/// further lines, which is quirk `Q14_DESCRIPTION_VERBATIM`. `None` and the
-/// empty string both render nothing, which is the `!description` test of :17.
+/// further lines, which is quirk `DESCRIPTION_VERBATIM`. `None` and the empty
+/// string both render nothing, which is the `!description` test of :17.
 fn render_description(description: Option<&str>, indent: &str) -> String {
     let Some(description) = description.filter(|text| !text.is_empty()) else {
         return String::new();
@@ -310,7 +310,7 @@ pub fn to_sdl(ir: &SchemaIr) -> Result<String, CollateError> {
     }
 
     // GraphQL requires at least one field of an input object, so an input
-    // with none renders a placeholder, quirk `Q08_EMPTY_INPUT_PLACEHOLDER`.
+    // with none renders a placeholder, quirk `EMPTY_INPUT_PLACEHOLDER`.
     for input in ir.inputs.values() {
         let fields = if input.fields.is_empty() {
             String::from("  _: String")

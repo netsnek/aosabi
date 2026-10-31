@@ -27,8 +27,8 @@
 //! after that turn. So the records of a process before its loop first turns
 //! carry no time and every later one carries `HH:MM:SS.mmm` in front, but for
 //! a later record of the request that wrote the first record, which is pretty
-//! within the turn. That is the quirk the plan proposes as
-//! `Q17_FIRST_PRETTY_RECORD_UNTIMED`.
+//! within the turn. That is a quirk the register does not hold yet,
+//! `FIRST_PRETTY_RECORD_UNTIMED`.
 //!
 //! [`logger`] is a `const fn`, so a module keeps its tagged logger in a
 //! `static`, and the logger resolves the scoped logger on every call, as the

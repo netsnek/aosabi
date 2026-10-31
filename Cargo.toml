@@ -2,14 +2,14 @@
 #
 # This file is the one place
 # the settings every crate inherits are written down. Each crate is listed by
-# name as its milestone lands, see the comment above members.
+# name, see the comment above members.
 
 [workspace]
 resolver = "3"
-# Listed one by one rather than globbed. tools/provenance writes extracted
-# literals into the crate directory that NOTICE declares for them, which means a
-# directory under crates/ can hold vendored bytes before the crate that carries
-# them exists. A glob would treat those as members and fail the workspace.
+# Listed one by one rather than globbed. The extracted literals land in the
+# crate directory that NOTICE declares for them, which means a directory under
+# crates/ can hold vendored bytes before the crate that carries them exists. A
+# glob would treat those as members and fail the workspace.
 members = [
     "crates/aosabi",
     "crates/aosabi-build",

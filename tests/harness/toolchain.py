@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the one flag set of a shipped build and the toolchain it runs on.
 
-Item Z21 of that plan keeps the flags of such a build in this module alone, so a flag that a bump of the pin renames
-is one edit here: the variable `RUSTC_BOOTSTRAP=1`, the `-Z` flags of each card, the features of the standard
-library of each card, and the remap of the source of the standard library.
+A shipped card builds its standard library from source on the pinned stable compiler 1.95.0 under
+`RUSTC_BOOTSTRAP=1`, the way of the Linux kernel, and no card takes a nightly. This module alone keeps the flags of
+such a build, so a flag that a bump of the pin renames is one edit here: the variable `RUSTC_BOOTSTRAP=1`, the `-Z`
+flags of each card, the features of the standard library of each card, and the remap of the source of the standard
+library.
 
 The remap. With the component `rust-src` beside a compiler, rustc writes the panic locations of the inlined code of
 the standard library with the path of the machine, and cargo keeps the artifacts built in that window. The flag
@@ -16,11 +18,11 @@ tree, so a build of the harness on it names the remap of the source after the pr
 of the command line names the prefix of the tree after the remap the harness gives it, and it writes the bytes of
 the build on the pin all the same.
 
-The private copy. The shared pin carries no `rust-src` until step 3 of Z21, so tools/size_toolchain.py makes a hard
-linked copy of the pin under target/size/toolchain/ that alone carries it, and `private_copy` finds it through the
-variable AOSABI_SIZE_TOOLCHAIN or at that place. A cargo call runs a toolchain through the proxies of the rustup
-home with RUSTUP_TOOLCHAIN naming the pin or the path of the copy, never the default of the machine, which is
-another stable.
+The private copy. The shared pin carries no `rust-src` until `RUST_SRC_COMMAND` adds it, so tools/size_toolchain.py
+makes a hard linked copy of the pin under target/size/toolchain/ that alone carries it, and `private_copy` finds it
+through the variable AOSABI_SIZE_TOOLCHAIN or at that place. A cargo call runs a toolchain through the proxies of
+the rustup home with RUSTUP_TOOLCHAIN naming the pin or the path of the copy, never the default of the machine,
+which is another stable.
 
 The options. A build takes `RUSTC_BOOTSTRAP=1` only where a notebook measures it, in the environment of that one
 call, and a dev build takes no `-Z` flag and no bootstrap. A notebook takes the flags of a set from here, the cargo
@@ -28,16 +30,18 @@ arguments of `Options.cargo_args`, the `--config` arguments of `Options.config`,
 `Options.rustflags` and the flags the wrapper of Z24 adds, `NO_DEBUG_TEXT` and `NO_LOCATION_DETAIL`, and writes none
 of them again.
 
-The switch. Item Z23 puts every option of the standard library from source behind the switch `AOSABI_STD`,
-`prebuilt` by default or `source`, which the command line reads and the harness passes through. The command line
-gives a release build of a card at `source` the set its table names, `RUSTC_BOOTSTRAP=1`, the crates of
-`-Zbuild-std`, the wrapper of Z24 and a target directory of the value, and puts the binary where a build at
-`prebuilt` puts it. It refuses a toolchain with no rust-src, and the shared pin carries none until step 3 of Z21, so
-`switch_env` gives a release build through the command line at `source` the private copy as RUSTUP_TOOLCHAIN, the
-stand in of that step, and nothing at `prebuilt` and nothing to a dev build, and `cli_toolchain` gives every other
-call of the command line of a notebook the same copy at `source` through `run` of procs.py. Where the copy is
-missing a build at `source` runs on the pin and the command line refuses it with `RUST_SRC_REFUSAL`, which names the
-command that adds the component, and the harness never adds it.
+The switch. Every option of the standard library from source stands behind the switch `AOSABI_STD`, `prebuilt` by
+default or `source`, which the command line reads and the harness passes through. The command line gives a release
+build of a card at `source` the set its table names, `RUSTC_BOOTSTRAP=1`, the crates of `-Zbuild-std`, the wrapper
+per crate and a target directory of the value, and puts the binary where a build at `prebuilt` puts it. It refuses a
+toolchain with no rust-src, and the shared pin carries none until `RUST_SRC_COMMAND` adds it, so `switch_env` gives
+a release build through the command line at `source` the private copy as RUSTUP_TOOLCHAIN, the stand in of that
+command, and nothing at `prebuilt` and nothing to a dev build, and `cli_toolchain` gives every other call of the
+command line of a notebook the same copy at `source` through `run` of procs.py. Where the copy is missing a build at
+`source` runs on the pin and the command line refuses it with `RUST_SRC_REFUSAL`, which names the command that adds
+the component, and the harness never adds it. The variable `AOSABI_STD_SMALL` of the speed verdict gives every set
+the feature `optimize_for_size` at `on` and takes it away at `off` through `CARGO_UNSTABLE_BUILD_STD_FEATURES`,
+which the command line leaves as the environment names it, so the judging notebooks build both sides with no edit.
 
 The copies a bump edits as well. The standalone tool tools/size_toolchain.py
 runs without the harness, so it keeps its own copies of `PIN`, `PIN_COMMIT`,
@@ -86,9 +90,10 @@ DOWNLOAD_FAILED = 75
 #: The crates `-Zbuild-std` builds: the whole standard library for a card with an operating system and the Worker,
 #: and `core` and `alloc` alone for the ESP32-C3.
 BUILD_STD = {"std": "std,panic_abort", "core": "core,alloc"}
-#: The features of the standard library the prebuilt one carries, which L1 keeps and L2 drops.
+#: The features of the standard library the prebuilt one carries, which `STD_IN_LTO` keeps and `NO_SYMBOLIZER`
+#: drops.
 PREBUILT_FEATURES = "backtrace,panic-unwind"
-#: The feature of L3, the small algorithms of core, alloc and std.
+#: The feature of the standard library that picks the small algorithms of core, alloc and std.
 SMALL = "optimize_for_size"
 
 #: An empty value counts as unset, and unset is `prebuilt`.
@@ -214,7 +219,7 @@ def std_packages(copy) -> list[str]:
 
 def framework_crates(root) -> list[str]:
     """Returns the crate names of the framework: the members of the workspace at `root` and the forks under
-    third_party/rust/, which the options per crate of Z24 reach."""
+    third_party/rust/, which the options per crate reach."""
     root = Path(root)
     with (root / "Cargo.toml").open("rb") as handle:
         members = tomllib.load(handle)["workspace"]["members"]
@@ -235,16 +240,14 @@ def framework_crates(root) -> list[str]:
 class Options:
     """One set of the levers of the plan, as a build the harness measures takes it.
 
-    `build_std` is None for the prebuilt standard library, `std` or `core` for
-    the crates of BUILD_STD, `features` the value of `-Zbuild-std-features`
-    beside `small`, the feature of L3. `fmt_debug` is L4 on every crate, `none`
-    or `shallow`, `location_detail` L5 on every crate, `per_crate` the form of
-    Z24 that gives the framework's crates both and the standard library its
-    locations alone, `immediate_abort` L6, `lld` the pin's LLD of L7 and `icf`
-    its identical code folding of L8, `vfe` L9, `trim_paths` the `-Z
-    trim-paths` of cargo in place of the hand written prefixes, and
-    `std_level` the opt-level the crates of the standard library take through
-    the overrides per package of Z23, None for the level of the card.
+    `build_std` is None for the prebuilt standard library, `std` or `core` for the crates of BUILD_STD, `features`
+    the value of `-Zbuild-std-features` beside `small`, the feature `optimize_for_size`. `fmt_debug` is the value of
+    `-Zfmt-debug` on every crate, `none` or `shallow`, `location_detail` takes the location detail off every crate,
+    `per_crate` gives the framework's crates both and the standard library its locations alone, `immediate_abort` is
+    the immediate abort on a panic, `lld` the pin's LLD and `icf` its identical code folding, `vfe` the removal of
+    dead virtual functions, `trim_paths` the `-Z trim-paths` of cargo in place of the hand written prefixes, and
+    `std_level` the opt-level the crates of the standard library take through the overrides per package, None for
+    the level of the card.
     """
 
     name: str = "stock"
@@ -320,21 +323,24 @@ class Options:
 
 #: The stock build, the prebuilt standard library of the pin and no lever.
 STOCK = Options()
-#: The rungs of the ladder of the plan's lever table, each on the one it names.
-L1 = Options("L1, std inside the link time optimization", build_std="std", features=PREBUILT_FEATURES)
-L2 = Options("L2, the symbolizer out", build_std="std")
-L3 = L2.but(name="L3, optimize_for_size", small=True)
-L4 = L3.but(name="L4, no Debug text on every crate", fmt_debug="none")
-L5 = L4.but(name="L5, no location detail on every crate", location_detail=True)
-L6 = L2.but(name="L6, the immediate abort over L2", immediate_abort=True)
-L6_SMALL = L3.but(name="L6, the immediate abort over L3", immediate_abort=True)
-EVERY = L6_SMALL.but(name="every option of the standard library", fmt_debug="none", location_detail=True)
+#: The rungs of the ladder of the levers, each over the rung it extends.
+STD_IN_LTO = Options("std inside the link time optimization", build_std="std", features=PREBUILT_FEATURES)
+NO_SYMBOLIZER = Options("the symbolizer out", build_std="std")
+OPTIMIZE_FOR_SIZE = NO_SYMBOLIZER.but(name="optimize_for_size", small=True)
+WITHOUT_DEBUG_TEXT = OPTIMIZE_FOR_SIZE.but(name="no Debug text on every crate", fmt_debug="none")
+WITHOUT_LOCATION_DETAIL = WITHOUT_DEBUG_TEXT.but(name="no location detail on every crate", location_detail=True)
+IMMEDIATE_ABORT = NO_SYMBOLIZER.but(name="the immediate abort over the symbolizer out", immediate_abort=True)
+IMMEDIATE_ABORT_SMALL = OPTIMIZE_FOR_SIZE.but(name="the immediate abort over optimize_for_size", immediate_abort=True)
+EVERY = IMMEDIATE_ABORT_SMALL.but(name="every option of the standard library", fmt_debug="none", location_detail=True)
 
-#: The Linux cards and the player take L1 and L2 with the Debug text and the location detail per crate of Z24. The
-#: Worker and the modules of a page take L1 and L2 with the standard library held at opt-level 3, the default of Z23
-#: on a card at `z`, and the immediate abort of Z25, since no panic text of theirs reaches anyone. L3 joins a set
-#: only on the speed verdict of Z26, L9 only on the rule of Z37, and the linker stands behind its own switch
-#: AOSABI_LINKER.
+#: The set each card takes at the switch `source`. The Linux cards and the player take the standard library inside
+#: the link time optimization without its symbolizer and drop the Debug text and the location detail per crate. The
+#: Worker and the modules of a page take the same standard library held at opt-level 3, the default on a card at
+#: `z`, and the immediate abort, since no panic text of theirs reaches anyone. The release image of the ESP32-C3
+#: takes the same over `core` and `alloc`, its debug image keeps the handler, and the wasm32 `subset`, the stand in
+#: of the ESP32-C3 on wasm32, takes the set of the release image over the whole standard library, which the target
+#: needs. The feature `optimize_for_size` joins a set only on the speed verdict and the removal of dead virtual
+#: functions only on its own rule, and the linker stands behind its own switch AOSABI_LINKER.
 SHIPPED = {
     "server": Options("the set of the Linux cards", build_std="std", per_crate=True),
     "server-legacy": Options("the set of the Linux cards", build_std="std", per_crate=True),
@@ -350,20 +356,20 @@ SHIPPED = {
     "esp32c3-debug": Options("the set of the debug image of the ESP32-C3", build_std="core", std_level="3"),
 }
 #: The cards whose release build goes through the command line, which `switch_env` serves: their sets need no
-#: flag of rustc and no `--config` beside the crates of the standard library and the wrapper of Z24.
+#: flag of rustc and no `--config` beside the crates of the standard library and the wrapper per crate.
 COMMAND_LINE_CARDS = ("server", "server-legacy", "docker", "web", "player")
 
 
-#: The flag of L4 that the wrapper of Z24 adds to a unit of the framework's crates compiled for the target, as
-#: `Options.rustflags` writes it.
-NO_DEBUG_TEXT = Options(fmt_debug="none").rustflags()[0]
-#: The flag of L5 that the wrapper of Z24 adds to a unit of the framework's crates and to `core`, `alloc` and `std`
+#: The flag of `WITHOUT_DEBUG_TEXT` that the wrapper per crate adds to a unit of the framework's crates
 #: compiled for the target, as `Options.rustflags` writes it.
+NO_DEBUG_TEXT = Options(fmt_debug="none").rustflags()[0]
+#: The flag of `WITHOUT_LOCATION_DETAIL` that the wrapper per crate adds to a unit of the framework's crates and to
+#: `core`, `alloc` and `std` compiled for the target, as `Options.rustflags` writes it.
 NO_LOCATION_DETAIL = Options(location_detail=True).rustflags()[0]
 
 
 def per_crate_wrapper(path, crates, remap=None, chain=None) -> Path:
-    """Writes the wrapper of rustc of Z24 at `path` and returns it.
+    """Writes the wrapper of rustc per crate at `path` and returns it.
 
     The wrapper adds NO_DEBUG_TEXT and NO_LOCATION_DETAIL to a unit whose command line holds `--target` and the name
     of one of `crates`, adds NO_LOCATION_DETAIL alone to `core`, `alloc` and `std` built for the target, and passes
@@ -380,7 +386,7 @@ def per_crate_wrapper(path, crates, remap=None, chain=None) -> Path:
     tail = " %s" % shlex.quote(remap) if remap else ""
     lines = [
         "#!/bin/sh",
-        "# The wrapper of rustc of item Z24, written by tests/harness/toolchain.py.",
+        "# The wrapper of rustc per crate, written by tests/harness/toolchain.py.",
         "rustc=\"$1\"",
         "shift",
         "target=no",
@@ -438,7 +444,7 @@ def switch_value(env=None) -> str:
 
 
 def small_value(env=None):
-    """Returns True or False where AOSABI_STD_SMALL of `env` or of the process asks for the feature of L3 or
+    """Returns True or False where AOSABI_STD_SMALL of `env` or of the process asks for the small algorithms or
     against it, and None where it is unset and the set of the card stands."""
     value = _value(env, SMALL_SWITCH)
     if not value:
@@ -449,7 +455,7 @@ def small_value(env=None):
 
 
 def card_set(card, env=None) -> Options:
-    """Returns the set `card` takes at the switch source, with the feature of L3 as AOSABI_STD_SMALL asks."""
+    """Returns the set `card` takes at the switch source, with the small algorithms as AOSABI_STD_SMALL asks."""
     options = SHIPPED[card]
     small = small_value(env)
     return options if small is None else options.but(small=small)
@@ -459,9 +465,11 @@ def command_line_env(card, root, env=None) -> dict:
     """Returns the variables a release build of `card` through the command line takes at `source` in the harness.
 
     The command line reads the switch and gives the build the set of its card itself, and refuses a toolchain with
-    no rust-src, so the harness gives it the private copy as RUSTUP_TOOLCHAIN, the stand in of step 3 of Z21, and
-    the features of the standard library where AOSABI_STD_SMALL asks for L3 or against it. Where the copy is missing
-    it gives no toolchain, so the build runs on the pin and the command line refuses it with `RUST_SRC_REFUSAL`.
+    no rust-src, so the harness gives it the private copy as RUSTUP_TOOLCHAIN, the stand in of `RUST_SRC_COMMAND`,
+    and the features of the standard library where AOSABI_STD_SMALL asks for the small algorithms or against it.
+    Where the copy is missing it gives no toolchain, so the build runs on the pin and the command line refuses it
+    with `RUST_SRC_REFUSAL`. A card outside COMMAND_LINE_CARDS builds through no command line yet, so its set
+    travels as the arguments of `size.variant`.
     """
     if card not in COMMAND_LINE_CARDS:
         raise ValueError("the card %s builds through no command line, so its set travels through size.variant" % card)
@@ -514,12 +522,12 @@ def cli_toolchain(argv, env) -> dict:
 
     A notebook may run the program cargo-aosabi itself, for a build of the
     card docker among others, and the command line at `source` refuses the
-    shared pin, which carries no rust-src before step 3 of Z21, so `run` and
-    `serve` of procs.py give such a call the copy where the switch of its
-    environment reads `source`, the environment names no toolchain of its own
-    and the program reads the switch. A command line that reads no switch
-    builds stock at every value, so it keeps the toolchain it finds, as does
-    any other call and every call at `prebuilt`.
+    shared pin, which carries no rust-src before `RUST_SRC_COMMAND` adds it,
+    so `run` and `serve` of procs.py give such a call the copy where the
+    switch of its environment reads `source`, the environment names no
+    toolchain of its own and the program reads the switch. A command line
+    that reads no switch builds stock at every value, so it keeps the
+    toolchain it finds, as does any other call and every call at `prebuilt`.
     """
     if not argv or Path(str(argv[0])).name != CLI_PROGRAM or env.get("RUSTUP_TOOLCHAIN"):
         return {}

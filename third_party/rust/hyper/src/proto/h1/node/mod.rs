@@ -7,8 +7,8 @@
  * lib/_http_common.js:53 and :62-63, http.maxHeaderSize,
  * lib/_http_server.js:468-510, :1094-1104 and :1110-1114,
  * lib/_http_outgoing.js:388-392 and src/node_http_parser.cc:84-86 and
- * :751-764, and ADR-0026 of Aosabi, sections on JSON content coding and on
- * the limits outside the API, for max_request and max_response. The
+ * :751-764. Aosabi adds max_request and max_response, the bounds a device
+ * card sets on a whole request and on each body or chunk it writes. The
  * bounds of ESP32C3 are the bounds of a device card and no quirk.
  */
 //! The configuration of the Node connection and the modules of the Node parity layer.
@@ -32,7 +32,7 @@ pub(crate) mod timers;
 pub enum OverFields {
     /// Refuses the head with 431, as hyper refuses a head past its
     /// `max_headers`, where Node drops every field past the first 1,023
-    /// (divergence D74 of quirk Q26).
+    /// (a named divergence from quirk `NODE_FIELD_WINDOWS`).
     Overflow,
     /// Refuses the request with Node's fixed 413, the bound of a device card.
     Refuse,

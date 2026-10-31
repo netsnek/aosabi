@@ -28,7 +28,7 @@
 //! the introspection of the remote schema, whose request carries no context,
 //! so a function that forwards a header of the caller sends that header
 //! empty to the introspection. `aosabi-compat` registers that as
-//! `Q77_FEDERATION_INTROSPECTION_HEADERS`.
+//! `FEDERATION_INTROSPECTION_HEADERS`.
 //!
 //! Under the feature `host-headers`, which only the builds of the
 //! TypeScript option take, `HostHeaders` is the headers function of the

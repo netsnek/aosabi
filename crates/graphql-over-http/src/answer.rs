@@ -15,8 +15,8 @@
 //! The function reads GET and POST JSON, and forms, `application/graphql` and
 //! uploads, it refuses a wrong method, a mutation over GET, broken parameters,
 //! an unknown body and a batch, it answers with the status and the type the
-//! client accepts, JSON or an event stream and never `multipart/mixed`, the
-//! named divergence D59, it masks unexpected errors, and it caches parsed and
+//! client accepts, JSON or an event stream and never `multipart/mixed`, a
+//! named divergence, it masks unexpected errors, and it caches parsed and
 //! validated documents. Each step stands where its plugin stood in Yoga's
 //! list, so every hook of an app's plugin runs at Yoga's point and in Yoga's
 //! order:
@@ -190,7 +190,7 @@ fn on_request_steps(
         return empty_response(200, None, &headers).map(Some);
     }
     // The engine answers no `OPTIONS` request, which falls through to the web
-    // server or the host as an unhandled route does, the named divergence D46.
+    // server or the host as an unhandled route does, a named divergence.
     if upper_ascii_exact(&request.method) == "OPTIONS" {
         return new_response(
             ResponseBody::Text(Vec::new()),

@@ -6,8 +6,9 @@
  * Translation of Node 24.13.0 lib/_http_common.js:53,
  * lib/_http_server.js:1161-1205, lib/_http_outgoing.js:341-360 and :610-625,
  * and @hono/node-server 1.19.9 dist/listener.js:375-387 and :509-548. It holds
- * the types of the quirks Q19, Q26, Q38, Q47 and Q59 of docs/byte-equality.md
- * section 13 of Aosabi, and no logic.
+ * the types of the quirks LLHTTP_TARGET_RAW, NODE_FIELD_WINDOWS,
+ * NODE_CONTINUE_EAGER, NODE_CLEANUP_INCOMING and NODE_RECORD_CHECK_500, and no
+ * logic.
  */
 //! The extensions of the Node parity layer.
 
@@ -20,7 +21,7 @@ pub use crate::proto::h1::node::methods::NODE_METHODS;
 /// llhttp accepts bytes in a target that `http::Uri` refuses, and the `Uri` of a
 /// request the Node parser reads is built with those bytes percent encoded and
 /// without the fragment. An adapter that needs the target as Node saw it reads it
-/// here (quirk Q19).
+/// here (quirk `LLHTTP_TARGET_RAW`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RawTarget(pub Bytes);
 
@@ -28,7 +29,8 @@ pub struct RawTarget(pub Bytes);
 ///
 /// Node checks `Host` and `Expect` of an HTTP/1.1 request and reads `TE`, and
 /// the parser reads all three over every field of a head, as llhttp sets its
-/// flags (quirk Q20 and divergence D74 of quirk Q26).
+/// flags (quirk `LLHTTP_FOUR_VERSIONS` and a named divergence from quirk
+/// `NODE_FIELD_WINDOWS`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NodeHead {
     /// The version of the request line, one of the four llhttp accepts.
@@ -75,13 +77,13 @@ pub enum NodeExpect {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NodeAnswer {
     /// The first write of the answer, which decides where its head goes
-    /// against a queued `100 Continue` (quirk Q38).
+    /// against a queued `100 Continue` (quirk `NODE_CONTINUE_EAGER`).
     pub first_write: FirstWrite,
     /// Whether the connection cleans up an unread request body after the
-    /// answer as the adapter does (quirk Q47).
+    /// answer as the adapter does (quirk `NODE_CLEANUP_INCOMING`).
     pub cleanup_incoming: bool,
     /// Whether the connection ends with no further byte after the answer, as
-    /// Node's check of a record destroys it (quirk Q59).
+    /// Node's check of a record destroys it (quirk `NODE_RECORD_CHECK_500`).
     pub destroy: bool,
 }
 

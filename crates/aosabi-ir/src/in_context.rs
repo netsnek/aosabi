@@ -16,8 +16,8 @@
 //!
 //! The reference assembles `schema.graphql` as the printed IR, a blank line,
 //! `IN_CONTEXT_SDL` and one newline. The constant carries U+2014 inside a
-//! description, quirk `Q11_IN_CONTEXT_EM_DASH`, so it is never typed by hand.
-//! The extractor evaluates the escapes of the template literal and writes the
+//! description, quirk `IN_CONTEXT_EM_DASH`, so it is never typed by hand. The
+//! extractor evaluates the escapes of the template literal and writes the
 //! evaluated string, and this module includes that file.
 
 /// The SDL of the `@inContext` directive.

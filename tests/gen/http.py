@@ -216,57 +216,81 @@ def defaults_cases(variant: str) -> list[HttpCase]:
     """
     if variant not in VARIANTS + DEFAULTS_VARIANTS:
         raise ValueError("no variant named %s" % variant)
-    return qd055_cases(variant) + qd024_cases(variant) + qd275_cases(variant) + qd021_cases(variant) + qd228_cases(variant)
+    return (star_origin_cases(variant) + origin_list_cases(variant) + no_options_cases(variant)
+            + no_cors_cases(variant) + no_viewer_cases(variant) + endpoint_ending_cases(variant)
+            + endpoint_slash_cases(variant))
 
 
-def qd055_cases(variant: str) -> list[HttpCase]:
-    """QD-055, D46: under `cors_star`, a POST and a preflight from an origin the star would match."""
+def star_origin_cases(variant: str) -> list[HttpCase]:
+    """Under `cors_star`, a POST and a preflight from an origin the star would match."""
     if variant != "cors_star":
         return []
     origin = ("Origin", "https://a.example.invalid")
     return [
-        make("D", "d-qd055-post-origin", "POST", "/graphql", [("Content-Type", "application/json"), origin], json_body()),
-        make("D", "d-qd055-preflight-headers", "OPTIONS", "/graphql",
+        make("D", "d-star-origin-post", "POST", "/graphql", [("Content-Type", "application/json"), origin], json_body()),
+        make("D", "d-star-origin-preflight", "OPTIONS", "/graphql",
              [origin, ("Access-Control-Request-Method", "POST"), ("Access-Control-Request-Headers", "content-type")]),
     ]
 
 
-def qd024_cases(variant: str) -> list[HttpCase]:
-    """QD-024, D46: under `cors_list`, a POST from the origin `null`, from an origin outside the list and from one in it."""
+def origin_list_cases(variant: str) -> list[HttpCase]:
+    """Under `cors_list`, a POST from the origin `null`, from an origin outside the list and from one in it."""
     if variant != "cors_list":
         return []
     json_type = ("Content-Type", "application/json")
     return [
-        make("D", "d-qd024-origin-null", "POST", "/graphql", [json_type, ("Origin", "null")], json_body()),
-        make("D", "d-qd024-post-outside", "POST", "/graphql", [json_type, ("Origin", "https://c.example.invalid")], json_body()),
-        make("D", "d-qd024-post-inside", "POST", "/graphql", [json_type, ("Origin", "https://a.example.invalid")], json_body()),
+        make("D", "d-origin-list-null", "POST", "/graphql", [json_type, ("Origin", "null")], json_body()),
+        make("D", "d-origin-list-outside", "POST", "/graphql", [json_type, ("Origin", "https://c.example.invalid")], json_body()),
+        make("D", "d-origin-list-inside", "POST", "/graphql", [json_type, ("Origin", "https://a.example.invalid")], json_body()),
     ]
 
 
-def qd275_cases(variant: str) -> list[HttpCase]:
-    """QD-275, D46: an `OPTIONS` request to an unknown path and to the health check, the first coded."""
+def no_options_cases(variant: str) -> list[HttpCase]:
+    """An `OPTIONS` request to an unknown path and to the health check, the first coded."""
     return [
-        make("D", "d-qd275-options-unknown-gzip", "OPTIONS", "/nothing-here",
+        make("D", "d-options-unknown-gzip", "OPTIONS", "/nothing-here",
              [("Accept", "text/html"), ("Accept-Encoding", "gzip")]),
-        make("D", "d-qd275-options-health", "OPTIONS", "/health", [("Origin", ORIGIN)]),
+        make("D", "d-options-health", "OPTIONS", "/health", [("Origin", ORIGIN)]),
     ]
 
 
-def qd021_cases(variant: str) -> list[HttpCase]:
+def no_cors_cases(variant: str) -> list[HttpCase]:
     """QD-021, D46: a POST, the page of GraphiQL and an unknown path, each from an origin."""
     origin = ("Origin", ORIGIN)
     return [
-        make("D", "d-qd021-post-origin", "POST", "/graphql", [("Content-Type", "application/json"), origin], json_body()),
+        make("D", "d-no-cors-post", "POST", "/graphql", [("Content-Type", "application/json"), origin], json_body()),
         make("D", "d-qd021-graphiql-origin", "GET", "/graphql", [("Accept", "text/html"), origin]),
-        make("D", "d-qd021-unknown-origin", "GET", "/nothing-here", [("Accept", "text/html"), origin]),
+        make("D", "d-no-cors-unknown", "GET", "/nothing-here", [("Accept", "text/html"), origin]),
     ]
 
 
-def qd228_cases(variant: str) -> list[HttpCase]:
-    """QD-228, D48: the viewer, by GET and by HEAD."""
+def no_viewer_cases(variant: str) -> list[HttpCase]:
+    """The viewer, by GET and by HEAD."""
     return [
-        make("D", "d-qd228-viewer", "GET", "/viewer", [("Accept", "text/html")]),
-        make("D", "d-qd228-viewer-head", "HEAD", "/viewer", []),
+        make("D", "d-no-viewer", "GET", "/viewer", [("Accept", "text/html")]),
+        make("D", "d-no-viewer-head", "HEAD", "/viewer", []),
+    ]
+
+
+def endpoint_ending_cases(variant: str) -> list[HttpCase]:
+    """A POST to a path that ends in the endpoint and a query that ends in it."""
+    return [
+        make("D", "d-endpoint-ending-nested", "POST", "/a/b/graphql", [("Content-Type", "application/json")],
+             json_body()),
+        make("D", "d-endpoint-ending-query", "GET", "/nothing?to=/graphql", [("Accept", "application/json")]),
+    ]
+
+
+def endpoint_slash_cases(variant: str) -> list[HttpCase]:
+    """A GET to the endpoint and a slash, beside the POST of case t28 of family T.
+
+    A GET to a path that goes on past the endpoint stands beside it, which Yoga
+    takes for no request to the endpoint either, so both sides answer it as the
+    reference does.
+    """
+    return [
+        make("D", "d-endpoint-slash-get", "GET", get_target(path="/graphql/"), [("Accept", "application/json")]),
+        make("D", "d-endpoint-slash-longer", "GET", get_target(path="/graphqlx"), [("Accept", "application/json")]),
     ]
 
 

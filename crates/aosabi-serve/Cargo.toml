@@ -67,9 +67,8 @@ rustls = { version = "0.23.46", optional = true, default-features = false, featu
 rustix = { version = "1.1.5", optional = true, default-features = false, features = ["std", "event", "net"] }
 
 # The runtime with one timer beyond the 32 bit range of a wait, which accepts
-# one connection, the probe of the timeout of the epoll reactor that
-# tests/notebooks/08_card_builds.ipynb builds for the host with each backend
-# of rustix and for the player and runs, and which ships in no artifact.
+# one connection, the probe of the timeout of the epoll reactor, which ships in
+# no artifact.
 [[example]]
 name = "far_timer"
 path = "examples/far_timer.rs"

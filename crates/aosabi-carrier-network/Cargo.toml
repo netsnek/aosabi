@@ -31,9 +31,9 @@ homa-ip = [
     "homa/ip",
 ]
 # The kernel path over the socket of the crate's kernel module, whose code
-# stage H5 writes with the feature kernel-socket of homa. Until then it takes
-# the raw path for the modules both paths share, and a path of the kernel
-# reads NoModule.
+# comes later with the feature kernel-socket of homa. Until then it takes the
+# raw path for the modules both paths share, and a path of the kernel reads
+# NoModule.
 homa-kernel = ["homa-ip"]
 
 [dependencies]

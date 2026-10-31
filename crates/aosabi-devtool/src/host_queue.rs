@@ -94,8 +94,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "host-queue";
 
-/// The batch the primitive lands at.
-const LANDS_AT: &str = "TS1";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "ts";
 
 /// The operations of the protocol.
 const OPERATIONS: &Operations = &[("scenario", op_scenario)];

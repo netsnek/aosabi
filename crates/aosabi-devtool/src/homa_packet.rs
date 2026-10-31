@@ -88,8 +88,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "homa-packet";
 
-/// The stage of the Homa track the primitive lands at.
-pub const LANDS_AT: &str = "H0";
+/// The area the primitive lands at.
+pub const LANDS_AT: &str = "homa";
 
 /// The largest integer a double carries without a gap, 2^53 - 1.
 const MAX_SAFE_INTEGER: f64 = 9_007_199_254_740_991.0;

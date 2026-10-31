@@ -402,7 +402,7 @@ def serve_development(name: str, port: int, variant: str = "default", env: dict 
                  name="%s %s development" % (name, variant), timeout_s=timeout_s)
 
 
-def serve_ts1(name: str, port: int, host: str, module, variant: str = "default", node_env: str | None = "test",
+def serve_ts_side(name: str, port: int, host: str, module, variant: str = "default", node_env: str | None = "test",
               mode: str = "faithful", read: str = "get", root=None, timeout_s: float = 90.0, env=None,
               ready=None) -> Server:
     """The side is the reference's own build of the fixture with only its import specifiers

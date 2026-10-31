@@ -247,15 +247,15 @@ const GAP: &str = "  ";
 const CLIENT_FILES: [&str; 3] = ["client/types.ts", "client/index.ts", "client/index.js"];
 
 /// What the log says of a `worker` build.
-const WORKER_NOTE: &str = "the Workers entry lands at M12";
+const WORKER_NOTE: &str = "the Workers entry lands with a later release";
 
 /// What the log says of an `esp32c3-devkitm1` build.
 const MCU_NOTE: &str =
-    "the GraphQL stack enters the image at round 3 of M12 and the card build at DC9";
+    "the GraphQL stack enters the image with a later release and the card build with device cards";
 
 /// What the log says of an `esp32c3-devkitm1` build over a facade that is no
 /// path facade, which compiles nothing.
-const MCU_NO_PATH_NOTE: &str = "the kernel crates build from the workspace of a path facade alone, and the card build lands at DC9";
+const MCU_NO_PATH_NOTE: &str = "the kernel crates build from the workspace of a path facade alone, and the card build lands with device cards";
 
 /// What [`run`] did.
 #[derive(Clone, Debug, Default)]
@@ -1669,7 +1669,7 @@ fn log(
     let mut text = format!(
         "  device    {}, built in\n  payload   none, a built in card\n  \
          build     0 declared build scripts, {scripts}, sandbox none, 0 network\n  \
-         artifact  {artifact}\n  docs      none until M14\n",
+         artifact  {artifact}\n  docs      none until a later release\n",
         card.name
     );
     match image {

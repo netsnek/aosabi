@@ -479,7 +479,7 @@ fn options_of(request: &JsObject) -> Result<ZitadelAuthOptions, JsString> {
         };
         let unknown = || {
             JsString::from(format!(
-                "principal: no mapper \"{id}\" for {option}, the ids of tests/sidecar/zitadel.md"
+                "principal: no mapper \"{id}\" for {option}, not one of the ids of the table of mappers"
             ))
         };
         match option.as_str() {

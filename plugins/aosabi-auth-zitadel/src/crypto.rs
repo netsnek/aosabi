@@ -64,7 +64,7 @@ use crate::oidc::errors::UnsupportedOperationError;
 
 /// The message every call answers on a target with no signer.
 #[cfg(not(all(unix, feature = "ring", not(feature = "host-crypto"))))]
-const NO_CRYPTO: &str = "crypto is not available on this card until M12";
+const NO_CRYPTO: &str = "crypto is not available on this card until a later release";
 
 /// The `CryptoKey` of a private RSA key for `RSASSA-PKCS1-v1_5` with SHA-256.
 #[cfg(all(unix, feature = "ring", not(feature = "host-crypto")))]
@@ -307,6 +307,8 @@ fn modulus_bits(der: &[u8]) -> Option<usize> {
 /// Answers the `TypeError` of rule 9, since this target has no signer.
 ///
 /// # Errors
+///
+/// Always returns the `TypeError` `crypto is not available on this card until a later release`.
 #[cfg(not(any(feature = "host-crypto", all(unix, feature = "ring"))))]
 pub(crate) fn import_private_key(_pem: &str) -> Result<PrivateKey, Thrown> {
     Err(Thrown::type_error(NO_CRYPTO))
@@ -394,6 +396,8 @@ pub fn verify_rs256(pem: &str, data: &[u8], signature: &[u8]) -> Result<bool, Th
 /// Answers the `TypeError` of rule 9, since this target has no verifier.
 ///
 /// # Errors
+///
+/// Always returns the `TypeError` `crypto is not available on this card until a later release`.
 #[cfg(not(all(unix, feature = "ring", not(feature = "host-crypto"))))]
 #[doc(hidden)]
 pub fn verify_rs256(_pem: &str, _data: &[u8], _signature: &[u8]) -> Result<bool, Thrown> {
@@ -421,6 +425,8 @@ pub(crate) fn sha256(data: &[u8]) -> Result<[u8; 32], Thrown> {
 /// Answers the `TypeError` of rule 9, since this target has no digest.
 ///
 /// # Errors
+///
+/// Always returns the `TypeError` `crypto is not available on this card until a later release`.
 #[cfg(not(any(feature = "host-crypto", all(unix, feature = "ring"))))]
 pub(crate) fn sha256(_data: &[u8]) -> Result<[u8; 32], Thrown> {
     Err(Thrown::type_error(NO_CRYPTO))

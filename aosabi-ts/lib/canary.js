@@ -87,7 +87,7 @@ export const authMiddleware = (checks = {}) => {
     if (!auth) {
       throw new HTTPException(401, { message: "Authentication required" });
     }
-    // No user is refused like no auth state, divergence D50 (P1).
+    // No user is refused like no auth state, a named divergence.
     if (!auth.user) {
       throw new HTTPException(401, { message: "Authentication required" });
     }

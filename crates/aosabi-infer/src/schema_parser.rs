@@ -1584,7 +1584,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
                 }
                 Processing::Inputs => {
                     // An input field takes the documentation of its type and
-                    // not of its property, quirk `Q15_INPUT_DESCRIPTION_FROM_TYPE`.
+                    // not of its property, quirk `INPUT_DESCRIPTION_FROM_TYPE`.
                     let description = self.get_type_documentation(field_type);
                     let field = Argument {
                         name: String::from(property_name),
@@ -1647,7 +1647,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
     /// `schema-parser.ts:909-926`.
     ///
     /// A deprecation tag folds into the text like every other tag, quirk
-    /// `Q07_NO_DEPRECATED`.
+    /// `NO_DEPRECATED`.
     fn get_symbol_documentation(&self, symbol: S::Symbol) -> String {
         let mut header = self.source.get_documentation_comment(symbol);
 
@@ -1966,7 +1966,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
     /// which returns at the first guard. In the output direction every
     /// member that is no `null`, no `undefined` and no primitive is walked.
     /// In the input direction the non nullable type is walked, and of a union
-    /// the first member alone, quirk `Q09_INPUT_UNION_FIRST_MEMBER`.
+    /// the first member alone, quirk `INPUT_UNION_FIRST_MEMBER`.
     fn rec_loop_union(
         &mut self,
         reference_schema: &mut ReferenceSchemaOf<S>,

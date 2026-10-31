@@ -6,9 +6,8 @@
  * Translation of the request grammar of llhttp 9.3.0, src/llhttp/http.ts,
  * src/llhttp/url.ts, src/llhttp/constants.ts and src/native/http.c, as Node
  * 24.13.0 counts and reads it in src/node_http_parser.cc:305-358 and
- * lib/_http_server.js:1161-1205. Each item names the quirk of
- * docs/byte-equality.md section 13.1 or the divergence of its section 3 it
- * implements.
+ * lib/_http_server.js:1161-1205. Each item names the quirk or the named
+ * divergence it implements.
  */
 //! The incremental head parser of llhttp 9.3.0 as Node 24.13.0 applies it.
 //!
@@ -16,8 +15,9 @@
 //! so a head that arrives one byte at a time costs time linear in its length.
 //! It keeps the target and the names and values of the fields it keeps, and it
 //! drops every byte it skips as it reads it: the empty lines before a request
-//! line, which it reads as hyper's own parser reads them (divergence D73 of
-//! quirk Q21), and the whitespace before a value (quirk Q25).
+//! line, which it reads as hyper's own parser reads them (a named divergence
+//! from quirk `LLHTTP_REQUEST_LINE`), and the whitespace before a value (quirk
+//! `NODE_HEAD_COUNT`).
 
 use alloc::vec::Vec;
 use core::fmt;
@@ -44,7 +44,9 @@ pub(crate) enum Refusal {
     Invalid(Part),
     /// The counted bytes of a head or of a trailer section reached their
     /// bound, or a head holds a field past the bound of the server cards,
-    /// answered with 431 (quirks Q25 and Q32, divergence D74 of quirk Q26).
+    /// answered with 431 (quirks `NODE_HEAD_COUNT` and
+    /// `LLHTTP_TRAILERS_COUNTED`, a named divergence from quirk
+    /// `NODE_FIELD_WINDOWS`).
     HeaderOverflow,
     /// A bound of chunk extensions or of the configuration, answered with 413.
     TooLarge,
@@ -84,19 +86,21 @@ pub(crate) fn refusal_of(error: &io::Error) -> Refusal {
 /// The part of a request a refused byte belongs to.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Part {
-    /// The method of the request line (quirk Q18).
+    /// The method of the request line (quirk `LLHTTP_METHODS`).
     Method,
-    /// The target of the request line (quirk Q19).
+    /// The target of the request line (quirk `LLHTTP_TARGET_RAW`).
     Target,
-    /// The version of the request line and its end (quirks Q20 and Q21).
+    /// The version of the request line and its end (quirks `LLHTTP_FOUR_VERSIONS`
+    /// and `LLHTTP_REQUEST_LINE`).
     Version,
-    /// A field line (quirks Q22 and Q23).
+    /// A field line (quirks `LLHTTP_CRLF_ONLY` and `LLHTTP_FIELDS`).
     Field,
-    /// A `Content-Length` (quirk Q24).
+    /// A `Content-Length` (quirk `LLHTTP_FRAMING_FIELDS`).
     Length,
-    /// A `Transfer-Encoding` (quirk Q24).
+    /// A `Transfer-Encoding` (quirk `LLHTTP_FRAMING_FIELDS`).
     Encoding,
-    /// A byte after a request that is not kept alive (quirk Q41).
+    /// A byte after a request that is not kept alive (quirk
+    /// `NODE_CLOSED_CONNECTION`).
     Closed,
 }
 
@@ -111,7 +115,8 @@ pub(crate) enum Framing {
     Chunked,
     /// A `Transfer-Encoding` of a request whose last coding is not chunked,
     /// which llhttp refuses after the callback of the head, so Node's own
-    /// checks and the request listener run before the refusal (quirk Q24).
+    /// checks and the request listener run before the refusal (quirk
+    /// `LLHTTP_FRAMING_FIELDS`).
     Refused,
 }
 
@@ -273,11 +278,12 @@ pub(crate) enum Parsed {
 /// A request head the parser has completed.
 #[derive(Debug)]
 pub(crate) struct Head {
-    /// The method, one of [`methods::NODE_METHODS`] (quirk Q18).
+    /// The method, one of [`methods::NODE_METHODS`] (quirk `LLHTTP_METHODS`).
     pub(crate) method: Method,
-    /// What Node's own checks read of the head (quirks Q20 and Q26).
+    /// What Node's own checks read of the head (quirks `LLHTTP_FOUR_VERSIONS` and
+    /// `NODE_FIELD_WINDOWS`).
     pub(crate) node: NodeHead,
-    /// The framing of the body (quirk Q24).
+    /// The framing of the body (quirk `LLHTTP_FRAMING_FIELDS`).
     pub(crate) framing: Framing,
     /// Whether a field named `Upgrade` has a value, which hyper's own path reads.
     pub(crate) upgrade_field: bool,
@@ -321,7 +327,7 @@ impl NodeParser {
     /// token bytes, their names and values count from zero toward `max_head`,
     /// no field is kept, and the flags of a chunked body stand, so a
     /// `Content-Length` or a `Transfer-Encoding` among them is refused as
-    /// llhttp refuses it (quirk Q32).
+    /// llhttp refuses it (quirk `LLHTTP_TRAILERS_COUNTED`).
     #[cfg(feature = "node-chunked")]
     pub(crate) fn trailers(limits: NodeLimits) -> Self {
         let mut parser = NodeParser::new(limits);
@@ -340,7 +346,7 @@ impl NodeParser {
 
     /// Prepares the parser for the next message, a request when the one before
     /// it is kept alive and a refusal of every byte but CR and LF otherwise
-    /// (quirk Q41).
+    /// (quirk `NODE_CLOSED_CONNECTION`).
     #[cfg(feature = "node-conn")]
     pub(crate) fn next_message(&mut self, keep_alive: bool) {
         *self = NodeParser::new(self.limits);
@@ -380,8 +386,8 @@ impl NodeParser {
             match self.state {
                 // The empty lines before a request line, each a CRLF or a lone
                 // LF, are skipped and not kept, and a CR before any other byte
-                // is refused, as hyper's own parser reads them (divergence D73
-                // of quirk Q21).
+                // is refused, as hyper's own parser reads them (a named
+                // divergence from quirk LLHTTP_REQUEST_LINE).
                 State::Start => match b {
                     b'\n' => return Ok(false),
                     b'\r' => {
@@ -397,7 +403,8 @@ impl NodeParser {
                 State::Method => return self.method_byte(b).map(|()| false),
                 State::SpacesBeforeTarget => match b {
                     // One space parts the method from the target, so a second
-                    // space or a tab is refused (divergence D73 of quirk Q21).
+                    // space or a tab is refused (a named divergence from quirk
+                    // LLHTTP_REQUEST_LINE).
                     b' ' | b'\t' | 0x0c => return Err(Refusal::Invalid(Part::Target)),
                     _ => {
                         self.target = self.kept.len()..self.kept.len();
@@ -411,7 +418,8 @@ impl NodeParser {
                 },
                 State::Target(url) => return self.target_byte(url, b).map(|()| false),
                 // One space parts the target from the version, so a second
-                // space is refused (divergence D73 of quirk Q21).
+                // space is refused (a named divergence from quirk
+                // LLHTTP_REQUEST_LINE).
                 State::SpacesBeforeVersion => {
                     if b == b' ' {
                         return Err(Refusal::Invalid(Part::Version));
@@ -428,7 +436,7 @@ impl NodeParser {
                     self.version = (0, 9);
                     return self.expect(b, b'\n', State::HeadersStart, Part::Target);
                 }
-                // A field line never starts with a space (quirk Q23).
+                // A field line never starts with a space (quirk LLHTTP_FIELDS).
                 State::HeadersStart => {
                     if b == b' ' {
                         return Err(Refusal::Invalid(Part::Field));
@@ -440,7 +448,7 @@ impl NodeParser {
                         self.state = State::HeadLf;
                         return Ok(false);
                     }
-                    // Every line ends in CRLF (quirk Q22).
+                    // Every line ends in CRLF (quirk LLHTTP_CRLF_ONLY).
                     b'\n' | b':' => return Err(Refusal::Invalid(Part::Field)),
                     _ => self.begin_field()?,
                 },
@@ -456,7 +464,7 @@ impl NodeParser {
                 },
                 State::DiscardWsLf => return self.expect(b, b'\n', State::DiscardLws, Part::Field),
                 // An empty value followed by a space or a tab is an obsolete
-                // line folding, which llhttp refuses (quirk Q23).
+                // line folding, which llhttp refuses (quirk LLHTTP_FIELDS).
                 State::DiscardLws => {
                     if b == b' ' || b == b'\t' {
                         return Err(Refusal::Invalid(Part::Field));
@@ -489,7 +497,7 @@ impl NodeParser {
                 }
                 State::Done => return Ok(false),
                 // A byte other than CR and LF after a request that is not kept
-                // alive is refused (quirk Q41).
+                // alive is refused (quirk NODE_CLOSED_CONNECTION).
                 State::Closed => {
                     if b == b'\r' || b == b'\n' {
                         return Ok(false);
@@ -510,7 +518,7 @@ impl NodeParser {
     }
 
     /// Reads a byte of the method, which ends at its one space and is one of
-    /// the 35 methods of Node (quirk Q18).
+    /// the 35 methods of Node (quirk `LLHTTP_METHODS`).
     fn method_byte(&mut self, b: u8) -> Result<(), Refusal> {
         if b == b' ' {
             self.method =
@@ -526,12 +534,13 @@ impl NodeParser {
         Ok(())
     }
 
-    /// Reads a byte of the target in llhttp's grammar of a URL (quirk Q19).
+    /// Reads a byte of the target in llhttp's grammar of a URL (quirk
+    /// `LLHTTP_TARGET_RAW`).
     ///
     /// The target is one or more bytes of llhttp's URL class, `#` and `?`
     /// included, and a control byte, a tab or a byte from 0x80 up is refused.
     /// A target that ends at CR or LF has no version, which llhttp reads as
-    /// HTTP/0.9 (quirk Q20).
+    /// HTTP/0.9 (quirk `LLHTTP_FOUR_VERSIONS`).
     fn target_byte(&mut self, url: Url, b: u8) -> Result<(), Refusal> {
         let next = match url_next(url, b) {
             Ok(next) => next,
@@ -580,7 +589,7 @@ impl NodeParser {
     }
 
     /// Reads a digit of the version, of which llhttp takes HTTP/0.9, 1.0, 1.1
-    /// and 2.0 (quirk Q20).
+    /// and 2.0 (quirk `LLHTTP_FOUR_VERSIONS`).
     fn version_byte(&mut self, b: u8) -> Result<(), Refusal> {
         if !b.is_ascii_digit() {
             return Err(Refusal::Invalid(Part::Version));
@@ -600,7 +609,8 @@ impl NodeParser {
 
     /// Begins a field line, and refuses a head with a field past `max_fields`
     /// as hyper's own parser refuses one past its `max_headers`, where Node's
-    /// window dropped the rest (divergence D74 of quirk Q26).
+    /// window dropped the rest (a named divergence from quirk
+    /// `NODE_FIELD_WINDOWS`).
     fn begin_field(&mut self) -> Result<(), Refusal> {
         self.field_count += 1;
         if !self.trailers && self.field_count > self.limits.max_fields {
@@ -617,7 +627,7 @@ impl NodeParser {
     }
 
     /// Reads a byte of a field name, token bytes directly before the colon
-    /// (quirk Q23).
+    /// (quirk `LLHTTP_FIELDS`).
     fn name_byte(&mut self, b: u8) -> Result<(), Refusal> {
         if b == b':' {
             let name = if self.word_len <= WORD {
@@ -633,7 +643,8 @@ impl NodeParser {
                 _ => Special::General,
             };
             // A `Transfer-Encoding` beside a `Content-Length` is refused in
-            // either order, as llhttp 9 refuses it (quirk Q24).
+            // either order, as llhttp 9 refuses it (quirk
+            // LLHTTP_FRAMING_FIELDS).
             match self.special {
                 Special::Encoding if self.flags & CONTENT_LENGTH != 0 => {
                     return Err(Refusal::Invalid(Part::Encoding));
@@ -660,7 +671,8 @@ impl NodeParser {
     }
 
     /// Begins the value of a field at its first byte after the whitespace
-    /// llhttp skips, in the grammar its name selects (quirks Q23 and Q24).
+    /// llhttp skips, in the grammar its name selects (quirks `LLHTTP_FIELDS`
+    /// and `LLHTTP_FRAMING_FIELDS`).
     fn begin_value(&mut self) -> Result<(), Refusal> {
         let value = match self.special {
             Special::General => Value::General,
@@ -670,7 +682,7 @@ impl NodeParser {
             }
             // A `Transfer-Encoding` after one whose last coding is
             // `chunked` is refused, as a request names nothing after
-            // `chunked` (quirk Q24).
+            // `chunked` (quirk LLHTTP_FRAMING_FIELDS).
             Special::Encoding => {
                 if self.flags & CHUNKED != 0 {
                     return Err(Refusal::Invalid(Part::Encoding));
@@ -680,7 +692,7 @@ impl NodeParser {
                 Value::TeWord(0)
             }
             // A second `Content-Length` is refused, even with the same value
-            // (quirk Q24).
+            // (quirk LLHTTP_FRAMING_FIELDS).
             Special::Length => {
                 if self.flags & CONTENT_LENGTH != 0 {
                     return Err(Refusal::Invalid(Part::Length));
@@ -699,7 +711,7 @@ impl NodeParser {
     fn value_byte(&mut self, value: Value, b: u8) -> Result<Option<State>, Refusal> {
         let next = match value {
             // A value is a tab, a space, a visible byte or a byte from 0x80
-            // up, NUL and DEL refused (quirk Q23).
+            // up, NUL and DEL refused (quirk LLHTTP_FIELDS).
             Value::General => {
                 if b == b'\r' {
                     return Ok(Some(self.end_value()));
@@ -709,7 +721,8 @@ impl NodeParser {
                 }
                 Value::General
             }
-            // A length is digits alone, with spaces after them (quirk Q24).
+            // A length is digits alone, with spaces after them (quirk
+            // LLHTTP_FRAMING_FIELDS).
             Value::Length => {
                 if !b.is_ascii_digit() {
                     return Ok(self.again(Value::LengthWs));
@@ -730,7 +743,7 @@ impl NodeParser {
                 _ => return Err(Refusal::Invalid(Part::Length)),
             },
             // A body is chunked when the last coding is `chunked` in any case
-            // (quirk Q24).
+            // (quirk LLHTTP_FRAMING_FIELDS).
             Value::TeWord(n) => {
                 if b.to_ascii_lowercase() != b"chunked"[usize::from(n)] {
                     return Ok(self.again(Value::TeToken));
@@ -827,7 +840,7 @@ impl NodeParser {
 
     /// Counts a byte of the target, of a name or of a value, which Node
     /// refuses with 431 once the count reaches `max_head`, and a byte llhttp
-    /// skips counts nothing (quirk Q25).
+    /// skips counts nothing (quirk `NODE_HEAD_COUNT`).
     fn counted(&mut self) -> Result<(), Refusal> {
         self.count += 1;
         if self.count >= self.limits.max_head {
@@ -880,7 +893,7 @@ impl NodeParser {
         let chunked = self.flags & CHUNKED != 0;
         let length = self.flags & CONTENT_LENGTH != 0 && self.content_length > 0;
         // The order of llhttp's `after_headers_complete`, so an upgrade with no
-        // body and a `CONNECT` end at their head (quirk Q24).
+        // body and a `CONNECT` end at their head (quirk LLHTTP_FRAMING_FIELDS).
         let framing = if upgrade && (connect || !(chunked || length)) {
             Framing::None
         } else if chunked {
@@ -893,7 +906,8 @@ impl NodeParser {
         } else {
             Framing::None
         };
-        // Every version but HTTP/1.1 takes the rules of HTTP/1.0 (quirk Q20).
+        // Every version but HTTP/1.1 takes the rules of HTTP/1.0 (quirk
+        // LLHTTP_FOUR_VERSIONS).
         let keep_alive = if self.version == (1, 1) {
             self.flags & CLOSE == 0
         } else {
@@ -902,7 +916,7 @@ impl NodeParser {
         let kept = core::mem::take(&mut self.kept).freeze();
         let fields = core::mem::take(&mut self.fields);
         // `Host`, `Expect` and `TE` are read over every field, as the flags
-        // are (divergence D74 of quirk Q26).
+        // are (a named divergence from quirk NODE_FIELD_WINDOWS).
         let every = fields.as_slice();
         let bytes = &kept;
         let named = move |name: &'static [u8]| {
@@ -1026,13 +1040,13 @@ impl Head {
         self.kept.len() as u64
     }
 
-    /// Returns the target as it arrived (quirk Q19).
+    /// Returns the target as it arrived (quirk `LLHTTP_TARGET_RAW`).
     pub(crate) fn raw_target(&self) -> Bytes {
         self.kept.slice(self.target.clone())
     }
 
     /// Returns the target as an `http::Uri`, without its fragment and with every
-    /// byte `http::Uri` refuses percent encoded (quirk Q19).
+    /// byte `http::Uri` refuses percent encoded (quirk `LLHTTP_TARGET_RAW`).
     pub(crate) fn uri(&self) -> Uri {
         let target = &self.kept[self.target.clone()];
         let target = target
@@ -1085,11 +1099,11 @@ impl Head {
 }
 
 /// Reads a request head on hyper's own path, from the start of the buffer at
-/// every read as hyper's own parse does (quirks Q18 to Q26).
+/// every read as hyper's own parse does (the quirks of `node-llhttp`).
 ///
 /// A version other than HTTP/1.1 takes the rules of HTTP/1.0, as Node applies
-/// them (quirk Q20), and the head carries its [`RawTarget`] and its
-/// [`NodeHead`] among its extensions.
+/// them (quirk `LLHTTP_FOUR_VERSIONS`), and the head carries its [`RawTarget`]
+/// and its [`NodeHead`] among its extensions.
 ///
 /// # Errors
 ///
@@ -1134,8 +1148,9 @@ pub(crate) fn server(buf: &mut BytesMut, ctx: ParseContext<'_>) -> ParseResult<R
     };
     let http11 = version == Version::HTTP_11;
     // Node's match of `100-continue` in any word of the field goes with the
-    // eager `100 Continue` of the Node connection (quirk Q38), so hyper's own
-    // path keeps hyper's exact match of the last `Expect`.
+    // eager `100 Continue` of the Node connection (quirk
+    // NODE_CONTINUE_EAGER), so hyper's own path keeps hyper's exact match of
+    // the last `Expect`.
     let expect_continue = http11
         && headers
             .get_all(http::header::EXPECT)
@@ -1176,7 +1191,8 @@ fn parse_error(refusal: Refusal) -> Parse {
 }
 
 /// The chunk extensions and the trailer section of a chunked body as llhttp
-/// reads them (quirks Q32 and Q33).
+/// reads them (quirks `LLHTTP_TRAILERS_COUNTED` and
+/// `LLHTTP_CHUNK_EXTENSIONS_413`).
 #[cfg(feature = "node-chunked")]
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct Chunked {
@@ -1219,7 +1235,7 @@ impl Chunked {
     ///
     /// The names and values count from zero at each chunk in `count`, and
     /// more than `max_chunk_extensions` of them are refused with 413 (quirk
-    /// Q33).
+    /// `LLHTTP_CHUNK_EXTENSIONS_413`).
     ///
     /// # Errors
     ///
@@ -1256,7 +1272,7 @@ impl Chunked {
     }
 
     /// Reads a byte of the trailer section and returns whether it ends it,
-    /// the trailers dropped (quirk Q32).
+    /// the trailers dropped (quirk `LLHTTP_TRAILERS_COUNTED`).
     ///
     /// # Errors
     ///

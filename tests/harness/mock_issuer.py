@@ -32,8 +32,8 @@ key optional. The scenarios are those of the plan's tables: `ok`, `no_expiry`, `
 login routes reach, and the discovery of a provider scenario adds `introspection_endpoint`, `userinfo_endpoint` and
 the signing algorithms of a JWT answer, which oauth4webapi needs to read a JWT user info answer at all.
 
-Beside them stands a scenario for each token and refusal capture rows C80 to C82 hold, so every observation of those
-rows runs against both sides: the ID tokens of `id_token_bad_iss`, `id_token_expired`, `id_token_no_iat` and
+Beside them stands a scenario for each token and refusal of the capture of the login, so every observation of that
+capture runs against both sides: the ID tokens of `id_token_bad_iss`, `id_token_expired`, `id_token_no_iat` and
 `id_token_no_sub`, the JWT answers of `userinfo_jwt_bad_aud`, `userinfo_jwt_bad_iss`, `introspect_jwt_bad_aud`,
 `introspect_jwt_bad_iss`, `introspect_jwt_no_iat` and `introspect_jwt_no_typ`, and each JWT scenario of the provider
 once more with the suffix `_plain`, whose discovery is the plain document of the capture issuer, the issuer, the

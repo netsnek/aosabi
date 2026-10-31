@@ -5,20 +5,20 @@
  * Translation of the connection of Node 24.13.0, lib/_http_server.js:899-993,
  * :1014-1066 and :1084-1215, lib/_http_outgoing.js:320-396 and :1077-1082 and
  * src/node_http_parser.cc:768-838, and of the listener of @hono/node-server
- * 1.19.9, dist/listener.js:303-311 and :509-548. Each item names the quirk of
- * docs/byte-equality.md section 13.1 it implements.
+ * 1.19.9, dist/listener.js:303-311 and :509-548. Each item names the quirk it
+ * implements.
  */
 //! The Node connection, its requests in flight, its queues and the events of a read in the order of llhttp.
 //!
 //! A read is parsed whole before the services move, as llhttp executes a
-//! read before Node runs the application's promises (quirk Q35), with the two
-//! points where Node runs code inside the read: the request listener inside
-//! the callback of each head, whose service is polled once there, and the
-//! ticks after the callback of each piece of a body, where the services and
-//! the bodies move until neither does. Each head is handed to the service as
-//! soon as it is complete, each answer is written into a queue of its own
-//! until the answers before it have ended, and the answer of the oldest
-//! request goes to the socket as it comes.
+//! read before Node runs the application's promises (quirk `NODE_PIPELINE`),
+//! with the two points where Node runs code inside the read: the request
+//! listener inside the callback of each head, whose service is polled once
+//! there, and the ticks after the callback of each piece of a body, where the
+//! services and the bodies move until neither does. Each head is handed to
+//! the service as soon as it is complete, each answer is written into a queue
+//! of its own until the answers before it have ended, and the answer of the
+//! oldest request goes to the socket as it comes.
 
 use alloc::boxed::Box;
 use alloc::collections::VecDeque;
@@ -251,7 +251,7 @@ where
     ///
     /// The reads pause while the unread request bodies hold `body_buffer`
     /// bytes, as a Node request stream pauses, and after a new head while the
-    /// answers wait to be written (quirk Q35).
+    /// answers wait to be written (quirk `NODE_PIPELINE`).
     fn poll_read(&mut self, cx: &mut Context<'_>) -> bool {
         let pending: usize = self.flight.iter().map(|f| f.pending_len).sum();
         if self.eof || self.paused || pending >= self.config.limits.body_buffer {
@@ -285,7 +285,8 @@ where
         self.timers.read(self.time.now(), &self.config);
         self.execute(cx);
         // A reply of Node written inside the read ends after it, as Node's
-        // `finish` of that reply follows the execute of the parser (quirk Q37).
+        // `finish` of that reply follows the execute of the parser (quirk
+        // NODE_HOST_EXPECT).
         for flight in &mut self.flight {
             flight.held = false;
         }
@@ -313,7 +314,7 @@ where
     }
 
     /// Parses every byte of the read, as llhttp executes a read, before any
-    /// service future is polled (quirk Q35).
+    /// service future is polled (quirk `NODE_PIPELINE`).
     fn execute(&mut self, cx: &mut Context<'_>) {
         while !self.input.is_empty() && self.end.is_none() {
             match &mut self.reading {
@@ -342,7 +343,7 @@ where
                         Ok(frame) => frame.into_data().unwrap_or_default(),
                         // A body llhttp refuses ends the connection, with
                         // Node's fixed answer while the oldest answer has not
-                        // written its head (quirk Q42).
+                        // written its head (quirk NODE_BODY_REFUSAL).
                         Err(e) => return self.refuse_body(refusal_of(&e)),
                     };
                     *decoded += data.len() as u64;
@@ -362,7 +363,8 @@ where
                         }
                         // Node calls the callback of a piece of a body with
                         // its ticks after it, so the services and the bodies
-                        // move before the parser reads on (quirk Q35).
+                        // move before the parser reads on (quirk
+                        // NODE_PIPELINE).
                         self.tick(cx);
                     }
                     if eof {
@@ -391,7 +393,7 @@ where
     /// Moves the services and the bodies until neither moves, the ticks Node
     /// runs after the callback of a piece of a body, in which the `finish` of
     /// an answer written inside the read is emitted, so the hold on it ends
-    /// (quirk Q35).
+    /// (quirk `NODE_PIPELINE`).
     fn tick(&mut self, cx: &mut Context<'_>) {
         for flight in &mut self.flight {
             flight.held = false;
@@ -402,7 +404,8 @@ where
     /// Polls the service of the request handed last once, as Node runs the
     /// request listener inside the callback of the head, so an answer the
     /// listener writes before its first wait goes out inside the read and is
-    /// held to its end, as a reply of Node's own checks is (quirk Q35).
+    /// held to its end, as a reply of Node's own checks is (quirk
+    /// `NODE_PIPELINE`).
     fn listen(&mut self, cx: &mut Context<'_>) {
         let Some(i) = self.flight.len().checked_sub(1) else {
             return;
@@ -432,7 +435,8 @@ where
             self.head_since = None;
         }
         // A `CONNECT` ends the connection with no answer before any check of
-        // Node, and the answers not yet written are lost (quirk Q39).
+        // Node, and the answers not yet written are lost (quirk
+        // NODE_CONNECT_ENDS).
         if head.node.connect {
             return self.finish(ConnectionEnd::Closed);
         }
@@ -446,7 +450,7 @@ where
             return self.refuse(Refusal::TooLarge);
         }
         // Node pauses its reads at a new head while its answers wait to be
-        // written (quirk Q35).
+        // written (quirk NODE_PIPELINE).
         if self.unwritten() >= self.config.write_high_water {
             self.paused = true;
         }
@@ -479,7 +483,8 @@ where
         };
         let http11 = head.node.version == NodeVersion::Http11;
         // Node checks an HTTP/1.1 head alone, a missing `Host` first and then
-        // its `Expect`, and answers either inside the read (quirk Q37).
+        // its `Expect`, and answers either inside the read (quirk
+        // NODE_HOST_EXPECT).
         let status = match head.node.expect {
             _ if !http11 => None,
             _ if head.node.host.is_none() => Some(StatusCode::BAD_REQUEST),
@@ -512,7 +517,8 @@ where
         }
         // A transfer coding without chunked last is refused after the
         // callback of the head, as llhttp's `after_headers_complete` refuses
-        // it, so Node's checks and the listener have run (quirk Q24).
+        // it, so Node's checks and the listener have run (quirk
+        // LLHTTP_FRAMING_FIELDS).
         if framing == Framing::Refused {
             return self.refuse_body(Refusal::Invalid(Part::Encoding));
         }
@@ -522,7 +528,8 @@ where
     }
 
     /// Queues `100 Continue` as Node's `writeContinue` does, at once for the
-    /// oldest request and first in its own queue otherwise (quirk Q38).
+    /// oldest request and first in its own queue otherwise (quirk
+    /// `NODE_CONTINUE_EAGER`).
     #[cfg(feature = "node-continue")]
     fn expect_continue(&mut self, flight: &mut Flight<S::Future, B>, oldest: bool) {
         if oldest {
@@ -578,7 +585,7 @@ where
 
     /// Writes the 400 or the 417 of Node's own checks, inside the read when
     /// its request is the oldest, as Node's `writeHead` and `end` reach the
-    /// socket while llhttp executes the read (quirk Q37).
+    /// socket while llhttp executes the read (quirk `NODE_HOST_EXPECT`).
     fn write_reply(&mut self, flight: &mut Flight<S::Future, B>, oldest: bool) {
         let Some(status) = flight.reply else {
             return;
@@ -654,10 +661,12 @@ where
         }
         self.reading = Reading::Head;
         // The parser refuses a request after one that is not kept alive,
-        // which the connection answers as any refusal (quirk Q41).
+        // which the connection answers as any refusal (quirk
+        // NODE_CLOSED_CONNECTION).
         self.parser.next_message(keep_alive);
         // After a request marked as an upgrade the rest of its read is dropped
-        // unparsed and the next read is parsed from its start (quirk Q40).
+        // unparsed and the next read is parsed from its start (quirk
+        // NODE_UPGRADE_DROPS_READ).
         if upgrade {
             self.input.clear();
         }
@@ -665,7 +674,7 @@ where
 
     /// Ends the connection for a refusal of llhttp or of a bound, with Node's
     /// fixed answer while the oldest answer in flight has not written its
-    /// head and with no byte otherwise (quirk Q36).
+    /// head and with no byte otherwise (quirk `NODE_FIXED_REFUSALS`).
     fn refuse(&mut self, refusal: Refusal) {
         if answers::written(self.flight.front().map(|f| f.started)) {
             self.out.extend_from_slice(answers::fixed(refusal));
@@ -674,7 +683,7 @@ where
     }
 
     /// Ends the connection for a body llhttp refuses, whose request body ends
-    /// with an error (quirk Q42).
+    /// with an error (quirk `NODE_BODY_REFUSAL`).
     fn refuse_body(&mut self, refusal: Refusal) {
         let id = self.body_id;
         if let Some(tx) = self
@@ -692,17 +701,18 @@ where
     fn on_eof(&mut self, cx: &mut Context<'_>) {
         self.eof = true;
         // A message in progress at the end is refused as llhttp's finish
-        // refuses it (quirk Q42).
+        // refuses it (quirk NODE_BODY_REFUSAL).
         if matches!(self.reading, Reading::Body(..)) || self.parser.begun() {
             return self.refuse(Refusal::Invalid(Part::Field));
         }
         // Node ends its side at the client's FIN, so an answer its handler
         // wrote before the tick of the FIN goes out and one written after it
-        // is lost (quirk Q48). Under `node-half-open` the services and the
-        // bodies run until neither moves, as Node's microtasks run before it
-        // reads the FIN, and the answers ready then go out before the
-        // connection ends. Without it the end drops every answer byte not yet
-        // written, as hyper's own connection ends it without `half_close`.
+        // is lost (quirk NODE_HALF_OPEN). Under `node-half-open` the services
+        // and the bodies run until neither moves, as Node's microtasks run
+        // before it reads the FIN, and the answers ready then go out before
+        // the connection ends. Without it the end drops every answer byte not
+        // yet written, as hyper's own connection ends it without
+        // `half_close`.
         if cfg!(feature = "node-half-open") {
             while self.end.is_none() && (self.poll_answers(cx) | self.poll_bodies(cx)) {}
         } else {
@@ -715,8 +725,8 @@ where
     ///
     /// A request body that has ended keeps its bytes and its channel, so its
     /// handler reads it whole while it runs to its answer, as a Node request
-    /// stream that ended holds its bytes when the socket goes (quirk Q45). A
-    /// body that has not ended ends with an error.
+    /// stream that ended holds its bytes when the socket goes (quirk
+    /// `NODE_HANDLERS_RUN_ON`). A body that has not ended ends with an error.
     fn finish(&mut self, end: ConnectionEnd) {
         if self.end.is_none() {
             self.end = Some(end);
@@ -748,7 +758,7 @@ where
 
     /// Writes what is left, shuts the stream and runs every service called
     /// to its answer, which is dropped, handing each the bytes of its body
-    /// that ended (quirk Q45).
+    /// that ended (quirk `NODE_HANDLERS_RUN_ON`).
     fn poll_end(
         &mut self,
         end: ConnectionEnd,
@@ -820,7 +830,8 @@ where
                 return true;
             }
             // A body the service did not read closes the connection when it
-            // has not ended shortly after its answer (quirk Q47).
+            // has not ended shortly after its answer (quirk
+            // NODE_CLEANUP_INCOMING).
             if done.cleanup && !done.body_ended {
                 let after = Duration::from_millis(u64::from(self.config.cleanup_after_ms));
                 self.cleanup = Some((done.id, self.time.now() + after));
@@ -903,7 +914,7 @@ where
             }
             // The head goes in front of a queued `100 Continue` on a first
             // write of bytes of a body with a length, as Node's `_send`
-            // unshifts it (quirk Q38).
+            // unshifts it (quirk NODE_CONTINUE_EAGER).
             let bytes_first =
                 first_write == FirstWrite::Bytes && !encoder.is_eof() && !encoder.is_chunked();
             if oldest {
@@ -927,7 +938,7 @@ where
         };
         loop {
             // The body of an answer that waits is polled while its queue holds
-            // fewer than `answer_high_water` bytes (quirk Q35).
+            // fewer than `answer_high_water` bytes (quirk NODE_PIPELINE).
             if !oldest && flight.queue.len() >= config.answer_high_water {
                 break;
             }
@@ -962,7 +973,7 @@ where
                     self.error = Some(crate::Error::new_user_body(e));
                     flight.failed = Some(ConnectionEnd::StreamError);
                     // A stream that fails ends the connection with no further
-                    // byte, its queue dropped (quirk Q46).
+                    // byte, its queue dropped (quirk NODE_STREAM_ERROR_ENDS).
                     flight.queue.clear();
                     break;
                 }
@@ -1011,7 +1022,7 @@ where
                     }
                     Poll::Ready(Err(_)) => {
                         // The service dropped the body, whose bytes are read to
-                        // their end and dropped (quirk Q47).
+                        // their end and dropped (quirk NODE_CLEANUP_INCOMING).
                         flight.pending.clear();
                         flight.pending_len = 0;
                         flight.tx = None;
@@ -1037,7 +1048,7 @@ where
     }
 
     /// Answers the deadlines of the timers, the cleanup of an unread body
-    /// among them (quirk Q47).
+    /// among them (quirk `NODE_CLEANUP_INCOMING`).
     fn poll_timers(&mut self, cx: &mut Context<'_>) -> bool {
         if matches!(self.time, Time::Empty(_)) {
             return false;
@@ -1069,14 +1080,14 @@ where
         false
     }
 
-    /// Returns the next deadline of Node's timers (quirk Q43).
+    /// Returns the next deadline of Node's timers (quirk `NODE_TIMERS`).
     #[cfg(feature = "node-timers")]
     fn deadline(&self) -> Option<Duration> {
         self.timers.deadline(&self.config)
     }
 
     /// Answers the timers of Node at `now`, a 408 or the idle close (quirk
-    /// Q43).
+    /// `NODE_TIMERS`).
     #[cfg(feature = "node-timers")]
     fn expired(&mut self, now: Duration) -> bool {
         match self.timers.expired(now, &self.config) {

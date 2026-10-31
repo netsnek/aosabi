@@ -10,7 +10,7 @@
 //! `GraphTP`(Homa) reaches Network over IP protocol 146 in the full form of
 //! `homa_wire.h`, never over UDP, on the crate's own engine over a raw socket
 //! by default, and on a host that loads the crate's kernel module over its
-//! socket from stage H5 on. A peer is an address with its Homa port, so two
+//! socket, a later path. A peer is an address with its Homa port, so two
 //! client processes of one host are two peers to a server. The Homa port of a
 //! service is its HTTP port, and a card names how the path under Homa is
 //! protected, since Homa carries no security of its own. The crate serves the
@@ -21,7 +21,7 @@
 //! | --- | --- |
 //! | `network` | `Path`, `Protection`, `Requirement`, `HomaNetwork`, `NetworkError`, `profile` and the configuration of a card's endpoint |
 //! | `homa_ip` | `serve_ip` over the raw socket of `homa::ip`, its task and its counts, under the feature `homa-ip` |
-//! | `homa_kernel` | `serve_kernel` over the socket of the kernel module, under the feature `homa-kernel`, which stage H5 writes |
+//! | `homa_kernel` | `serve_kernel` over the socket of the kernel module, under the feature `homa-kernel`, which comes later |
 //! | `serve` | `driver` and `HomaListen`, the driver `serve_with` starts |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md

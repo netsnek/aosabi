@@ -9,4 +9,4 @@
  */
 
 //! `GraphTP`(Homa) on Network over the socket of the crate's kernel module,
-//! which stage H5 writes.
+//! which comes later.

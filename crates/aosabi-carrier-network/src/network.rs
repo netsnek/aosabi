@@ -112,7 +112,7 @@ pub const PACER_BACKLOG_NS: u64 = 5_000;
 pub const PACER_DEFER_MIN: u32 = 1_000;
 
 /// The bytes of the socket's buffers, above the 400,000 bytes of
-/// `max_incoming` the profile grants at once, as the plan asks of a card.
+/// `max_incoming` the profile grants at once.
 pub const SOCKET_BUFFER: usize = 4 << 20;
 
 /// How `GraphTP`(Homa) reaches Network on this host.
@@ -253,7 +253,7 @@ impl HomaNetwork {
     ///
     /// Returns [`NetworkError::NoProtection`] where the path is named and no
     /// protection is, [`NetworkError::NoModule`] for the kernel path, whose
-    /// client lands at stage H5, and [`NetworkError::Io`] with the kind
+    /// client comes later, and [`NetworkError::Io`] with the kind
     /// `InvalidInput` for a value that names no path, port, protection,
     /// count, address or MTU, and the error of `/dev/urandom`.
     pub fn from_env() -> Result<Option<Self>, NetworkError> {
@@ -382,7 +382,7 @@ impl fmt::Display for NetworkError {
             }
             Self::ForeignModule => f.write_str("ForeignModule: HomaModule holds protocol 146"),
             Self::NoModule => f.write_str(
-                "NoModule: no module of the crate holds protocol 146, the kernel path of stage H5",
+                "NoModule: no module of the crate holds protocol 146 for the kernel path",
             ),
             Self::NoProtection => f.write_str(
                 "NoProtection: the card names GraphTP(Homa) on Network and no protection, ipsec, trusted-fabric or wireguard-without-priorities",

@@ -59,7 +59,7 @@ use crate::{
 };
 
 /// The exit of a process whose Homa port another process holds, `EX_SOFTWARE`
-/// of `sysexits.h`, the exit the plan gives `PortTaken`.
+/// of `sysexits.h`, the exit of `PortTaken`.
 pub const EXIT_PORT_TAKEN: i32 = 70;
 
 /// The exit of a process whose required path cannot open or failed,

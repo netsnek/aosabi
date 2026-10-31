@@ -40,8 +40,8 @@
 //! array written back after the last pass. A plugin of the records is labelled
 //! by its identity, its index in `config.plugins` as the boot found it, or for
 //! an always on plugin its role and the pass that created it, because a name
-//! may be shared or absent and the write back of `Q01` repeats the always on
-//! plugins.
+//! may be shared or absent and the write back of `DUPLICATE_PLUGIN_WRITEBACK`
+//! repeats the always on plugins.
 
 use core::fmt;
 use std::rc::Rc;

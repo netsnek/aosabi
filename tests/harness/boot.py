@@ -42,7 +42,8 @@ from .procs import _environment, run
 #: docs/byte-equality.md section 3.
 LISTEN = re.compile(rb"(?:Pylon|Aosabi) running at http://localhost:([0-9]+)")
 
-#: The listen line of the reference and the one of the side under test, divergence D53.
+#: The listen line of the reference and the one of the side under test, a named
+#: divergence.
 LISTEN_REFERENCE = b"Pylon running at "
 LISTEN_AOSABI = b"Aosabi running at "
 
@@ -90,7 +91,7 @@ class Boot:
         return apply_masks(self.stdout, masks)
 
     def masked_as_reference(self, masks=None) -> bytes:
-        """Standard output masked as `masked_stdout` gives it, the listen line of D53 written as the reference writes it.
+        """Standard output masked as `masked_stdout` gives it, the listen line written as the reference writes it.
 
         A side under test writes `Aosabi running at` where the reference writes
         its own name, divergence D53 of docs/byte-equality.md section 3,

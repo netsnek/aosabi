@@ -62,7 +62,7 @@ pub struct AppConfig {
     /// `logger`, `false` for no access line or the object form.
     pub logger: Option<LoggerOption>,
     /// `plugins`, which the boot writes back with the built array (quirk
-    /// `Q01_DUPLICATE_PLUGIN_WRITEBACK`).
+    /// `DUPLICATE_PLUGIN_WRITEBACK`).
     pub plugins: Option<PluginList>,
     /// `maskedErrors` of Yoga.
     pub masked_errors: Option<MaskedErrors>,
