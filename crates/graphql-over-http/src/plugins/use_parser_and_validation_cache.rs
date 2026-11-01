@@ -113,7 +113,10 @@
 //! allocates their copy.
 
 use core::{
-    cell::RefCell,
+    cell::{
+        Cell,
+        RefCell, //
+    },
     mem::size_of, //
 };
 use std::{
@@ -264,22 +267,35 @@ type Documents = Table<Document, SchemaRef, Vec<GraphQLError>>;
 /// The keyed hash of the text of a request, the one call `SipHash-1-3` of
 /// [`KeyState::hash_bytes`] on every target.
 ///
-/// The state takes the key `aosabi_json::value::seed` stored for its thread when
-/// the plugin is made, and the fixed key where none was stored. The boot of a
-/// Linux card keys its thread from the randomness it installs before its first
-/// pass, which makes the plugin, so a client that does not know the key cannot
-/// choose texts that share a window of the table, and a Worker keeps the fixed
-/// key until its boot calls `seed`, as before. The one call keeps at opt-level z
-/// the speed of opt-level 3, where the streaming `SipHash-1-3` of the standard
-/// library keeps its rounds out of line and its state in memory. The hash steers
-/// the window of the table alone, and the whole text decides every hit, so the
-/// function the hash computes changes no answer.
-struct TextKeys(KeyState);
+/// The state takes the key `aosabi_json::value::seed` stored for its thread at
+/// the first text the plugin hashes once the thread holds one, and keeps it for
+/// the life of the table. Before then the plugin hashes a text under the fixed
+/// key and keeps no state, so a thread keyed after the first text keys the table
+/// as well. The boot of a Linux card keys its thread from the randomness it
+/// installs before its first pass, and the module of `aosabi-js` and its native
+/// library for Bun key theirs at the end of their boot, after it made the
+/// plugin, or where the host hands no bytes there, at the first later call that
+/// gets bytes, before a request reaches the plugin. So every platform with the
+/// standard library hashes its texts under its own key from the first text after
+/// its thread is keyed, and a client that does not know the key cannot choose
+/// texts that share a window of the table. A build without the standard library
+/// has no `seed` and hashes under the fixed key, which the doc of `seed` weighs.
+/// The one call keeps at opt-level z the speed of opt-level 3, where the
+/// streaming `SipHash-1-3` of the standard library keeps its rounds out of line
+/// and its state in memory. The hash steers the window of the table alone, and
+/// the whole text decides every hit, so the function the hash computes changes
+/// no answer.
+struct TextKeys(Cell<Option<KeyState>>);
 
 impl TextHash for TextKeys {
     #[inline]
     fn hash_text(&self, text: &[u8]) -> u64 {
-        self.0.hash_text(text)
+        let keys = self.0.get().or_else(|| {
+            let keys = KeyState::seeded();
+            self.0.set(keys);
+            keys
+        });
+        keys.unwrap_or_default().hash_text(text)
     }
 }
 
@@ -431,6 +447,6 @@ pub(crate) fn use_parser_and_validation_cache_with(
     Rc::new(UseParserAndValidationCache {
         entry_bytes: table.budget().entry_bytes,
         table: Rc::new(RefCell::new(table)),
-        keys: TextKeys(KeyState::default()),
+        keys: TextKeys(Cell::new(None)),
     })
 }

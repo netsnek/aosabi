@@ -24,11 +24,10 @@ pub trait TextHash {
 
 /// The one call `SipHash-1-3` of [`KeyState::hash_bytes`] under the key of the state.
 ///
-/// The state takes the key of `aosabi_json::value::seed` or the fixed key
-/// when it is made, and a build without the standard library takes the fixed
-/// key, which a Worker keeps until its boot calls `seed`. The one call keeps
-/// at opt-level z the speed of opt-level 3, which the streaming hasher does
-/// not.
+/// The state takes the key of `aosabi_json::value::seed` or the fixed key when it is
+/// made, and a build without the standard library takes the fixed key, which a Worker
+/// keeps until its first request calls `seed`. The one call keeps at opt-level z the
+/// speed of opt-level 3, which the streaming hasher does not.
 impl TextHash for KeyState {
     #[inline]
     fn hash_text(&self, text: &[u8]) -> u64 {

@@ -170,6 +170,29 @@ impl BuildHasher for KeyState {
 }
 
 impl KeyState {
+    /// Returns the state of the key `seed` stored for this thread, or `None`
+    /// while it stores none.
+    ///
+    /// A build without the standard library has no `seed` and answers `None`. A
+    /// table that hashes under one state for its whole life keeps this one once
+    /// it answers, and before then hashes with [`KeyState::default`] and keeps
+    /// nothing, so a platform that keys its thread on a later request than the
+    /// first keys the table as well. The module of `aosabi-js` and its native
+    /// library for Bun key their thread at their boot, or at the first call of
+    /// the host that hands them bytes.
+    #[inline]
+    #[must_use]
+    pub fn seeded() -> Option<Self> {
+        #[cfg(feature = "std")]
+        {
+            SEEDED_KEY.with(Cell::get).map(|key| Self { key })
+        }
+        #[cfg(not(feature = "std"))]
+        {
+            None
+        }
+    }
+
     /// Returns the `SipHash-1-3` of `bytes` under the key of this state.
     ///
     /// The key is the one the state took when it was made, the key of `seed` or
