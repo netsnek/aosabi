@@ -267,7 +267,11 @@ pub type KeyHasherBuilder = std::hash::RandomState;
 /// where it is off. That is the case with no standard library, where the feature
 /// `std` is off, and on `wasm32-unknown-unknown` and the operating systems
 /// `xous` and `vexos`, whose standard library takes the key of `RandomState`
-/// from the addresses of two allocations for want of a source.
+/// from the addresses of two allocations for want of a source. The builds of the
+/// cards `worker` and `esp32c3-devkitm1` are such builds, so they hash with the
+/// fixed key, with no cap on the count of keys of an object, the Worker until
+/// its first request calls `seed` and the ESP32-C3 until a later release keys
+/// it, which the doc of [`KeyState`] weighs.
 #[cfg(not(all(
     feature = "std",
     not(any(

@@ -614,9 +614,14 @@ pub fn wait_on(request: u32, handle: u32, promise: Rc<JsPromise>) {
 ///
 /// The last byte of the input names what answers the request,
 /// [`TO_ENDPOINT`] or [`TO_APP`], and the bytes before it are the record of
-/// the request, none for a request the host opened.
+/// the request, none for a request the host opened. The call keys the hashes
+/// of the thread before it makes a map, where no call before keyed them,
+/// [`crate::boot::seed_keys`].
 pub fn fetch(len: u32, request: u32) -> usize {
     let mut record = host::input(len);
+    // The randomness of the host comes through the input buffer, so the
+    // record is read first.
+    crate::boot::seed_keys();
     let to = record.pop();
     if with_entry(request, |entry| entry.opened.is_some()).unwrap_or(false) {
         aosabi_core::clock::note_turn();

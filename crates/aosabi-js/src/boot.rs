@@ -224,6 +224,8 @@ thread_local! {
     static VARS: RefCell<Vec<(String, String)>> = const { RefCell::new(Vec::new()) };
     /// The environment of a request over [`VARS`], made once after they change.
     static ENV: RefCell<Option<Rc<dyn core::any::Any>>> = const { RefCell::new(None) };
+    /// Whether [`seed_keys`] keyed the hashes of this thread.
+    static SEEDED: Cell<bool> = const { Cell::new(false) };
 }
 
 /// Returns the environment of a request of the app, `c.env`: the variables of
@@ -280,20 +282,22 @@ pub fn app() -> Option<Rc<Booted>> {
 /// buffer and the handle `graphql` of its graphql object, or the logger alone
 /// where `graphql` is [`ABSENT`], and returns 0 or the address of the message
 /// of the failure.
+///
+/// Either boot tries once at its end to key the hashes of the thread,
+/// [`seed_keys`], which keys it where the global scope of the host hands
+/// random values.
 pub fn boot(len: u32, graphql: u32) -> usize {
     let record = host::input(len);
-    if graphql == ABSENT {
-        return match prime(&record) {
-            Ok(()) => 0,
-            Err(message) => host::output(message.as_bytes()),
-        };
-    }
-    let roots = ROOT_NAMES.map(|name| value::boot_member(graphql, name).unwrap_or(ABSENT));
-    match request::with_current(BOOT, || boot_from(&record, roots)) {
-        Ok(app) => {
-            APP.with_borrow_mut(|slot| *slot = Some(Rc::new(app)));
-            0
-        }
+    let booted = if graphql == ABSENT {
+        prime(&record).map_err(String::from)
+    } else {
+        let roots = ROOT_NAMES.map(|name| value::boot_member(graphql, name).unwrap_or(ABSENT));
+        request::with_current(BOOT, || boot_from(&record, roots))
+            .map(|app| APP.with_borrow_mut(|slot| *slot = Some(Rc::new(app))))
+    };
+    seed_keys();
+    match booted {
+        Ok(()) => 0,
         Err(message) => host::output(message.as_bytes()),
     }
 }
@@ -734,6 +738,20 @@ pub(crate) fn logger_config(object: &JsValue) -> LoggerConfig {
         sink: None,
         job_level,
     }
+}
+
+/// Keys the keyed hashes of this thread from the randomness of the host, once.
+pub fn seed_keys() {
+    if SEEDED.get() {
+        return;
+    }
+    let mut key = [0; 16];
+    if HostRandom.fill(&mut key).is_err() {
+        return;
+    }
+    SEEDED.set(true);
+    // A key stored on this thread before stays the key.
+    let _ = aosabi_json::value::seed(key);
 }
 
 /// The randomness of the host, the bytes `crypto.getRandomValues` of the host

@@ -134,8 +134,15 @@ const BROKEN: &str = "the host called the logger with a broken record";
 /// Answers the call of the logger the record in the first `len` bytes of the
 /// input buffer names, and returns the address of its completion record in
 /// the output buffer.
+///
+/// The call keys the hashes of the thread before it decodes the record,
+/// [`crate::boot::seed_keys`], since a logger call of the app can come
+/// before any request.
 pub fn log(len: u32) -> usize {
     let record = host::input(len);
+    // The randomness of the host comes through the input buffer, so the
+    // record is read first.
+    crate::boot::seed_keys();
     let mut reader = Reader::new(&record);
     let request = reader.word();
     if reader.byte() == Some(1) {

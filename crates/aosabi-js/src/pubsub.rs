@@ -100,8 +100,14 @@ pub fn topic(reader: &mut Reader<'_>) -> Option<Value> {
 /// export `publish`: the number of the pub sub, the routing key and the count
 /// and the copies of the arguments, and drives every request whose body the
 /// module pushes. A broken record publishes nothing.
+///
+/// The call keys the hashes of the thread before it decodes the arguments,
+/// [`crate::boot::seed_keys`], since an app can publish before any request.
 pub fn publish(len: u32) {
     let record = host::input(len);
+    // The randomness of the host comes through the input buffer, so the
+    // record is read first.
+    crate::boot::seed_keys();
     let mut reader = Reader::new(&record);
     let Some((pub_sub, routing_key, args)) = read_publish(&mut reader) else {
         return;
