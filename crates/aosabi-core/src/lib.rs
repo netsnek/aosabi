@@ -22,6 +22,7 @@
 //! | [`create_schema`](mod@create_schema) | the GraphQL handler, `addResolversToSchema.js` | the resolver map and the schema build |
 //! | [`scalars`] | the GraphQL handler | the seven bound scalars |
 //! | [`service`] | no analogue | the service an application builds and a request or a subscription runs through |
+//! | [`embed`] | no analogue | the GraphQL request of a host that holds the engine in its own process |
 //! | [`request_stream`] | no analogue | the request lines a twin answers without a socket |
 //! | [`glue`] | no analogue | the traits the generated code calls |
 //! | [`app`] | `app/index.ts`, the GraphQL handler, `app/plugin-order.ts` | the application, its boot and its GraphQL handler |
@@ -96,6 +97,8 @@ pub mod create_schema;
 #[cfg(feature = "runtime")]
 pub mod decorator;
 pub mod descriptor;
+#[cfg(feature = "runtime")]
+pub mod embed;
 #[cfg(feature = "runtime")]
 pub mod file;
 #[cfg(feature = "runtime")]
