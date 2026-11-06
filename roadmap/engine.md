@@ -30,3 +30,9 @@ builtins of the WebAssembly engine where the host offers them.
 Every change of the engine that claims speed carries its notebook, and the numbers the documentation
 quotes are measured again against graphql-js 16.12.0 on the same machine whenever the engine changes
 its path.
+
+## 4. Subscriptions inside a host
+
+Today a host that embeds the engine through `aosabi::embed` answers a query or a mutation with one
+body and a subscription with one error. The next step hands the results of a subscription to the
+host through a callback it registers, so a host pushes events as a card pushes them.

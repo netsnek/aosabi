@@ -13,8 +13,11 @@ API between minor versions.
   links the app into its own program, such as a module of WebAssembly that a Web Worker of a page
   runs, boots it with `Embedded::boot` and hands each request over as the JSON body of a GraphQL
   request over HTTP, with no socket, no clock and no thread. `aosabi_core::embed::answer` is the
-  entry below it, and `tests/notebooks/07_embed.ipynb` holds it byte for byte to the executor over
-  the capture corpus.
+  entry below it, which the operation `embed` of `aosabi-devtool execute` reaches, and
+  `tests/notebooks/07_embed.ipynb` holds it byte for byte to the executor over the capture corpus
+  and a complete host to the served binary of its app. The guide
+  [Documentation/guides/embedding.md](Documentation/guides/embedding.md) says when to embed and
+  shows the build of a host and that complete host.
 
 ## [0.1.0] - 2026-10-30
 

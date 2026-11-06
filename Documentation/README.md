@@ -17,6 +17,8 @@ the same revision, and every measured number names the notebook that measured it
 ## Guides
 
 - [guides/rust.md](guides/rust.md) writes a service in plain Rust.
+- [guides/embedding.md](guides/embedding.md) links the engine and the roots of an app into the
+  program of a host, such as a module of WebAssembly that a Web Worker of a page runs.
 - [guides/typescript.md](guides/typescript.md) builds and serves a TypeScript app on Bun and on
   Cloudflare Workers.
 - [guides/graphtp.md](guides/graphtp.md) describes GraphTP, the protocol for links where HTTP does
