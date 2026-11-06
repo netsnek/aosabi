@@ -176,8 +176,7 @@ where
 }
 
 /// Returns the future of `rest` over `c` with no check, since under the
-/// feature `host-platform` the TypeScript option runs no
-/// csrf.
+/// feature `host-platform` the TypeScript option runs no csrf of its own.
 #[cfg(feature = "host-platform")]
 pub fn behind_default_csrf<T, E, R, F>(c: &Context, rest: R) -> F
 where
