@@ -1,0 +1,36 @@
+# The app the embedding host of 07_embed boots, a service of the Rust layer of
+# Aosabi in the shape `aosabi new` writes. Its query reaches a union, so the
+# build writes a type resolution that the host must carry, and a field that
+# resolves after a timer, so the agent of a request runs its virtual clock.
+#
+# The app is a cargo workspace of its own with its own lock, as a fixture
+# application is, and the Aosabi workspace at the repository root does not
+# list it, so it ships nothing. The notebook builds it twice from the
+# repository root, as the card that serves sockets and as the card worker,
+# whose generated copy tests/fixtures/rs/embed-host links:
+#
+#   target/debug/cargo-aosabi build --locked --manifest-path tests/fixtures/rs/embed-app/Cargo.toml
+#   target/debug/cargo-aosabi build --locked --device worker --manifest-path tests/fixtures/rs/embed-app/Cargo.toml
+
+[workspace]
+
+[package]
+name = "embed-app"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+# A fixture application is built in place and is never published.
+publish = false
+
+[dependencies]
+aosabi = { path = "../../../../crates/aosabi" }
+
+# The card that serves sockets links the engine of the facade with these
+# features, for a Unix target alone, so a build for the Worker links no
+# engine of a server and Cargo.lock pins the packages the engine takes from
+# a registry, which the lock of every build is checked against.
+[target.'cfg(unix)'.dependencies]
+aosabi = { path = "../../../../crates/aosabi", features = ["serve", "unix-socket", "deflate", "linux"] }
+
+[lints.rust]
+unsafe_code = "forbid"

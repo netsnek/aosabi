@@ -1,0 +1,52 @@
+# The embedding host of 07_embed, a program that links the engine and the
+# roots of an app into itself through aosabi::embed and answers one GraphQL
+# request body per line of its standard input. It is the complete example of
+# Documentation/guides/embedding.md, and the app it boots is
+# tests/fixtures/rs/embed-app, through the generated copy that
+# `cargo aosabi build` writes under that app's target/aosabi/app.
+#
+# The host is a cargo workspace of its own with its own lock, as a fixture
+# application is, and the Aosabi workspace at the repository root does not
+# list it, so it ships nothing. It builds once the app is built, from the
+# repository root:
+#
+#   ~/.cargo/bin/cargo build --locked --manifest-path tests/fixtures/rs/embed-host/Cargo.toml
+
+[workspace]
+resolver = "3"
+
+[package]
+name = "embed-host"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT"
+authors = ["Florian Kleber <kleber@snek.at>"]
+repository = "https://github.com/netsnek/aosabi"
+# A fixture application is built in place and is never published.
+publish = false
+build = "build.rs"
+
+[dependencies]
+# The generated copy of the app, whose module __aosabi holds the entry.
+embed-app = { path = "../embed-app/target/aosabi/app" }
+aosabi = { path = "../../../../crates/aosabi" }
+
+[build-dependencies]
+aosabi-build = { path = "../../../../crates/aosabi-build" }
+
+# The lints of the Aosabi workspace.
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# The map guard of the byte contract, as in the Aosabi workspace. The list of
+# refused types is clippy.toml at the repository root, which clippy finds by
+# walking up from this manifest.
+disallowed_types = "deny"
+# No operating system threads, as in the Aosabi workspace.
+disallowed_methods = "deny"
