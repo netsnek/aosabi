@@ -50,6 +50,8 @@ FAST = (
     "03_homa_packets",
     # The frame format the carriers share.
     "04_aoframe",
+    # The entry of a host that embeds the engine, and the facade such a host links.
+    "07_embed",
     # The full wire form of Homa over a synthetic link.
     "05_homa_wire_full-synthetic",
     # The frame of the LoRa carrier.
