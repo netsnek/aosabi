@@ -84,6 +84,17 @@
     frames_ops: 2000
     timeout_s: 600
 
+# The notebook of the embedding entry judges aosabi_core::embed through the
+# operation embed of aosabi-devtool execute against the executor over the
+# capture corpus. It runs the gates it rests on first, so it carries the cold
+# build timeout.
+- notebook: tests/notebooks/07_embed.ipynb
+  id: 07_embed
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    timeout_s: 600
+
 # The byte level notebook of stage H1 of the Homa track judges the full wire
 # form of the crate homa through aosabi-devtool homa-packet against
 # tests/harness/homa/full.py, written from homa_wire.h at the pinned HomaModule

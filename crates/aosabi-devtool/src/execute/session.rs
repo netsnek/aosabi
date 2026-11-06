@@ -261,6 +261,15 @@ impl Session {
         }
     }
 
+    /// Returns the service of the table `name`, `None` when the session holds
+    /// no such table of [`Mode::Service`].
+    pub fn service(&self, name: &str) -> Option<&Service> {
+        match self.tables.get(name)? {
+            Runner::Plain(_) => None,
+            Runner::Service { service, .. } => Some(service),
+        }
+    }
+
     /// Returns the schema and the factory of the root `Query` of the table
     /// `name`, `None` when the session holds no such table of
     /// [`Mode::Service`].

@@ -84,6 +84,14 @@
 //! to the projection and answers its own keys and its `reads`, which
 //! [`project`] describes, so a notebook holds the keys of the view to those
 //! of the object of the reference, which no answer of the reference reads.
+//!
+//! The operation `embed` hands `body`, the JSON body of a GraphQL request
+//! over HTTP, to the service of a loaded service table through
+//! `aosabi_core::embed::answer`, the entry of a host that links the engine
+//! into its own program, and answers `{"body":"<text>"}` with the response
+//! body it returns. `body` travels as a string, as `result` does, so a
+//! notebook holds the bytes of the answer to the result text of an `execute`
+//! of the same document.
 
 mod clock;
 mod interpret;
@@ -101,9 +109,12 @@ use std::{
     rc::Rc, //
 };
 
-use aosabi_core::resolvers::{
-    resolvers_to_graphql_resolvers::root_member_counts,
-    wrap_resolver::set_eager_projection, //
+use aosabi_core::{
+    embed,
+    resolvers::{
+        resolvers_to_graphql_resolvers::root_member_counts,
+        wrap_resolver::set_eager_projection, //
+    }, //
 };
 use aosabi_execute::{
     errors::copy_graphql_error,
@@ -188,6 +199,7 @@ const OPERATIONS: &Operations = &[
     ("roots", op_roots),
     ("coerce", op_coerce),
     ("project", project::op_project),
+    ("embed", op_embed),
 ];
 
 /// The refusal of a run that ends with its result pending.
@@ -576,6 +588,31 @@ fn op_execute(request: &JsObject) -> Result<JsObject, JsString> {
         .with_borrow(|session| call.run(session, name))
         .ok_or_else(|| format!("{NAME}: {}", no_table(name)))?;
     payload(executed, call.trace)
+}
+
+/// Answers the operation `embed`, which hands the request body `body` to the
+/// service of a loaded table the way an embedding host hands it, through
+/// `aosabi_core::embed::answer`.
+///
+/// A table the run does not hold and a table of the mode `plain`, which has
+/// no service, are mistakes of the harness and answer `fatal`.
+fn op_embed(request: &JsObject) -> Result<JsObject, JsString> {
+    let name = batch::require_string(request, "table")?;
+    let body = batch::require_string(request, "body")?;
+    begin_request();
+    let bytes = SESSION.with_borrow(|session| {
+        let service = session.service(name).ok_or_else(|| {
+            if session.schema(name).is_some() {
+                format!("embed: the table {name} is of the mode plain")
+            } else {
+                format!("embed: {}", no_table(name))
+            }
+        })?;
+        Ok::<_, String>(in_window(|| embed::answer(service, body.as_bytes())).0)
+    })?;
+    let mut payload = JsObject::new();
+    payload.insert("body", String::from_utf8_lossy(&bytes).into_owned());
+    Ok(payload)
 }
 
 /// Answers the operation `root`, which holds the factory of one root of a table with no schema.
