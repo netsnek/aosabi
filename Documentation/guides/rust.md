@@ -313,3 +313,25 @@ the glue as well.
 
 The types of a remote schema, which a delegation to another GraphQL service reads, are code a
 command writes: `aosabi pull <url>` writes them as a registry of the remote API.
+
+## 14. Embedding the engine in a program
+
+A card builds a binary that serves sockets. A host that links the app into its own program instead,
+such as a module of WebAssembly that a Web Worker of a page runs, boots the roots of the app with
+`aosabi::embed::Embedded::boot` and hands each request to `answer` as the JSON body a GraphQL
+request over HTTP carries. The answer is the response body. No socket, no HTTP, no clock and no
+thread are needed, so the host builds for every target the library of the service builds for,
+`wasm32-unknown-unknown` among them.
+
+```rust
+let engine = aosabi::embed::Embedded::boot(my_app::__aosabi::entry, aosabi::embed_output!())?;
+let body = engine.answer(r#"{"query":"{ hello }"}"#);
+```
+
+The host depends on the generated copy of the crate that `cargo aosabi build` writes, whose module
+`__aosabi` holds the entry, and its build script takes the schema and the type resolution of the
+build into `OUT_DIR` with `aosabi_build::take_artifacts`, which `embed_output!` includes. The card
+`worker` writes such a copy with no server around it. Every request runs on a fresh agent with
+virtual timers, which the host never drives. The routes, the middleware and the plugins of the app
+take no part, since no request of HTTP reaches them, so an app that needs them is served through a
+card.

@@ -5,6 +5,17 @@ Changelog](https://keepachangelog.com/en/1.1.0/), and Aosabi follows [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html), under which a version before 1.0 may change its
 API between minor versions.
 
+## [Unreleased]
+
+### Added
+
+- `aosabi::embed`, the engine and the roots of an app inside the program of a host. A host that
+  links the app into its own program, such as a module of WebAssembly that a Web Worker of a page
+  runs, boots it with `Embedded::boot` and hands each request over as the JSON body of a GraphQL
+  request over HTTP, with no socket, no clock and no thread. `aosabi_core::embed::answer` is the
+  entry below it, and `tests/notebooks/07_embed.ipynb` holds it byte for byte to the executor over
+  the capture corpus.
+
 ## [0.1.0] - 2026-10-30
 
 The first public release.

@@ -59,6 +59,7 @@
 //! | [`BUILTINS`] | the viewer and the landing page every boot adds |
 //! | `serve_app`, `BuildOutput`, `build_output!`, `use_node_server` | the engine, under the feature `serve` on a native target |
 //! | `serve_static`, `ServeStaticOptions` | the middleware that serves the files of a directory, `serveStatic` of the Node adapter, under the feature `serve` on a native target |
+//! | [`embed`], [`embed_output!`] | the engine and the roots of an app inside the program of a host, such as a module of WebAssembly in a Web Worker, which answers GraphQL request bodies with no socket |
 //! | [`fn@compress`] | the middleware `compress()` of hono under its name, which codes the answers of the routes after it in deflate, since the base pipeline codes none, divergence D72 |
 //!
 //! A plain crate builds its app with the builder [`App`], which [`prelude`]
@@ -116,6 +117,7 @@
 //! ```
 
 pub mod app;
+pub mod embed;
 pub mod prelude;
 
 /// The engine's `createDecorator`, under the hidden feature `mirror`.
