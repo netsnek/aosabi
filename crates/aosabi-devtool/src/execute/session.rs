@@ -13,8 +13,9 @@
 //! resolvers are the specs of the table, with no scalar bound. A table of
 //! [`Mode::Service`] becomes a [`Service`], so its root objects go through the
 //! resolver wrapping of aosabi-core and the seven scalars it adds are bound,
-//! and the factory of its root `Query` stays beside the service for the
-//! operation `project`. Both run a request through `run_request` of aosabi-execute, which is the
+//! and the factories of its roots and the text of its schema stay beside the
+//! service, for the operation `project` and for the app the operation
+//! `revisions` boots over the table. Both run a request through `run_request` of aosabi-execute, which is the
 //! one pipeline a served application runs through too, and a subscription
 //! through `run_subscription` of the same crate, which the service reaches
 //! through [`Service::subscribe`] with the policy of Network.
@@ -121,9 +122,12 @@ enum Runner {
     Service {
         /// The service.
         service: Service,
-        /// The factory of the root `Query` the service holds, which
-        /// [`Session::query_root`] answers.
-        query: Option<RootFactory>,
+        /// The text of its schema, which [`Session::app_parts`] answers.
+        type_defs: &'static str,
+        /// The factories of the roots the service holds, whose root `Query`
+        /// [`Session::query_root`] answers and all of which
+        /// [`Session::app_parts`] answers.
+        roots: Resolvers,
     },
 }
 
@@ -262,13 +266,36 @@ impl Session {
         }
     }
 
+    /// Returns the service of the table `name`, `None` when the session holds
+    /// no such table of [`Mode::Service`].
+    pub fn service(&self, name: &str) -> Option<&Service> {
+        match self.tables.get(name)? {
+            Runner::Plain(_) => None,
+            Runner::Service { service, .. } => Some(service),
+        }
+    }
+
     /// Returns the schema and the factory of the root `Query` of the table
     /// `name`, `None` when the session holds no such table of
     /// [`Mode::Service`].
     pub fn query_root(&self, name: &str) -> Option<(&SharedSchema, &RootFactory)> {
         match self.tables.get(name)? {
             Runner::Plain(_) => None,
-            Runner::Service { service, query } => Some((service.schema(), query.as_ref()?)),
+            Runner::Service { service, roots, .. } => {
+                Some((service.schema(), roots.query.as_ref()?))
+            }
+        }
+    }
+
+    /// Returns the text of the schema and the factories of the roots of the
+    /// table `name`, which an app booted over the table takes, `None` when the
+    /// session holds no such table of [`Mode::Service`].
+    pub fn app_parts(&self, name: &str) -> Option<(&'static str, Resolvers)> {
+        match self.tables.get(name)? {
+            Runner::Plain(_) => None,
+            Runner::Service {
+                type_defs, roots, ..
+            } => Some((type_defs, roots.clone())),
         }
     }
 }
@@ -331,17 +358,20 @@ fn plain_binding(spec: &Arc<Spec>, subscription: bool) -> FieldBinding {
 
 /// Builds the service of a table of [`Mode::Service`].
 fn service_runner(mut table: Table) -> Result<Runner, CreateSchemaError> {
-    let query = root_factory(&mut table, "Query");
     let roots = Resolvers {
-        query: query.clone(),
+        query: root_factory(&mut table, "Query"),
         mutation: root_factory(&mut table, "Mutation"),
         subscription: root_factory(&mut table, "Subscription"),
     };
     // A service keeps its SDL text for the life of the process, so the text
     // of a table outlives the table, also one the run drops.
     let type_defs: &'static str = Box::leak(table.sdl.into_boxed_str());
-    let service = Service::builder(type_defs).roots(roots).build()?;
-    Ok(Runner::Service { service, query })
+    let service = Service::builder(type_defs).roots(roots.clone()).build()?;
+    Ok(Runner::Service {
+        service,
+        type_defs,
+        roots,
+    })
 }
 
 /// Returns the factory of the root object `type_name`, `None` when the table

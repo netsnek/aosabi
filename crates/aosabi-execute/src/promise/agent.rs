@@ -11,8 +11,8 @@
 //!
 //! An agent of ECMA-262 is one thread of execution with its job queues.
 //! [`Agent`] is that for one request: the queue of promise jobs, the timer
-//! wheel, the spawned futures, the ambient hooks and the trace. A clone is the
-//! same agent.
+//! wheel, the spawned futures, the ambient hooks, the hook of the events of a
+//! subscription and the trace. A clone is the same agent.
 //!
 //! Behind the feature `host-queue`, which the module of the npm package
 //! `aosabi`, `crates/aosabi-js`, and the core probe of the TypeScript option
@@ -36,7 +36,10 @@ use core::{
 };
 
 use crate::promise::{
-    ambient::AmbientHooks,
+    ambient::{
+        AmbientHooks,
+        EventHook, //
+    },
     future::{
         Tasks,
         WakeSet, //
@@ -74,6 +77,8 @@ pub(super) struct AgentInner {
     pub(super) wake_set: Arc<WakeSet>,
     /// The hooks that carry ambient state across an await.
     pub(super) ambient_hooks: RefCell<Option<AmbientHooks>>,
+    /// The hook that runs at the start of the execution of each event of a subscription.
+    pub(super) event_hook: RefCell<Option<EventHook>>,
     /// The recorded events.
     pub(super) trace: RefCell<Vec<TraceEvent>>,
     /// The clock of the host, which the timers read under [`TimerMode::Host`].
@@ -253,6 +258,7 @@ impl Agent {
             tasks: RefCell::new(Tasks::new()),
             wake_set: Arc::new(WakeSet::new()),
             ambient_hooks: RefCell::new(None),
+            event_hook: RefCell::new(None),
             trace: RefCell::new(Vec::new()),
             host_clock: RefCell::new(None),
             #[cfg(feature = "host-queue")]

@@ -84,11 +84,19 @@
 //! to the projection and answers its own keys and its `reads`, which
 //! [`project`] describes, so a notebook holds the keys of the view to those
 //! of the object of the reference, which no answer of the reference reads.
+//!
+//! The operation `revisions` subscribes to a topic of the pub sub of the
+//! request on one road of a loaded service table, through
+//! `Service::subscribe`, over HTTP or on the served road of `GraphTP`, runs a
+//! publish a number of times and answers, after each result, the revision of
+//! its execution and how many revisions the context of the subscription
+//! keeps whose execution has not started, which [`revisions`] describes.
 
 mod clock;
 mod interpret;
 mod project;
 mod pub_sub;
+mod revisions;
 mod session;
 mod subscribe;
 mod table;
@@ -188,6 +196,7 @@ const OPERATIONS: &Operations = &[
     ("roots", op_roots),
     ("coerce", op_coerce),
     ("project", project::op_project),
+    ("revisions", revisions::op_revisions),
 ];
 
 /// The refusal of a run that ends with its result pending.
@@ -576,6 +585,18 @@ fn op_execute(request: &JsObject) -> Result<JsObject, JsString> {
         .with_borrow(|session| call.run(session, name))
         .ok_or_else(|| format!("{NAME}: {}", no_table(name)))?;
     payload(executed, call.trace)
+}
+
+/// Returns the text of the outcome of one run: the result text, `thrown: `
+/// and the message of the thrown value, or the refusal of a stall.
+fn outcome_text(outcome: Result<ExecutionResult, RunFailure>) -> String {
+    match outcome {
+        Ok(result) => result_text(&result),
+        Err(RunFailure::Thrown(thrown)) => {
+            format!("thrown: {}", to_string_lossy(&thrown_message(&thrown)))
+        }
+        Err(RunFailure::Stalled) => String::from(STALLED),
+    }
 }
 
 /// Answers the operation `root`, which holds the factory of one root of a table with no schema.

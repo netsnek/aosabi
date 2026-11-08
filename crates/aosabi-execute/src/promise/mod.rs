@@ -25,7 +25,7 @@
 //! | [`future`] | 27.7.5.1, 27.7.5.3 | [`Agent::spawn`], [`PromiseFuture`], [`LocalFuture`] and the wake set |
 //! | [`timers`] | no clause, the timers of node | the wheel on the virtual or the host clock, [`TimerId`], [`Agent::set_timeout`], [`Agent::set_interval`], [`Agent::clear_timer`] and [`Agent::sleep`] |
 //! | [`host`] | 9.5, the host side | [`Drive`], [`Idle`], [`Agent::run`], [`Agent::drain_until_idle`], [`Stalled`], [`sleep`], [`tick`] and [`set_timeout`] |
-//! | [`ambient`] | no clause, `AsyncLocalStorage` of node | the running agents of the thread and the ambient snapshot of a future |
+//! | [`ambient`] | no clause, `AsyncLocalStorage` of node | the running agents of the thread, the ambient snapshot of a future and the hook of the events of a subscription |
 //! | [`trace`] | no clause | [`TraceEvent`] |
 //!
 //! # The rules
@@ -78,7 +78,8 @@ pub use self::{
     },
     ambient::{
         AmbientCapture,
-        AmbientRestore, //
+        AmbientRestore,
+        EventHook, //
     },
     future::{
         LocalFuture,

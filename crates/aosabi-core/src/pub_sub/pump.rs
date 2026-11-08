@@ -16,7 +16,10 @@
 //! request context, turns the payload into a value on the agent of the
 //! stream, pushes it into the repeater and awaits the push before it takes
 //! the next event. The repeater therefore holds at most one pending push, and
-//! every stream carries its events in publish order.
+//! every stream carries its events in publish order. Before its first event
+//! the pump sets the hook of the agent through which the revision of each
+//! event leaves the context when the execution of that event starts, which
+//! [`follow_executions`] describes.
 //!
 //! The pump ends when its slot is gone, which the stop of the repeater brings
 //! about. A value thrown into the repeater reaches the push the pump awaits,
@@ -58,7 +61,10 @@ use super::{
     SharedPayload, //
 };
 use crate::{
-    carrier::note_revision,
+    carrier::{
+        follow_executions,
+        note_revision, //
+    },
     context::Context, //
 };
 
@@ -74,6 +80,9 @@ pub(super) fn spawn(
     stop: StopHandle,
     context: Option<Context>,
 ) {
+    if let Some(context) = &context {
+        follow_executions(agent, context);
+    }
     let pump = async move {
         while let Some(event) = poll_fn(|task| take(pub_sub, slot, task)).await {
             if let Some(context) = &context {

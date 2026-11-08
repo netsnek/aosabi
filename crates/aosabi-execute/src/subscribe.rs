@@ -256,7 +256,9 @@ pub(crate) fn build_per_event_execution_context(
 /// back as it is. For each payload yielded from a subscription, the operation
 /// runs over the normal executor with `payload` as the root value, which is
 /// the `ExecuteSubscriptionEvent` algorithm, and a rejection of the source
-/// becomes a `GraphQLError` that blames the operation.
+/// becomes a `GraphQLError` that blames the operation. The execution of each
+/// event starts with the hook of [`Agent::set_event_hook`], which no
+/// reference has.
 fn map_source_to_response(
     agent: &Agent,
     exe_context: &Rc<ExecutionContext>,
@@ -267,6 +269,7 @@ fn map_source_to_response(
     }
     let per_event = Rc::clone(exe_context);
     let on_next: OnValue = Rc::new(move |agent, payload| {
+        agent.start_event();
         let exe_context = Rc::clone(&per_event);
         handle_maybe_promise(
             agent,

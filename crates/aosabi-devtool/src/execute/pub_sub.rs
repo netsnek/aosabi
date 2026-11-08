@@ -21,13 +21,25 @@
 //! executor belongs to one agent, so a publish of a spec carries a
 //! [`Frozen`] copy of the value it made, which every subscriber turns back
 //! into a value of its own agent.
+//!
+//! While [`watch_subscribers`] keeps them, a spec that subscribes to a topic
+//! hands [`note_subscriber`] the context in place, the one the pub sub of
+//! aosabi-core keeps the revisions of the stream on, which the operation
+//! `revisions` reads.
 
 use std::{
-    cell::Cell,
+    cell::{
+        Cell,
+        RefCell, //
+    },
     rc::Rc, //
 };
 
 use aosabi_core::{
+    context::{
+        Context,
+        ambient_context, //
+    },
     execute::value::{
         PlainObject,
         Value, //
@@ -47,11 +59,41 @@ use aosabi_scalars::JsDate;
 thread_local! {
     /// The pub sub of the request that runs, once one of its specs needed it.
     static REQUEST_PUB_SUB: Cell<Option<&'static PubSub>> = const { Cell::new(None) };
+    /// Whether [`note_subscriber`] keeps the context in place.
+    static WATCHING: Cell<bool> = const { Cell::new(false) };
+    /// The contexts [`note_subscriber`] kept, one per subscription to a topic.
+    static SUBSCRIBERS: RefCell<Vec<Context>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Starts a request with no pub sub.
 pub fn begin_request() {
     REQUEST_PUB_SUB.set(None);
+}
+
+/// Starts keeping the context in place at each subscription to a topic, or
+/// stops it, and drops the contexts kept so far either way.
+pub fn watch_subscribers(on: bool) {
+    WATCHING.set(on);
+    SUBSCRIBERS.take();
+}
+
+/// Keeps the context in place, while [`watch_subscribers`] keeps them.
+pub fn note_subscriber() {
+    if !WATCHING.get() {
+        return;
+    }
+    if let Some(context) = ambient_context() {
+        SUBSCRIBERS.with_borrow_mut(|subscribers| subscribers.push(context));
+    }
+}
+
+/// Returns the context of the one subscription to a topic since the watch
+/// started, `None` when there was none or more than one.
+pub fn subscriber() -> Option<Context> {
+    SUBSCRIBERS.with_borrow(|subscribers| match subscribers.as_slice() {
+        [context] => Some(context.clone()),
+        _ => None,
+    })
 }
 
 /// Returns the pub sub of the request that runs, made on first use.

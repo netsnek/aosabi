@@ -111,7 +111,7 @@ const POLLS: usize = 1024;
 
 /// The built in plugins the facade hands the boot, the viewer of the first
 /// slot and the landing page.
-const BUILTINS: Builtins = Builtins {
+pub(crate) const BUILTINS: Builtins = Builtins {
     first: None,
     viewer: aosabi_viewer::use_viewer,
     unhandled_route: aosabi_landing::use_unhandled_route,
