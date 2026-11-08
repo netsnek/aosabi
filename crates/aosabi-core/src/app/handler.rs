@@ -113,6 +113,7 @@ use crate::{
             type_resolver, //
         },
     },
+    random::seed_keys,
     resolvers::{
         Resolvers,
         resolvers_to_graphql_resolvers, //
@@ -327,9 +328,13 @@ pub(crate) fn handler_with_server(
         spawner: spawner.clone(),
     });
     let middleware = move |c: Context, next: Next| {
+        let keyed = seed_keys().is_ok();
         let server = Rc::clone(&server);
         let spawner = spawner.clone();
         async move {
+            if !keyed {
+                return Ok(crate::random::refused());
+            }
             let server_context = ServerContext {
                 env: c.env(),
                 execution_ctx: c.execution_ctx(),

@@ -39,8 +39,8 @@ aosabi-core = { path = "../aosabi-core" }
 # layer whose Fetch types the adapter answers as Node fills them.
 aosabi-http = { path = "../aosabi-http", default-features = false, features = ["messages", "node", "node-server"] }
 # The one writer of JSON bytes, which writes the boot report of the harness,
-# and the function seed of its feature std, which the boot keys the hashes of
-# its thread with (src/serve.rs, seed_keys).
+# and the function seed of its feature std, through which the boot keys the
+# hashes of its thread (src/serve.rs, aosabi_core::random::seed_keys).
 aosabi-json = { path = "../aosabi-json", features = ["std"] }
 # The forks vendored the kernel way under third_party/rust/, reached by path.
 # Hyper serves HTTP/1.1 with the Node parity of its layer B and std without

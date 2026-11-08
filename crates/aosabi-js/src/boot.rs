@@ -741,6 +741,29 @@ pub(crate) fn logger_config(object: &JsValue) -> LoggerConfig {
 }
 
 /// Keys the keyed hashes of this thread from the randomness of the host, once.
+///
+/// A map of the engine hashes its keys with the state
+/// `aosabi_json::value::KeyState` takes when the map is made, the key
+/// [`aosabi_json::value::seed`] stores for the thread or the fixed key, and on
+/// `wasm32-unknown-unknown` every map takes that state, the maps of the JSON reader
+/// that hold the variables of a request among them. The fixed key is public, so
+/// without a key a client can send keys that collide and cost time quadratic in
+/// their count. The boot calls it once at its end, and each export that decodes a
+/// record of the host into values calls it before it decodes one, `fetch`, `ctx`,
+/// `logger` and `publish`, and the first of those calls the host hands sixteen
+/// bytes of [`HostRandom`] keys the thread. So a host whose global scope hands
+/// random values, Node and Bun among them, holds the key from its boot on, and
+/// workerd, which refuses them in the global scope where the host boots the module,
+/// from the first of those calls in a request or another event of the Worker. A
+/// host that hands no bytes leaves the thread without a key, and the next call
+/// tries again. A request to the endpoint or to the app of the engine on a thread
+/// without a key calls `aosabi_core::random::seed_keys`, which keys the thread of
+/// the native library for Bun from the source of its standard library and finds
+/// none on `wasm32-unknown-unknown`, where the request answers the refusal of
+/// `aosabi_core::random`, the status 503 with the text of `NO_RANDOMNESS` and no
+/// header field, before the engine reads any part of it. So the module answers no
+/// request under the fixed key. A thread keyed before keeps its key, which `seed`
+/// answers.
 pub fn seed_keys() {
     if SEEDED.get() {
         return;

@@ -102,6 +102,10 @@ use crate::{
         CarrierId,
         CarrierPolicy, //
     },
+    random::{
+        NO_RANDOMNESS,
+        seed_keys, //
+    },
     service::{
         Service,
         ServiceStream, //
@@ -144,16 +148,29 @@ const EX_IOERR: u8 = 74;
 ///
 /// The subscriptions a file starts live until their `return` or the end of
 /// the file, whichever comes first, and a stream still open at the end is
-/// closed, which calls `return` on its iterator.
+/// closed, which calls `return` on its iterator. On a thread that
+/// [`seed_keys`] leaves without a key, every line answers the `fatal`
+/// [`NO_RANDOMNESS`] with a null `id` and `op`, since no line is read.
 #[must_use]
 pub fn answer_requests(service: &Service, requests: &[u8]) -> Vec<u8> {
+    // The maps of every line hash under the key of this thread, so the
+    // thread holds one before the first line is read.
+    let keyed = seed_keys().is_ok();
     let mut streams = Streams::default();
     let mut out = Vec::new();
     for line in requests.split(|&byte| byte == b'\n') {
         if line.trim_ascii().is_empty() {
             continue;
         }
-        let response = answer(service, &mut streams, line);
+        let response = if keyed {
+            answer(service, &mut streams, line)
+        } else {
+            respond(
+                JsValue::Null,
+                JsValue::Null,
+                Err(JsString::from(NO_RANDOMNESS)),
+            )
+        };
         aosabi_json::write(&mut out, &JsValue::Object(response));
         out.push(b'\n');
     }

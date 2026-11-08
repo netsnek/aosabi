@@ -804,9 +804,19 @@ fn execute_request(record: &[u8], request: u32) -> Option<Request> {
 /// `record` of `request`, which the server of the GraphQL endpoint or the app
 /// of the engine answers as `to` names, or the record of the failure the
 /// module answers at once where it is not booted or the record is not valid.
+///
+/// A request to the endpoint on a thread that holds no key keys it through
+/// `aosabi_core::random::seed_keys` first. Where that finds no source, as on
+/// `wasm32-unknown-unknown` while the host hands no random bytes, it answers the refusal at
+/// once, before the engine reads any part of the request: the status 503 with the text of
+/// `NO_RANDOMNESS` and no header field, the answer `BootedApp::fetch` gives a request to the
+/// app of the engine there.
 fn answer_of(record: &Rc<[u8]>, request: u32, to: Option<u8>) -> Result<Answer, Vec<u8>> {
     match (crate::boot::app(), request_of(record, request), to) {
         (None, _, _) => Err(failure(503, b"the module is not booted")),
+        (Some(_), Some(_), Some(TO_ENDPOINT)) if aosabi_core::random::seed_keys().is_err() => {
+            Err(failure(503, aosabi_core::random::NO_RANDOMNESS.as_bytes()))
+        }
         (Some(booted), Some(parsed), Some(TO_ENDPOINT)) => Ok(Box::pin(async move {
             record_of_answer(crate::endpoint::answer(booted, Rc::new(parsed), request).await).await
         })),

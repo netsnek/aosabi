@@ -120,6 +120,10 @@ use crate::{
         create_schema, //
     },
     in_context::apply_in_context,
+    random::{
+        NO_RANDOMNESS,
+        seed_keys, //
+    },
     resolvers::{
         Resolvers,
         resolvers_to_graphql_resolvers, //
@@ -247,8 +251,22 @@ impl Service {
     /// what the plugin `useInContext` does in `onExecute`. A subscription
     /// operation answers the one error of `run_request`, because its answer is
     /// a stream, which [`Service::subscribe`] returns.
+    ///
+    /// The calling thread is keyed by [`seed_keys`] before the request makes
+    /// a map. The variables of `request` are a map the caller made, though,
+    /// under the key its thread held when it parsed them, so a caller that
+    /// parses the body of a client calls [`seed_keys`] before it parses it, as
+    /// the embedding entry and the request lines do. On a thread that
+    /// [`seed_keys`] leaves without a key, the request answers the one error
+    /// [`NO_RANDOMNESS`] with no data and its document is never parsed.
     #[must_use]
     pub fn execute(&self, request: &Request<'_>, options: AgentOptions) -> Executed {
+        if seed_keys().is_err() {
+            return Executed {
+                outcome: Ok(one_error(NO_RANDOMNESS)),
+                trace: Vec::new(),
+            };
+        }
         let context = service_context();
         if !is_subscription(request, self.max_tokens()) {
             apply_in_context(&context, request, self.max_tokens());
@@ -274,6 +292,10 @@ impl Service {
     /// where only a foreign waker could move the agent on, because nothing on
     /// the calling thread wakes it. The answer and its trace are taken before
     /// the drain, so the drain changes neither.
+    ///
+    /// Its two callers, the embedding entry and the request lines, key the
+    /// thread with [`seed_keys`] before they parse the body that carries the
+    /// request, so the thread holds its key here already.
     pub(crate) fn execute_drained(&self, request: &Request<'_>, options: AgentOptions) -> Executed {
         let context = service_context();
         if !is_subscription(request, self.max_tokens()) {
@@ -305,7 +327,9 @@ impl Service {
     /// it before the subscribe resolver runs. The `@inContext` directive is
     /// not applied, because the reference applies it in `onExecute` alone,
     /// which a subscription never reaches. An operation that is no
-    /// subscription runs to its one result without the directive.
+    /// subscription runs to its one result without the directive. The thread
+    /// and the variables are keyed as for [`Service::execute`], and on a
+    /// thread with no key the single result is the one error [`NO_RANDOMNESS`].
     ///
     /// # Errors
     ///
@@ -318,6 +342,9 @@ impl Service {
         options: AgentOptions,
         policy: CarrierPolicy,
     ) -> Result<Subscribed, RunFailure> {
+        if seed_keys().is_err() {
+            return Ok(Subscribed::One(one_error(NO_RANDOMNESS)));
+        }
         let context = service_context();
         set_carrier_policy(&context, policy);
         self.subscribe_in(&context, request, options)
@@ -545,12 +572,21 @@ impl Execute for Service {
     /// throws and a stalled run both answer as one error with no data, and a
     /// persisted operation answers the one error that says the engine accepts
     /// no persisted document.
+    ///
+    /// The calling thread is keyed by [`seed_keys`] first, for a subscription
+    /// as for a query. The variables are a map the carrier made under the key
+    /// its thread held when it parsed them, so a carrier that parses them from
+    /// a client calls [`seed_keys`] before it parses them. A thread with no
+    /// key answers the one error [`NO_RANDOMNESS`] for every operation.
     fn execute(
         &self,
         operation: Operation<'_>,
         variables: &Self::Variables,
         policy: &Self::Context,
     ) -> Self::Stream {
+        if seed_keys().is_err() {
+            return ServiceStream::One(Some(one_error(NO_RANDOMNESS)));
+        }
         let Operation::Document {
             text,
             operation_name,

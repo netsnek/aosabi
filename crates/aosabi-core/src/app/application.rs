@@ -147,6 +147,7 @@ use crate::{
         AppConfig,
         PluginMiddleware, //
     },
+    random::seed_keys,
     resolvers::Resolvers,
     result::Result, //
 };
@@ -327,6 +328,12 @@ impl BootedApp {
 
     /// Answers `request`, `app.fetch(request, env, executionCtx)`.
     ///
+    /// The calling thread is keyed by [`seed_keys`] before the request reaches
+    /// the app, so a host that answers from threads of its own keys each of
+    /// them on its first request, and a route that parses a body parses it
+    /// under that key. Where the key fails the request is refused unread, as
+    /// the doc of `crate::random` says.
+    ///
     /// # Errors
     ///
     /// The future answers the value the chain threw when it is no instance of
@@ -337,6 +344,9 @@ impl BootedApp {
         env: Env,
         execution_ctx: Option<ExecutionCtx>,
     ) -> LocalBoxFuture<'static, core::result::Result<Response, Thrown>> {
+        if seed_keys().is_err() {
+            return Box::pin(core::future::ready(Ok(crate::random::refused())));
+        }
         self.web.fetch(request, env, execution_ctx)
     }
 

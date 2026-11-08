@@ -133,6 +133,7 @@ use crate::{
         Request,
         URL, //
     },
+    random::seed_keys, //
 };
 
 /// The status a fetch the app rejected with an error of any name but
@@ -229,6 +230,9 @@ struct Straight {
 pub fn fetch(app: Rc<BootedApp>) -> Fetch {
     let straight = straight_server(&app);
     Rc::new(move |call: Request| -> Reply {
+        if seed_keys().is_err() {
+            return Box::pin(core::future::ready(answer(&crate::random::refused())));
+        }
         let request = request(&call);
         let pending: LocalBoxFuture<'static, Result<(Response, aosabi_http::Body), Thrown>> =
             if let Some(straight) = &straight {

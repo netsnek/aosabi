@@ -227,15 +227,30 @@ impl fmt::Debug for KeyState {
 /// sixteen bytes of its randomness. The boot of a Linux card calls it with
 /// sixteen bytes of the randomness it installs, before its first pass makes the
 /// cache of parsed documents, whose hash of a text is a [`KeyState`] on every
-/// target. Until a platform calls it, every map of a build whose builder is
-/// [`KeyState`] hashes with the fixed key. Where [`KeyHasherBuilder`] is the
-/// `RandomState` of the standard library, the key reaches only the maps that
-/// name [`KeyState`], since the standard library keys the others.
+/// target. The entries that answer a request, which the module doc of
+/// `aosabi_core::random` names, call its `seed_keys` too before they read one,
+/// so the threads of a host that embeds the engine or calls a service from
+/// threads of its own are keyed on their first request, from the provider the
+/// host installed, and with none, from a `RandomState` where the standard
+/// library draws its keys from the operating system, and on the three targets
+/// where [`KeyHasherBuilder`] is [`KeyState`] for want of such a source each of
+/// those entries refuses a request until the host installs a provider. A Worker
+/// builds this crate with the feature `std` through the default features of
+/// `aosabi-core`, and the module of `aosabi-js` and its native library for Bun
+/// call it with sixteen bytes of `crypto.getRandomValues` of the host at the end
+/// of their boot, and where the host refuses them there, as workerd does in its
+/// global scope, at the first call of an export that decodes a record. Until a
+/// platform calls it, every map of a build whose builder is [`KeyState`] hashes
+/// with the fixed key, the maps the boot of that module makes among them. Where
+/// [`KeyHasherBuilder`] is the `RandomState` of the standard library, the key
+/// reaches only the maps that name [`KeyState`], since the standard library keys
+/// the others.
 ///
 /// The key is kept for the thread that calls it, as the standard library keeps
-/// the keys of `RandomState`, so a map another thread makes keeps the fixed key.
-/// No served crate starts a thread, so the thread that calls it at start makes
-/// every map.
+/// the keys of `RandomState`, so a map another thread makes keeps the fixed key
+/// until that thread is keyed too. No served crate starts a thread, so in a
+/// served binary the thread that calls it at start makes every map, and the
+/// threads of a host are keyed by the entries of the engine.
 ///
 /// Only a build with the feature `std` has it. A function that stores a key
 /// every later map reads needs a static it writes, and without the standard
