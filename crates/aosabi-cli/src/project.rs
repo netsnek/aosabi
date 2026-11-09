@@ -125,13 +125,79 @@ pub enum DepSource {
         /// The pinned version.
         version: String,
     },
-    /// A git dependency, with its repository and the commit the lock pins.
+    /// A git dependency, with its repository and the reference its manifest
+    /// names it by.
     Git {
         /// The URL of the repository.
         url: String,
-        /// The commit.
-        rev: String,
+        /// The reference.
+        reference: GitReference,
     },
+}
+
+/// The reference a manifest names a git dependency by, which cargo keeps in
+/// the query of the source it locks, `?tag=v0.1.0#<commit>` for
+/// `tag = "v0.1.0"`.
+///
+/// The check of the derived lock compares the sources of two locks as text, so
+/// the generated workspace names a git dependency by the reference of the
+/// manifest of the project, and the lock it derives carries the source of the
+/// lock of the project as the same text. A workspace that named the commit by
+/// `rev` would derive the source `?rev=<commit>#<commit>`, which the lock of a
+/// pin by tag, by branch, by a short revision or by the default branch holds
+/// for no package. Each kind passes `--frozen`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GitReference {
+    /// No reference, the default branch of the repository.
+    DefaultBranch,
+    /// A branch, the key `branch`.
+    Branch(String),
+    /// A tag, the key `tag`.
+    Tag(String),
+    /// A revision, the key `rev`, as the manifest writes it.
+    Rev(String),
+}
+
+impl GitReference {
+    /// Returns the key and the value a manifest names the reference by,
+    /// `None` for the default branch, which it names by no key.
+    #[must_use]
+    pub fn key_value(&self) -> Option<(&'static str, &str)> {
+        match self {
+            Self::DefaultBranch => None,
+            Self::Branch(value) => Some(("branch", value)),
+            Self::Tag(value) => Some(("tag", value)),
+            Self::Rev(value) => Some(("rev", value)),
+        }
+    }
+}
+
+/// Returns the URL and the reference of the git source `source` of a
+/// dependency, as cargo metadata states it, `git+<url>` with the query of its
+/// reference and no commit, or `None` for a source of another kind.
+///
+/// The query is one pair, the key and the value as the manifest writes them.
+/// Cargo writes the value without percent encoding here and with it in a lock
+/// of version 4, `tag=v0.0.0+local` here for the tag `v0.0.0+local` and
+/// `tag=v0.0.0%2Blocal` in the lock, so the value is taken whole and decoded by
+/// no rule. The key `ref` is the old name of `branch`, as cargo reads it. The
+/// source of a resolved package adds the commit after `#`, so it is no source
+/// this function reads. The primitive `git-source` of `aosabi-devtool` answers
+/// this reading and the entry [`crate::generate::spec`] writes for it, one case
+/// per kind of reference.
+#[must_use]
+pub fn git_source(source: &str) -> Option<(String, GitReference)> {
+    let git = source.strip_prefix("git+")?;
+    let (url, query) = git.split_once('?').unwrap_or((git, ""));
+    let reference = query
+        .split_once('=')
+        .map_or(GitReference::DefaultBranch, |(key, value)| match key {
+            "branch" | "ref" => GitReference::Branch(value.to_owned()),
+            "tag" => GitReference::Tag(value.to_owned()),
+            "rev" => GitReference::Rev(value.to_owned()),
+            _ => GitReference::DefaultBranch,
+        });
+    Some((url.to_owned(), reference))
 }
 
 /// One normal dependency of a plain crate as the manifest of its generated
@@ -170,13 +236,13 @@ pub enum CopySource {
         /// The URL of a registry other than crates.io.
         registry: Option<String>,
     },
-    /// A dependency of a repository, with its URL and the reference after
-    /// `?` of its source, `rev=..`, `tag=..` or `branch=..`.
+    /// A dependency of a repository, with its URL and the reference its
+    /// manifest names it by.
     Git {
         /// The URL of the repository.
         url: String,
-        /// The reference, as `key=value`.
-        reference: Option<String>,
+        /// The reference.
+        reference: GitReference,
     },
 }
 
@@ -434,19 +500,8 @@ fn copy_dependency(dep: &JsValue) -> Option<CopyDependency> {
     let key = cargo::text(dep, "rename").unwrap_or(&package).to_owned();
     let source = if let Some(path) = cargo::text(dep, "path") {
         CopySource::Path(PathBuf::from(path))
-    } else if let Some(git) =
-        cargo::text(dep, "source").and_then(|source| source.strip_prefix("git+"))
-    {
-        let (url, reference) = git.split_once('?').map_or((git, None), |(url, query)| {
-            (
-                url,
-                Some(query.split('#').next().unwrap_or(query).to_owned()),
-            )
-        });
-        CopySource::Git {
-            url: url.to_owned(),
-            reference,
-        }
+    } else if let Some((url, reference)) = cargo::text(dep, "source").and_then(git_source) {
+        CopySource::Git { url, reference }
     } else {
         CopySource::Registry {
             req: cargo::text(dep, "req").unwrap_or("*").to_owned(),
@@ -587,14 +642,8 @@ fn source_of(metadata: &JsValue, dep: &JsValue) -> Result<DepSource, CliError> {
             "cargo metadata resolved no package for the dependency {name} from {declared}"
         )));
     };
-    let source = cargo::text(resolved, "source").unwrap_or_default();
-    if let Some(git) = source.strip_prefix("git+") {
-        let url_end = git.find(['?', '#']).unwrap_or(git.len());
-        let rev = git.rsplit_once('#').map_or("", |(_, rev)| rev);
-        return Ok(DepSource::Git {
-            url: git[..url_end].to_owned(),
-            rev: rev.to_owned(),
-        });
+    if let Some((url, reference)) = git_source(declared) {
+        return Ok(DepSource::Git { url, reference });
     }
     Ok(DepSource::Registry {
         version: cargo::text(resolved, "version")

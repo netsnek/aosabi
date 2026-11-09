@@ -127,12 +127,13 @@ aosabi-carrier-lora = { path = "../aosabi-carrier-lora", features = ["model"] }
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 aosabi-build = { path = "../aosabi-build", features = ["source"] }
 
-# The command line behind the pull and dotenv primitives, its registry of a
-# remote and its reader of .env. The plan gives the command line the runtime of
-# aosabi-serve, which builds for a Unix host alone, so the seam names it there
-# alone and still builds for wasm32-unknown-unknown. Its client of http:// alone
-# needs no runtime, and the table keeps the form of the plan for the day the
-# client moves to aosabi-fetch.
+# The command line behind the pull, dotenv and git-source primitives, its
+# registry of a remote, its reader of .env and its reader of the source of a
+# dependency from a repository. The command line is meant to run on the runtime
+# of aosabi-serve, which builds for a Unix host alone, so the seam names it
+# there alone and still builds for wasm32-unknown-unknown. Its client of http://
+# alone needs no runtime, and the table keeps the target cfg(unix) for the day
+# the client moves to aosabi-fetch.
 [target.'cfg(unix)'.dependencies]
 aosabi-cli = { path = "../aosabi-cli" }
 

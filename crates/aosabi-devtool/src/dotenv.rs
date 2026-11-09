@@ -51,7 +51,7 @@ use crate::{
 const NAME: &str = "dotenv";
 
 /// The milestone the primitive lands at.
-const LANDS_AT: &str = "M8";
+pub(crate) const LANDS_AT: &str = "cli";
 
 /// The operations of the batch form.
 const OPERATIONS: &Operations = &[("dotenv_parse", op_dotenv_parse)];

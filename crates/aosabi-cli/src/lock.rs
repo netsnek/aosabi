@@ -44,6 +44,7 @@
 //! skips every other line.
 
 use std::{
+    fmt::Write as _,
     fs,
     path::Path, //
 };
@@ -52,6 +53,7 @@ use aosabi_build::update_file_if_changed;
 
 use crate::{
     codes,
+    generate::toml_string,
     project::FACADE,
     report::CliError, //
 };
@@ -90,7 +92,12 @@ pub struct LockReport {
 /// Returns a failure when the file cannot be read or holds a package with
 /// no name or no version.
 pub fn read(path: &Path) -> Result<Vec<LockEntry>, CliError> {
-    let text = read_text(path)?;
+    parse(path, &read_text(path)?)
+}
+
+/// Returns every `[[package]]` table of the text `text` of the lock at
+/// `path`, in its order.
+fn parse(path: &Path, text: &str) -> Result<Vec<LockEntry>, CliError> {
     let mut entries = Vec::new();
     let mut current: Option<PartialEntry> = None;
     let mut in_dependencies = false;
@@ -145,20 +152,56 @@ pub fn read(path: &Path) -> Result<Vec<LockEntry>, CliError> {
 }
 
 /// Writes the lock at `generated_lock` from the lock of the project at
-/// `project_lock`, unless the file holds the same bytes.
+/// `project_lock`, with the packages of the build side beside a facade of a
+/// repository, unless the file holds the same bytes.
 ///
 /// # Errors
 ///
-/// Returns a failure when the lock cannot be read or the file cannot be
-/// written.
+/// Returns a failure when the lock cannot be read or holds a package with no
+/// name or no version, or the file cannot be written.
 pub fn seed(project_lock: &Path, generated_lock: &Path) -> Result<(), CliError> {
     let text = read_text(project_lock)?;
+    let seeded = with_build_side(&text, &parse(project_lock, &text)?);
     if let Some(dir) = generated_lock.parent() {
         fs::create_dir_all(dir).map_err(|error| io_failure(dir, &error))?;
     }
-    update_file_if_changed(generated_lock, text.as_bytes())
+    update_file_if_changed(generated_lock, seeded.as_bytes())
         .map(|_| ())
         .map_err(|error| io_failure(generated_lock, &error))
+}
+
+/// Returns the text `text` of the lock of a project, whose tables are
+/// `entries`, with a table for each package of the build side that it does
+/// not pin from the source of the facade, at the version and from the source
+/// of the facade, where the facade comes from a repository, and `text` as it
+/// is otherwise.
+fn with_build_side(text: &str, entries: &[LockEntry]) -> String {
+    let Some((facade, source)) = entries.iter().find_map(|entry| {
+        let source = entry.source.as_deref()?;
+        (entry.name == FACADE && source.starts_with("git+")).then_some((entry, source))
+    }) else {
+        return text.to_owned();
+    };
+    let mut seeded = text.to_owned();
+    for name in BUILD_SIDE {
+        if entries
+            .iter()
+            .any(|entry| entry.name == name && entry.source.as_deref() == Some(source))
+        {
+            continue;
+        }
+        if !seeded.is_empty() && !seeded.ends_with('\n') {
+            seeded.push('\n');
+        }
+        let _ = write!(
+            seeded,
+            "\n[[package]]\nname = {}\nversion = {}\nsource = {}\n",
+            toml_string(name),
+            toml_string(&facade.version),
+            toml_string(source)
+        );
+    }
+    seeded
 }
 
 /// Checks the derived lock at `generated_lock` against the lock of the

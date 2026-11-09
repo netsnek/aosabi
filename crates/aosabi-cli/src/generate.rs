@@ -64,6 +64,11 @@
 //! where the facade comes: the package beside a path facade, or the version or
 //! the commit of the facade.
 //!
+//! A git dependency is named by the reference the manifest of the project names
+//! it by, a tag, a branch, a revision or none for the default branch, so the
+//! derived lock carries the source of the lock of the project as the same text,
+//! and a pin by tag passes its check.
+//!
 //! `Flavour::Verify` writes the same workspace under
 //! `<target_dir>/aosabi-verify/` with the packages `<name>-verify` and
 //! `<name>-verify-inspect`, so a `verify` never touches `target/aosabi/`
@@ -94,6 +99,7 @@ use crate::{
         CopyFacts,
         CopySource,
         DepSource,
+        GitReference,
         Project, //
     },
     report::CliError, //
@@ -407,9 +413,9 @@ fn build_side_of_facade(project: &Project) -> Result<DepSource, CliError> {
         DepSource::Registry { version } => DepSource::Registry {
             version: version.clone(),
         },
-        DepSource::Git { url, rev } => DepSource::Git {
+        DepSource::Git { url, reference } => DepSource::Git {
             url: url.clone(),
-            rev: rev.clone(),
+            reference: reference.clone(),
         },
     })
 }
@@ -634,13 +640,7 @@ fn dependency_line(dependency: &CopyDependency, dir: &Path) -> Result<String, Cl
             }
             spec
         }
-        CopySource::Git { url, reference } => {
-            let mut spec = format!("git = {}", toml_string(url));
-            if let Some((key, value)) = reference.as_deref().and_then(|r| r.split_once('=')) {
-                let _ = write!(spec, ", {key} = {}", toml_string(value));
-            }
-            spec
-        }
+        CopySource::Git { url, reference } => git_spec(url, reference),
     }];
     if dependency.package != dependency.key {
         parts.push(format!("package = {}", toml_string(&dependency.package)));
@@ -864,10 +864,20 @@ pub fn spec(source: &DepSource, dir: &Path) -> Result<String, CliError> {
         DepSource::Registry { version } => {
             format!("version = {}", toml_string(&format!("={version}")))
         }
-        DepSource::Git { url, rev } => {
-            format!("git = {}, rev = {}", toml_string(url), toml_string(rev))
-        }
+        DepSource::Git { url, reference } => git_spec(url, reference),
     })
+}
+
+/// Returns the specification of a dependency of the repository `url` inside
+/// an inline table, named by `reference` as the manifest of the project
+/// names it, so cargo takes it from the source the lock of the project pins,
+/// as [`GitReference`] says.
+fn git_spec(url: &str, reference: &GitReference) -> String {
+    let mut spec = format!("git = {}", toml_string(url));
+    if let Some((key, value)) = reference.key_value() {
+        let _ = write!(spec, ", {key} = {}", toml_string(value));
+    }
+    spec
 }
 
 /// Returns `path` as UTF-8 text.
