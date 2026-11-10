@@ -183,7 +183,9 @@ note: the service reads the key once, so a key added or changed later takes a re
 
 /// The ignore file of the `native` runtime, which keeps the build directory,
 /// the variables of `.env` and the key file `key.json` the auth plugins read
-/// by default out of git.
+/// by default out of git. It names no `schema.graphql`, so the current schema
+/// the build writes beside `Cargo.toml` stays tracked and a service commits
+/// it.
 pub const GITIGNORE: &str = "/target
 .env
 /key.json

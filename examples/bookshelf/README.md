@@ -13,7 +13,9 @@ PORT=4000 examples/bookshelf/target/aosabi/dist/bookshelf-server
 ```
 
 The build infers the schema from the types of the service and writes it to
-`examples/bookshelf/target/aosabi/schema.graphql`. Ask the service from a second terminal:
+`examples/bookshelf/target/aosabi/schema.graphql` and beside the manifest to
+`examples/bookshelf/schema.graphql`, which the ignore file of the repository keeps out of git. Ask
+the service from a second terminal:
 
 ```sh
 curl -s localhost:4000/graphql -H 'content-type: application/json' \

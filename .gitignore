@@ -8,6 +8,10 @@ node_modules/
 # option
 .aosabi/
 
+# The schema the build of each example writes beside its manifest
+/examples/bookshelf/schema.graphql
+/examples/worker/schema.graphql
+
 # Python environment of the harness
 .venv/
 

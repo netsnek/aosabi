@@ -313,7 +313,9 @@ impl Supervisor {
         Ok(())
     }
 
-    /// Runs steps 3 to 7 of `build` for the card and answers the binary.
+    /// Runs steps 3 to 7 of `build` for the card, writes the schema into the
+    /// folder of the project once the build answered a binary, and answers
+    /// the binary.
     fn build(&self) -> Result<PathBuf, CliError> {
         let args = BuildArgs {
             device: None,
@@ -329,12 +331,14 @@ impl Supervisor {
             Output::Inherit,
             &self.setup.cargo,
         )?;
-        outcome.binary.ok_or_else(|| {
+        let binary = outcome.binary.clone().ok_or_else(|| {
             CliError::new(format!(
                 "the card {} built no binary to serve",
                 self.setup.card.name
             ))
-        })
+        })?;
+        build::write_project_schema(&self.setup.project, &outcome)?;
+        Ok(binary)
     }
 
     /// Starts `binary` as the child in the project root.

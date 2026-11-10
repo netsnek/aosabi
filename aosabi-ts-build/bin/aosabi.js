@@ -56,9 +56,10 @@ of src/ with the compiler options of its tsconfig.json, infers the schema of
 the default export of src/index.ts with infer.wasm over the checker of that program, transpiles
 every file of src/ and the configuration into .aosabi/, keeping every import, and writes the glue
 there, schema.graphql, schema.mjs, resolvers.js, ir.json, ir.mjs, server.mjs and worker.mjs, the
-entry of a Cloudflare Worker. It loads the configuration it transpiled. A source with a syntax
-error, a configuration that throws when it loads and a schema that forms no valid GraphQL schema
-fail the build before a file of the glue is written.`
+entry of a Cloudflare Worker. It loads the configuration it transpiled. It writes the schema to
+schema.graphql in the working directory as well, the file an app commits, where its text changed. A
+source with a syntax error, a configuration that throws when it loads and a schema that forms no
+valid GraphQL schema fail the build before a file of the glue or that schema is written.`
 
 /** Resolves to the exit code of the command line `args`. */
 async function run(args) {

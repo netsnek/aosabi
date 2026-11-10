@@ -2,7 +2,8 @@
 /*
  * aosabi-build lib/build: the command aosabi build, the author mode of the TypeScript option, which
  * infers the schema of an app over the live checker of typescript with the module infer.wasm,
- * transpiles its sources and writes the glue into .aosabi/.
+ * transpiles its sources and writes the glue into .aosabi/ and the current schema into the folder of
+ * the app.
  *
  * It fails on an app with no entry or no default export, on a refusal of the inference, on a source
  * with a syntax error, on a configuration that throws when it loads and on a schema that is no valid
@@ -14,11 +15,17 @@ import path from 'node:path'
 import {pathToFileURL} from 'node:url'
 import ts from 'typescript'
 import {ROOTS, createSource} from './checker.js'
-import {emitGlue, findConfigFile, transpileApp} from './glue.js'
+import {emitGlue, findConfigFile, transpileApp, updateFileIfChanged} from './glue.js'
 
 /** The entry of an app and the folder of the build. */
 const SFI_FILE_PATH = './src/index.ts'
 const OUTPUT_DIR = './.aosabi'
+
+/**
+ * The current schema in the folder of the app, beside package.json and aosabi.config.ts, the file an
+ * app commits, a named divergence.
+ */
+const SCHEMA_FILE = 'schema.graphql'
 
 /** The module of the inference beside this folder in the package. */
 const INFER_WASM = new URL('../infer.wasm', import.meta.url)
@@ -215,7 +222,10 @@ async function loadConfig(configOut) {
  * of the invalid schema. The step loads the configuration after the transpile, whose file plain
  * Node imports, fails on a load that throws, and calls no member build of a plugin, which only the
  * plugin usePages holds, since the package carries no entry of the pages. The typed client of the
- * subpath query waits with that subpath.
+ * subpath query waits with that subpath. After the glue the step writes the schema of the glue to
+ * schema.graphql in `cwd` as well, with the bytes of .aosabi/schema.graphql and only when its text
+ * changed, so a second build of the same source writes no byte there, and a build that fails writes
+ * none.
  */
 export async function build(cwd, {wasm, warn = message => console.error(message)} = {}) {
   const sfiFilePath = path.join(cwd, SFI_FILE_PATH)
@@ -243,6 +253,7 @@ export async function build(cwd, {wasm, warn = message => console.error(message)
     appImport: relative(entryOut),
     configImport: configOut ? relative(configOut) : null
   })
+  updateFileIfChanged(path.join(cwd, SCHEMA_FILE), inferred.typeDefs)
   return {schemaChanged, transpiled: written, warnings: inferred.warnings, counts: inferred.counts}
 }
 

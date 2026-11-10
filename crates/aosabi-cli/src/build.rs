@@ -42,6 +42,14 @@
 //! 10. `target/aosabi/build.json`, the build record, and the build log of
 //!     `docs/cli-and-targets.md` section 5.0 on standard error.
 //!
+//! A build that writes the schema, of the server package or of a plain
+//! crate for any card, leaves it in the folder of the project as well, as
+//! `schema.graphql` beside `Cargo.toml` with the bytes of the copy under
+//! `target/aosabi/` and only when its text changed, the current schema a
+//! service commits. The command writes it as its last step, after the build
+//! record of step 10 and before the build log, so a build that fails at any
+//! step writes none, and `verify` never writes it ([`write_project_schema`]).
+//!
 //! A plain crate, whose roots no fragment of `graphql!` holds, takes the source
 //! path for the schema: the reader of `aosabi-build` reads the crate from its
 //! root as rustc compiles it for the card, stripped over the active set
@@ -282,6 +290,10 @@ pub struct BuildOutcome {
     /// The crates of the framework the wrapper of rustc of a release build
     /// at the switch `source` names, `None` for a build that took no set.
     pub source_crates: Option<Vec<String>>,
+    /// The schema the build wrote into its artifact directory, `None` for a
+    /// build that writes none, which [`write_project_schema`] copies into
+    /// the folder of the project once the build succeeded.
+    pub schema: Option<PathBuf>,
 }
 
 /// What [`prepare`] made ready for the cargo build of a server package.
@@ -379,11 +391,11 @@ pub fn run(
     } else {
         None
     };
-    match card.builds {
+    let mut outcome = match card.builds {
         Builds::ServerPackage(package) => run_server(&job, &package, plain.as_ref()),
         Builds::AppForTarget { features } => match &plain {
             Some(plain) => run_source_app(&job, features, plain),
-            None => run_app(&job, features),
+            None => return run_app(&job, features),
         },
         Builds::KernelForTarget { packages } => {
             let Some(plain) = &plain else {
@@ -399,7 +411,40 @@ pub fn run(
             outcome.artifacts = present_artifacts(&artifact_dir);
             Ok(outcome)
         }
-    }
+    }?;
+    // The roads that write no schema returned above, so this build wrote
+    // the schema of the service into its artifact directory.
+    outcome.schema = Some(artifact_dir(project, flavour).join(SCHEMA_FILE));
+    Ok(outcome)
+}
+
+/// Writes the schema the build of `project` with `outcome` wrote into its
+/// artifact directory as `schema.graphql` in the folder of the project, the
+/// directory of its `Cargo.toml`.
+///
+/// The command `build` calls it as its last step, after the build record, and
+/// the loop of `dev` after each build that answers a binary, so a build that
+/// fails at any step writes none, and `verify` never calls it. The file holds
+/// the bytes of the copy in the artifact directory, which the glue, the client
+/// and the server package read and which stays, and it is written only when its
+/// text changed, so a second build of the same source writes no byte. A file of
+/// that name the project held before is overwritten. The file in the folder of
+/// the project is the current schema a service commits, a named divergence.
+///
+/// # Errors
+///
+/// Returns the failure of the write.
+pub fn write_project_schema(project: &Project, outcome: &BuildOutcome) -> Result<(), CliError> {
+    let Some(copy) = &outcome.schema else {
+        return Ok(());
+    };
+    let Ok(schema) = fs::read(copy) else {
+        return Ok(());
+    };
+    let path = project.root.join(SCHEMA_FILE);
+    update_file_if_changed(&path, &schema)
+        .map(|_| ())
+        .map_err(|error| io_failure(&path, &error))
 }
 
 /// Returns what the build `job` of a plain crate reads from its source, the
@@ -770,6 +815,8 @@ fn build(args: &BuildArgs, global: &Global, env_file: &DotEnv) -> Result<(), Cli
     );
     let record_path = artifact_dir.join(BUILD_FILE);
     write_json(&record_path, &record)?;
+    // The last step that can fail, so a failed build writes no schema there.
+    write_project_schema(&project, &outcome)?;
     eprint!("{}", log(&project, card, &outcome, image.as_ref()));
     Ok(())
 }
@@ -881,9 +928,8 @@ fn run_server(
         artifacts: present_artifacts(&prepared.artifact_dir),
         generated: Some(prepared.generated),
         lock: Some(prepared.lock),
-        library: None,
-        note: None,
         source_crates: source.map(|source| source.crates),
+        ..BuildOutcome::default()
     })
 }
 
