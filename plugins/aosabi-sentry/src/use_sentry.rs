@@ -30,6 +30,13 @@
 //! whenever the result has errors, and the map writes into the same error
 //! objects, so the port writes into the errors in place.
 //!
+//! The variables of the operation enter an event only where the option
+//! `includeExecuteVariables` is true, as the extra `variables` and as the
+//! member `variables` of the `GraphQL` context of each capture, so an event
+//! of the port with the option unset or false carries no variable of the
+//! operation, and with the option true it carries them where the reference
+//! does.
+//!
 //! The plugin calls no `init`, so the GraphQL half sends an event only where
 //! the application called `init` of [`crate::hub`], and the middleware sends
 //! the error of a route only where its options or its environment name a DSN.
@@ -171,7 +178,9 @@ pub struct SentryPluginOptions {
     pub rename_transaction: Option<bool>,
     /// `includeRawResult`, `false` by default, the result as an extra.
     pub include_raw_result: Option<bool>,
-    /// `includeExecuteVariables`, `false` by default, the variables as an extra.
+    /// `includeExecuteVariables`, `false` by default, the variables of the
+    /// operation as an extra and in the `GraphQL` context of each capture,
+    /// where an event carries none of them otherwise, a named divergence.
     pub include_execute_variables: Option<bool>,
     /// `eventIdKey`.
     pub event_id_key: Option<EventIdKey>,
@@ -422,7 +431,10 @@ impl Execution {
         let mut graphql = JsObject::new();
         graphql.insert("operationName", self.op_name.as_str());
         graphql.insert("operationType", self.operation_type);
-        graphql.insert("variables", variables.clone());
+        // The variables enter the context only where the option is true.
+        if self.options.include_execute_variables == Some(true) {
+            graphql.insert("variables", variables.clone());
+        }
         let mut contexts = JsObject::new();
         contexts.insert("GraphQL", JsValue::Object(graphql));
         let hint = CaptureContext {
