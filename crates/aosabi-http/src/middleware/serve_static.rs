@@ -20,10 +20,11 @@
 //! A request passes through these steps.
 //!
 //! 1. A finalized context passes on to `next`.
-//! 2. The file name is the option `path` where it is set, which serves one
-//!    file for every request, and otherwise `decodeURIComponent` of the
-//!    request path. A path that does not decode or that holds a `..` segment
-//!    calls `on_not_found` with the request path and passes on.
+//! 2. The file name is the option `path` where it is set, which serves one file
+//!    for every request, and otherwise the request path as the router decoded
+//!    it, with no second decode. A path that holds a `%`, a segment of one or
+//!    two dots, a run of two or more `/` or a `\` calls `on_not_found` with the
+//!    request path and passes on, a named divergence.
 //! 3. The path is the root joined with the file name, rewritten by
 //!    `rewrite_request_path` where no `path` is set. A directory is joined
 //!    with `index`, `index.html` by default. A path with no file calls
@@ -76,16 +77,12 @@ use crate::{
     },
     middleware::compress::is_compressible,
     utils::{
-        filepath::{
-            DEFAULT_DOCUMENT,
-            has_parent_segment, //
-        },
+        filepath::DEFAULT_DOCUMENT,
         mime::{
             InheritedProperty,
             MIMES,
             get_mime_type, //
-        },
-        url::decode_uri_component, //
+        }, //
     }, //
     web_app::RouteError,
 };
@@ -269,12 +266,25 @@ async fn serve<E: RouteError, C: Content>(
     body_with(&c, body, code)
 }
 
-/// Returns the file name of the request path `request_path`, `None` where it
-/// does not decode or holds a `..` segment.
+/// Returns the file name of the request path `request_path`, the path itself,
+/// `None` where it holds a `%`, a segment of one or two dots, a run of two or
+/// more `/` or a `\`.
 ///
-/// The reference throws in either case and passes on in its `catch`.
+/// The router reads the path of a request decoded once, so the file name takes
+/// no second decode, a named divergence. A refused path passes on as a path
+/// with no file, the way the reference passes on a path it does not serve in
+/// its `catch`.
 fn request_filename(request_path: &str) -> Option<String> {
-    decode_uri_component(request_path).filter(|filename| !has_parent_segment(filename))
+    let refused = request_path.contains(['%', '\\'])
+        || request_path.contains("//")
+        || request_path
+            .split('/')
+            .any(|segment| segment == "." || segment == "..");
+    if refused {
+        None
+    } else {
+        Some(String::from(request_path))
+    }
 }
 
 /// Returns the path of `filename` below the root and what the provider knows
