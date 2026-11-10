@@ -50,6 +50,9 @@
 //! [`CREDENTIAL_PARTS`], the cookies and the parameter `token` of the query.
 //! The parameter `variables`, which holds the variables of an operation sent
 //! by `GET`, stays out as well, a named divergence.
+//!
+//! The client of the middleware takes the same rule for the fields and the
+//! parameters ([`crate::toucan`]).
 
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -220,6 +223,7 @@ fn is_credential_field(name: &str) -> bool {
     CREDENTIAL_PARTS.iter().any(|part| name.contains(part))
 }
 
+/// The names of the fields of a request that carry the address of the client.
 pub(crate) const ADDRESS_FIELDS: [&str; 12] = [
     "X-Client-IP",
     "X-Forwarded-For",

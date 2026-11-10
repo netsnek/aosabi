@@ -37,6 +37,11 @@
 //! operation, and with the option true it carries them where the reference
 //! does.
 //!
+//! The request data of an event leaves out the parameter `variables` of the
+//! query whatever the option says, since the module `integrations` and the
+//! client of the middleware build it apart from the plugin, and the document
+//! of the operation stays in the extra `document` as the reference writes it.
+//!
 //! The plugin calls no `init`, so the GraphQL half sends an event only where
 //! the application called `init` of [`crate::hub`], and the middleware sends
 //! the error of a route only where its options or its environment name a DSN.

@@ -162,8 +162,10 @@ thread_local! {
 /// key and its handle in the table of the boot, 0 for a key whose value is a
 /// function or holds one the engine runs none of.
 ///
-/// Every other key of the middleware takes no effect here, and one that holds
-/// a function fails the boot, section 14 of `docs/ts1-surface.md`.
+/// Where `enabled` is `false`, and for no other value, the client of the
+/// middleware sends no event, as a client of Toucan with that option sends
+/// none, the act `START`. Every other key of the middleware takes no effect
+/// here, and one that holds a function fails the boot.
 ///
 /// # Errors
 ///
