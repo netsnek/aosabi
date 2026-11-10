@@ -19,7 +19,8 @@
 //!
 //! A request passes through these steps.
 //!
-//! 1. A finalized context passes on to `next`.
+//! 1. A finalized context passes on to `next`, and so does a request of a
+//!    method other than `GET` and `HEAD`, a named divergence.
 //! 2. The file name is the option `path` where it is set, which serves one file
 //!    for every request, and otherwise the request path as the router decoded
 //!    it, with no second decode. A path that holds a `%`, a segment of one or
@@ -35,9 +36,8 @@
 //!    `br`, `zstd` and `gzip` that `Accept-Encoding` names and whose sibling
 //!    `.br`, `.zst` or `.gz` exists is served with `Content-Encoding` and
 //!    `Vary: Accept-Encoding`.
-//! 5. `HEAD` and `OPTIONS` answer 200 with `Content-Length` and no body. A
-//!    request with no `Range` answers 200 with the whole file and
-//!    `Content-Length`.
+//! 5. `HEAD` answers 200 with `Content-Length` and no body. A `GET` with no
+//!    `Range` answers 200 with the whole file and `Content-Length`.
 //! 6. The callback `on_found` is called with the path last, before the
 //!    answer is made, so a header it sets reaches the answer.
 //!
@@ -236,6 +236,10 @@ async fn serve<E: RouteError, C: Content>(
     if c.finalized() {
         return next.run(c).await;
     }
+    let method = c.req().method();
+    if method != "GET" && method != "HEAD" {
+        return next.run(c).await;
+    }
     let option_path = options.path.as_deref().filter(|path| !path.is_empty());
     let filename = if let Some(path) = option_path {
         String::from(path)
@@ -428,8 +432,7 @@ fn respond<E: RouteError, C: Content>(
 ) -> Result<Option<Prepared>, E> {
     let size = stats.size.to_string();
     let range = c.req().header("range").unwrap_or_default();
-    let method = c.req().method();
-    if method == "HEAD" || method == "OPTIONS" {
+    if c.req().method() == "HEAD" {
         c.header("Content-Length", &size);
         return Ok(Some((200, Body::Empty)));
     }
@@ -473,8 +476,7 @@ fn respond_range<E: RouteError, C: Content>(
 ///
 /// The context has no helper that takes a body and a status, so the status
 /// is prepared first, where it stays for the rest of the request. For a
-/// `HEAD` and an `OPTIONS` this is `c.status(200)` and `c.body(null)` of the
-/// reference.
+/// `HEAD` this is `c.status(200)` and `c.body(null)` of the reference.
 fn body_with<E: RouteError>(c: &Context, body: Body, status: u16) -> Result<Response, E> {
     c.status(status);
     c.body(body)

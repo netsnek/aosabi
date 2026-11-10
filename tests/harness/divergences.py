@@ -507,6 +507,16 @@ def node_server_change(method: str, headers, reference, side) -> str | None:
     return None
 
 
+def serve_static_method(method: str, reference, side) -> str | None:
+    """Return `static-method` where the answer `side` of a Rust twin to a request of `method` is hono's not found, or None.
+
+    `reference` is the answer of the reference to the same request.
+    """
+    if reference is None or side is None or method in ("GET", "HEAD"):
+        return None
+    return "static-method" if reference.status == 200 and hono_not_found(side) else None
+
+
 #: The threshold of compress(), the length below which an answer that carries its Content-Length stays uncoded.
 COMPRESS_THRESHOLD = 1024
 
