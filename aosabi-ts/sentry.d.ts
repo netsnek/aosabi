@@ -22,6 +22,8 @@ export interface NodeOptions {
   release?: string
   /** The share of the errors the client sends, every one where the options name none. */
   sampleRate?: number
+  /** Whether the client sends events, none where it is false, which sets up no client. */
+  enabled?: boolean
   [key: string]: unknown
 }
 

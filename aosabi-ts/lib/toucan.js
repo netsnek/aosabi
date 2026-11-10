@@ -70,8 +70,10 @@ function refuseFunction(key, value, seen) {
 // options of the call, an own member that is undefined among them, so
 // init({dsn: undefined}) names no DSN, and the release of the options where
 // they name one and the release getSentryRelease reads otherwise. The engine
-// takes the DSN, the environment, the release and the sample rate at its
-// boot, and an option that is a function or holds one throws.
+// takes the DSN, the environment, the release and the sample rate at its boot,
+// and enabled where it is false, for which the engine sets up no client, so no
+// event leaves, as the client of @sentry/node sends none then, and an option
+// that is a function or holds one throws.
 export function setInit(options = {}) {
   for (const [key, value] of Object.entries(options)) refuseFunction(key, value, new Set());
   const env = globalThis.process?.env ?? {};
@@ -87,6 +89,7 @@ export function setInit(options = {}) {
     release: typeof merged.release === "string" ? merged.release : undefined,
     sampleRate: typeof merged.sampleRate === "number" ? merged.sampleRate : undefined,
   };
+  if (merged.enabled === false) initialized.enabled = false;
 }
 
 // Returns the options of the last init, or undefined before the first.

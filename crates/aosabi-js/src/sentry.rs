@@ -78,6 +78,7 @@ use aosabi_sentry::{
     },
     toucan::{
         Toucan,
+        ToucanOptions,
         message_of, //
     },
     use_sentry, //
@@ -151,8 +152,9 @@ thread_local! {
     /// The clients of the requests in flight, each with its request.
     static CLIENTS: RefCell<Vec<(u32, Rc<Toucan>)>> = const { RefCell::new(Vec::new()) };
     /// The options of the middleware of each marker `useSentry` of the
-    /// configuration, in their order.
-    static MARKERS: RefCell<Vec<ClientOptions>> = const { RefCell::new(Vec::new()) };
+    /// configuration, in their order, `None` for a marker whose option
+    /// `enabled` is `false`.
+    static MARKERS: RefCell<Vec<Option<ClientOptions>>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Returns the plugin of the marker `useSentry` with the JSON data of its
@@ -206,13 +208,14 @@ pub fn plugin(options: &JsValue, functions: &[(String, u32)]) -> Result<PluginSl
             (key, _) => return Err(format!("the option {key} {WAITS}")),
         }
     }
+    let enabled = flag("enabled") != Some(false);
     MARKERS.with_borrow_mut(|markers| {
-        markers.push(ClientOptions {
+        markers.push(enabled.then(|| ClientOptions {
             dsn: sentry.dsn.clone(),
             environment: sentry.environment.clone(),
             release: sentry.release.clone(),
             sample_rate: sentry.sample_rate,
-        });
+        }));
     });
     Ok(PluginSlot::new(use_sentry(sentry).into_plugin()))
 }
@@ -238,6 +241,11 @@ fn skip(handle: u32) -> aosabi_sentry::use_sentry::ArgsFn<bool> {
 
 /// Initializes the hub of the engine with the JSON data `options` of the last
 /// `Sentry.init` the app made, `aosabi_sentry::init`.
+///
+/// Where the option `enabled` is `false`, and for no other value, the hub sets
+/// up no client, so it sends no event and installs no integration, as the
+/// client of `@sentry/node` 8.55.0 with that option sends none and sets up
+/// none.
 // Out of line, so a boot compiles the options of `Sentry.init` where the app made one.
 #[inline(never)]
 pub fn init(options: &JsValue) {
@@ -245,6 +253,9 @@ pub fn init(options: &JsValue) {
         aosabi_sentry::init(ClientOptions::default());
         return;
     };
+    if matches!(object.get("enabled"), Some(JsValue::Bool(false))) {
+        return;
+    }
     let text = |key: &str| match object.get(key) {
         Some(JsValue::String(value)) => Some(to_string_lossy(value).into_owned()),
         _ => None,
@@ -469,11 +480,18 @@ fn with_scope<R>(request: u32, number: u32, body: impl FnOnce(&mut Scope) -> R) 
 /// The environment of a request is the variables of the process of the host
 /// the boot took, the string bindings of a Worker among them. A request holds
 /// one client, the first one built.
+///
+/// A marker whose option `enabled` is `false` builds a client with no DSN,
+/// whose captures answer an event id and send nothing, as the captures of the
+/// Toucan of such a marker do. Where the request holds the client of the
+/// canary already, that marker answers that it holds none, so its middleware
+/// neither sets that client nor captures through it.
 fn start(request: u32, c: &Context, marker: u32) -> bool {
-    if client_of(request).is_some() {
-        return true;
-    }
-    let options = if marker == CANARY {
+    let held = client_of(request).is_some();
+    let toucan = if marker == CANARY {
+        if held {
+            return true;
+        }
         let env = c.env();
         let dsn = env
             .var("SENTRY_DSN")
@@ -482,7 +500,7 @@ fn start(request: u32, c: &Context, marker: u32) -> bool {
         if dsn.is_none() {
             return false;
         }
-        ClientOptions::default()
+        client(c, &ClientOptions::default())
     } else {
         let Some(options) = usize::try_from(marker)
             .ok()
@@ -490,9 +508,13 @@ fn start(request: u32, c: &Context, marker: u32) -> bool {
         else {
             return false;
         };
-        options
+        match options {
+            Some(_) if held => return true,
+            Some(options) => client(c, &options),
+            None if held => return false,
+            None => Rc::new(Toucan::new(ToucanOptions::default())),
+        }
     };
-    let toucan = client(c, &options);
     CLIENTS.with_borrow_mut(|clients| clients.push((request, toucan)));
     true
 }

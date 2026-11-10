@@ -112,7 +112,7 @@ VARIANTS = ("default", "graphiql_false", "landing_false", "both", "logger_false"
 FIXTURE_VARIANTS = {
     "plugins-app": ("default", "fail_named", "fail_unnamed", "fail_value", "fail_last", "cycle"),
     "use-identity-app": ("default", "async", "numeric", "failing", "none", "twice"),
-    "sentry-app": ("default", "null_key", "custom_key", "skip", "env_dsn", "initialized"),
+    "sentry-app": ("default", "null_key", "custom_key", "skip", "env_dsn", "initialized", "variables", "disabled"),
     "zitadel-login-app": ("default", "endpoint", "http_issuer", "bad_key", "key_file", "no_key", "pkcs8_key"),
     "zitadel-auth-app": ("default", "mapped", "key_file", "two_keys", "with_login"),
     "zitadel-providers-app": ("default", "unused_first", "second_first", "per_request", "streamed"),
