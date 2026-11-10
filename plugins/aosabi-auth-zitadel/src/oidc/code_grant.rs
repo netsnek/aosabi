@@ -11,12 +11,13 @@
 //! The grant reads the parameters of the callback URL, checks them against the expected
 //! state, posts the code to the token endpoint and checks the answer.
 //!
-//! The body of the token request is the query of the callback in its order with `code`
-//! set in place, then `redirect_uri`, `code_verifier`, `grant_type`, `client_id`,
-//! `client_assertion_type` and `client_assertion`, sent as a `POST` with the headers
-//! `accept`, `content-type` and `user-agent` in that order. The request names no
-//! `accept-encoding` and carries no signal. So the network capability ends it at its own
-//! 30 seconds with the `TypeError` `fetch failed`.
+//! The body of the token request is the parameters the caller hands the grant in their
+//! order, then `redirect_uri`, `code` and `code_verifier`, each set in place where a
+//! parameter names it, then `grant_type`, `client_id`, `client_assertion_type` and
+//! `client_assertion`, sent as a `POST` with the headers `accept`, `content-type` and
+//! `user-agent` in that order. The request names no `accept-encoding` and carries no
+//! signal. So the network capability ends it at its own 30 seconds with the `TypeError`
+//! `fetch failed`.
 //!
 //! An ID token in the answer is decoded and its claims checked: `aud`, `exp`, `iat`,
 //! `iss` and `sub` present, `iss` the issuer, `aud` the client, `azp` for more than one

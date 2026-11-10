@@ -26,6 +26,8 @@
 //!
 //! The callback holds the `state` of its query to the state its login bound to the verifier cookie.
 //!
+//! The callback hands the token request the code of its query and no other parameter of it.
+//!
 //! The bootstrap is shared by the provider and the login routes. It reads the auth key, imports its
 //! private key, and discovers the issuer with the key as the client authentication. One cache of
 //! this thread holds the bootstraps. The provider and the routes each keep the slot the cache gave
@@ -703,21 +705,23 @@ fn cookie_text(value: &JsString) -> Result<&str, Thrown> {
 
 /// Answers `GET <endpoint>/callback`, the exchange of the code for the session cookie.
 ///
-/// The bootstrap runs first. A `code` or a `state` that is missing or empty
-/// answers the `HTTPException` 400 `Missing authorization code or state`, and
-/// a missing or empty cookie `aosabi_code_verifier` the `HTTPException` 400
-/// `Missing code verifier`. The grant takes the callback URL, the verifier,
-/// the callback's own `state` as the expected one and the pairs of the
-/// callback URL as the parameters of the token request. The answer sets
-/// `aosabi-auth` to the access token with `httpOnly` and `maxAge` of
-/// `expires_in`, 3600 where that is absent or 0, and redirects to `/`. An
-/// access token with a lone surrogate answers the `URIError` of
-/// [`cookie_text`], as `setCookie` throws it.
+/// The bootstrap runs first. A `code` or a `state` that is missing or empty answers the
+/// `HTTPException` 400 `Missing authorization code or state`, and a missing or empty
+/// cookie `aosabi_code_verifier` the `HTTPException` 400 `Missing code verifier`.
 ///
 /// The callback holds its query to the state the login bound to the verifier cookie,
 /// [`bound_state`], by the checks of the authorization response of the grant, so a `state` the
 /// login did not bind answers the `ClientError` `invalid response encountered`, the form the grant
 /// gives `unexpected "state" response parameter value`.
+///
+/// The grant takes the callback URL, the verifier, the callback's own `state` as the expected one
+/// and the empty list as the parameters of the token request, so the token request carries the code
+/// of the query, the redirect URI, the verifier, the grant type and the client authentication alone
+/// and no other parameter of the query.
+///
+/// The answer sets the session cookie to the access token with `httpOnly` and `maxAge` of
+/// `expires_in`, 3600 where that is absent or 0, and redirects to `/`. An access token with a lone
+/// surrogate answers the `URIError` of [`cookie_text`], as `setCookie` throws it.
 ///
 /// The session cookie carries `SameSite=Lax` as the cookie of the verifier does, and `Secure` where
 /// [`over_https`] holds.
@@ -755,8 +759,7 @@ async fn callback(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
         pkce_code_verifier: Some(code_verifier),
         expected_state: Some(String::from(state)),
     };
-    let tokens =
-        authorization_code_grant(&config, &cb_url, &checks, &cb_url.search_params()).await?;
+    let tokens = authorization_code_grant(&config, &cb_url, &checks, &[]).await?;
     let max_age = tokens
         .expires_in
         .filter(|seconds| *seconds != 0.0)
