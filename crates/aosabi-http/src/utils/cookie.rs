@@ -219,16 +219,16 @@ pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
         return Vec::new();
     }
     let mut parsed: Vec<(String, String)> = Vec::new();
-    for pair in js_trim(cookie).split(';') {
-        let pair = js_trim(pair);
+    for pair in trim_space_and_tab(cookie).split(';') {
+        let pair = trim_space_and_tab(pair);
         let Some(value_start) = pair.find('=') else {
             continue;
         };
-        let cookie_name = js_trim(&pair[..value_start]);
+        let cookie_name = trim_space_and_tab(&pair[..value_start]);
         if name.is_some_and(|name| name != cookie_name) || !is_cookie_name(cookie_name) {
             continue;
         }
-        let mut value = js_trim(&pair[value_start + 1..]);
+        let mut value = trim_space_and_tab(&pair[value_start + 1..]);
         if value.starts_with('"') && value.ends_with('"') {
             value = value.get(1..value.len().saturating_sub(1)).unwrap_or("");
         }
@@ -404,12 +404,14 @@ fn own_keys_order(mut object: Vec<(String, String)>) -> Vec<(String, String)> {
     object
 }
 
-/// Returns `text` without the white space `String.prototype.trim` removes.
+/// Returns `text` without the space and the horizontal tab at its ends.
 ///
-/// That set is `WhiteSpace` and `LineTerminator` of ECMA-262, which is the
-/// Unicode `White_Space` property with U+FEFF added and U+0085 left out.
-fn js_trim(text: &str) -> &str {
-    text.trim_matches(|c: char| c == '\u{FEFF}' || (c.is_whitespace() && c != '\u{0085}'))
+/// Those two are the white space `WSP` a browser trims from the name and the
+/// value of a cookie it stores, and no other white space is trimmed, so a name
+/// or a value that another one opens or ends fails its grammar, a named
+/// divergence.
+fn trim_space_and_tab(text: &str) -> &str {
+    text.trim_matches([' ', '\t'])
 }
 
 /// Returns `new Date(time).toUTCString()`, `Invalid Date` for no time value.
