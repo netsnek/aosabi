@@ -65,7 +65,9 @@ use crate::{
     router::{
         METHOD_NAME_ALL,
         Params,
-        Router, //
+        Router,
+        constrained_parameter,
+        constraint_refusal, //
     },
     utils::url::{
         get_path,
@@ -510,6 +512,9 @@ impl<E: RouteError> WebApp<E> {
     }
 
     /// Adds one route.
+    ///
+    /// A path whose parameter carries a constraint `:name{...}` is refused with a panic
+    /// that names the place of the registration, a named divergence.
     fn add_route(
         &self,
         method: &str,
@@ -521,6 +526,14 @@ impl<E: RouteError> WebApp<E> {
         // upper case keeps every mapping of `toUpperCase`.
         let method = upper_case(method);
         let path = merge_path(&self.base_path, path);
+        if let Some((name, constraint)) = constrained_parameter(&path) {
+            panic!(
+                "{} The route is registered at {}:{}.",
+                constraint_refusal(&method, &path, &name, &constraint),
+                location.file(),
+                location.line()
+            );
+        }
         let route = Route {
             csrf: handler.is_csrf(),
             handler,

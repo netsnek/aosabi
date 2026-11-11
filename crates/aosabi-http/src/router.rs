@@ -106,7 +106,16 @@ impl<H: Clone> Router<H> {
     /// Adds the route `path` of `method` with `handler`.
     ///
     /// A path with an optional parameter adds each path it stands for.
+    ///
+    /// # Panics
+    ///
+    /// Panics where a parameter of `path` carries a constraint `:name{...}`,
+    /// [`constrained_parameter`], which the router does not match, a named
+    /// divergence.
     pub fn add(&mut self, method: &str, path: &str, handler: &H) {
+        if let Some((name, constraint)) = constrained_parameter(path) {
+            panic!("{}", constraint_refusal(method, path, &name, &constraint));
+        }
         match check_optional_parameter(path) {
             Some(results) => {
                 for result in results {
@@ -285,6 +294,40 @@ impl<H: Clone> Router<H> {
             .map(|(_, handler, params)| (handler, params))
             .collect()
     }
+}
+
+/// Returns the name and the constraint of the first parameter of the route
+/// path `path` that carries a constraint `:name{...}`, `None` where none does.
+///
+/// The labels are read as the router reads them, [`split_routing_path`], so a
+/// `/` inside a constraint stays in its label. A label that starts with `:`
+/// and holds a `{` carries a constraint, an optional parameter `:name{...}?`
+/// among them, and the constraint runs from the first `{` to the last `}`.
+#[must_use]
+pub fn constrained_parameter(path: &str) -> Option<(String, String)> {
+    split_routing_path(path).into_iter().find_map(|label| {
+        let rest = label.strip_prefix(':')?;
+        let open = rest.find('{')?;
+        let close = rest
+            .rfind('}')
+            .filter(|&close| close > open)
+            .unwrap_or(rest.len());
+        Some((
+            String::from(&rest[..open]),
+            String::from(&rest[open + 1..close]),
+        ))
+    })
+}
+
+/// Returns the message of the refusal of the route `path` of `method`, whose
+/// parameter `name` carries the constraint `constraint`.
+#[must_use]
+pub fn constraint_refusal(method: &str, path: &str, name: &str, constraint: &str) -> String {
+    format!(
+        "The route {method} {path} gives the parameter :{name} the constraint {{{constraint}}}, \
+         which the router of Aosabi does not match. Write the parameter as :{name} and check \
+         its value in the handler."
+    )
 }
 
 /// Returns the value of `key` in `params`.
