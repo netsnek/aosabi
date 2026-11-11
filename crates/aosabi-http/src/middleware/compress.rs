@@ -67,10 +67,7 @@ use crate::{
         body::LocalBoxFuture,
         response::Response, //
     },
-    web_app::{
-        MiddlewareFn,
-        RouteError, //
-    }, //
+    web_app::RouteError, //
 };
 
 /// The codings `compress()` picks from, in order, `deflate` alone.
@@ -132,14 +129,24 @@ pub const fn card_params() -> graphtp::deflate::Params {
 }
 
 /// Returns the middleware `compress()` with no options.
-#[must_use]
-pub fn compress<E: RouteError>() -> impl MiddlewareFn<E> {
+///
+/// The closure is a [`MiddlewareFn`] and also what `.middleware(path, f)` of
+/// the app of the facade takes, as the closure of `body_limit` is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
+pub fn compress<E: RouteError>()
+-> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     compress_with(CompressOptions::default())
 }
 
 /// Returns the middleware `compress(options)`.
-#[must_use]
-pub fn compress_with<E: RouteError>(options: CompressOptions) -> impl MiddlewareFn<E> {
+///
+/// The closure is a [`MiddlewareFn`], as the one of [`compress`] is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
+pub fn compress_with<E: RouteError>(
+    options: CompressOptions,
+) -> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     move |c: Context, next: Next<E>| -> LocalBoxFuture<'static, Result<Response, E>> {
         Box::pin(async move {
             next.run(c.clone()).await?;

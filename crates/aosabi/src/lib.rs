@@ -43,7 +43,7 @@
 //! | [`create_graphql_error`], [`GraphQLError`], [`GraphQLErrorOptions`], [`MaskedErrors`] | `createGraphQLError` of graphql-yoga, the `GraphQLError` it makes and its options, and the type of the key of Yoga a configuration sets, `MaskedErrors` with its options |
 //! | [`get_cookie`], [`get_cookies`], [`set_cookie`], [`delete_cookie`], [`CookieOptions`] | the cookie helpers of hono, the signed forms aside |
 //! | [`fn@body_limit`], [`BodyLimitOptions`] | the middleware `body_limit(options)` of hono under its names, with the options `max_size` and `on_error`, which `.middleware(path, body_limit(options))` of the app registers in place of the default bound of 1 MiB on that path, and which reads a body with no usable `Content-Length` through its bound before the routes run, where the default decides as the route reads |
-//! | [`fn@cors`], [`CorsOptions`], [`CorsOrigin`] | the middleware `cors(options)` of hono under its names, with the option `origin`, which `app.use_boxed(path, Rc::new(cors(options)))` registers |
+//! | [`fn@cors`], [`CorsOptions`], [`CorsOrigin`] | the middleware `cors(options)` of hono under its names, with the option `origin`, which `.middleware(path, cors(options))` of the app registers |
 //! | [`fn@csrf`], [`CsrfOptions`], [`CsrfOrigin`], [`CsrfSecFetchSite`] | the middleware `csrf(options)` of hono under its names, with the options `origin` and `sec_fetch_site`, which `app.use_boxed(path, Rc::new(csrf(options)))` registers in place of the default csrf on that path, divergence D70 |
 //! | [`on_execute_done`], [`ExecutionOutcome`] | the done hook of a plugin literal and the result it reads |
 //! | [`current_role`], [`Role`] | the run role of the process |
@@ -58,7 +58,7 @@
 //! | [`BUILTINS`] | the plugins a boot of Rust takes from its host, none |
 //! | `serve_app`, `BuildOutput`, `build_output!`, `use_node_server` | the engine, under the feature `serve` on a native target |
 //! | `serve_static`, `ServeStaticOptions` | the middleware that serves the files of a directory, `serveStatic` of the Node adapter, under the feature `serve` on a native target |
-//! | [`fn@compress`] | the middleware `compress()` of hono under its name, which codes the answers of the routes after it in deflate, since the base pipeline codes none, divergence D72 |
+//! | [`fn@compress`] | the middleware `compress()` of hono under its name, which `.middleware(path, compress())` of the app registers and which codes the answers of the routes after it in deflate, since the base pipeline codes none, a named divergence |
 //!
 //! A plain crate builds its app with the builder [`App`], which [`prelude`]
 //! exports as well, `App::new().query(Query)`. The chain carries the

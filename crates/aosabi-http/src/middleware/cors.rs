@@ -52,10 +52,7 @@ use crate::{
             ResponseInit, //
         },
     },
-    web_app::{
-        MiddlewareFn,
-        RouteError, //
-    },
+    web_app::RouteError,
 };
 
 /// The methods a preflight allows by default.
@@ -126,8 +123,14 @@ impl<E> Default for CorsOptions<E> {
 }
 
 /// Returns the middleware `cors(options)`.
-#[must_use]
-pub fn cors<E: RouteError>(options: CorsOptions<E>) -> impl MiddlewareFn<E> {
+///
+/// The closure is a [`MiddlewareFn`] and also what `.middleware(path, f)` of
+/// the app of the facade takes, as the closure of `body_limit` is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
+pub fn cors<E: RouteError>(
+    options: CorsOptions<E>,
+) -> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     let options = Rc::new(options);
     move |c: Context, next: Next<E>| -> LocalBoxFuture<'static, Result<Response, E>> {
         let options = Rc::clone(&options);
