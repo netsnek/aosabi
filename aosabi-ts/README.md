@@ -207,6 +207,10 @@ and the error answer. So the routes, the middleware, the error handlers, the chi
 `c` of a request, `HTTPException` and the helpers of an app run in hono's own code and in the order
 of the base pipeline.
 
+The GraphQL handler of the glue hands every request whose path is `/graphql`, with every method, to
+the engine, whose server of `graphql-over-http` answers it as Yoga answers it, with no router in its
+way, and every other request goes on to the routes of the app, a named divergence.
+
 The engine answers the three routes of the login of `zitadelLogin`. The engine reads its own
 variables of a request, the bag of `@inContext` and the info a root resolver stores under
 `graphqlResolveInfo`, through `c.get` and `c.var` of the same `c` for a key the app did not set, and

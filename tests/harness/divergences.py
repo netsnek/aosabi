@@ -296,8 +296,11 @@ def hono_not_found(answer) -> bool:
     return held == body or (held == b"" and _values(answer, "content-length") in ([], ["0"], [str(len(body))]))
 
 
+#: The path of the GraphQL endpoint of the reference's handler.
+ENDPOINT_PATH = "/graphql"
+
 #: The two endings of the GraphQL endpoint of the reference's handler, `/graphql` with and without its slash.
-ENDPOINT_ENDINGS = ("/graphql", "/graphql/")
+ENDPOINT_ENDINGS = (ENDPOINT_PATH, ENDPOINT_PATH + "/")
 
 
 def _path_of(target: str) -> str:
@@ -326,7 +329,7 @@ def is_endpoint(target: str) -> bool:
     A target that ends in /graphql or /graphql/, or whose path is one of the two, which the engine answers on
     the side ts with every method, while the hono of the app answers every other target.
     """
-    return target.endswith(ENDPOINT_ENDINGS) or _path_of(target) in ENDPOINT_ENDINGS
+    return _path_of(target) == ENDPOINT_PATH
 
 
 def outside_endpoint(reference, viewer: bool = False, target: str | None = None) -> str | None:
@@ -353,6 +356,10 @@ def outside_endpoint(reference, viewer: bool = False, target: str | None = None)
         return "D56"
     if preflight:
         return "D56"
+    if _path_of(target) == ENDPOINT_PATH + "/":
+        return "endpoint-slash"
+    if target.endswith(ENDPOINT_ENDINGS):
+        return "endpoint-ending"
     if LANDING_REFERENCE_TITLE in body:
         return "D47"
     if reference.status == 404 and not body and _values(reference, "content-type") == [LANDING_TYPE]:
@@ -989,21 +996,31 @@ def boot_keys(boot: dict) -> dict:
     return keys
 
 
+#: The key under which `keys_of` hands the steps the `NODE_ENV` the side under test serves under, which no
+#: configuration sets and which the variants pair with each variant.
 NODE_ENV_KEY = "nodeEnv"
 
 #: The key under which `keys_of` hands the steps the middleware cors() of the app of a fixture, its entries of
 #: `APP_CORS`, which is source of the app and no key of a configuration.
 APP_CORS_KEY = "appCors"
 
+#: The key under which `keys_of` hands the steps the prefixes the app of a fixture strips before it dispatches a
+#: request through the app again, its entries of `APP_PREFIXES`, which are source of the app and no key of a
+#: configuration.
+APP_PREFIX_KEY = "appPrefixes"
 
-def keys_of(fixture: str, variant: str, side: str = "rs") -> dict:
+
+def keys_of(fixture: str, variant: str, side: str = "rs", node_env: str | None = None) -> dict:
     """Return the keys of the configuration the side under test serves `fixture` under `variant` with.
 
     The keys of the fixture's own configuration and of the variant hold on both
     sides. The twin of the side rs adds the keys of `TWIN_KEYS`, and the module
     of the side ts reads the keys of `TS_KEYS` alone. The middleware cors() of
     hono that the app of the fixture puts before the routes of the function
-    holds on both sides, under `APP_CORS_KEY`.
+    holds on both sides, under `APP_CORS_KEY`, and so do the prefixes the app
+    strips before it dispatches a request through the app again, under
+    `APP_PREFIX_KEY`, and the `NODE_ENV` `node_env` the side serves under,
+    under `NODE_ENV_KEY`, where the caller names one other than `unset`.
     """
     keys = dict(FIXTURE_KEYS.get(fixture, {}))
     keys.update(OVERLAY_KEYS.get(variant, {}))
@@ -1013,6 +1030,10 @@ def keys_of(fixture: str, variant: str, side: str = "rs") -> dict:
         keys.update(TWIN_KEYS.get(fixture, {}))
     if fixture in APP_CORS:
         keys[APP_CORS_KEY] = APP_CORS[fixture]
+    if fixture in APP_PREFIXES:
+        keys[APP_PREFIX_KEY] = APP_PREFIXES[fixture]
+    if node_env not in (None, "unset"):
+        keys[NODE_ENV_KEY] = node_env
     return keys
 
 
@@ -1117,6 +1138,21 @@ APP_CORS = {
                 credentials=True),
     ),
 }
+
+
+#: The prefixes the app of a fixture strips from a path before it dispatches the request through the app again, by
+#: fixture.
+APP_PREFIXES = {
+    "lines-catalogue-app": ("/catalogue-api",),
+}
+
+
+def app_target(ask: Ask, keys: dict) -> str:
+    """Return the target of `ask` as the app hands it to the function, without the prefix among `keys` it strips."""
+    for prefix in keys.get(APP_PREFIX_KEY, ()):
+        if ask.path.startswith(prefix + "/"):
+            return ask.target[len(prefix):]
+    return ask.target
 
 
 def app_cors(ask: Ask, keys: dict):

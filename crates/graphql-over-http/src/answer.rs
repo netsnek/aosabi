@@ -86,7 +86,10 @@ use crate::{
         entry, //
     },
     process_request::process_request,
-    routes::matches_endpoint,
+    routes::{
+        is_plain_endpoint,
+        matches_endpoint, //
+    },
     server::HttpServer,
     server_adapter::{
         LazyUrl,
@@ -134,17 +137,19 @@ pub fn answer(
             }
         }
         // The unhandled route, `useUnhandledRoute`, after the hooks of the
-        // app, which may answer a path of their own.
-        if response.is_none() {
-            let pathname = || url.get(&request.url).map(|url| url.pathname.clone());
-            if !matches_endpoint(&request, pathname, &server.graphql_endpoint)? {
-                response = Some(new_response(
-                    ResponseBody::Text(Vec::new()),
-                    404,
-                    Some("Not Found"),
-                    NO_HEADERS,
-                )?);
-            }
+        // app, which may answer a path of their own, and the endpoint matched
+        // by its whole path, a named divergence. A plain URL that no hook had
+        // parsed is tested by its text, which the parser reads the same way.
+        if response.is_none()
+            && !(url.is_unparsed() && is_plain_endpoint(&request.url, &server.graphql_endpoint))
+            && !matches_endpoint(&url.get(&request.url)?.pathname, &server.graphql_endpoint)
+        {
+            response = Some(new_response(
+                ResponseBody::Text(Vec::new()),
+                404,
+                Some("Not Found"),
+                NO_HEADERS,
+            )?);
         }
         let mut response = match response {
             Some(response) => response,

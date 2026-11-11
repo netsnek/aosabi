@@ -205,14 +205,14 @@ function variablesOf(env) {
   return { ...(globalThis.process?.env ?? {}), ...bindingsOf(env) };
 }
 
-// Returns whether the URL `url` names the GraphQL endpoint, the test of the
-// unhandled route of Yoga with the endpoint /graphql that Pylon's handler sets:
-// a URL or a path that ends in /graphql or /graphql/. The engine answers each
-// such request with every method, and the hono of the app every other one.
+// Returns whether the URL `url` names the GraphQL endpoint, by its whole path:
+// the path /graphql, where the test of the unhandled route of Yoga with the
+// endpoint /graphql that Pylon's handler sets also passes the path /graphql/, a
+// named divergence, and a URL that ends in either, a named divergence. The
+// engine answers each request of that path with every method, and the hono of
+// the app every other one.
 function isEndpoint(url) {
-  if (url.endsWith("/graphql") || url.endsWith("/graphql/")) return true;
-  const path = new URL(url).pathname;
-  return path === "/graphql" || path === "/graphql/";
+  return new URL(url).pathname === "/graphql";
 }
 
 // The class Pylon of app/index.ts:140, under Aosabi's name, a Hono of the real

@@ -83,6 +83,12 @@ impl LazyUrl {
             .as_ref()
             .map_err(|()| Value::from(ErrorObject::type_error("Invalid URL")))
     }
+
+    /// Returns whether no read has parsed the URL yet.
+    #[must_use]
+    pub(crate) fn is_unparsed(&self) -> bool {
+        self.0.get().is_none()
+    }
 }
 
 /// The payload of `onRequest`.
