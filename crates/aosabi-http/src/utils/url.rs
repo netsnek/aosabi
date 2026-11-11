@@ -294,9 +294,11 @@ pub fn get_path(url: &str) -> String {
     String::from(&url[start..i])
 }
 
-/// Returns the query of `url` from its first `?` after the scheme, with the `?`, or the empty string.
+/// Returns the query of `url` from its first `?` after the scheme to its
+/// first `#`, with the `?`, or the empty string.
 #[must_use]
 pub fn get_query_strings(url: &str) -> String {
+    let url = before_fragment(url);
     match url.get(8..).and_then(|rest| rest.find('?')) {
         Some(at) => format!("?{}", &url[at + 8 + 1..]),
         None => String::new(),
@@ -391,6 +393,12 @@ pub fn get_query_param(url: &str, key: &str) -> Option<String> {
             .get(8..)
             .and_then(|rest| rest.find('?'))
             .map(|at| at + 8)?;
+        // The query ends at the first `#`, which no value reaches, a named
+        // divergence.
+        let url = before_fragment(url);
+        if query >= url.len() {
+            return None;
+        }
         let mut key_index = if url[query + 1..].starts_with(key) {
             Some(query)
         } else {
@@ -422,6 +430,18 @@ fn find_from(haystack: &str, needle: &str, from: usize) -> Option<usize> {
     haystack.get(from..)?.find(needle).map(|at| at + from)
 }
 
+/// Returns `url` up to its first `#` after the scheme, the part every query
+/// helper reads, so the fragment is no part of a query value, a named
+/// divergence.
+///
+/// The search starts at byte 8, past `https://`, where the search for the
+/// query starts.
+fn before_fragment(url: &str) -> &str {
+    url.get(8..)
+        .and_then(|rest| rest.find('#'))
+        .map_or(url, |at| &url[..at + 8])
+}
+
 /// Returns every value of the query parameter `key` of `url`, `None` when it is missing.
 #[must_use]
 pub fn get_query_params(url: &str, key: &str) -> Option<Vec<String>> {
@@ -442,10 +462,12 @@ pub fn get_query_param_all(url: &str) -> Vec<(String, String)> {
 
 /// Returns the query parameters of `url` in the order of their first key, each with its values.
 ///
-/// The slow path of `_getQueryParam`: every name and value is decoded when
-/// the URL holds a `%` or a `+`, a key already seen keeps its first value
-/// unless `multiple` asks for all of them, and an empty name is skipped.
+/// The slow path of `_getQueryParam` over the URL cut at its first `#`: every
+/// name and value is decoded when the URL holds a `%` or a `+`, a key already
+/// seen keeps its first value unless `multiple` asks for all of them, and an
+/// empty name is skipped.
 fn query_values(url: &str, key: Option<&str>, multiple: bool) -> Vec<(String, Vec<String>)> {
+    let url = before_fragment(url);
     let encoded = url.contains(['%', '+']);
     let mut results: Vec<(String, Vec<String>)> = Vec::new();
     let Some(mut key_index) = url
