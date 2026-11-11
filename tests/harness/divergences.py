@@ -392,10 +392,10 @@ VARY_ENCODING = "Accept-Encoding"
 def hono_vary(side: list, reference: list) -> list:
     """Return the values `side` of the field Vary of the side ts read as hono 4.11.9 writes them, change HV1.
 
-    compress() of hono 4.13.14 sets `Vary: Accept-Encoding` on an answer whose type it codes, coded or not,
-    appending the name to a Vary that holds another, where compress() of 4.11.9 sets none. Where the values of
-    the reference name no Accept-Encoding, the name is taken out of the values of the side, a field of that one
-    name with it.
+    compress() of hono 4.13.16 sets `Vary: Accept-Encoding` on an answer whose type it codes, coded or not,
+    appending the name to a Vary that holds another, where compress() of 4.11.9 sets none. Where the values of the
+    reference name no Accept-Encoding, the name is taken out of the values of the side, a field of that one name
+    with it.
     """
     if any(VARY_ENCODING.lower() in value.lower() for value in reference):
         return side
@@ -425,12 +425,10 @@ def _memo_names(value: str) -> list:
 def hono_memo(side: list, reference: list) -> list:
     """Return the values `side` of the field of the memo of transit-app read as hono 4.11.9 writes them, change HV1.
 
-    The memo writes the names of the fields of the c.res it kept after the
-    compress() of the base pipeline has run, which the module of the app
-    stands before, so compress() of hono 4.13.14 adds vary to those names
-    where 4.11.9 adds none. Where no value of the reference names vary, the
-    name is taken out of the names of each value of the side, and every other
-    byte of the value stays.
+    The memo writes the names of the fields of the c.res it kept after the compress() of the base pipeline has run,
+    which the module of the app stands before, so compress() of hono 4.13.16 adds vary to those names where 4.11.9
+    adds none. Where no value of the reference names vary, the name is taken out of the names of each value of the
+    side, and every other byte of the value stays.
     """
     if any("vary" in _memo_names(value) for value in reference):
         return side
@@ -477,14 +475,14 @@ UNSATISFIED_RANGE = re.compile(r"^bytes \*/\d+$")
 
 
 def node_server_change(method: str, headers, reference, side) -> str | None:
-    """Return the change of serveStatic of @hono/node-server 2.1.5 against 1.19.9 that the answer `side` shows, or None.
+    """Return the change of serveStatic of @hono/node-server 2.1.6 against 1.19.9 that the answer `side` shows, or None.
 
-    `method` and `headers`, pairs of a name and a value, are those of the request, `reference` the answer of
-    the reference and `side` the answer of the side ts. HN1 is a request of OPTIONS, which 1.19.9 answers 200 with the
-    type of the file and no body and 2.1.5 hands to the next handler, the not found handler of hono where no
-    route answers. HN2 is a range: one 2.1.5 cannot satisfy it answers 416 with `Content-Range: bytes */<size>`
-    and no body, where 1.19.9 fails with 500, and the suffix range `bytes=-<n>` it answers with the last n
-    bytes, where 1.19.9 answers the bytes 0 to n.
+    `method` and `headers`, pairs of a name and a value, are those of the request, `reference` the answer of the
+    reference and `side` the answer of the side ts. HN1 is a request of OPTIONS, which 1.19.9 answers 200 with the
+    type of the file and no body and 2.1.6 hands to the next handler, the not found handler of hono where no route
+    answers. HN2 is a range: one 2.1.6 cannot satisfy it answers 416 with `Content-Range: bytes */<size>` and no
+    body, where 1.19.9 fails with 500, and the suffix range `bytes=-<n>` it answers with the last n bytes, where
+    1.19.9 answers the bytes 0 to n.
     """
     if reference is None or side is None:
         return None

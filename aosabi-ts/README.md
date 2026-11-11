@@ -6,7 +6,7 @@ Pylon v3 keeps its source byte for byte and changes its import specifiers and a 
 `graphql-yoga` becomes the root `aosabi`, every other subpath and every package pulled in that has
 an entry becomes the same path under `aosabi/`, and the configuration of the app and its kin take
 Aosabi's own names, `AppConfig` among them. An import of `hono` or of `@hono/node-server` stays as
-it is. The class `App` is a Hono of the real hono, the peer of the package in the range `^4.13.14`,
+it is. The class `App` is a Hono of the real hono, the peer of the package in the range `^4.13.16`,
 with the base pipeline in hono's own code, so the routes, the middleware and the context `c` of an
 app are hono's. The engine under it is the module `core.wasm`, built from the Rust
 crates of the Aosabi workspace, which answers the GraphQL endpoint and the hooks of the execution,
@@ -179,9 +179,11 @@ stream of events, where the default of Bun closes one after 10 s. The wrapper an
 no HTTP code and no deflate code of their own: `compress()` of hono in the base pipeline codes a
 body through the `CompressionStream` of Bun, as on a Worker.
 
-The harness serves the fixture of its files with `@hono/node-server` 2.1.5, where the reference
-lockfile pins 1.19.9, and names the changes of 2.1.5 that an answer shows with their cases, HN1 to HN5. A
-Worker gives no file system, so there it serves no file.
+The middleware `serveStatic(options)` of `@hono/node-server/serve-static` runs in the hono of the
+app, the adapter's own code, which the app installs itself, and on Bun it reads the file system of
+the process through `node:fs` as it reads it on Node. The harness serves the fixture of its files
+with `@hono/node-server` 2.1.6, where the reference lockfile pins 1.19.9, and names each change of
+2.1.6 that an answer shows by its case. A Worker gives no file system, so there it serves no file.
 
 ## The entry `aosabi/pylon`
 

@@ -72,7 +72,7 @@
     "LICENSE-Unicode-3.0"
   ],
   "peerDependencies": {
-    "hono": "^4.13.14"
+    "hono": "^4.13.16"
   },
   "optionalDependencies": {
     "aosabi-linux-x64-gnu": "0.0.0",
