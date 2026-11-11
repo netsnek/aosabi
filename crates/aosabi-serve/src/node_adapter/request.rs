@@ -90,14 +90,24 @@ pub fn latin1(bytes: &[u8]) -> String {
 /// is joined to the scheme and the host, which is refused when it is missing,
 /// the scheme of HTTP/2 when it is neither `http` nor `https`, and the host
 /// when the parsed hostname differs from it in length and from it with a
-/// trailing `:` and digits removed.
+/// trailing `:` and digits removed. A target whose part before the first `?` or
+/// `#` holds a `\` is refused on HTTP/1 and on HTTP/2 alike, where the URL
+/// standard reads it as a `/`, a named divergence.
 ///
 /// # Errors
 ///
-/// Returns [`RequestError`] with the message of the reference, or `Invalid
-/// URL` for a URL the parser refuses, which the listener answers with 400.
+/// Returns [`RequestError`] with the message of the reference, `Invalid URL`
+/// for a URL the parser refuses, or the refusal of a `\` in the path, which
+/// the listener answers with 400.
 pub fn request_url(incoming: &NodeIncoming) -> Result<String, RequestError> {
     let target = latin1(&incoming.raw_target);
+    if target
+        .split(['?', '#'])
+        .next()
+        .is_some_and(|path| path.contains('\\'))
+    {
+        return Err(RequestError::new("Backslash in the path of the target"));
+    }
     if !target.starts_with('/') && (target.starts_with("http://") || target.starts_with("https://"))
     {
         if incoming.http2 {
