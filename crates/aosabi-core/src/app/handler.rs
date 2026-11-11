@@ -263,6 +263,14 @@ fn agent_setup(core: &Arc<CoreState>, host_clock: Option<Rc<dyn HostClock>>) -> 
 
 /// Returns the GraphQL middleware of `target`, `handler(options, target)`.
 ///
+/// The middleware keys the thread of each request with [`seed_keys`] before it
+/// reads the body, so a host that mounts it in an app of its own keys its
+/// threads as the fetch of a booted app does, and refuses where the key fails
+/// as that fetch refuses. It counts as a handler in the rule of the default
+/// csrf, [`MiddlewareFn::is_handler`], so a `csrf(options)` of the app takes
+/// the place of the default on a request of the endpoint only where it stands
+/// ahead of the endpoint, a named divergence.
+///
 /// # Errors
 ///
 /// Returns what the schema build throws.
@@ -333,7 +341,22 @@ pub(crate) fn handler_with_server(
             c.new_response(body, &response)
         }
     };
-    Ok((middleware, mounted))
+    Ok((Endpoint(middleware), mounted))
+}
+
+/// The GraphQL middleware, which tells the dispatch that it answers as a
+/// handler of a route method does, so a `csrf(options)` behind it never takes
+/// the place of the default csrf on the requests it matches.
+struct Endpoint<F>(F);
+
+impl<F: MiddlewareFn<Thrown>> MiddlewareFn<Thrown> for Endpoint<F> {
+    fn call(&self, c: Context, next: Next) -> LocalBoxFuture<'static, Result<Response, Thrown>> {
+        self.0.call(c, next)
+    }
+
+    fn is_handler(&self) -> bool {
+        true
+    }
 }
 
 /// The GraphQL server the middleware answers with and the spawner of its

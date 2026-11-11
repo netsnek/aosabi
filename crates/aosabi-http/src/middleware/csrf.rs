@@ -30,13 +30,17 @@
 //! The base pipeline of a Rust service runs the check with the defaults on a
 //! request that carries a `Cookie` field, where a cookie can carry a session,
 //! through [`behind_default_csrf`] in the entry of the plugin middleware and
-//! ahead of it, divergence D70 of `docs/byte-equality.md`. A `csrf` the app
-//! registers takes the place of the default on every request it matches,
-//! wherever it stands in the chain: the dispatch of the app marks such a
-//! request, since [`MiddlewareFn::is_csrf`] tells the middleware apart, and
-//! the default lets a marked request through to the app's own check. The
-//! TypeScript option keeps the pipeline of a TypeScript app, which runs no csrf, so under the
-//! feature `host-platform` there is no default.
+//! ahead of it, a named divergence. A `csrf` the app registers takes the place
+//! of the default on a request where it stands ahead of the handlers of the
+//! routes the request matches, every handler a route method registered and the
+//! endpoint of the engine, which counts as a handler through
+//! [`MiddlewareFn::is_handler`], while a middleware of `use` ahead of it leaves
+//! it in that place: the dispatch of the app marks such a request, since
+//! [`MiddlewareFn::is_csrf`] tells the middleware apart, and the default lets a
+//! marked request through to the app's own check. The TypeScript option keeps
+//! the pipeline of a TypeScript app, which runs no csrf, so under the feature
+//! `host-platform` there is no default, and an app there writes `csrf()`
+//! itself.
 
 use core::future::Future;
 use std::rc::Rc;
@@ -117,8 +121,9 @@ impl<E> Default for CsrfOptions<E> {
     }
 }
 
-/// The mark of a request that a `csrf` of the app matches, which the dispatch
-/// of the app sets and on which the default steps aside.
+/// The mark of a request where a `csrf` of the app stands ahead of the
+/// handlers of the routes it matches, which the dispatch of the app sets and
+/// on which the default steps aside.
 pub(crate) struct AppCsrf;
 
 /// The middleware `csrf(options)`, which [`MiddlewareFn::is_csrf`] tells apart.

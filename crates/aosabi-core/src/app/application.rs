@@ -917,12 +917,14 @@ impl<G> App<G> {
 
         let middleware = Rc::clone(&self.inner.plugins_middleware);
         web.r#use("*", move |c: Context, next: Next| {
-            // The default csrf of a Rust service, hono's check with its
-            // defaults on a request that carries a cookie and that no csrf of
-            // the app matches, runs in this entry ahead of the plugin
-            // middleware, behind the access logger, which logs its 403, so
-            // `app.routes` lists the entries of the TypeScript pipeline,
-            // divergence D70. The TypeScript option has none.
+            // The default csrf of a Rust service, hono's check with its defaults
+            // on a request that carries a cookie and where no csrf of the app
+            // stands ahead of the handlers of the routes it matches, the endpoint
+            // of the engine among them, which counts as a handler, runs in this
+            // entry ahead of the plugin middleware, behind the access logger,
+            // which logs its 403, so `app.routes` lists the entries of the
+            // TypeScript pipeline, a named divergence. The TypeScript option has
+            // none.
             let middleware = Rc::clone(&middleware);
             let value = aosabi_http::middleware::csrf::behind_default_csrf(&c, move |c| {
                 dispatch_plugins(middleware, 0, c, next)
