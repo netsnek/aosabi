@@ -209,7 +209,8 @@ impl core::error::Error for CookieError {}
 ///
 /// With a name the walk stops at the first pair of that name whose value
 /// passes, and a header that does not hold the name at all answers nothing.
-/// An empty name is no name, as the reference tests it for truth.
+/// Without a name the first such pair of each name stands as well, a named
+/// divergence. An empty name is no name, as the reference tests it for truth.
 #[must_use]
 pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
     let name = name.filter(|name| !name.is_empty());
@@ -240,7 +241,7 @@ pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
         } else {
             String::from(value)
         };
-        set_property(&mut parsed, cookie_name, value);
+        add_property(&mut parsed, cookie_name, value);
         if name.is_some() {
             break;
         }
@@ -388,18 +389,16 @@ fn check_attributes(opt: &CookieOptions) -> Result<(), CookieError> {
     Ok(())
 }
 
-/// Sets the property `key` of the object `object` to `value`, `object[key] = value`.
+/// Adds the property `key` with `value` to the object `object` where it holds no such key.
 ///
-/// An existing key keeps its place. The key `__proto__` reaches the setter of
+/// A key the object holds keeps its first value, so the first pair of a name
+/// stands, a named divergence. The key `__proto__` reaches the setter of
 /// `Object.prototype`, which ignores a string, so no property is made.
-fn set_property(object: &mut Vec<(String, String)>, key: &str, value: String) {
-    if key == "__proto__" {
+fn add_property(object: &mut Vec<(String, String)>, key: &str, value: String) {
+    if key == "__proto__" || object.iter().any(|(known, _)| known == key) {
         return;
     }
-    match object.iter_mut().find(|(known, _)| known == key) {
-        Some(entry) => entry.1 = value,
-        None => object.push((String::from(key), value)),
-    }
+    object.push((String::from(key), value));
 }
 
 /// Returns `object` in the key order of an object of JavaScript.
