@@ -388,7 +388,7 @@ fn decode_query(value: &str) -> String {
 /// when that finds nothing and the URL holds a `%` or a `+`.
 #[must_use]
 pub fn get_query_param(url: &str, key: &str) -> Option<String> {
-    if !key.is_empty() && !key.contains(['%', '+']) {
+    if !key.is_empty() && !key.contains(['%', '+', '&', '=']) {
         let query = url
             .get(8..)
             .and_then(|rest| rest.find('?'))
