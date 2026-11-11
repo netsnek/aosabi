@@ -28,7 +28,7 @@
 //! | `answer` | `server.js:239-398`, `createServerAdapter.js:95-149` | the function |
 //! | `server` | `server.js:57-238` | the options and the state the function reads |
 //! | `checks` | `plugins/request-validation/` | the checks of the method, the parameters, a batch and a mutation over GET, and the stamps of the parse and of the validation |
-//! | `routes` | `plugins/use-unhandled-route.js`, `plugins/use-health-check.js` | the endpoint and the health check |
+//! | `routes` | `plugins/use-unhandled-route.js` | the endpoint |
 //! | `plugin` | `plugins/types.js` | the plugin of an app and the payloads of its hooks |
 //! | `process_request` | `process-request.js` | the run of one operation through the hook layer |
 //! | `error` | `error.js` | the handling of an escaping error |

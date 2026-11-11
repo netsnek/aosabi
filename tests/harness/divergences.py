@@ -1961,6 +1961,10 @@ def wire_bytes(data: bytes, request: dict, names, keys: dict) -> bytes:
             break
         status, reason, fields, wire, head_only, end = message
         reply = Reply(status, reason, fields, message_body(fields, wire) if wire else b"")
+        if head_only and status == 200 and reply.header(HEALTH_FIELD) is not None:
+            # The health check of the reference answers every method alike,
+            # with no body and no length, so its answer reads as one to GET.
+            head_only = False
         ask = wire_ask(reply, head_only)
         done = oracle_chain(reply, request, ask, keys, "rs", names)
         if done == reply:

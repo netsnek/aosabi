@@ -224,9 +224,6 @@ pub fn build_http_options(
     if let Some(endpoint) = config.graphql_endpoint.clone() {
         options.graphql_endpoint = Some(endpoint);
     }
-    if let Some(endpoint) = config.health_check_endpoint.clone() {
-        options.health_check_endpoint = Some(endpoint);
-    }
     if let Some(multipart) = config.multipart {
         options.multipart = Some(multipart);
     }

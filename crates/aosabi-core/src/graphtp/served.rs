@@ -423,23 +423,16 @@ async fn operate(
 /// the core makes itself, with members [`STRAIGHT_MEMBERS`] holds, the plugin
 /// chain holds no middleware, counted at every push of the loader, the
 /// router meets `POST /graphql` with the five registrations of
-/// [`CORE_LAYERS`] alone, each from the sources of the core, the endpoint is
-/// `/graphql` and no health check endpoint ends the URL of a call, the test
-/// of `useHealthCheck`. Any other app answers every call
-/// through [`BootedApp::fetch`], so a check it holds, the principal
-/// `use_identity` binds above all, holds on every call as it holds over
-/// HTTP. What a plugin of the configuration or of the host declares never
-/// opens the road, since its members may name fewer hooks than it runs, so
-/// every boot that adds the viewer or the landing page of its host keeps its
-/// app on the fetch.
+/// [`CORE_LAYERS`] alone, each from the sources of the core, and the endpoint
+/// is `/graphql`. Any other app answers every call through
+/// [`BootedApp::fetch`], so a check it holds, the principal `use_identity`
+/// binds above all, holds on every call as it holds over HTTP. What a plugin
+/// of the configuration or of the host declares never opens the road, since
+/// its members may name fewer hooks than it runs.
 fn straight_server(app: &BootedApp) -> Option<Straight> {
     let mounted = app.graphql_server()?;
     let server = mounted.server();
-    let health = app
-        .config()
-        .and_then(|config| config.health_check_endpoint.as_deref())
-        .is_some_and(|endpoint| URL.ends_with(endpoint));
-    if server.graphql_endpoint() != GRAPHQL_PATH || health {
+    if server.graphql_endpoint() != GRAPHQL_PATH {
         return None;
     }
     let boot = app.boot_record();

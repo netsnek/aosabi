@@ -184,11 +184,6 @@ fn on_request_steps(
     server_context: &HookContext,
     url: &LazyUrl,
 ) -> Result<Option<Response>, Value> {
-    if request.url.ends_with(&server.health_check_endpoint) {
-        server.logger.debug("Responding Health Check");
-        let headers = [(String::from("x-yoga-id"), server.id.clone())];
-        return empty_response(200, None, &headers).map(Some);
-    }
     // The engine answers no `OPTIONS` request, which falls through to the web
     // server or the host as an unhandled route does, a named divergence.
     if upper_ascii_exact(&request.method) == "OPTIONS" {

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
- * graphql-over-http: the paths the function answers, the endpoint and the health check.
+ * graphql-over-http: the path the function answers, its endpoint.
+ *
+ * The function matches_endpoint holds the test of the path of the endpoint.
  *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/use-unhandled-route.js, MIT.
  * Derived from graphql-yoga 5.18.0, cjs/plugins/use-health-check.js, MIT.
@@ -20,8 +22,6 @@
 //! path equal to it, which the third test covers already, and the endpoint of an app
 //! is `/graphql`, so [`matches_endpoint`] reads the pattern as that text.
 //!
-//! The health check answers every request whose whole URL string ends in its
-//! endpoint, `/health` by default, whatever its method.
 
 use aosabi_execute::Value;
 use aosabi_http::Request;

@@ -122,7 +122,6 @@ use crate::{
     },
     request_parser::Parsers,
     result_processor::Processors,
-    routes::DEFAULT_HEALTH_CHECK_ENDPOINT,
     server_adapter::RequestHandler,
     utils::mask_error::mask_error, //
 };
@@ -217,13 +216,10 @@ pub struct HttpOptions {
     pub masked_errors: MaskedErrors,
     /// `graphqlEndpoint`, `/graphql` when absent or empty.
     pub graphql_endpoint: Option<String>,
-    /// `healthCheckEndpoint`, `/health` when absent.
-    pub health_check_endpoint: Option<String>,
     /// `graphiql`.
     pub graphiql: Graphiql,
-    /// `multipart`, which puts the multipart parser in only when `true`, the
-    /// named divergence D49 of `docs/byte-equality.md` section 3, where Yoga
-    /// puts it in unless the option is `false`.
+    /// `multipart`, which puts the multipart parser in only when `true`, a named
+    /// divergence, where Yoga puts it in unless the option is `false`.
     pub multipart: Option<bool>,
     /// `parserAndValidationCache`, which leaves the cache out when `false`.
     pub parser_and_validation_cache: Option<bool>,
@@ -269,8 +265,6 @@ pub struct HttpServer {
     pub(crate) logger: HttpLogger,
     /// `graphqlEndpoint`.
     pub(crate) graphql_endpoint: String,
-    /// `healthCheckEndpoint`, which the health check answers.
-    pub(crate) health_check_endpoint: String,
     /// The options of the page of `GraphiQL` of a request, none when the option `graphiql` is `false`.
     pub(crate) graphiql: Option<GraphiqlOptionsFactory>,
     /// The request parsers.
@@ -310,7 +304,6 @@ impl HttpServer {
         let HttpOptions {
             id,
             graphql_endpoint,
-            health_check_endpoint,
             multipart,
             extra_param_names,
             agent,
@@ -322,8 +315,6 @@ impl HttpServer {
             graphql_endpoint: graphql_endpoint
                 .filter(|endpoint| !endpoint.is_empty())
                 .unwrap_or_else(|| String::from(DEFAULT_GRAPHQL_ENDPOINT)),
-            health_check_endpoint: health_check_endpoint
-                .unwrap_or_else(|| String::from(DEFAULT_HEALTH_CHECK_ENDPOINT)),
             graphiql,
             parsers: Parsers::new(multipart == Some(true)),
             processors: Processors::new(),
