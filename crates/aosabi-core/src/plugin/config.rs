@@ -63,6 +63,10 @@ pub struct AppConfig {
     /// `viewer`, Aosabi's own key, the viewer at `/viewer` only when `true`,
     /// D48.
     pub viewer: Option<bool>,
+    /// `introspection`, a key of Aosabi's own: `false` refuses introspection and
+    /// any other value leaves it on, a named divergence, where Pylon refuses it
+    /// under `graphiql: false`.
+    pub introspection: Option<bool>,
     /// `logger`, `false` for no access line or the object form.
     pub logger: Option<LoggerOption>,
     /// `plugins`, which the boot writes back with the built array (quirk
@@ -90,6 +94,7 @@ impl core::fmt::Debug for AppConfig {
             .field("landing_page", &self.landing_page)
             .field("graphiql", &self.graphiql)
             .field("viewer", &self.viewer)
+            .field("introspection", &self.introspection)
             .field("logger", &self.logger)
             .field("plugins", &self.plugins)
             .field("graphql_endpoint", &self.graphql_endpoint)

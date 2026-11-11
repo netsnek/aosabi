@@ -375,7 +375,7 @@ pub async fn execute_config(
         created.push((slot, Builtin::Landing));
     }
 
-    if config.graphiql == Some(false) {
+    if config.introspection == Some(false) {
         // `useDisableIntrospection() as Plugin`, which states no member beyond those of Yoga.
         let slot = PluginSlot::new(from_http(use_disable_introspection()));
         plugins.push(slot.clone());

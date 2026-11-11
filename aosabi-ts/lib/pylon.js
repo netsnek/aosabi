@@ -559,7 +559,7 @@ function builtins(config) {
   const before = [{ builtin: "viewer" }, { builtin: "errors" }, { builtin: "in-context", name: "in-context" }];
   const after = [];
   if (config?.landingPage ?? true) after.push({ builtin: "landing" });
-  if (config?.graphiql === false) after.push({ builtin: "introspection" });
+  if (config?.introspection === false) after.push({ builtin: "introspection" });
   return [before, after];
 }
 

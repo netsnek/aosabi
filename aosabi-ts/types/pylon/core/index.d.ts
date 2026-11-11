@@ -95,6 +95,9 @@ export type Plugin<PluginContext extends Record<string, any> = {}, TServerContex
 export type AppConfig = {
     landingPage?: boolean;
     graphiql?: boolean;
+    /** Introspection is answered unless this key is `false`, which refuses every field of
+     *  introspection. */
+    introspection?: boolean;
     /** Per-request access logging. `false` disables the access line; an object configures the
      *  runtime logger (`{level, format, base, redact, sink}` — see `LoggerConfig`). Default: on.
      *  Env `LOG_LEVEL` (e.g. `info,db=debug`) and `PYLON_LOG_FORMAT` override at runtime. */

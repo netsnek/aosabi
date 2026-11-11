@@ -1394,7 +1394,7 @@ const BUILDER_METHODS: [&str; 30] = [
     "on_error",
     "compose",
     "plugin",
-    "graphiql",
+    "introspection",
     "landing_page",
     "viewer",
     "logger",

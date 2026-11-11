@@ -43,6 +43,7 @@
 //! | `.compose(child)` | `compose(...children)`, one child per call, the parent's roots first and the children's in the order of the calls |
 //! | `.plugin(..)` | one element of `plugins` of `aosabi.config.ts`, in the order of the calls |
 //! | `.graphiql(..)`, `.landing_page(..)`, `.logger(..)`, `.masked_errors(..)`, `.graphql_endpoint(..)`, `.health_check_endpoint(..)`, `.multipart(..)` | the other keys of the configuration that Aosabi ports |
+//! | `.introspection(..)` | the key `introspection` of Aosabi |
 //! | `.viewer(..)` | the key `viewer` of Aosabi |
 //! | `.max_tokens(..)` | the key `maxTokens` of Aosabi, the cap on the tokens of a request document |
 //!
@@ -409,12 +410,11 @@ impl App {
         self
     }
 
-    /// Sets `graphiql`. The page of `GraphiQL` is served only when it is
-    /// `true`, the named divergence D48, and `false` turns off introspection
-    /// as well.
+    /// Sets `introspection`, a key of Aosabi's own. `false` refuses
+    /// introspection and any other value leaves it on, a named divergence.
     #[must_use]
-    pub fn graphiql(mut self, enabled: bool) -> Self {
-        self.config().graphiql = Some(enabled);
+    pub fn introspection(mut self, enabled: bool) -> Self {
+        self.config().introspection = Some(enabled);
         self
     }
 

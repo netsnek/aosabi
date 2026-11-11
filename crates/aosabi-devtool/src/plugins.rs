@@ -15,7 +15,7 @@
 //! | --- | --- | --- |
 //! | `topo_sort` | `plugins`, `{name, depends_on}` each | `order`, the input indices, or `error`, the message of the cycle |
 //! | `role_gate` | `plugins`, `{name, strategy, roles}` each | `ran`, the names whose setup ran |
-//! | `boot` | `plugins`, `{name?, depends_on?, strategy?, roles?, setup?, middleware?}` each, `landing_page?`, `graphiql?`, `viewer?` | `role` and `passes`, or `thrown` and `cause` |
+//! | `boot` | `plugins`, `{name?, depends_on?, strategy?, roles?, setup?, middleware?}` each, `introspection?` | `role` and `passes`, or `thrown` and `cause` |
 //! | `map_forbidden` | `errors`, `{message, path?, forbidden?, extensions?}` each | `errors` as `toJSON` writes them, or `unchanged` |
 //!
 //! `role_gate` and `boot` run [`execute_config`](fn@execute_config) over a
@@ -251,6 +251,7 @@ fn op_boot(request: &JsObject) -> Result<JsObject, JsString> {
         landing_page: optional_bool(request, "landing_page", "boot")?,
         graphiql: optional_bool(request, "graphiql", "boot")?,
         viewer: optional_bool(request, "viewer", "boot")?,
+        introspection: optional_bool(request, "introspection", "boot")?,
         ..AppConfig::default()
     };
     let mut target = App::default();

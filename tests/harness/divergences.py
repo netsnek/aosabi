@@ -1351,6 +1351,10 @@ def qd680(reply, ask, keys):
     return dataclasses.replace(done, lines=kept + done.lines) if kept else done
 
 
+#: The refusal of the plugin `useDisableIntrospection`, which the handler of the reference adds on
+#: `graphiql: false`.
+INTROSPECTION_REFUSAL = b"GraphQL introspection has been disabled"
+
 #: The steps `steps` runs, in the order they rewrite an answer, each with the divergence its row names.
 NAMED_STEPS = ((qd055, "D46"), (qd024, "D46"), (qd275, "D46"), (qd228, "D48"), (qd122, "D48"),
                (qd224, "D49"), (qd021, "D46"), (qd830, "D60"), (qd680, "D47"))
