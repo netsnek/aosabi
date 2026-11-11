@@ -21,7 +21,10 @@
 //! `encodeURIComponent`, and the attributes in the order `Max-Age`, `Domain`,
 //! `Path`, `Expires`, `HttpOnly`, `Secure`, `SameSite`, `Priority` and
 //! `Partitioned`. The throws of the reference are the values of
-//! [`CookieError`] with its messages, in the order the reference meets them.
+//! [`CookieError`] with its messages, in the order the reference meets them. A
+//! name outside the token of a cookie name, and a `Domain` or a `Path` that
+//! holds `;`, CR or LF, are refused as well, each with an error of its own
+//! kind, a named divergence.
 
 use core::fmt::Write as _;
 use std::time::SystemTime;
@@ -158,13 +161,21 @@ pub enum CookieError {
     ExpiresTooFar,
     /// `partitioned` without `secure`.
     PartitionedNotSecure,
+    /// A name outside the token of a cookie name, checked before every other rule.
+    InvalidName,
+    /// A `domain` that holds `;`, CR or LF.
+    InvalidDomain,
+    /// A `path` that holds `;`, CR or LF.
+    InvalidPath,
 }
 
 impl CookieError {
     /// Returns the message of the error the reference throws.
     ///
     /// The texts are those of `cookie.js:77`, `:81`, `:84`, `:87`, `:93`,
-    /// `:107` and `:126`.
+    /// `:107` and `:126`. The refusals of a name, a domain and a path carry
+    /// the messages the hono of the TypeScript option throws for them, a named
+    /// divergence.
     #[must_use]
     pub const fn message(self) -> &'static str {
         match self {
@@ -179,6 +190,9 @@ impl CookieError {
                 "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
             }
             Self::PartitionedNotSecure => "Partitioned Cookie must have Secure attributes",
+            Self::InvalidName => "Invalid cookie name",
+            Self::InvalidDomain => "domain must not contain \";\", \"\\r\", or \"\\n\"",
+            Self::InvalidPath => "path must not contain \";\", \"\\r\", or \"\\n\"",
         }
     }
 }
@@ -238,16 +252,25 @@ pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
 ///
 /// # Errors
 ///
-/// Returns the [`CookieError`] of the first rule the cookie breaks, in the
-/// order the reference checks them.
+/// Returns the [`CookieError`] of the first rule the cookie breaks: the name,
+/// then the rules of the reference in its order, the domain and the path
+/// after the prefixes.
 pub fn serialize(name: &str, value: &str, opt: &CookieOptions) -> Result<String, CookieError> {
     serialize_encoded(name, &encode_uri_component(value), opt)
 }
 
 /// Returns the `Set-Cookie` value of `name` and the encoded `value`, `_serialize(name, value, opt)`.
+///
+/// A name outside the token of [`is_cookie_name`] is refused before any other
+/// rule, and a domain or a path that holds `;`, CR or LF after the rules of
+/// the prefixes, so no such cookie is written, a named divergence.
 fn serialize_encoded(name: &str, value: &str, opt: &CookieOptions) -> Result<String, CookieError> {
+    if !is_cookie_name(name) {
+        return Err(CookieError::InvalidName);
+    }
     let mut cookie = format!("{name}={value}");
     check_prefix(name, opt)?;
+    check_attributes(opt)?;
     if let Some(max_age) = opt.max_age.filter(|max_age| *max_age >= 0.0) {
         if max_age > MAX_AGE_LIMIT {
             return Err(CookieError::MaxAgeTooLong);
@@ -338,6 +361,22 @@ fn is_cookie_value(value: &str) -> bool {
     value
         .bytes()
         .all(|byte| matches!(byte, b' ' | b'!' | b'#'..=b':' | b'<'..=b'[' | b']'..=b'~'))
+}
+
+/// Refuses a `domain` or a `path` that holds `;`, CR or LF, which the value of
+/// an attribute leaves out.
+fn check_attributes(opt: &CookieOptions) -> Result<(), CookieError> {
+    let holds_separator = |text: &str| {
+        text.bytes()
+            .any(|byte| matches!(byte, b';' | b'\r' | b'\n'))
+    };
+    if opt.domain.as_deref().is_some_and(holds_separator) {
+        return Err(CookieError::InvalidDomain);
+    }
+    if opt.path.as_deref().is_some_and(holds_separator) {
+        return Err(CookieError::InvalidPath);
+    }
+    Ok(())
 }
 
 /// Sets the property `key` of the object `object` to `value`, `object[key] = value`.
