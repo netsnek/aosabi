@@ -27,7 +27,10 @@
       "types": "./auth-contract.d.ts",
       "default": "./lib/auth-contract.js"
     },
-    "./auth/zitadel": "./lib/zitadel.js",
+    "./auth/zitadel": {
+      "types": "./zitadel.d.ts",
+      "default": "./lib/zitadel.js"
+    },
     "./graphql": {
       "types": "./graphql.d.ts",
       "default": "./lib/graphql.js"
@@ -52,6 +55,7 @@
     "auth.d.ts",
     "auth-plugin.d.ts",
     "auth-contract.d.ts",
+    "zitadel.d.ts",
     "sentry.d.ts",
     "types/",
     "lib/",

@@ -129,5 +129,17 @@ export declare function requireAuth(checks?: AuthRequireChecks): {
   <T>(fn: T): T
 }
 
-/** The plugin of Pylon's canary that sets the auth state of a request and mounts the routes under `endpoint`. */
-export declare function useAuth(args: {issuer: string; endpoint?: string; keyPath?: string}): Plugin
+/**
+ * The plugin of Pylon's canary that sets the auth state of a request and mounts the routes under
+ * `endpoint`. The key `cookieName` names the session cookie its middleware reads and its logout deletes,
+ * `aosabi-auth` where the options name none or the empty name, as the options of aosabi/auth/zitadel name
+ * it. A name outside the token that RFC 6265 takes as a cookie name throws a TypeError that names the key
+ * when useAuth is called, and the logout deletes a name with the prefix `__Secure-` or `__Host-` with
+ * `Secure`.
+ */
+export declare function useAuth(args: {
+  issuer: string
+  endpoint?: string
+  keyPath?: string
+  cookieName?: string
+}): Plugin

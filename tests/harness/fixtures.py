@@ -2,16 +2,15 @@
 """Aosabi harness: the staging, building and serving of both sides of a fixture.
 
 The TypeScript side of a fixture is staged under target/harness/fixtures/, built
-there with the vendored command line and served with the overlay
-tests/sidecar/config-overlay.mjs in place of its built configuration, so
-the build of the reference never writes into vendor/ or tests/fixtures/ and the port reaches
-the reference through the plugin option. The Rust side of a fixture is its twin
-under tests/fixtures/rs/, built with `cargo build --locked` and served with an
-explicit, non zero `PORT`, because the twin keeps `use_node_server()` with no
-option and the rule of the port is the same on both sides. A served twin writes
-its boot report where `AOSABI_BOOT_REPORT` names a file, and `read_boot_report`
-reads it. HTTP(Unix Socket) gets a fresh runtime directory of mode 0700 under
-target/harness/.
+there with the vendored command line and served with the configuration overlay in
+place of its built configuration, so the build of the reference never writes into
+vendor/ or tests/fixtures/ and the port reaches the reference through the plugin
+option. The Rust side of a fixture is its twin, built with `cargo build --locked`
+and served with an explicit, non zero `PORT`, because the twin keeps
+`use_node_server()` with no option and the rule of the port is the same on both
+sides. A served twin writes its boot report where `AOSABI_BOOT_REPORT` names a
+file, and `read_boot_report` reads it. HTTP(Unix Socket) gets a fresh runtime
+directory of mode 0700 under target/harness/.
 
 A twin is built the way its layout asks. A twin with a `server/` crate of its own
 is a cargo workspace, built with `cargo build --locked` in its directory. A twin
@@ -105,16 +104,21 @@ CA_VARIABLES = {"reference": "NODE_EXTRA_CA_CERTS", "twin": "AOSABI_EXTRA_CA_CER
 VARIANTS = ("default", "graphiql_false", "landing_false", "both", "logger_false", "identity", "database",
             "switches_on", "cors_star", "cors_list")
 
-#: The failure variants of plugins-app never finish a boot, so
-#: tests/harness/boot.py boots them and serve_reference does not. The app
-#: zitadel-providers-app of tests/ts1/apps, which no fixture holds, selects its
-#: providers the same way for section 5b of `39_ts1_parity`.
+#: The variants a fixture selects in its own configuration through
+#: `AOSABI_CONFIG`, which its module exports as `variants` and the overlay serves
+#: with no keys spread. The failure variants of plugins-app never finish a boot,
+#: so tests/harness/boot.py boots them and serve_reference does not. The app
+#: zitadel-providers-app, which no fixture holds, selects its providers the same
+#: way. The variant `cookie_name_host` of zitadel-login-app stands in the twin
+#: alone, which its notebook serves with no reference, since the reference has no
+#: key that names the session cookie.
 FIXTURE_VARIANTS = {
     "plugins-app": ("default", "fail_named", "fail_unnamed", "fail_value", "fail_last", "cycle"),
     "use-identity-app": ("default", "async", "numeric", "failing", "none", "twice"),
     "sentry-app": ("default", "null_key", "custom_key", "skip", "env_dsn", "initialized", "variables", "disabled"),
-    "zitadel-login-app": ("default", "endpoint", "http_issuer", "bad_key", "key_file", "no_key", "pkcs8_key"),
-    "zitadel-auth-app": ("default", "mapped", "key_file", "two_keys", "with_login"),
+    "zitadel-login-app": ("default", "endpoint", "http_issuer", "bad_key", "key_file", "no_key", "pkcs8_key",
+                          "cookie_name", "cookie_name_host"),
+    "zitadel-auth-app": ("default", "mapped", "key_file", "two_keys", "with_login", "cookie_name"),
     "zitadel-providers-app": ("default", "unused_first", "second_first", "per_request", "streamed"),
 }
 
@@ -125,9 +129,10 @@ FIXTURE_VARIANTS = {
 #: variants of zitadel-providers-app.
 KEY_SOURCES = {
     "zitadel-login-app": {"default": "pkcs1", "endpoint": "pkcs1", "http_issuer": "pkcs1", "bad_key": "bad_json",
-                          "key_file": "file", "no_key": "none", "pkcs8_key": "pkcs8"},
+                          "key_file": "file", "no_key": "none", "pkcs8_key": "pkcs8", "cookie_name": "pkcs1",
+                          "cookie_name_host": "pkcs1"},
     "zitadel-auth-app": {"default": "pkcs1", "mapped": "pkcs1", "key_file": "file", "two_keys": "files_ab",
-                         "with_login": "pkcs1"},
+                         "with_login": "pkcs1", "cookie_name": "pkcs1"},
     "zitadel-providers-app": {"default": "pkcs1", "unused_first": "pkcs1", "second_first": "files_ab",
                               "per_request": "pkcs1", "streamed": "pkcs1"},
 }

@@ -47,17 +47,34 @@ no key verifies, as the tokens of the capture that answer success did. The last 
 introspection answer cut in its middle, `z-malformed-introspect`. Each counts apart from the 31,
 with the tokens `t7` and `t9` of the capture row and `t14` to `t17`.
 
-The lower case of `toLowerCase` writes U+212A KELVIN SIGN as the ASCII `k`, so `normalizeTyp` reads
-`token-introspection+jwt`, the type the check takes, and a lower case of ASCII alone would refuse
-the answer.
+Runs after them hold the hostile inputs, as tests/gen/login.py lays them out for the login routes, each
+counted apart from the 31: a principal under each key case of `KEY_SIZES` in each form, `z-key-rsa1024-pkcs1`
+to `z-key-rsa3072mp-pkcs8`, whose introspection signs the client assertion with the key, a principal under the
+key of the run in an `AUTH_KEY` with a byte that is no UTF-8, `z-auth-key-byte`, the callbacks of the lone
+surrogates and of the odd states under the variant `with_login`, `z-surrogate-access-token` to
+`z-surrogate-id-token`, `z-state-ff` and `z-state-twice`, a principal against an issuer on a port the Fetch
+standard blocks, `z-blocked-port`, and a principal whose roles claim holds an own key `valueOf`,
+`z-roles-value-of`, the message of the `TypeError` of `roles_of`, with the token `t18`.
+
+The run after them holds the type of a JWT, counted apart from the 31: the principal of a JWT introspection
+answer whose `typ` is `Application/To<U+212A>en-Introspection+JWT`, `z-typ-kelvin`, with the token `t19`. The
+lower case of `toLowerCase` writes U+212A KELVIN SIGN as the ASCII `k`, so `normalizeTyp` reads
+`token-introspection+jwt`, the type the check takes, and a lower case of ASCII alone would refuse the answer.
+
+The last run serves the variant `cookie_name`, the pair of `with_login` whose options name the session cookie
+`app-session` on both halves, the option `cookieName`, counted apart from the 31: a login and its callback,
+which sets the session under the name of the option, the principal of that cookie, no principal and no request
+at the issuer for the same token under `aosabi-auth`, which the provider then reads not, and the logout, which
+deletes the session under the name of the option. The run reads the session of the side with the name of the
+option, the field `session_cookie` of the run.
 """
 
 from __future__ import annotations
 
 import json
 
-from .login import (AUTH_KEY_BYTE_KEY, KEY_FORMS, KEY_NOT_SIGNED, KEY_REFUSED, KEY_SIZES, OTHER_COOKIE, Run, Step,
-                    cookie_fields, counted_cases, get, graphql, verifier_cookie)
+from .login import (AUTH_KEY_BYTE_KEY, COOKIE_NAME, KEY_FORMS, KEY_NOT_SIGNED, KEY_REFUSED, KEY_SIZES, OTHER_COOKIE,
+                    SESSION_COOKIE, Run, Step, cookie_fields, counted_cases, get, graphql, verifier_cookie)
 from .rng import Rng
 
 #: The seed a run takes when its parameters name none.
@@ -94,10 +111,12 @@ HOSTILE_CASES = (tuple("z-key-%s-%s" % (name, form) for name in KEY_SIZES for fo
                  + ("z-auth-key-byte", "z-surrogate-access-token", "z-surrogate-token-type", "z-surrogate-id-token",
                     "z-state-ff", "z-state-twice", "z-blocked-port", "z-roles-value-of"))
 TOKEN_TYPE_CASES = ("z-typ-kelvin",)
+#: The case of the session cookie the option `cookieName` names on both halves.
+COOKIE_NAME_CASES = ("z-cookie-name",)
 #: The cases that run beside the 31 and count apart.
 EXTRA_CASES = (("z-hostile", "z-40", "z-41", "z-42", "z-43", "z-44", "z-45")
                + tuple(case for case, _, _ in JWT_ROW_CASES + PLAIN_ROW_CASES) + SHAPE_CASES + HOSTILE_CASES
-               + TOKEN_TYPE_CASES)
+               + TOKEN_TYPE_CASES + COOKIE_NAME_CASES)
 
 #: The mapper ids of each option, the table of tests/sidecar/zitadel.md, section principal.
 MAPPERS = {
@@ -511,8 +530,8 @@ def provider_runs() -> list:
     runs = []
     me = "{me{id tenant roles permissions email}}"
 
-    def add(run_id, variant, steps, issuer="running", key=None):
-        runs.append(Run(run_id, fixture, variant, issuer, tuple(steps), key=key))
+    def add(run_id, variant, steps, issuer="running", key=None, session_cookie=SESSION_COOKIE):
+        runs.append(Run(run_id, fixture, variant, issuer, tuple(steps), key=key, session_cookie=session_cookie))
 
     def ask(step_id, case, scenario, headers, pins, document=me, target="/graphql", carry=()):
         return Step(step_id, case, scenario, graphql(step_id, document, headers, target), pins, tuple(carry))
@@ -694,6 +713,24 @@ def provider_runs() -> list:
         ask("z-typ-kelvin", "z-typ-kelvin", "introspect_jwt_typ_kelvin", _bearer("t19"), "the principal of a "
             "token-introspection+jwt answer whose typ holds U+212A KELVIN SIGN, which lowers to the ASCII k"),
     ])
+    case = "z-cookie-name"
+    named = "%s={session}" % COOKIE_NAME
+    from_login = ("verifier", case + "-login", "aosabi_code_verifier")
+    from_callback = ("session", case + "-callback", COOKIE_NAME)
+    add("auth-cookie_name", "cookie_name", [
+        Step(case + "-login", case, both, get(case + "-login", "/auth/login"), "302 and the verifier cookie under "
+             "its own name", hands_challenge=True),
+        Step(case + "-callback", case, both, get(case + "-callback", callback, verifier_cookie()), "302 and the "
+             "session cookie under the name of the option cookieName, holding the token of the scenario",
+             (from_login,)),
+        ask(case, case, both, [("Cookie", named)], "the principal of the session under the name of the option",
+            "{me{id roles email}}", carry=(from_callback,)),
+        ask(case + "-default", case, both, [("Cookie", "%s={session}" % SESSION_COOKIE)], "null with no request at "
+            "the issuer, the token under the name aosabi-auth, which a provider whose option names another reads "
+            "not", "{me{id}}", carry=(from_callback,)),
+        Step(case + "-logout", case, both, get(case + "-logout", "/auth/logout", [("Cookie", named)]),
+             "the session cookie of the option deleted as in lg-cookie-name-logout", (from_callback,)),
+    ], session_cookie=COOKIE_NAME)
     return runs
 
 
@@ -762,6 +799,7 @@ __all__ = [
     "CLAIM_SET_COUNT",
     "CLAIM_VALUE_COUNT",
     "COOKIE_FIELD_SHAPES",
+    "COOKIE_NAME_CASES",
     "DEFAULT_SEED",
     "EXTRA_CASES",
     "HOSTILE_CASES",

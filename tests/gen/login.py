@@ -65,8 +65,15 @@ malformed answers, each counted apart from the 25:
 - **The hash of the access token.** `lg-zitadel-at-hash`, the ID token of
   Zitadel with the `at_hash` of another token, which neither side checks.
 
+The last run serves the variant `cookie_name`, whose options name the session cookie `app-session`, the option
+`cookieName`, counted apart from the 25: a login, whose verifier cookie keeps its own name, the callback
+`lg-cookie-name`, which sets the session under the name of the option, and the logout, which deletes it under
+that name. The run reads the session of the side with the name of the option where every other run reads
+`aosabi-auth`, the field `session_cookie` of the run.
+
 Every name and value is a neutral test string, the code `c1`, the states `s1`,
-`s2` and `s9`, the extra parameter `session_state=x1` and the cookie `other=1`.
+`s2` and `s9`, the extra parameter `session_state=x1`, the cookie `other=1` and
+the name `app-session`.
 """
 
 from __future__ import annotations
@@ -130,12 +137,16 @@ AUDIENCE_CASES = ("lg-aud-no-client", "lg-aud-no-azp", "lg-azp-other")
 BASE64URL_CASES = ("lg-b64-lenient", "lg-malformed-b64-length", "lg-malformed-b64-alphabet")
 #: The case of an ID token of Zitadel with the `at_hash` of another token.
 AT_HASH_CASES = ("lg-zitadel-at-hash",)
+#: The case of the session cookie the option `cookieName` names.
+COOKIE_NAME_CASES = ("lg-cookie-name",)
 #: The cases that run beside the 25 and count apart.
 EXTRA_CASES = (("lg-13b", "lg-hostile", "lg-40", "lg-41") + ROW_CASES + HOSTILE_CASES + TOKEN_TYPE_CASES
-               + AUDIENCE_CASES + BASE64URL_CASES + AT_HASH_CASES)
+               + AUDIENCE_CASES + BASE64URL_CASES + AT_HASH_CASES + COOKIE_NAME_CASES)
 #: The cookie of the PKCE verifier and the cookie of the session.
 VERIFIER_COOKIE = "aosabi_code_verifier"
 SESSION_COOKIE = "aosabi-auth"
+#: The name of the session cookie the variant `cookie_name` of both fixtures gives in the option `cookieName`.
+COOKIE_NAME = "app-session"
 #: A cookie of the host beside the cookies the routes read, which a browser sends with them.
 OTHER_COOKIE = "other=1"
 
@@ -182,7 +193,9 @@ class Run:
     list of bad ports of the Fetch standard. `key` names the key `AUTH_KEY`
     holds where it is not the key of the run: a key case of `KEY_SIZES` with
     its form, `rsa2560-pkcs8`, a value of `KEY_VALUES`, or
-    `AUTH_KEY_BYTE_KEY`.
+    `AUTH_KEY_BYTE_KEY`. `session_cookie` is the name of the session cookie
+    the side sets and reads in the run, the option `cookieName` of its
+    variant, `SESSION_COOKIE` where the variant names none.
     """
 
     id: str
@@ -192,6 +205,7 @@ class Run:
     steps: tuple
     node_envs: tuple = NODE_ENVS
     key: str | None = None
+    session_cookie: str = SESSION_COOKIE
 
     @property
     def first_scenario(self) -> str | None:
@@ -260,8 +274,8 @@ def login_runs() -> list:
     fixture = "zitadel-login-app"
     runs = []
 
-    def add(run_id, variant, steps, issuer="running", key=None):
-        runs.append(Run(run_id, fixture, variant, issuer, tuple(steps), key=key))
+    def add(run_id, variant, steps, issuer="running", key=None, session_cookie=SESSION_COOKIE):
+        runs.append(Run(run_id, fixture, variant, issuer, tuple(steps), key=key, session_cookie=session_cookie))
 
     q = "?code=c1&state=s1"
     add("login-default-ok", "default", [
@@ -437,6 +451,15 @@ def login_runs() -> list:
         _callback(case, case, "token_type_kelvin", q, "500 after one token request, the token type Bearer with U+212A "
                   "KELVIN SIGN, which lowers to bearerk, a type neither side takes", case + "-login"),
     ])
+    case = "lg-cookie-name"
+    add("login-cookie_name", "cookie_name", [
+        _login(case + "-login", case, "ok", "302 and the verifier cookie under its own name, whose verifier the "
+               "callback of %s carries" % case),
+        _callback(case, case, "ok", q, "the token request of lg-07 and 302 with %s=<token>, the session cookie "
+                  "under the name of the option cookieName" % COOKIE_NAME, case + "-login"),
+        Step(case + "-logout", case, "ok", get(case + "-logout", "/auth/logout"), "302 to / and %s=; Max-Age=0; "
+             "Path=/, the session cookie of the option deleted" % COOKIE_NAME),
+    ], session_cookie=COOKIE_NAME)
     return runs
 
 
@@ -521,6 +544,8 @@ __all__ = [
     "AUTH_KEY_BYTE_KEY",
     "BASE64URL_CASES",
     "CASE_COUNT",
+    "COOKIE_NAME",
+    "COOKIE_NAME_CASES",
     "EXTRA_CASES",
     "FAMILY",
     "HOSTILE_CASES",

@@ -9,13 +9,15 @@
 //! `parse`, `serialize`, `CookieOptions`, `SameSite`, `Priority`,
 //! `CookiePrefix` and `CookieError`.
 //!
-//! A `Cookie` header is split on `;`, each pair is trimmed and split at its
-//! first `=`, a pair whose name or value fails the grammar of hono is
-//! skipped, a value in double quotes loses them, and a value that holds a `%`
-//! is decoded with `decodeURIComponent` where it can be. The answer is the
-//! object the reference builds, a later pair of a name taking the place of
-//! the earlier one and the names that are array indices first in ascending
-//! order, which is the key order of an object of JavaScript.
+//! A `Cookie` header is split on `;`, each pair is trimmed of the space and
+//! the tab alone, a named divergence, and split at its first `=`, a pair whose
+//! name or value fails the grammar of hono is skipped, a value in double
+//! quotes loses them, and a value that holds a `%` is decoded with
+//! `decodeURIComponent` where it can be. The answer is the object the
+//! reference builds, but the first pair of a name that passes stands where a
+//! later pair of that name would take its place, a named divergence, and the
+//! names that are array indices come first in ascending order, which is the
+//! key order of an object of JavaScript.
 //!
 //! A `Set-Cookie` value is the name, `=`, the value encoded with
 //! `encodeURIComponent`, and the attributes in the order `Max-Age`, `Domain`,
@@ -358,8 +360,21 @@ fn has_prefix(name: &str, prefix: &str) -> bool {
         .is_some_and(|head| head.eq_ignore_ascii_case(prefix))
 }
 
+/// Returns whether `name` starts with `__Secure-` or `__Host-` in any case of
+/// ASCII, the names [`serialize`] writes only with `Secure`, a named
+/// divergence.
+#[must_use]
+pub fn has_cookie_prefix(name: &str) -> bool {
+    has_prefix(name, "__Secure-") || has_prefix(name, "__Host-")
+}
+
 /// Returns whether `name` passes ``/^[\w!#$%&'*.^`|~+-]+$/``.
-fn is_cookie_name(name: &str) -> bool {
+///
+/// The pattern is the token that RFC 6265 section 4.1.1 takes as a cookie
+/// name. [`serialize`] refuses every other name before any other rule, so an
+/// option that names a cookie checks its name here when the app starts.
+#[must_use]
+pub fn is_cookie_name(name: &str) -> bool {
     !name.is_empty()
         && name
             .bytes()

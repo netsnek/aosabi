@@ -2606,13 +2606,14 @@ function open(engine) {
   };
 
   // Returns the promise of the claims of `request` a provider of
-  // aosabi/auth/zitadel answers over the issuer `issuer` and the key path
-  // `keyPath`, crates/aosabi-js/src/zitadel.rs. The promise is made and kept
-  // under a number of its own before the call, since the import js_next may
-  // settle it before the export ctx returns, and the numbers of the
-  // continuations of a chain, which count from 1, never reach it.
+  // aosabi/auth/zitadel answers over the issuer `issuer`, the key path
+  // `keyPath` and the session cookie `cookieName`, each of the last two a
+  // string or undefined, crates/aosabi-js/src/zitadel.rs. The promise is made
+  // and kept under a number of its own before the call, since the import
+  // js_next may settle it before the export ctx returns, and the numbers of
+  // the continuations of a chain, which count from 1, never reach it.
   let claimNumbers = CLAIM_NUMBERS;
-  const claimsOf = (request, issuer, keyPath) => {
+  const claimsOf = (request, issuer, keyPath, cookieName) => {
     if (state.dead) return HostPromise.reject(new Error("the module trapped"));
     const number = claimNumbers;
     claimNumbers = claimNumbers >= 0x7ffffffe ? CLAIM_NUMBERS : claimNumbers + 1;
@@ -2637,6 +2638,12 @@ function open(engine) {
       } else {
         out.byte(1);
         out.text(String(keyPath));
+      }
+      if (cookieName === undefined) {
+        out.byte(0);
+      } else {
+        out.byte(1);
+        out.text(String(cookieName));
       }
       out.word(number);
       ctxCall(request, out);
@@ -4861,14 +4868,14 @@ export function createCore({
     },
 
     // Answers the promise of the claims of the request of the context `c`
-    // that a provider of aosabi/auth/zitadel over the issuer `issuer` and the
-    // key path `keyPath` answers, crates/aosabi-js/src/zitadel.rs, on the
-    // request the core holds for c, or on a request of its own where the
-    // request of c has ended, `alone`.
-    claims(c, issuer, keyPath) {
-      if (!held.has(c)) return alone(c, (state, id) => state.claimsOf(id, issuer, keyPath));
+    // that a provider of aosabi/auth/zitadel over the issuer `issuer`, the
+    // key path `keyPath` and the session cookie `cookieName` answers,
+    // crates/aosabi-js/src/zitadel.rs, on the request the core holds for c,
+    // or on a request of its own where the request of c has ended, `alone`.
+    claims(c, issuer, keyPath, cookieName) {
+      if (!held.has(c)) return alone(c, (state, id) => state.claimsOf(id, issuer, keyPath, cookieName));
       const { state, id } = this.open(c);
-      return state.claimsOf(id, issuer, keyPath);
+      return state.claimsOf(id, issuer, keyPath, cookieName);
     },
   };
   return core;

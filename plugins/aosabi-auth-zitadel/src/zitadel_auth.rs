@@ -65,7 +65,8 @@ use crate::{
         AUTH_COOKIE,
         IssuerSlot,
         KEY_PATH,
-        bootstrap, //
+        bootstrap,
+        session_cookie, //
     },
 };
 
@@ -83,7 +84,8 @@ const NOT_A_FUNCTION: &str =
 /// The OIDC user info Zitadel returns, which already carries arbitrary claims.
 pub type OidcUser = JsObject;
 
-/// The options of `zitadelAuth`, `ZitadelOptions` with the four mapping functions.
+/// The options of `zitadelAuth`, `ZitadelOptions` with the four mapping functions, and the name of
+/// the session cookie beside them.
 ///
 /// A mapper is a function pointer, so `Some(|u| ...)` in the literal reads as
 /// the TypeScript `id: u => ...`, and a mapper that needs state reads a
@@ -95,6 +97,12 @@ pub struct ZitadelAuthOptions {
     /// Service account key file (PKCS1 PEM JSON), `key.json` by default, or the variable
     /// `AUTH_KEY`.
     pub key_path: Option<String>,
+    /// The name of the session cookie the token is read from, `aosabi-auth` where the options
+    /// name none or the empty name, the cookie the callback of
+    /// [`zitadel_login`](crate::zitadel::zitadel_login) sets under the name its own options give.
+    /// The provider has no setup that could refuse a name, so a name outside the token of a cookie
+    /// name matches no cookie of a request, while the setup of the login half refuses it.
+    pub cookie_name: Option<String>,
     /// Override the principal id (default: the OIDC `sub`).
     pub id: Option<fn(&OidcUser) -> PrincipalId>,
     /// Derive the tenant id (e.g. org) from the claims (default: none).
@@ -158,7 +166,8 @@ impl ZitadelAuth {
         expect(unreachable_code, reason = "this build has no signer")
     )]
     pub async fn claims(&self, c: &Context) -> Result<Option<Claims>, Thrown> {
-        let Some(token) = read_token(c).filter(|token| !token.is_empty()) else {
+        let cookie = session_cookie(self.options.cookie_name.as_deref());
+        let Some(token) = token_of(c, cookie).filter(|token| !token.is_empty()) else {
             return Ok(None);
         };
         let config = bootstrap(&self.slot, &self.options.issuer, &self.key_path).await?;
@@ -251,10 +260,17 @@ fn principal_of(
 /// answers its second word, none when it has one word alone and the empty
 /// string after two spaces, and never falls through. Otherwise the query
 /// `token` answers, the empty string included, and then the cookie
-/// `aosabi-auth`.
+/// `aosabi-auth`, the session cookie of a provider whose options name no
+/// other.
 #[doc(hidden)]
 #[must_use]
 pub fn read_token(c: &Context) -> Option<String> {
+    token_of(c, AUTH_COOKIE)
+}
+
+/// Pulls the bearer, query or cookie token off the request as [`read_token`] does, from the
+/// session cookie `cookie`.
+fn token_of(c: &Context, cookie: &str) -> Option<String> {
     if let Some(header) = c
         .req()
         .header("Authorization")
@@ -266,9 +282,7 @@ pub fn read_token(c: &Context) -> Option<String> {
             _ => {}
         }
     }
-    c.req()
-        .query("token")
-        .or_else(|| get_cookie(c, AUTH_COOKIE))
+    c.req().query("token").or_else(|| get_cookie(c, cookie))
 }
 
 /// Returns the second word of `header`, which starts with `Bearer` and a space, cut out in place.
@@ -279,7 +293,7 @@ pub fn read_token(c: &Context) -> Option<String> {
 /// # Panics
 ///
 /// Panics where `header` is shorter than `Bearer` and a space, or where its
-/// first seven bytes end inside a character, which [`read_token`] rules out
+/// first seven bytes end inside a character, which [`token_of`] rules out
 /// before it calls.
 fn second_word(mut header: String) -> String {
     let start = "Bearer ".len();

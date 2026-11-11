@@ -13,20 +13,24 @@
 
 //! `zitadel_login`, its options and plugin, and the bootstrap of an issuer.
 //!
-//! The plugin `zitadel_login` returns is unnamed and has `setup` alone, which
-//! registers `GET <endpoint>/login`, `GET <endpoint>/logout` and
-//! `GET <endpoint>/callback` in that order, with the endpoint `/auth` by
-//! default. The login route sets the cookie `aosabi_code_verifier` and
-//! redirects to the authorization URL, the logout route deletes the cookie
-//! `aosabi-auth` and redirects to `/`, and the callback route exchanges the
-//! code for tokens, sets `aosabi-auth` to the access token and redirects to
-//! `/`. The callback runs the bootstrap before it reads its query, so a
-//! failed bootstrap answers 500 before the 400 of a missing code. Every other
-//! failure is no `HTTPException`, so the root answers it with 500.
+//! The plugin `zitadel_login` returns is unnamed and has `setup` alone, which registers
+//! `GET <endpoint>/login`, `GET <endpoint>/logout` and `GET <endpoint>/callback` in that order,
+//! with the endpoint `/auth` by default. The login route sets the cookie `aosabi_code_verifier` and
+//! redirects to the authorization URL, the logout route deletes the session cookie and redirects to
+//! `/`, and the callback route exchanges the code for tokens, sets the session cookie to the access
+//! token and redirects to `/`. The callback runs the bootstrap before it reads its query, so a
+//! failed bootstrap answers 500 before the 400 of a missing code. Every other failure is no
+//! `HTTPException`, so the root answers it with 500.
 //!
 //! The callback holds the `state` of its query to the state its login bound to the verifier cookie.
 //!
 //! The callback hands the token request the code of its query and no other parameter of it.
+//!
+//! The session cookie is `aosabi-auth`, or the name the option `cookie_name` gives it, a named
+//! divergence, while the cookie of the verifier keeps its name.
+//!
+//! A name outside the token of a cookie name fails the setup with a `TypeError`
+//! that names the option.
 //!
 //! The bootstrap is shared by the provider and the login routes. It reads the auth key, imports its
 //! private key, and discovers the issuer with the key as the client authentication. One cache of
@@ -70,7 +74,9 @@ use aosabi_http::{
     parse_url,
     utils::cookie::{
         CookieOptions,
-        SameSite, //
+        SameSite,
+        has_cookie_prefix,
+        is_cookie_name, //
     },
 };
 use aosabi_json::{
@@ -118,7 +124,8 @@ use crate::{
 /// The key path of both halves when the options name none.
 pub(crate) const KEY_PATH: &str = "key.json";
 
-/// The options of `zitadelLogin`, `ZitadelOptions & {endpoint?: string}`.
+/// The options of `zitadelLogin`, `ZitadelOptions & {endpoint?: string}`, with the name of the
+/// session cookie beside them.
 #[derive(Clone, Debug, Default)]
 pub struct ZitadelLoginOptions {
     /// OIDC issuer URL, e.g. `https://acme.zitadel.cloud`.
@@ -128,6 +135,15 @@ pub struct ZitadelLoginOptions {
     pub key_path: Option<String>,
     /// The path the three routes are mounted under, `/auth` by default.
     pub endpoint: Option<String>,
+    /// The name of the session cookie the callback sets and the logout deletes, `aosabi-auth` where
+    /// the options name none or the empty name.
+    ///
+    /// The provider of [`zitadel_auth`](crate::zitadel_auth::zitadel_auth) reads the cookie of the
+    /// name its own options give, so an app hands both the same name. A name outside the token of
+    /// [`is_cookie_name`] fails the setup of the plugin. A name with the prefix `__Secure-` or
+    /// `__Host-` is deleted with `Secure` and needs https at the callback, its URL of `https:` or a
+    /// first `x-forwarded-proto` of `https`.
+    pub cookie_name: Option<String>,
 }
 
 /// Returns the plain `new Error(message)` of a thrown value.
@@ -557,8 +573,17 @@ const SCOPE: &str =
 /// The cookie that carries the PKCE code verifier from the login to the callback.
 const CODE_VERIFIER_COOKIE: &str = "aosabi_code_verifier";
 
-/// The cookie that carries the access token, which the provider half reads.
+/// The cookie that carries the access token, which the provider half reads, where the options of
+/// each half name no other.
 pub(crate) const AUTH_COOKIE: &str = "aosabi-auth";
+
+/// Returns the name of the session cookie the option `cookie_name` of either half gives,
+/// [`AUTH_COOKIE`] where it names none or the empty name, which no cookie of a request carries.
+pub(crate) fn session_cookie(cookie_name: Option<&str>) -> &str {
+    cookie_name
+        .filter(|name| !name.is_empty())
+        .unwrap_or(AUTH_COOKIE)
+}
 
 /// The life of the cookie of the code verifier, in seconds.
 const CODE_VERIFIER_MAX_AGE: f64 = 300.0;
@@ -580,7 +605,8 @@ fn bound_state(code_verifier: &str) -> Result<String, OauthError> {
     calculate_pkce_code_challenge(&format!("{STATE_BINDING}{code_verifier}"))
 }
 
-/// The issuer, the key path and the endpoint the three routes share.
+/// The issuer, the key path, the endpoint and the name of the session cookie the three routes
+/// share.
 #[derive(Debug)]
 struct Routes {
     /// The issuer.
@@ -589,6 +615,8 @@ struct Routes {
     key_path: String,
     /// The endpoint.
     endpoint: String,
+    /// The name of the session cookie.
+    cookie_name: String,
     /// The slot of the issuer, kept at the first call of a route.
     slot: IssuerSlot,
 }
@@ -672,9 +700,17 @@ async fn login(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
     c.redirect(&url.href)
 }
 
-/// Answers `GET <endpoint>/logout`, which deletes the cookie `aosabi-auth` and redirects to `/`.
-fn logout(c: &Context) -> Result<Response, Thrown> {
-    delete_cookie(c, AUTH_COOKIE, CookieOptions::default())?;
+/// Answers `GET <endpoint>/logout`, which deletes the session cookie `cookie_name` and redirects to
+/// `/`.
+///
+/// A name with the prefix `__Secure-` or `__Host-` is deleted with `Secure`, and every other name
+/// without it, a named divergence.
+fn logout(c: &Context, cookie_name: &str) -> Result<Response, Thrown> {
+    let opt = CookieOptions {
+        secure: has_cookie_prefix(cookie_name),
+        ..CookieOptions::default()
+    };
+    delete_cookie(c, cookie_name, opt)?;
     c.redirect("/")
 }
 
@@ -723,6 +759,9 @@ fn cookie_text(value: &JsString) -> Result<&str, Thrown> {
 /// `expires_in`, 3600 where that is absent or 0, and redirects to `/`. An access token with a lone
 /// surrogate answers the `URIError` of [`cookie_text`], as `setCookie` throws it.
 ///
+/// The session cookie the callback sets is `aosabi-auth` or the name of the option
+/// `cookie_name`.
+///
 /// The session cookie carries `SameSite=Lax` as the cookie of the verifier does, and `Secure` where
 /// [`over_https`] holds.
 #[cfg_attr(
@@ -766,7 +805,7 @@ async fn callback(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
         .unwrap_or(AUTH_MAX_AGE);
     set_cookie(
         &c,
-        AUTH_COOKIE,
+        &routes.cookie_name,
         cookie_text(&tokens.access_token)?,
         CookieOptions {
             http_only: true,
@@ -779,10 +818,20 @@ async fn callback(c: Context, routes: Rc<Routes>) -> Result<Response, Thrown> {
     c.redirect("/")
 }
 
+/// Returns the `TypeError` of a session cookie `name` outside the token of a cookie name.
+///
+/// The name is written with its escapes.
+fn invalid_cookie_name(name: &str) -> Thrown {
+    Thrown::type_error(&format!(
+        "Invalid cookie name {name:?} in the option cookie_name of zitadel_login, which takes \
+         a token of RFC 6265 section 4.1.1 alone"
+    ))
+}
+
 /// The plugin `zitadelLogin` returns, unnamed, with `setup` alone.
 #[derive(Clone, Debug)]
 pub struct ZitadelLoginPlugin {
-    /// The issuer, the key path and the endpoint of the routes.
+    /// The issuer, the key path, the endpoint and the session cookie of the routes.
     routes: Rc<Routes>,
 }
 
@@ -791,18 +840,24 @@ impl IntoPlugin for ZitadelLoginPlugin {
         let routes = self.routes;
         Rc::new(PluginObject {
             setup: __wrap::setup(move |app: &mut App| {
+                if !is_cookie_name(&routes.cookie_name) {
+                    return Err(invalid_cookie_name(&routes.cookie_name));
+                }
                 let endpoint = &routes.endpoint;
                 let login_routes = Rc::clone(&routes);
                 app.get(&format!("{endpoint}/login"), move |c: Context| {
                     login(c, Rc::clone(&login_routes))
                 });
-                app.get(&format!("{endpoint}/logout"), |c: Context| async move {
-                    logout(&c)
+                let logout_routes = Rc::clone(&routes);
+                app.get(&format!("{endpoint}/logout"), move |c: Context| {
+                    let routes = Rc::clone(&logout_routes);
+                    async move { logout(&c, &routes.cookie_name) }
                 });
                 let callback_routes = Rc::clone(&routes);
                 app.get(&format!("{endpoint}/callback"), move |c: Context| {
                     callback(c, Rc::clone(&callback_routes))
                 });
+                Ok(())
             }),
             ..PluginObject::default()
         })
@@ -818,6 +873,7 @@ impl IntoPlugin for ZitadelLoginPlugin {
 pub fn zitadel_login(options: ZitadelLoginOptions) -> ZitadelLoginPlugin {
     ZitadelLoginPlugin {
         routes: Rc::new(Routes {
+            cookie_name: String::from(session_cookie(options.cookie_name.as_deref())),
             issuer: options.issuer,
             key_path: options.key_path.unwrap_or_else(|| String::from(KEY_PATH)),
             endpoint: options.endpoint.unwrap_or_else(|| String::from(ENDPOINT)),

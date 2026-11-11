@@ -24,9 +24,8 @@ import { createDecorator, getContext } from "./pylon.js";
 
 // The waiting the steps of the OIDC path of useAuth name.
 const OIDC = "the OIDC path of useAuth of the canary, the introspection of a token of the header " +
-  "Authorization, of the cookie aosabi-auth or of the query parameter token and the routes of the login and of " +
-  "the callback, waits for the connection of round TS1T over the OIDC client of the engine, which the lead takes " +
-  "after item T9 of TS1";
+  "Authorization, of the session cookie or of the query parameter token and the routes of the login and of " +
+  "the callback, waits for the connection over the OIDC client of the engine, which a later release makes";
 
 // Returns the runtime of the host, getRuntimeKey of hono at
 // dist/helper/adapter/index.js, which the entry aosabi/pylon reads as well,
@@ -163,25 +162,55 @@ function stateWithoutToken() {
   return state;
 }
 
+// The name of the session cookie useAuth reads and its logout deletes where its
+// options name none, a named divergence, as the entry aosabi/auth/zitadel names
+// it.
+const SESSION_COOKIE = "aosabi-auth";
+
+// The token that RFC 6265 section 4.1.1 takes as a cookie name.
+const COOKIE_NAME = /^[\w!#$%&'*.^`|~+-]+$/;
+
+// The prefixes of a cookie name that ask for Secure.
+const SECURE_PREFIX = /^__(?:secure|host)-/i;
+
+// Returns the name of the session cookie the key cookieName of `args` gives,
+// with the rules of the options of aosabi/auth/zitadel: a string that is not
+// empty, or SESSION_COOKIE for the empty name and for any other value.
+//
+// A string that is not empty and outside COOKIE_NAME throws a TypeError that
+// names the key.
+function sessionCookieOf(args) {
+  const name = args.cookieName;
+  if (typeof name !== "string" || name === "") return SESSION_COOKIE;
+  if (!COOKIE_NAME.test(name)) {
+    throw new TypeError(
+      `Invalid cookie name ${JSON.stringify(name)} in the option cookieName of useAuth, which takes a token of RFC 6265 section 4.1.1 alone`,
+    );
+  }
+  return name;
+}
+
 // Returns the plugin useAuth of the canary's dist/index.js:372-506 for the
 // options `args`: its middleware sets the auth state of a request with no token
 // and goes on, and throws the error of the OIDC path for a request with a token
-// in the header Authorization, the cookie aosabi-auth or the query parameter
-// token, which the canary introspects, and its setup mounts the routes of the
-// login, the logout and the callback under `endpoint`, /auth by default, where
-// the logout deletes the cookie aosabi-auth and redirects to /, as the canary's
-// does, and the two others throw the error of the OIDC path. The middleware
+// in the header Authorization, the session cookie or the query parameter token,
+// which the canary introspects, and its setup mounts the routes of the login,
+// the logout and the callback under `endpoint`, /auth by default, where the
+// logout deletes the session cookie and redirects to /, as the canary's does,
+// and the two others throw the error of the OIDC path. The session cookie is
+// aosabi-auth or the name the key cookieName of `args` gives it. The middleware
 // calls next where the canary's returns nothing, which the loader of the canary
 // takes as going on and the chain of the plugins of the base pipeline as the
 // end of the chain.
 export function useAuth(args) {
   const { endpoint = "/auth" } = args;
+  const cookieName = sessionCookieOf(args);
   const loginPath = `${endpoint}/login`;
   const logoutPath = `${endpoint}/logout`;
   const callbackPath = `${endpoint}/callback`;
   return {
     middleware: async (ctx, next) => {
-      const authCookieToken = getCookie(ctx, "aosabi-auth");
+      const authCookieToken = getCookie(ctx, cookieName);
       const authHeader = ctx.req.header("Authorization");
       const authQueryToken = ctx.req.query("token");
       if (authCookieToken || authHeader || authQueryToken) {
@@ -195,7 +224,9 @@ export function useAuth(args) {
         throw new Error(OIDC);
       });
       app.get(logoutPath, async (ctx) => {
-        deleteCookie(ctx, "aosabi-auth");
+        // A name with a prefix is deleted with Secure, and every other name
+        // without it.
+        deleteCookie(ctx, cookieName, SECURE_PREFIX.test(cookieName) ? { secure: true } : undefined);
         return ctx.redirect("/");
       });
       app.get(callbackPath, async () => {
