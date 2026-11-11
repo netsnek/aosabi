@@ -16,18 +16,31 @@
 //! `logging`, and the key `logger` that the config of an app spreads into Yoga's
 //! options is not that option.
 //!
-//! The console of Node prints an error with its stack, which has no reading
-//! here, so an error prints as `Error.prototype.toString` gives it. The
-//! notebook `65_logs` reports these lines and never fails on them. Under the
-//! feature `host-env` a host of the TypeScript option prints them through the
-//! writer of its console, `host_env::set_writer`, since the standard
-//! streams of a module for `wasm32-unknown-unknown` write nowhere.
+//! The console of Node prints an error with its stack, whose frames have no
+//! reading here, so an error prints as the first line of that stack, its name
+//! and its message as `Error.prototype.toString` joins them, and no excerpt
+//! of the source, a named divergence. The checks of the logs report these
+//! lines, and one of their sections holds the line of a masked error to the
+//! first line the reference writes for it. Under the feature `host-env` a
+//! host of the TypeScript option prints them through the writer of its
+//! console, `host_env::set_writer`, since the standard streams of a module
+//! for `wasm32-unknown-unknown` write nowhere.
 
 use std::io::Write as _;
 
 use aosabi_execute::{
+    ErrorObject,
     Value,
-    value::inspect::inspect, //
+    errors::ThrownError,
+    value::{
+        error::ErrorName,
+        inspect::inspect, //
+    }, //
+};
+use aosabi_json::JsString;
+use aosabi_lang::{
+    GraphQLError,
+    OriginalError, //
 };
 
 /// The prefix of a warning, yellow `WARN`.
@@ -115,14 +128,11 @@ impl HttpLogger {
         }
     }
 
-    /// Prints the thrown `value` with the `ERR` prefix on standard error, `logger.error(error)`.
+    /// Prints the thrown `value` with the `ERR` prefix on standard error, `logger.error(error)`,
+    /// as the first line of what the console of Node prints for it, which `stack_line` writes.
     pub fn error_value(&self, value: &Value) {
         if self.level <= LogLevel::Error {
-            let text = match value {
-                Value::Error(error) => error.to_js_string(),
-                value => inspect(value),
-            };
-            print_line(true, ERROR_PREFIX, &text);
+            print_line(true, ERROR_PREFIX, &stack_line(value));
         }
     }
 }
@@ -156,4 +166,49 @@ fn print_line(to_stderr: bool, prefix: &str, message: &str) {
     } else {
         let _ = std::io::stdout().lock().write_all(line.as_bytes());
     }
+}
+
+/// Returns the first line of what the console of Node prints for the thrown `value`.
+///
+/// The console prints an error with its stack, which opens with the name and
+/// the message of the error as `Error.prototype.toString` joins them, and a
+/// `GraphQLError` with an original error carries the stack of that error, so
+/// the line of a located error names the error its resolver threw. The
+/// console leaves such a stack as it stands, since it opens with another name
+/// than the error's own. The line ends before the first line break of the
+/// message, so an error prints no excerpt of the source, and a value that is
+/// no error prints as the console inspects it.
+fn stack_line(value: &Value) -> String {
+    let Value::Error(error) = value else {
+        return inspect(value);
+    };
+    let mut line = match error.as_ref() {
+        ErrorObject::GraphQL(error) => stack_header(error),
+        error => error.to_js_string(),
+    };
+    if let Some(end) = line.find('\n') {
+        line.truncate(end);
+    }
+    line
+}
+
+/// Returns the opening of the stack of `error`, the one of its original error
+/// where it has one and its own name and message where it has none.
+fn stack_header(error: &GraphQLError) -> String {
+    let (name, message) = match &error.original_error {
+        Some(OriginalError::GraphQL(original)) => return stack_header(original),
+        Some(OriginalError::Other(original)) => match original.downcast_ref::<ThrownError>() {
+            Some(thrown) => (thrown.name.clone(), thrown.message.clone()),
+            None => (
+                JsString::from("Error"),
+                JsString::from(original.to_string()),
+            ),
+        },
+        None => (JsString::from("GraphQLError"), error.message.clone()),
+    };
+    ErrorObject::Plain {
+        name: ErrorName::Other(name),
+        message,
+    }
+    .to_js_string()
 }
