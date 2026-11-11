@@ -1425,8 +1425,9 @@ const UNREAD = failureRecord(500, "the host could not read the answer of the mod
 // The answer of a request with a settled value the host could not hand over.
 const UNSETTLED = failureRecord(500, "the host could not settle a promise of the request");
 
-// Returns the byte of the boot record for an option of the configuration
-// that is true, false or left out.
+// Returns the byte of a key the engine reads as a switch, the keys
+// introspection and maskedErrors: 0 where it is not set, 2 for false and 1
+// for any other value.
 function refusal(value) {
   if (value === undefined) return 0;
   return value === false ? 2 : 1;
@@ -1688,6 +1689,7 @@ function bootRecord(schema, ir, config, mode, read, env, plan, handle) {
   record.text(ir);
   writeTypeResolvers(record, plan.types ?? []);
   record.byte(refusal(config.introspection));
+  record.byte(refusal(config.maskedErrors));
   record.byte(MODES[mode]);
   record.byte(READS[read]);
   record.byte(typeof navigator !== "undefined" && navigator.userAgent?.startsWith("Bun") ? 1 : 0);
@@ -4477,33 +4479,33 @@ export function coreOf(c) {
 // the variables `env` of the process of the host, and returns the core of the
 // app. The graphql object is read once here, as graphqlOf reads it, and every
 // instance boots over the same copy. The configuration crosses as its options
-// graphiql, landingPage and logger and its plugins, the plan as its plugins,
-// each function a handle of the table of the boot. The job mode `mode` is
-// faithful, one microtask per job of the engine, or fast, and the read mode
-// `read` is get, one import per read, or project, one import per projected
-// object. A request whose instance traps answers with a failure of status
-// 500, a request after a trap runs on a fresh instance, and `instances`
-// counts the instances made. Where primeCore opened an instance of the same
-// engine for the logger of the app before its boot, `primed` is that state,
-// and the app boots over it, so the logger keeps the records and the sinks
-// of the passes of executeConfig. The text `ir` may be the schema record of
-// the build in place of the IR.
+// introspection, maskedErrors, maxTokens and logger and its plugins, the plan
+// as its plugins, each function a handle of the table of the boot.
 //
-// The routes and the middleware of the app run in its hono, lib/pylon.js,
-// and the core answers the requests the hono of the app hands it: the
-// GraphQL endpoint and the routes of the plugins of the engine. A request is
-// the context c of hono it runs in. The step of the request logger of
-// the base pipeline opens it in the engine with the logger of the
-// request, open(c, true), a middleware of a plugin of the engine opens it
-// where it needs it first, and answer(c) hands it to the app of the engine.
-// The step of the logger writes the access line once its chain has run,
-// note(c), and the request ends once the step of the async context bind of
-// that pipeline has released it and the fetch of the app that dispatches it
-// has ended, end(c), so the variables the engine sets for the request, the
-// client of Sentry and the loggers derived while it runs live as long as the
-// request, for a middleware the app registered before the base pipeline as
-// well. A request no step opened, of an app the glue booted with no base
-// pipeline, answers through answer(c) alone.
+// The job mode `mode` is faithful, one microtask per job of the engine, or
+// fast, and the read mode `read` is get, one import per read, or project, one
+// import per projected object. A request whose instance traps answers with a
+// failure of status 500, a request after a trap runs on a fresh instance, and
+// `instances` counts the instances made. Where primeCore opened an instance of
+// the same engine for the logger of the app before its boot, `primed` is that
+// state, and the app boots over it, so the logger keeps the records and the
+// sinks of the passes of executeConfig. The text `ir` may be the schema record
+// of the build in place of the IR.
+//
+// The routes and the middleware of the app run in its hono, lib/pylon.js, and
+// the core answers the requests the hono of the app hands it: the GraphQL
+// endpoint and the routes of the plugins of the engine. A request is the context
+// c of hono it runs in. The step of the request logger of the base pipeline
+// opens it in the engine with the logger of the request, open(c, true), a
+// middleware of a plugin of the engine opens it where it needs it first, and
+// answer(c) hands it to the app of the engine. The step of the logger writes the
+// access line once its chain has run, note(c), and the request ends once the
+// step of the async context bind of that pipeline has released it and the fetch
+// of the app that dispatches it has ended, end(c), so the variables the engine
+// sets for the request, the client of Sentry and the loggers derived while it
+// runs live as long as the request, for a middleware the app registered before
+// the base pipeline as well. A request no step opened, of an app the glue booted
+// with no base pipeline, answers through answer(c) alone.
 export function createCore({
   module, engine, schema, ir, graphql = {}, config = {}, mode = "faithful", read = "get", plan, env, primed,
 }) {

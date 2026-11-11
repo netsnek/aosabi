@@ -155,7 +155,7 @@ pub struct MaskedErrorsConfig {
     pub mask_error: Option<HttpMaskErrorFn>,
     /// `errorMessage`, `Unexpected error.` when absent.
     pub error_message: Option<String>,
-    /// `isDev`, read from `NODE_ENV` at each mask when absent.
+    /// `isDev`, `false` when absent, where Yoga reads `NODE_ENV` at each mask.
     pub is_dev: Option<bool>,
 }
 

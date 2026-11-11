@@ -109,10 +109,12 @@ pub fn create_default_mask_error(is_dev: bool) -> MaskErrorFn {
     })
 }
 
-/// Returns the default mask, `defaultMaskError`, for the `NODE_ENV` of the process.
+/// Returns the default mask, `defaultMaskError`, whose `isDev` is `false`,
+/// where the plugin of the reference reads `NODE_ENV` of the process, a named
+/// divergence.
 #[must_use]
 pub fn default_mask_error() -> MaskErrorFn {
-    create_default_mask_error(std::env::var("NODE_ENV").is_ok_and(|env| env == "development"))
+    create_default_mask_error(false)
 }
 
 /// The options of the plugin, `{ maskError, errorMessage }`.

@@ -96,6 +96,9 @@ export type AppConfig = {
     /** Introspection is answered unless this key is `false`, which refuses every field of
      *  introspection. */
     introspection?: boolean;
+    /** An unexpected error of a resolver answers its own message unless this key is `true`,
+     *  which answers `Unexpected error.` in its place. */
+    maskedErrors?: boolean;
     /** Per-request access logging. `false` disables the access line; an object configures the
      *  runtime logger (`{level, format, base, redact, sink}` — see `LoggerConfig`). Default: on.
      *  Env `LOG_LEVEL` (e.g. `info,db=debug`) and `PYLON_LOG_FORMAT` override at runtime. */

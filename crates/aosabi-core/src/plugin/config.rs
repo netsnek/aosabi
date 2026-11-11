@@ -61,7 +61,8 @@ pub struct AppConfig {
     /// `plugins`, which the boot writes back with the built array (quirk
     /// `DUPLICATE_PLUGIN_WRITEBACK`).
     pub plugins: Option<PluginList>,
-    /// `maskedErrors` of Yoga.
+    /// `maskedErrors` of Yoga, no mask when absent, a named divergence, where
+    /// Pylon masks outside `NODE_ENV=development`.
     pub masked_errors: Option<MaskedErrors>,
     /// `graphqlEndpoint` of Yoga, which the handler sets first and the
     /// configuration overrides.

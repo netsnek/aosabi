@@ -91,12 +91,9 @@ use graphql_over_http::{
 };
 
 use crate::{
-    app::{
-        application::{
-            App,
-            Next, //
-        },
-        env_alias,
+    app::application::{
+        App,
+        Next, //
     },
     context::ambient_hooks,
     create_schema::{
@@ -204,15 +201,10 @@ pub fn build_http_options(
         graphql_endpoint: Some(String::from(GRAPHQL_ENDPOINT)),
         ..HttpOptions::default()
     };
-    // Dev: surface the real error on the GraphQL response and the server log
-    // instead of Yoga's default masking.
-    if env_alias::var("NODE_ENV").as_deref() == Some("development") {
-        options.masked_errors = MaskedErrors::Off;
-    }
-    // The configuration spread, `...config`.
-    if let Some(masked_errors) = config.masked_errors.clone() {
-        options.masked_errors = masked_errors;
-    }
+    // `maskedErrors: false` under every `NODE_ENV`, then the configuration
+    // spread, `...config`, so the mask runs where the key turns it on, a named
+    // divergence.
+    options.masked_errors = config.masked_errors.clone().unwrap_or(MaskedErrors::Off);
     if let Some(endpoint) = config.graphql_endpoint.clone() {
         options.graphql_endpoint = Some(endpoint);
     }

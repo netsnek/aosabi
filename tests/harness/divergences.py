@@ -222,8 +222,8 @@ def listed_document(tokens: int, head: str = "query", directive: str = "") -> st
     return document
 
 
-#: The codings the compress() of the reference writes, ENCODING_TYPES of hono 4.11.9, and x-gzip, the alias of
-#: gzip (RFC 9110 section 8.4.1.3).
+#: The codings the compress() of the reference writes, ENCODING_TYPES of hono 4.11.9, and x-gzip, the alias of gzip
+#: (RFC 9110 section 8.4.1.3).
 CODED = ("gzip", "x-gzip", "deflate")
 
 
@@ -877,6 +877,10 @@ OVERLAY_KEYS = {
     "switches_on": {"landingPage": True, "graphiql": True, "multipart": True, "viewer": True},
     "cors_star": {"cors": {"origin": "https://*.example.invalid"}},
     "cors_list": {"cors": {"origin": ["https://a.example.invalid", "https://b.example.invalid"]}},
+    "tokens_low": {"maxTokens": 1000},
+    "tokens_high": {"maxTokens": 240_016},
+    "introspection_false": {"introspection": False},
+    "masked_errors_true": {"maskedErrors": True},
 }
 
 #: The keys the own configuration of a fixture sets on both sides.
@@ -893,8 +897,10 @@ TWIN_KEYS = {
     "docs-app": {"multipart": True},
 }
 
-#: The keys that reach the module of the side ts, the bytes of the boot record of crates/aosabi-js/src/boot.rs.
-TS_KEYS = ("graphiql", "landingPage")
+#: The keys the steps read on the side ts: `introspection`, `maskedErrors` and `maxTokens`, the bytes of the boot
+#: record of crates/aosabi-js/src/boot.rs, and `graphiql` and `landingPage`, which no side reads and the steps read
+#: as keys of the reference.
+TS_KEYS = ("graphiql", "landingPage", "maxTokens", "introspection", "maskedErrors")
 
 #: The keys of the instances of the in process capture, which leave multipart and cors unset.
 IN_PROCESS_KEYS = {}
@@ -983,6 +989,7 @@ def boot_keys(boot: dict) -> dict:
     return keys
 
 
+NODE_ENV_KEY = "nodeEnv"
 
 #: The key under which `keys_of` hands the steps the middleware cors() of the app of a fixture, its entries of
 #: `APP_CORS`, which is source of the app and no key of a configuration.
@@ -1675,6 +1682,401 @@ def pairs_defaults(status: int, fields: list, body: bytes, ask: Ask, keys: dict)
 # bytes of the kind `wire`, the three forms of the kind `h2`, the answers of the requests of a log, the front of
 # the federation and the answers of GraphTP.
 
+#: The message and the code of a masked error, whose `unexpected` the result processor leaves out.
+MASKED_MESSAGE = "Unexpected error."
+MASKED_CODE = "INTERNAL_SERVER_ERROR"
+
+
+def mask_differs(keys: dict) -> bool:
+    """Return whether an answer of the reference reads off the answer of the side under test with the keys `keys`:
+    outside `NODE_ENV=development` with no key `maskedErrors`, where the reference masks an error the side
+    answers with its own message, and under development with the key on, where the mask of the reference writes the
+    original error that the side's mask leaves out."""
+    masks = keys.get("maskedErrors")
+    if keys.get(NODE_ENV_KEY) == "development":
+        return masks not in (None, False)
+    return masks is None
+
+
+def masked_error(error: dict) -> dict:
+    """Return the error `error` of a result as the mask writes it: the message of a masked error, the `locations`
+    and the `path` of `error`, and the code of a masked error alone among its extensions."""
+    masked = {"message": MASKED_MESSAGE}
+    for name in ("locations", "path"):
+        if name in error:
+            masked[name] = error[name]
+    masked["extensions"] = {"code": MASKED_CODE}
+    return masked
+
+
+def json_space(text: str, at: int) -> int:
+    """Return the index of the first character at or after `at` of `text` that is no white space of JSON."""
+    while at < len(text) and text[at] in " \t\n\r":
+        at += 1
+    return at
+
+
+def json_end(text: str, at: int) -> int:
+    """Return the index after the JSON value that starts at `at` of `text`, with no recursion."""
+    depth = 0
+    while True:
+        char = text[at]
+        if char == '"':
+            at += 1
+            while text[at] != '"':
+                at += 2 if text[at] == "\\" else 1
+            at += 1
+        elif char in "{[":
+            depth += 1
+            at += 1
+            continue
+        elif char in "}]":
+            depth -= 1
+            at += 1
+        elif char in ",: \t\n\r":
+            at += 1
+            continue
+        else:
+            while at < len(text) and text[at] not in ",:]} \t\n\r":
+                at += 1
+        if depth == 0:
+            return at
+
+
+def error_spans(text: str):
+    """Return the spans `(start, end)` of the entries of the member `errors` of the JSON object `text`, or None."""
+    at = json_space(text, 0)
+    if text[at:at + 1] != "{":
+        return None
+    at = json_space(text, at + 1)
+    while at < len(text) and text[at] == '"':
+        key_end = json_end(text, at)
+        key = json.loads(text[at:key_end])
+        at = json_space(text, json_space(text, key_end) + 1)
+        end = json_end(text, at)
+        if key == "errors":
+            if text[at] != "[":
+                return None
+            spans, inner = [], json_space(text, at + 1)
+            while text[inner] != "]":
+                item_end = json_end(text, inner)
+                spans.append((inner, item_end))
+                inner = json_space(text, item_end)
+                if text[inner] == ",":
+                    inner = json_space(text, inner + 1)
+            return spans
+        at = json_space(text, end)
+        if text[at:at + 1] == ",":
+            at = json_space(text, at + 1)
+    return None
+
+
+#: The members of an error the writer of a result writes, `toJSON` of `GraphQLError`, which hold no stack.
+ERROR_MEMBERS = ("message", "locations", "path", "extensions")
+
+
+def masked_error_reads(error: dict, side: dict) -> bool:
+    """Return whether the error `error` of a result of the reference reads as the error `side` at its place of the
+    side's result: a masked error where the side answers its own message, or a masked error that carries the
+    original error under `extensions.originalError` where the side's masked error carries none. The error of the
+    side holds no member but those of `ERROR_MEMBERS`, so no stack."""
+    if any(name not in ERROR_MEMBERS for name in side):
+        return False
+    if error == masked_error(error):
+        return side != masked_error(side) and masked_error(side) == error
+    extensions = error.get("extensions")
+    if not isinstance(extensions, dict) or "originalError" not in extensions:
+        return False
+    bare = dict(error, extensions={name: value for name, value in extensions.items() if name != "originalError"})
+    return bare == masked_error(bare) and side == bare
+
+
+def unmasked_result(result: bytes, guide: bytes) -> bytes:
+    """Return the GraphQL result `result` of the reference with each masked error read as the error at its place of
+    the result `guide` of the side under test.
+
+    An error reads so where `masked_error_reads` holds for it and the error at the
+    same place of `guide`, whose errors are as many. The error of the side is
+    written as the side wrote it, and every other byte of `result` stays.
+    """
+    try:
+        text = result.decode("utf-8", "surrogateescape")
+        spans = error_spans(text)
+        theirs = guide.decode("utf-8", "surrogateescape")
+        guides = error_spans(theirs)
+    except (ValueError, IndexError):
+        return result
+    if not spans or not guides or len(guides) != len(spans):
+        return result
+    out, last = [], 0
+    for (start, end), (side_start, side_end) in zip(spans, guides):
+        try:
+            error = json.loads(text[start:end])
+            side = json.loads(theirs[side_start:side_end])
+        except ValueError:
+            continue
+        if not isinstance(error, dict) or not isinstance(side, dict) or not masked_error_reads(error, side):
+            continue
+        out += [text[last:start], theirs[side_start:side_end]]
+        last = end
+    if not out:
+        return result
+    return ("".join(out) + text[last:]).encode("utf-8", "surrogateescape")
+
+
+#: The start of a line of an event stream that holds a result.
+DATA_LINE = b"data: {"
+
+
+def unmasked_event_stream(body: bytes, guide: bytes) -> bytes:
+    """Return the event stream `body` of the reference with each result read through `unmasked_result` beside the
+    result at the same place of the event stream `guide` of the side under test, where both hold as many."""
+    lines = body.split(b"\n")
+    places = [index for index, line in enumerate(lines) if line.startswith(DATA_LINE)]
+    ours = [line for line in guide.split(b"\n") if line.startswith(DATA_LINE)]
+    if not places or len(places) != len(ours):
+        return body
+    for index, side in zip(places, ours):
+        lines[index] = b"data: " + unmasked_result(lines[index][6:], side[6:])
+    return b"\n".join(lines)
+
+
+def unmasked_body(body: bytes, guide: bytes, content_type) -> bytes:
+    """Return the body `body` of an answer of the reference of the type `content_type` with each masked error read
+    as the error at its place of the body `guide` of the side under test, a GraphQL result or an event stream
+    of results."""
+    media = (content_type or "").split(";")[0].strip().lower()
+    if media == EVENT_STREAM:
+        return unmasked_event_stream(body, guide)
+    if media in GRAPHQL_TYPES:
+        return unmasked_result(body, guide)
+    return body
+
+
+def body_fields(lines: list, before: bytes, body: bytes, ask: Ask) -> list:
+    """Return the fields `lines` of an answer of the reference to `ask` whose body `before` becomes `body`.
+
+    A length the answer names moves by the bytes the body gains, so a length
+    a mask of the comparison left behind its body stays as far behind. The
+    coding follows compress() of the reference, which codes an answer of
+    1,024 bytes or more in the coding the request accepts and leaves a
+    shorter one uncoded with its length.
+    """
+    length = next((value for name, value in lines if name.lower() == "content-length"), None)
+    coding = next((value for name, value in lines if name.lower() == "content-encoding"), None)
+    grown = len(body) - len(before)
+    if length is not None and length.isdigit():
+        size = int(length) + grown
+        if size >= COMPRESS_THRESHOLD and compress_coding(ask) is not None:
+            kept = [(name, value) for name, value in lines if name.lower() != "content-length"]
+            return sorted_in(kept, ("content-encoding", compress_coding(ask)))
+        return [(name, str(size) if name.lower() == "content-length" else value) for name, value in lines]
+    if coding is not None and len(body) < COMPRESS_THRESHOLD:
+        kept = [(name, value) for name, value in lines if name.lower() != "content-encoding"]
+        return sorted_in(kept, ("content-length", str(len(body))))
+    return lines
+
+
+def sorted_in(lines: list, field: tuple) -> list:
+    """Return the fields `lines` with `field` at its place in the order of names the reference writes its fields in,
+    before the first field whose name sorts after its own."""
+    at = next((index for index, (name, _) in enumerate(lines) if name.lower() > field[0]), len(lines))
+    return lines[:at] + [field] + lines[at:]
+
+
+def unmasked_served(answer, guide, case, keys: dict):
+    """Return the answer `answer` of the reference, an answer of `http.py`, to the case `case` with each masked
+    error read as the error at its place of the answer `guide` of the side under test, under the keys `keys` of
+    the side.
+
+    An answer no error of which changes is returned as it is. A changed one
+    keeps every field of the reference but its length and its coding, which
+    `body_fields` gives, and its framing follows its length.
+    """
+    if answer is None or guide is None or case is None or not mask_differs(keys):
+        return answer
+    before = plain_body(answer)
+    body = unmasked_body(before, plain_body(guide), answer.header("content-type"))
+    if body == before:
+        return answer
+    return with_body(answer, Ask(case.method, case.target, list(case.headers)), before, body)
+
+
+def with_body(answer, ask: Ask, before: bytes, body: bytes):
+    """Return the answer `answer` of `http.py` to `ask` whose body `before` becomes `body`, its fields read by
+    `body_fields` and its framing following its length."""
+    lines = body_fields(list(answer.header_lines), before, body, ask)
+    own = [(name, value) for name, value in lines if name.lower() != "transfer-encoding"]
+    chunked = not any(name.lower() == "content-length" for name, _ in own) and ask.method != "HEAD"
+    coded = coded_body(body, next((value for name, value in own if name.lower() == "content-encoding"), None))
+    raw = raw_message(answer.status_line, own, coded, chunked)
+    header_lines = own + ([("Transfer-Encoding", "chunked")] if chunked else [])
+    return dataclasses.replace(answer, header_lines=header_lines, framing="chunked" if chunked else "content-length",
+                               wire_body=raw[raw.index(b"\r\n\r\n") + 4:], payload=coded, decoded=body, raw=raw)
+
+
+def unmasked_stream(stream, guide, ask: Ask, keys: dict):
+    """Return the read `stream` of the reference, an answer of `sse.py`, to `ask` with each masked error read as the
+    error at its place of the read `guide` of the side under test, under the keys `keys` of the side.
+
+    A read no error of which changes is returned as it is. An event stream
+    reads its frames through `unmasked_event_stream` and keeps its fields and its
+    framing, but for a length it names, as the answers of Bun to a request
+    that names identity do, which moves by the bytes the frames gain. An
+    answer that is no stream reads its body through `unmasked_body` and its fields
+    through `body_fields`.
+    """
+    if stream is None or guide is None or stream.status is None or not mask_differs(keys):
+        return stream
+    if stream.is_stream:
+        before = stream.text.encode("utf-8", "surrogateescape")
+        text = unmasked_event_stream(before, guide.text.encode("utf-8", "surrogateescape"))
+        if text == before:
+            return stream
+        frames, _ = split_event_frames(text.decode("utf-8", "surrogateescape"))
+        body = text + stream.body[len(before):] if stream.body.startswith(before) else stream.body
+        grown = len(text) - len(before)
+        lines = [(name, str(int(value) + grown) if name.lower() == "content-length" and value.isdigit() else value)
+                 for name, value in stream.header_lines]
+        return dataclasses.replace(stream, frames=frames, body=body, header_lines=lines,
+                                   headers={name.lower(): value for name, value in lines})
+    body = unmasked_body(stream.body, guide.body, stream.headers.get("content-type"))
+    if body == stream.body:
+        return stream
+    own = [(name, value) for name, value in body_fields(list(stream.header_lines), stream.body, body, ask)
+           if name.lower() != "transfer-encoding"]
+    chunked = not any(name.lower() == "content-length" for name, _ in own) and ask.method != "HEAD"
+    coded = coded_body(body, next((value for name, value in own if name.lower() == "content-encoding"), None))
+    raw = raw_message(stream.status_line, own, coded, chunked)
+    lines = own + ([("Transfer-Encoding", "chunked")] if chunked else [])
+    return dataclasses.replace(stream, header_lines=lines, headers={name.lower(): value for name, value in lines},
+                               framing="chunked" if chunked else "content-length", body=body,
+                               wire_body=raw[raw.index(b"\r\n\r\n") + 4:])
+
+
+def unmasked_message(answer: bytes, guide: bytes, request: bytes, keys: dict) -> bytes:
+    """Return the HTTP/1.1 answer `answer` of the reference to the HTTP/1.1 request `request` with each masked error
+    read as the error at its place of the HTTP/1.1 answer `guide` of the side under test, under the keys `keys`
+    of the side.
+
+    A message no error of which changes is returned as it is. A changed one
+    keeps every field of the reference in its order but its length and its
+    coding, which `body_fields` gives, and its body is chunked where it names
+    no length.
+    """
+    if not answer or not guide or not mask_differs(keys):
+        return answer
+    head, _, wire = answer.partition(b"\r\n\r\n")
+    lines = head.decode("latin-1").split("\r\n")
+    fields = [tuple(part.strip() for part in line.split(":", 1)) for line in lines[1:] if ":" in line]
+    guide_head, _, guide_wire = guide.partition(b"\r\n\r\n")
+    guide_fields = [tuple(part.strip() for part in line.split(":", 1))
+                    for line in guide_head.decode("latin-1").split("\r\n")[1:] if ":" in line]
+    try:
+        before = message_body(fields, wire)
+        ours = message_body(guide_fields, guide_wire)
+    except (ValueError, zlib.error):
+        return answer
+    content_type = next((value for name, value in fields if name.lower() == "content-type"), None)
+    body = unmasked_body(before, ours, content_type)
+    if body == before:
+        return answer
+    ask = ask_of_raw(request)
+    own = [(name, value) for name, value in body_fields(fields, before, body, ask)
+           if name.lower() != "transfer-encoding"]
+    chunked = not any(name.lower() == "content-length" for name, _ in own) and ask.method != "HEAD"
+    coded = coded_body(body, next((value for name, value in own if name.lower() == "content-encoding"), None))
+    return raw_message(lines[0], own, coded, chunked)
+
+
+#: A Sentry event id of an error as the masks of the comparison write it, and the characters they take off the id
+#: of 32 it stands for.
+EVENT_ID_MASKED = b'"sentryEventId":"<sentry-event-id>"'
+EVENT_ID_TAKEN = 32 - len(b"<sentry-event-id>")
+
+
+def named_length(body: bytes) -> int:
+    """Return the length the answer named for the body `body` the masks of the comparison wrote, each Sentry event
+    id read at the 32 characters it stands for."""
+    return len(body) + body.count(EVENT_ID_MASKED) * EVENT_ID_TAKEN
+
+
+def unmasked_form(form: dict, guide: dict) -> dict:
+    """Return the compared form `form` of an answer of the reference, `{status, headers, body}` with its fields by
+    lower case name and an event stream read as `frames` where it holds them, with each masked error read as the
+    error at its place of the compared form `guide` of the side under test, and a length it names following its
+    body.
+
+    The body comes back plain, as `oracle_plain` reads a coded one, since the
+    oracle compares a body after its coding is undone. The length moves by
+    the bytes the body gains as the answer wrote them, so an event id the
+    masks wrote shorter counts at its own length.
+    """
+    frames, ours = form.get("frames"), guide.get("frames")
+    if isinstance(frames, list) and isinstance(ours, list):
+        joined = unmasked_event_stream("".join(frames).encode("utf-8", "surrogateescape"),
+                                  "".join(ours).encode("utf-8", "surrogateescape"))
+        done, _ = split_event_frames(joined.decode("utf-8", "surrogateescape"))
+        return form if done == frames else dict(form, frames=done)
+    content_type = (form.get("headers", {}).get("content-type") or [None])[0]
+    before = oracle_plain(form)
+    body = unmasked_body(before, oracle_plain(guide), content_type)
+    if body == before:
+        return form
+    headers = dict(form.get("headers", {}))
+    if headers.get("content-length"):
+        grown = named_length(body) - named_length(before)
+        headers["content-length"] = [str(int(headers["content-length"][0]) + grown)]
+    return dict(form, headers=headers, body=body)
+
+
+def masked_count(body: bytes) -> int:
+    """Return how many errors of the GraphQL result `body` are masked errors, none for a body that is no result."""
+    try:
+        errors = json.loads(body.decode("utf-8", "surrogateescape")).get("errors")
+    except (ValueError, AttributeError):
+        return 0
+    if not isinstance(errors, list):
+        return 0
+    return sum(1 for error in errors if isinstance(error, dict) and error == masked_error(error))
+
+
+def unmasked_log(form: dict, guide: dict) -> dict:
+    """Return the compared form `form` of a log of the reference, its standard output, the answers of its requests
+    as `follow` and the first words of the lines of its standard error as `verdict`, with each masked error read as
+    the error at its place of the log `guide` of the side under test.
+
+    Each answer reads as `unmasked_form` reads it beside the answer at the same place of `guide`. The verdict loses
+    its last word ERR for each error so read, since the mask writes the original of an error it masks on standard
+    error in a line that opens with ERR, after the lines of the execution of the request, and the side masks none.
+    """
+    follow, ours = form.get("follow"), guide.get("follow")
+    if not isinstance(follow, list) or not isinstance(ours, list) or len(follow) != len(ours):
+        return form
+    out, read = [], 0
+    for entry, side in zip(follow, ours):
+        pair = isinstance(entry, list) and isinstance(side, list) and len(entry) == len(side) == 3
+        if not pair or entry[0] is None or side[0] is None:
+            out.append(entry)
+            continue
+        before = {"status": entry[0], "headers": entry[1], "body": entry[2]}
+        done = unmasked_form(before, {"status": side[0], "headers": side[1], "body": side[2]})
+        if done is before:
+            out.append(entry)
+            continue
+        read += max(0, masked_count(oracle_plain(before)) - masked_count(done["body"]))
+        out.append([done["status"], done["headers"], done["body"]])
+    if out == follow:
+        return form
+    verdict = form.get("verdict") or ""
+    words = verdict.split(" ") if verdict else []
+    for _ in range(read):
+        at = max((index for index, word in enumerate(words) if word == "ERR"), default=None)
+        if at is not None:
+            del words[at]
+    return dict(form, follow=out, verdict=" ".join(words))
+
+
 #: The names whose rules `ORACLE` holds, in the order the oracle applies them.
 ORACLE_NAMES = ("D46", "D47", "D48", "D49", "D57", "D58", "D59", "D60")
 
@@ -2182,14 +2584,15 @@ def oracle_graphtp(old: dict, request: dict, names) -> dict:
     return dict(old, status=400, headers=headers, body=BATCH_REFUSAL)
 
 
-def oracle_rewrite(old: dict, request: dict, names) -> dict | None:
+def oracle_rewrite(old: dict, request: dict, names, guide: dict | None = None) -> dict | None:
     """Return the old answer `old` to the request `request` through the rewrites of the divergences `names`.
 
     None stands for a request or an answer no rewrite reads.
     """
     kind = request.get("kind")
-    rewrite = {"http": oracle_served, "yoga": oracle_served, "h2": oracle_h2, "wire": oracle_wire,
-               "log": oracle_log, "front": oracle_front, "graphtp": oracle_graphtp}.get(kind)
+    rewrite = {"http": oracle_served, "yoga": oracle_served, "ingest": oracle_served, "h2": oracle_h2,
+               "wire": oracle_wire, "log": oracle_log, "front": oracle_front,
+               "graphtp": oracle_graphtp}.get(kind)
     if rewrite is None:
         return None
     try:
@@ -2224,8 +2627,8 @@ def oracle_rule(name: str):
     def rule(request: dict, old: dict, new: dict):
         if name == "D46" and bun_refused_origin(request, old, new):
             return old
-        want = oracle_rewrite(old, request, later)
-        back = oracle_rewrite(old, request, later[1:])
+        want = oracle_rewrite(old, request, later, new)
+        back = oracle_rewrite(old, request, later[1:], new)
         if want is None or back is None:
             return None
         wanted, left = oracle_view(want, old), oracle_view(back, old)

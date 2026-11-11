@@ -424,7 +424,9 @@ impl App {
         self
     }
 
-    /// Sets `maskedErrors` of Yoga.
+    /// Sets `maskedErrors` of Yoga. An app that leaves it out masks no error,
+    /// and `MaskedErrors::On` hardens it, so an unexpected error answers
+    /// `Unexpected error.` in place of its own message, a named divergence.
     #[must_use]
     pub fn masked_errors(mut self, masked_errors: MaskedErrors) -> Self {
         self.config().masked_errors = Some(masked_errors);

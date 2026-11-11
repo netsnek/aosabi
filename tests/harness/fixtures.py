@@ -102,7 +102,8 @@ CA_VARIABLES = {"reference": "NODE_EXTRA_CA_CERTS", "twin": "AOSABI_EXTRA_CA_CER
 #: which the overlay lets through as names that spread no key, because the fixture
 #: selects its plugins by `AOSABI_CONFIG` itself.
 VARIANTS = ("default", "graphiql_false", "landing_false", "both", "logger_false", "identity", "database",
-            "switches_on", "cors_star", "cors_list")
+            "switches_on", "cors_star", "cors_list", "tokens_low", "tokens_high", "introspection_false",
+            "masked_errors_true")
 
 #: The variants a fixture selects in its own configuration through
 #: `AOSABI_CONFIG`, which its module exports as `variants` and the overlay serves

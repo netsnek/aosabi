@@ -10,27 +10,30 @@
 //! The boot of the app the host hands in.
 //!
 //! The boot record is the SDL, as `.aosabi/schema.mjs` of the build holds it, then
-//! the JSON text of the IR of the same build, then the type resolvers of the
-//! form of the canary among those the glue hands `handler()`, a count and
-//! each the name of its union or interface, a count of its members and each
-//! the name of the member, a count and the names of the fields its check
-//! tests with `in`, none for a build of the reference, then one byte for `graphiql`
-//! and one for `landingPage`, each 0 when the configuration leaves it out, 1
-//! for `true` and 2 for `false`, then one byte for the job mode, 0 for the
-//! faithful mode and 1 for the fast mode, one byte for the read mode, 0 for
-//! one `js_get` per read and 1 for the projection, and one byte for the
-//! platform of the host, 1 for Bun and 0 for any other. Then come the
-//! variables of the process of the host, a count and each name and value,
-//! which the engine takes as the variables of its process, since the module
-//! reads no environment of its own, then the option `logger`, a byte 0 when
-//! the configuration leaves it out, 1 for `true`, 2 for `false` and 3 for an
-//! object, whose value record follows, then the options of the last
-//! `Sentry.init` of `aosabi/sentry/node` the app made before the boot, a byte
-//! 0 for none or 1 and their JSON, and last the plugins of the configuration
-//! in their order, a count and each a byte 0, the name of a marker, the JSON
-//! of its options and a count of the functions of its options, each its key
-//! and its handle in the table of the boot, 0 for a function the engine runs
-//! none of, or a byte 1 and a plugin of the app.
+//! the JSON text of the IR of the same build, then the type resolvers of the form
+//! of the canary among those the glue hands `handler()`, a count and each the name
+//! of its union or interface, a count of its members and each the name of the
+//! member, a count and the names of the fields its check tests with `in`, none for
+//! a build of the reference, then one byte for `introspection` and one for
+//! `maskedErrors`, each 0 when the configuration leaves the key out, 2 for `false`
+//! and 1 for any other value, then one byte for the job mode, 0 for the faithful
+//! mode and 1 for the fast mode, one byte for the read mode, 0 for one `js_get` per
+//! read and 1 for the projection, and one byte for the platform of the host, 1 for
+//! Bun and 0 for any other. Then come the variables of the process of the host, a
+//! count and each name and value, which the engine takes as the variables of its
+//! process, since the module reads no environment of its own, then the option
+//! `logger`, a byte 0 when the configuration leaves it out, 1 for `true`, 2 for
+//! `false` and 3 for an object, whose value record follows, then the options of the
+//! last `Sentry.init` of `aosabi/sentry/node` the app made before the boot, a byte
+//! 0 for none or 1 and their JSON, then the plugins of the configuration in their
+//! order, a count and each a byte 0, the name of a marker, the JSON of its options
+//! and a count of the functions of its options, each its key and its handle in the
+//! table of the boot, 0 for a function the engine runs none of, or a byte 1 and a
+//! plugin of the app, and last the key `maxTokens`, a byte 0 when the configuration
+//! leaves it out or 1 and the cap on the tokens of a request document as a word,
+//! which every parse of a request document of the app takes, a named divergence.
+//! The key stands last, so a module built before it reads the record of a host that
+//! writes it and leaves the key unread.
 //!
 //! A plugin of the app is the record of [`crate::plugin::read`], the keys the host
 //! reports of its object: its name, its strategy, its roles, its dependencies, its
@@ -113,7 +116,8 @@ use std::{
 use aosabi::{
     AppConfig,
     ExecutionOutcome,
-    IntoApp as _, //
+    IntoApp as _,
+    MaskedErrors, //
 };
 use aosabi_core::{
     App,
@@ -348,6 +352,8 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
             .byte()
             .ok_or("the boot record holds no introspection byte")?,
     );
+    let masks = flag(reader.byte().ok_or(BROKEN)?) == Some(true);
+    value::set_masks(masks);
     request::set_fast(reader.byte().ok_or(BROKEN)? == 1);
     value::set_project(reader.byte().ok_or(BROKEN)? == 1);
     aosabi_http::fetch::response::set_listed_text_type(reader.byte().ok_or(BROKEN)? != BUN);
@@ -397,6 +403,7 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     let access = access_log_enabled();
     let config = AppConfig {
         introspection,
+        masked_errors: masks.then_some(MaskedErrors::On),
         logger: if configured {
             Some(LoggerOption::Enabled(false))
         } else {

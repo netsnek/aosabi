@@ -11,9 +11,12 @@
 //! `GraphQLError` of the message it is given with the extensions
 //! `{ code: "INTERNAL_SERVER_ERROR", unexpected: true }`. A `GraphQLError`
 //! lends the new one its nodes, source, positions and path and its `http`
-//! extension, and in development the serialized original error rides under
-//! `originalError`. The new error carries no original error, so it is an
-//! original `GraphQLError` itself and a second mask keeps it.
+//! extension, and the serialized original error rides under `originalError`
+//! where the options set `isDev`. Yoga reads `isDev` from `NODE_ENV` where
+//! the options leave it out, and the mask reads no environment, so it is
+//! `false` there, a named divergence. The new error carries no original
+//! error, so it is an original `GraphQLError` itself and a second mask keeps
+//! it.
 //!
 //! The serialization of an `Error` is `{ message, stack, cause }`, and the
 //! frames of a stack have no reading in the model, so the stack is its first
@@ -77,22 +80,16 @@ fn serialize_plain(name: &aosabi_json::JsString, message: &aosabi_json::JsString
     JsValue::Object(object)
 }
 
-/// Returns whether the development mode holds, `process.env.NODE_ENV === 'development'`.
-#[must_use]
-pub fn is_dev_default() -> bool {
-    std::env::var("NODE_ENV").is_ok_and(|env| env == "development")
-}
-
 /// Masks `error` with `message`, `maskError(error, message, isDev)`.
 ///
-/// `is_dev` of `None` reads the environment at the call, as the default
-/// parameter of the reference does.
+/// `is_dev` of `None` is `false`, where the default parameter of the
+/// reference reads `NODE_ENV` at the call, a named divergence.
 #[must_use]
 pub fn mask_error(error: Value, message: &str, is_dev: Option<bool>) -> Value {
     if is_original_graphql_error(&error) {
         return error;
     }
-    let is_dev = is_dev.unwrap_or_else(is_dev_default);
+    let is_dev = is_dev == Some(true);
     let mut extensions = JsObject::new();
     extensions.insert("code", JsValue::from("INTERNAL_SERVER_ERROR"));
     extensions.insert("unexpected", JsValue::Bool(true));

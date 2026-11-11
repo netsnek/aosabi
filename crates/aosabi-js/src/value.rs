@@ -478,6 +478,9 @@ thread_local! {
     /// Whether a plugin of the app maps a `ForbiddenError`, the identity
     /// plugin of `aosabi/auth/plugin`.
     static IDENTITY: Cell<bool> = const { Cell::new(false) };
+    /// Whether the mask of Yoga reads the errors of a result, off unless the
+    /// key `maskedErrors` of the configuration turns it on.
+    static MASKS: Cell<bool> = const { Cell::new(false) };
 }
 
 /// Sets the read mode the boot record names, the projection when `project`
@@ -491,6 +494,15 @@ pub fn set_project(project: bool) {
 /// feature of the error at the end of the execution in place of the mask.
 pub fn set_identity_map(on: bool) {
     IDENTITY.set(on);
+}
+
+/// Sets whether the mask of Yoga reads the errors of a result, `true` where the
+/// key `maskedErrors` of the configuration turns the mask on, so the reads at the
+/// end of the execution are otherwise those of the writer of the result alone.
+/// Pylon masks outside `NODE_ENV=development`, and the module masks where the key
+/// says so alone, a named divergence.
+pub fn set_masks(on: bool) {
+    MASKS.set(on);
 }
 
 /// The place a value of the host stands at in the schema, which tells the
@@ -768,7 +780,7 @@ impl Place<'_> {
             Self::Original => return vec![ORIGINAL],
             Self::Pulled | Self::Rejected(Position::Pulled) => return vec![PULLED],
             Self::Hook | Self::Rejected(Position::Hook) => {
-                return vec![HOOK, u8::from(masks_errors())];
+                return vec![HOOK, u8::from(MASKS.get())];
             }
             Self::Thrown => Position::field().levels(),
             Self::Rejected(position) => position.levels(),
@@ -777,7 +789,7 @@ impl Place<'_> {
                 position @ Position::Typed { .. } => position.levels(),
                 Position::Unknown => return vec![HELD],
                 Position::Pulled => return vec![PULLED],
-                Position::Hook => return vec![HOOK, u8::from(masks_errors())],
+                Position::Hook => return vec![HOOK, u8::from(MASKS.get())],
             },
         };
         let mut record = Vec::with_capacity(5 + levels.len());
@@ -2007,13 +2019,6 @@ fn read_hook(reader: &mut Reader<'_>, depth: usize) -> Option<Value> {
     })
 }
 
-/// Returns whether the mask of Yoga reads a value that escapes the execution,
-/// which the handler of `aosabi-core` turns off where `NODE_ENV` is
-/// `development`.
-fn masks_errors() -> bool {
-    aosabi_core::app::env_alias::var("NODE_ENV").as_deref() != Some("development")
-}
-
 /// The name of the class `ForbiddenError`, which the executor reads
 /// no name of and the error of the engine takes from its brand.
 const FORBIDDEN_NAME: &str = "ForbiddenError";
@@ -2073,8 +2078,9 @@ impl Deferred {
 /// the errors of the result. A `GraphQLError` first takes its original error
 /// in the form [`END`], read as `isOriginalGraphQLError` of Yoga reads it,
 /// which tells whether the mask keeps the error, and an error of any other
-/// class is masked. Then the form [`FINAL`] makes the reads of the mask or of
-/// the writer of the result, as [`Final::apply`] gives them to the error.
+/// class is masked, where the mask reads the result at all, [`set_masks`].
+/// Then the form [`FINAL`] makes the reads of the mask or of the writer of
+/// the result, as [`Final::apply`] gives them to the error.
 pub fn finish(errors: &mut [GraphQLError]) {
     if errors.is_empty() {
         return;
@@ -2114,7 +2120,7 @@ fn finish_all(errors: &mut [GraphQLError]) {
             }
             continue;
         }
-        let masked = deferred.brand != Brand::GraphQL || !is_original(error);
+        let masked = MASKS.get() && (deferred.brand != Brand::GraphQL || !is_original(error));
         let read = read_end(&deferred, &[FINAL, u8::from(masked)], |reader| {
             read_final(reader, &deferred, masked)
         });
