@@ -326,11 +326,14 @@ fn serialize_encoded(name: &str, value: &str, opt: &CookieOptions) -> Result<Str
 }
 
 /// Checks the rules of the name prefixes `__Secure-` and `__Host-`, `cookie.js:76-89`.
+///
+/// A name takes the rules of a prefix it starts with in any case of ASCII, so
+/// `__secure-id` and `__HOST-id` take them as well, a named divergence.
 fn check_prefix(name: &str, opt: &CookieOptions) -> Result<(), CookieError> {
-    if name.starts_with("__Secure-") && !opt.secure {
+    if has_prefix(name, "__Secure-") && !opt.secure {
         return Err(CookieError::SecurePrefixNotSecure);
     }
-    if name.starts_with("__Host-") {
+    if has_prefix(name, "__Host-") {
         if !opt.secure {
             return Err(CookieError::HostPrefixNotSecure);
         }
@@ -346,6 +349,12 @@ fn check_prefix(name: &str, opt: &CookieOptions) -> Result<(), CookieError> {
         }
     }
     Ok(())
+}
+
+/// Returns whether `name` starts with `prefix` in any case of ASCII.
+fn has_prefix(name: &str, prefix: &str) -> bool {
+    name.get(..prefix.len())
+        .is_some_and(|head| head.eq_ignore_ascii_case(prefix))
 }
 
 /// Returns whether `name` passes ``/^[\w!#$%&'*.^`|~+-]+$/``.
