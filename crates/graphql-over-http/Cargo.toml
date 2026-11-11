@@ -1,11 +1,10 @@
 # GraphQL over HTTP as one function, the jobs of graphql-yoga 5.18.0 with the
 # hooks of the server adapter of @whatwg-node/server 0.10.18 and the
-# introspection refusal an app installs. It carries the GraphiQL template
-# tools/provenance writes under src/graphiql/.
+# introspection refusal an app installs.
 [package]
 name = "graphql-over-http"
 version = "0.0.0"
-description = "GraphQL over HTTP as one function, the jobs of graphql-yoga 5.18.0 as Aosabi runs it: the request parsers, the multipart parser, the checks, the result processors, masking, the cache of documents, GraphiQL, the logger and the introspection refusal."
+description = "GraphQL over HTTP as one function, the jobs of graphql-yoga 5.18.0 as Aosabi runs it: the request parsers, the multipart parser, the checks, the result processors, masking, the cache of documents, the logger and the introspection refusal."
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true

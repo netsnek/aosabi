@@ -102,10 +102,6 @@ use crate::{
         HttpMaskErrorFn,
         MaskedErrorsOpts, //
     },
-    graphiql::{
-        Graphiql,
-        GraphiqlOptionsFactory, //
-    },
     logger::{
         HttpLogger,
         LogLevel,
@@ -216,8 +212,6 @@ pub struct HttpOptions {
     pub masked_errors: MaskedErrors,
     /// `graphqlEndpoint`, `/graphql` when absent or empty.
     pub graphql_endpoint: Option<String>,
-    /// `graphiql`.
-    pub graphiql: Graphiql,
     /// `multipart`, which puts the multipart parser in only when `true`, a named
     /// divergence, where Yoga puts it in unless the option is `false`.
     pub multipart: Option<bool>,
@@ -265,8 +259,6 @@ pub struct HttpServer {
     pub(crate) logger: HttpLogger,
     /// `graphqlEndpoint`.
     pub(crate) graphql_endpoint: String,
-    /// The options of the page of `GraphiQL` of a request, none when the option `graphiql` is `false`.
-    pub(crate) graphiql: Option<GraphiqlOptionsFactory>,
     /// The request parsers.
     pub(crate) parsers: Parsers,
     /// The result processors.
@@ -300,7 +292,6 @@ impl HttpServer {
         let masked_errors = masked_errors_opts(&options.masked_errors, logger);
         let hooks = hooks(hook_list(&options, masked_errors.as_ref()));
         let plugins = app_plugins(&hooks, &options.plugins);
-        let graphiql = crate::graphiql::options_factory(&options.graphiql);
         let HttpOptions {
             id,
             graphql_endpoint,
@@ -315,7 +306,6 @@ impl HttpServer {
             graphql_endpoint: graphql_endpoint
                 .filter(|endpoint| !endpoint.is_empty())
                 .unwrap_or_else(|| String::from(DEFAULT_GRAPHQL_ENDPOINT)),
-            graphiql,
             parsers: Parsers::new(multipart == Some(true)),
             processors: Processors::new(),
             extra_param_names,

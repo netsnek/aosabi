@@ -56,10 +56,6 @@ pub struct AppConfig {
     /// `landingPage`, the landing page on an unhandled route only when `true`,
     /// the named divergence D47 of `docs/byte-equality.md` section 3.
     pub landing_page: Option<bool>,
-    /// `graphiql`, the page of `GraphiQL` only when `true`, the named
-    /// divergence D48 of `docs/byte-equality.md` section 3, where Yoga serves
-    /// it unless the key is `false`, which turns off introspection as well.
-    pub graphiql: Option<bool>,
     /// `viewer`, Aosabi's own key, the viewer at `/viewer` only when `true`,
     /// D48.
     pub viewer: Option<bool>,
@@ -92,7 +88,6 @@ impl core::fmt::Debug for AppConfig {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("AppConfig")
             .field("landing_page", &self.landing_page)
-            .field("graphiql", &self.graphiql)
             .field("viewer", &self.viewer)
             .field("introspection", &self.introspection)
             .field("logger", &self.logger)

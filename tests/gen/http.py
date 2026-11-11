@@ -255,11 +255,11 @@ def no_options_cases(variant: str) -> list[HttpCase]:
 
 
 def no_cors_cases(variant: str) -> list[HttpCase]:
-    """QD-021, D46: a POST, the page of GraphiQL and an unknown path, each from an origin."""
+    """A POST, a request for a page and an unknown path, each from an origin."""
     origin = ("Origin", ORIGIN)
     return [
         make("D", "d-no-cors-post", "POST", "/graphql", [("Content-Type", "application/json"), origin], json_body()),
-        make("D", "d-qd021-graphiql-origin", "GET", "/graphql", [("Accept", "text/html"), origin]),
+        make("D", "d-no-cors-html", "GET", "/graphql", [("Accept", "text/html"), origin]),
         make("D", "d-no-cors-unknown", "GET", "/nothing-here", [("Accept", "text/html"), origin]),
     ]
 

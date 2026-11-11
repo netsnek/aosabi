@@ -61,7 +61,7 @@ import zlib
 from pathlib import Path
 from urllib.parse import parse_qs
 
-#: The name of the playground the side under test writes, divergence D52.
+#: The name of the playground the side under test wrote until 0.1.1.
 PLAYGROUND = b"Aosabi Playground"
 
 #: The name of the playground the reference writes.
@@ -896,9 +896,8 @@ TWIN_KEYS = {
 #: The keys that reach the module of the side ts, the bytes of the boot record of crates/aosabi-js/src/boot.rs.
 TS_KEYS = ("graphiql", "landingPage")
 
-#: The keys of the instances of the in process capture, which set the option graphiql themselves and leave
-#: multipart and cors unset.
-IN_PROCESS_KEYS = {"graphiql": True}
+#: The keys of the instances of the in process capture, which leave multipart and cors unset.
+IN_PROCESS_KEYS = {}
 
 #: The keys a boot in process of the twin carries in step 7 of 60_plugins, one entry per row: the switches
 #: of the secure defaults that turn on a plugin the reference adds under every configuration, so the twin boots the
@@ -1216,7 +1215,7 @@ def qd122(reply, ask, keys):
     does not serve, the 406 of `not_acceptable` with no body, with the content type the adapter of Node gives it
     where that adapter writes it.
     """
-    if keys.get("graphiql") is True or reply.status != 200 or PLAYGROUND_REFERENCE not in reply.body:
+    if reply.status != 200 or PLAYGROUND_REFERENCE not in reply.body:
         return reply
     lines = [("accept", not_acceptable(ask.header("accept")))] + cors_lines(reply)
     if ask.served and ask.node:

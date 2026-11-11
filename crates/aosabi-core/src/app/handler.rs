@@ -82,8 +82,6 @@ use aosabi_http::{
 use graphql_over_http::{
     AgentSetup,
     CacheBudget,
-    Graphiql,
-    GraphiqlOptions,
     HttpOptions,
     HttpPlugin,
     HttpServer,
@@ -124,12 +122,6 @@ use crate::{
 
 /// The endpoint the handler sets first, `graphqlEndpoint: '/graphql'`.
 const GRAPHQL_ENDPOINT: &str = "/graphql";
-
-/// The title of the playground with Aosabi's name, D52.
-const PLAYGROUND_TITLE: &str = "Aosabi Playground";
-
-/// The query of the playground, `defaultQuery` with Aosabi's name, D52.
-const PLAYGROUND_QUERY: &str = "# Welcome to the Aosabi Playground!";
 
 /// The options of [`handler`], the handler options with the type
 /// definitions and the build side type resolvers the build wrote.
@@ -240,18 +232,6 @@ pub fn build_http_options(
             })
             .collect();
     }
-    // The page of `GraphiQL` only on `graphiql: true`, the named divergence D48.
-    options.graphiql = if config.graphiql == Some(true) {
-        Graphiql::Factory(Rc::new(|_request, _context| {
-            Some(GraphiqlOptions {
-                should_persist_headers: Some(true),
-                title: Some(String::from(PLAYGROUND_TITLE)),
-                default_query: Some(String::from(PLAYGROUND_QUERY)),
-            })
-        }))
-    } else {
-        Graphiql::Off
-    };
     options.schema = Some(schema);
     options.agent = agent_setup(core, host_clock);
     options.parser_and_validation_cache_budget = cache_budget;

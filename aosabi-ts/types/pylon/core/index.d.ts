@@ -94,7 +94,6 @@ export type Plugin<PluginContext extends Record<string, any> = {}, TServerContex
 };
 export type AppConfig = {
     landingPage?: boolean;
-    graphiql?: boolean;
     /** Introspection is answered unless this key is `false`, which refuses every field of
      *  introspection. */
     introspection?: boolean;
@@ -111,7 +110,7 @@ export type AppConfigFactory = () => AppConfig | Promise<AppConfig>;
  * `satisfies PylonConfig` is just as good (and keeps the file dependency-free):
  *
  * ```ts
- * export default { graphiql: true } satisfies PylonConfig
+ * export default { introspection: false } satisfies PylonConfig
  * ```
  *
  * Reach for `defineConfig` when you need a lazy/async factory — the one thing a
@@ -119,7 +118,7 @@ export type AppConfigFactory = () => AppConfig | Promise<AppConfig>;
  *
  * ```ts
  * import {defineConfig} from '@getcronit/pylon'
- * export default defineConfig(async () => ({ graphiql: process.env.DEV === '1' }))
+ * export default defineConfig(async () => ({ introspection: process.env.DEV === '1' }))
  * ```
  *
  * Identity at runtime; the loader resolves a factory before use.

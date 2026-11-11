@@ -9,7 +9,7 @@
 //! | --- | --- | --- |
 //! | `prod` | first | none, masking on |
 //! | `dev` | first | `maskedErrors: false` |
-//! | `graphiqlFalse` | first | `graphiql: false` |
+//! | `graphiqlFalse` | first | none, as `prod`, since the function serves no page of `GraphiQL` |
 //! | `batching` | first | `batching: true` |
 //! | `noData` | first | a plugin that throws in `onParams` for `{__boom__}` |
 //! | `second` | second | none |
@@ -41,16 +41,12 @@ use aosabi_execute::{
     Value, //
 };
 use aosabi_hooks::{
-    HookContext,
     HookPlugin,
     plugins::use_engine::PassCounts, //
 };
-use aosabi_http::Request;
 use aosabi_type::Schema;
 use graphql_over_http::{
     AgentSetup,
-    Graphiql,
-    GraphiqlOptions,
     HttpOptions,
     HttpPlugin,
     HttpServer,
@@ -196,23 +192,14 @@ impl Instance {
 /// Returns the options of the instance `name`, the base options with the
 /// variation the capture gives it.
 fn options(name: &str, schema: Arc<Schema>, agent: AgentSetup) -> HttpOptions {
-    let graphiql = Graphiql::Factory(Rc::new(|_: &Request, _: &HookContext| {
-        Some(GraphiqlOptions {
-            should_persist_headers: Some(true),
-            title: Some(String::from("Aosabi Playground")),
-            default_query: Some(String::from("# Welcome to the Aosabi Playground!")),
-        })
-    }));
     let mut options = HttpOptions {
         graphql_endpoint: Some(String::from("/graphql")),
-        graphiql,
         schema: Some(schema),
         agent,
         ..HttpOptions::default()
     };
     match name {
         "dev" => options.masked_errors = MaskedErrors::Off,
-        "graphiqlFalse" => options.graphiql = Graphiql::Off,
         "noData" => options.plugins = vec![Rc::new(Boom)],
         "secondNoIntrospection" => options.plugins = vec![use_disable_introspection()],
         _ => {}

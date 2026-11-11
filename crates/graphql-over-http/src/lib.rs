@@ -3,8 +3,7 @@
  * graphql-over-http: GraphQL over HTTP as one function, the jobs of
  * graphql-yoga 5.18.0 as Aosabi runs it.
  *
- * This file holds the module list. The template graphiql/template.html is
- * written by tools/provenance and by nothing else.
+ * This file holds the module list.
  *
  * Derived from graphql-yoga 5.18.0, cjs/index.js, MIT.
  */
@@ -40,7 +39,6 @@
 //! | `request_parser` | `plugins/request-parser/`, `plugins/use-request-parser.js`, the JSON parser of V8 | the request parsers, the choice of one and `JSON.parse` with its refusals |
 //! | `form_data`, `file` | the multipart parser of the undici of Node 24.13.0 | the form data body and its files |
 //! | `plugins` | `plugins/use-parser-and-validation-cache.js`, `@graphql-yoga/plugin-disable-introspection` | the cache of documents of the hook layer and the introspection refusal |
-//! | `graphiql` | `graphiql-html.js`, `plugins/use-graphiql.js` | the `GraphiQL` page |
 //! | `host_env` | no file, the feature `host-env` | the variables of the process and the writer of the console a host of the TypeScript option hands in |
 //!
 //! Every message of the parsers, the checks, the processors and the errors is
@@ -57,7 +55,6 @@ pub mod checks;
 pub mod error;
 pub mod file;
 pub mod form_data;
-pub mod graphiql;
 #[cfg(feature = "host-env")]
 pub mod host_env;
 pub mod logger;
@@ -75,11 +72,6 @@ pub mod utils;
 pub use crate::{
     answer::answer,
     file::FileBody,
-    graphiql::{
-        Graphiql,
-        GraphiqlOptions,
-        render_graphiql, //
-    },
     logger::{
         HttpLogger,
         LogLevel,

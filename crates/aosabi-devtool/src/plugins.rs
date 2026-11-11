@@ -249,7 +249,6 @@ fn op_boot(request: &JsObject) -> Result<JsObject, JsString> {
     let mut config = AppConfig {
         plugins: Some(PluginList::new(slots)),
         landing_page: optional_bool(request, "landing_page", "boot")?,
-        graphiql: optional_bool(request, "graphiql", "boot")?,
         viewer: optional_bool(request, "viewer", "boot")?,
         introspection: optional_bool(request, "introspection", "boot")?,
         ..AppConfig::default()

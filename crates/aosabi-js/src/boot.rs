@@ -346,15 +346,10 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     let ir = reader.text().ok_or("the boot record holds no IR")?;
     let canary = canary_resolvers(&mut reader).ok_or(BROKEN)?;
     let schema = crate::prebuilt::schema_record_of(schema, ir, &canary)?;
-    let graphiql = flag(
+    let introspection = flag(
         reader
             .byte()
-            .ok_or("the boot record holds no graphiql byte")?,
-    );
-    let landing_page = flag(
-        reader
-            .byte()
-            .ok_or("the boot record holds no landing byte")?,
+            .ok_or("the boot record holds no introspection byte")?,
     );
     request::set_fast(reader.byte().ok_or(BROKEN)? == 1);
     value::set_project(reader.byte().ok_or(BROKEN)? == 1);
@@ -404,8 +399,7 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     let configured = CONFIGURED.get();
     let access = access_log_enabled();
     let config = AppConfig {
-        graphiql,
-        landing_page,
+        introspection,
         logger: if configured {
             Some(LoggerOption::Enabled(false))
         } else {

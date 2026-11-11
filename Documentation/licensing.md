@@ -75,7 +75,6 @@ project of each.
 | `crates/aosabi-query/src/index_js.segments` | Apache-2.0 |
 | `crates/aosabi-query/src/index_ts.tmpl` | Apache-2.0 |
 | `crates/aosabi-serve/src/config_abort_message.rs` | Apache-2.0 |
-| `crates/graphql-over-http/src/graphiql/` | MIT |
 | `plugins/aosabi-landing/src/landing.html.tmpl` | Apache-2.0 |
 
 ## 5. Code derived from other projects

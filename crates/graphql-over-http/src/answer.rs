@@ -23,7 +23,7 @@
 //!
 //! | Phase | Steps in order |
 //! | --- | --- |
-//! | `onRequest` | the health check, the fall through of an `OPTIONS` request, the page of `GraphiQL`, the hooks of the app, the unhandled route |
+//! | `onRequest` | the fall through of an `OPTIONS` request, the hooks of the app, the unhandled route |
 //! | the request parse | the request parser the method and the type choose, the hooks of the app, the check of the method, the parse, the done hooks of the app, the refusal of a batch |
 //! | `onParams` | the hooks of the app, the check of the parameters |
 //! | the run | the hook layer of `aosabi-hooks`, then `onExecutionResult` of the app |
@@ -74,10 +74,6 @@ use crate::{
         errors_result,
         handle_error, //
     },
-    graphiql::{
-        render_graphiql,
-        should_render_graphiql, //
-    },
     plugin::{
         GraphQLParams,
         HttpResult,
@@ -122,7 +118,7 @@ pub fn answer(
         let mut request = request;
         let mut request_handler = Rc::clone(&server.handler);
         let url = LazyUrl::new();
-        let mut response = on_request_steps(&server, &request, &server_context, &url)?;
+        let mut response = on_request_steps(&request)?;
         if response.is_none() {
             for plugin in &server.plugins {
                 plugin.on_request(&mut OnRequest {
@@ -178,12 +174,7 @@ pub fn answer(
 ///
 /// Returns the `TypeError` of a URL the parser refuses or of a header the
 /// response refuses.
-fn on_request_steps(
-    server: &HttpServer,
-    request: &Rc<Request>,
-    server_context: &HookContext,
-    url: &LazyUrl,
-) -> Result<Option<Response>, Value> {
+fn on_request_steps(request: &Rc<Request>) -> Result<Option<Response>, Value> {
     // The engine answers no `OPTIONS` request, which falls through to the web
     // server or the host as an unhandled route does, a named divergence.
     if upper_ascii_exact(&request.method) == "OPTIONS" {
@@ -195,41 +186,7 @@ fn on_request_steps(
         )
         .map(Some);
     }
-    match &server.graphiql {
-        Some(options) if should_render_graphiql(request) => {
-            render_page(server, request, server_context, url, options)
-        }
-        _ => Ok(None),
-    }
-}
-
-/// Returns the page of `GraphiQL` for `request`, which asks for it, where its
-/// path is the endpoint and the options of the request are not `false`.
-///
-/// # Errors
-///
-/// Returns the `TypeError` of a URL the parser refuses or of a header the
-/// response refuses.
-// Out of line, so a request that asks for no page compiles none of it.
-#[inline(never)]
-fn render_page(
-    server: &HttpServer,
-    request: &Rc<Request>,
-    server_context: &HookContext,
-    url: &LazyUrl,
-    options: &crate::graphiql::GraphiqlOptionsFactory,
-) -> Result<Option<Response>, Value> {
-    let pathname = || url.get(&request.url).map(|url| url.pathname.clone());
-    if !matches_endpoint(request, pathname, &server.graphql_endpoint)? {
-        return Ok(None);
-    }
-    server.logger.debug("Rendering GraphiQL");
-    let Some(options) = options(request, server_context) else {
-        return Ok(None);
-    };
-    let body = render_graphiql(&options);
-    let headers = [(String::from("Content-Type"), String::from("text/html"))];
-    new_response(ResponseBody::Text(body.into_bytes()), 200, None, &headers).map(Some)
+    Ok(None)
 }
 
 impl HttpServer {

@@ -1427,9 +1427,9 @@ const UNSETTLED = failureRecord(500, "the host could not settle a promise of the
 
 // Returns the byte of the boot record for an option of the configuration
 // that is true, false or left out.
-function flag(value) {
+function refusal(value) {
   if (value === undefined) return 0;
-  return value ? 1 : 2;
+  return value === false ? 2 : 1;
 }
 
 // Writes `copy`, data of JSON, nested `depth` levels deep: a primitive as
@@ -1687,8 +1687,7 @@ function bootRecord(schema, ir, config, mode, read, env, plan, handle) {
   record.text(schema);
   record.text(ir);
   writeTypeResolvers(record, plan.types ?? []);
-  record.byte(flag(config.graphiql));
-  record.byte(flag(config.landingPage));
+  record.byte(refusal(config.introspection));
   record.byte(MODES[mode]);
   record.byte(READS[read]);
   record.byte(typeof navigator !== "undefined" && navigator.userAgent?.startsWith("Bun") ? 1 : 0);
