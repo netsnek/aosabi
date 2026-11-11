@@ -66,9 +66,9 @@ aosabi-build = { path = "../aosabi-build" }
 aosabi-core = { path = "../aosabi-core", features = ["homa", "exec-eager-projection"] }
 aosabi-execute = { path = "../aosabi-execute" }
 aosabi-scalars = { path = "../aosabi-scalars" }
+# The crate behind the plugins primitive. aosabi-auth carries the mapping of a
+# forbidden error the identity plugin runs in its done hook.
 aosabi-auth = { path = "../../plugins/aosabi-auth" }
-aosabi-landing = { path = "../../plugins/aosabi-landing" }
-aosabi-viewer = { path = "../../plugins/aosabi-viewer" }
 # The crate behind the zitadel primitive, whose operations answer the principal,
 # the token, the roles and the introspection body of the provider half in
 # process.

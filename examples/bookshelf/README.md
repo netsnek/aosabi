@@ -4,6 +4,10 @@ A small service in Rust: a shelf of books in memory with two queries, a mutation
 `/graphql` and a middleware, all in [src/lib.rs](src/lib.rs). It is a cargo workspace of its own
 that names the facade crate `aosabi` by its path in this repository.
 
+The route `/health` is a route of the service itself, which src/lib.rs writes like any other route
+of an app. The server of Aosabi answers no health check of its own, so a service that a monitor
+checks writes that route as this one does.
+
 From the root of the repository, build the command line once, then the service, and start it:
 
 ```sh

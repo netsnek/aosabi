@@ -109,13 +109,9 @@ const LANDS_AT: &str = "plugins";
 /// The most polls a pass may take, since every setup of a line answers at once.
 const POLLS: usize = 1024;
 
-/// The built in plugins the facade hands the boot, the viewer of the first
-/// slot and the landing page.
-pub(crate) const BUILTINS: Builtins = Builtins {
-    first: None,
-    viewer: aosabi_viewer::use_viewer,
-    unhandled_route: aosabi_landing::use_unhandled_route,
-};
+/// The plugins the facade hands the boot, none, which the operation
+/// `revisions` of the primitive `execute` hands its boot as well.
+pub(crate) const BUILTINS: Builtins = Builtins { first: None };
 
 /// The operations of the primitive.
 const OPERATIONS: &Operations = &[
@@ -248,8 +244,6 @@ fn op_boot(request: &JsObject) -> Result<JsObject, JsString> {
     }
     let mut config = AppConfig {
         plugins: Some(PluginList::new(slots)),
-        landing_page: optional_bool(request, "landing_page", "boot")?,
-        viewer: optional_bool(request, "viewer", "boot")?,
         introspection: optional_bool(request, "introspection", "boot")?,
         ..AppConfig::default()
     };

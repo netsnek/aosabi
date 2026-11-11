@@ -4,10 +4,9 @@
  *
  * This file is the root of the crate. It re-exports the items of the crates
  * behind it, and defines the functions serve_app and serve, the constant
- * BUILTINS and the macro build_output, which name the engine and the two
- * plugins every boot adds, so that no crate behind it names the carrier or the
- * engine of another. The builder of an app and the prelude stand in the modules
- * app and prelude.
+ * BUILTINS and the macro build_output, which name the engine, so that no crate
+ * behind it names the carrier or the engine of another. The builder of an app
+ * and the prelude stand in the modules app and prelude.
  */
 
 //! The facade of Aosabi, the one crate a service names under `[dependencies]`.
@@ -56,7 +55,7 @@
 //! | `Lazy` | a member whose value is computed when it is selected, the twin of a property `() => value`, a form of the derive path under the hidden feature `mirror` |
 //! | `create_gateway`, `Gateway`, `GatewayFactory`, `GatewayOptions`, `DelegateCall`, `passthrough`, `Passthrough`, `Patches`, `pass`, `FieldPolicy`, `PatchPolicy`, `Force`, `Pass`, `HeadersFn`, `Needs`, `headers!`, `needs!`, `patches!`, `policy!`, `federation` | the federation, `createGateway` with its patches, policies, needs and headers, under the feature `federation`, the four literals a compile error under the default features |
 //! | `remote` |  |
-//! | [`BUILTINS`] | the viewer and the landing page every boot adds |
+//! | [`BUILTINS`] | the plugins a boot of Rust takes from its host, none |
 //! | `serve_app`, `BuildOutput`, `build_output!`, `use_node_server` | the engine, under the feature `serve` on a native target |
 //! | `serve_static`, `ServeStaticOptions` | the middleware that serves the files of a directory, `serveStatic` of the Node adapter, under the feature `serve` on a native target |
 //! | [`fn@compress`] | the middleware `compress()` of hono under its name, which codes the answers of the routes after it in deflate, since the base pipeline codes none, divergence D72 |
@@ -307,13 +306,9 @@ macro_rules! json {
     };
 }
 
-/// The viewer in the first slot and the landing page of the unhandled route,
-/// the two plugins every boot adds, `useViewer()` and `useUnhandledRoute()`.
-pub const BUILTINS: Builtins = Builtins {
-    first: None,
-    viewer: aosabi_viewer::use_viewer,
-    unhandled_route: aosabi_landing::use_unhandled_route,
-};
+/// The plugins a boot of Rust takes from its host, none, since a host of
+/// Rust puts no plugin before the plugins of a pass.
+pub const BUILTINS: Builtins = Builtins { first: None };
 
 /// The JSON value types a resolver builds and a `ServiceError` carries.
 ///

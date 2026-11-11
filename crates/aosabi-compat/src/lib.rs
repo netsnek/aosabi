@@ -74,7 +74,7 @@ pub const QUIRKS: &[Quirk] = &[
     },
     Quirk {
         id: "LANDING_VERSION_STRING",
-        what: "the landing page renders the Pylon package version, which is 2.9.5 at the reference commit",
+        what: "the landing page renders the Pylon package version, which is 2.9.5 at the reference commit. Aosabi has no landing page, a named divergence, so no answer carries the version",
         source: "packages/pylon/src/plugins/use-unhandled-route.ts:3",
         evidence: Evidence::Proven,
         drops: None,
@@ -109,7 +109,7 @@ pub const QUIRKS: &[Quirk] = &[
     },
     Quirk {
         id: "VIEWER_ALWAYS_ON",
-        what: "the viewer plugin slot survives graphiql: false and cannot be disabled, so it is always first in the array. Aosabi keeps the slot with the aoviewer plugin in it under its own key viewer: true alone, divergence D48, which keeps the array and the hook order equal under that key. The page that route serves is out of contract",
+        what: "the viewer plugin slot survives graphiql: false and cannot be disabled, so it is always first in the array. Aosabi has no viewer and leaves the slot empty, a named divergence, so the array lacks it and an unnamed plugin of the first pass stands one place lower",
         source: "packages/pylon/src/app/pylon-handler.ts:146-150",
         evidence: Evidence::Proven,
         drops: None,

@@ -93,7 +93,6 @@ export type Plugin<PluginContext extends Record<string, any> = {}, TServerContex
     build?: (ctx: BuildContext) => Promise<BuildController>;
 };
 export type AppConfig = {
-    landingPage?: boolean;
     /** Introspection is answered unless this key is `false`, which refuses every field of
      *  introspection. */
     introspection?: boolean;

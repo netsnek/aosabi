@@ -44,9 +44,8 @@
 //! handler of the engine goes on to the routes after it and the not found
 //! handler of the app. The handler of the glue goes on in the hono of the
 //! host for every answer of the engine with that status, and the host
-//! registers every route of a plugin of the engine and the not found handler
-//! of the landing page itself, each answered by the app of the engine, so
-//! the request ends with the same answer.
+//! registers every route of a plugin of the engine itself, each answered by
+//! the app of the engine, so the request ends with the same answer.
 //!
 //! The routes of the plugins of the engine and its not found handler run in
 //! the app of the engine, whose chain runs the same server on `*` between

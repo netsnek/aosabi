@@ -37,14 +37,13 @@
 // children at their base paths, the routes the setups of the plugins register
 // and the GraphQL handler of the glue. The engine in core.wasm, or the native
 // library of the engine on Bun, answers the GraphQL endpoint and the execute
-// hooks of the plugins, and the routes of the plugins of the engine: the viewer
-// where the configuration asks for it with viewer true, the landing page with
-// landingPage true and the login of Zitadel. A host hands the app its engine,
-// aosabi/worker on a Worker and aosabi/bun on Bun, and the core boots at the
-// first request, or where aosabi/worker boots it in the global scope of a
-// Worker before that request (lib/early.js), from the SDL, the graphql object
-// and the type resolvers the glue of Pylon's build hands handler(), the
-// configuration of executeConfig and the IR the host hands.
+// hooks of the plugins, and the routes of the plugins of the engine, the login
+// of Zitadel. A host hands the app its engine, aosabi/worker on a Worker and
+// aosabi/bun on Bun, and the core boots at the first request, or where
+// aosabi/worker boots it in the global scope of a Worker before that request
+// (lib/early.js), from the SDL, the graphql object and the type resolvers the
+// glue of Pylon's build hands handler(), the configuration of executeConfig and
+// the IR the host hands.
 //
 // The context c of a request is the c of hono, which getContext() answers
 // through the store the bind of the async context puts in place, and the
@@ -548,17 +547,16 @@ function topoSortPlugins(plugins) {
 }
 
 // The built in plugins of the boot of Pylon in their place of the list of
-// pylon-handler.ts:153-170, before and after the configured ones: the viewer,
-// the error logger and the in context plugin, and the landing page and the
-// refusal of introspection where the configuration asks for them. The
-// engine runs the hooks of each, and the routes of the viewer and of the
-// landing page answer on the engine where the configuration switches them on
-// with viewer true and landingPage true, the sides ts of D48 and D47 of
-// docs/byte-equality.md of the Aosabi repository.
+// pylon-handler.ts:153-170, before and after the configured ones: the error
+// logger and the in context plugin, and the refusal of introspection where the
+// configuration asks for it, with no viewer, which opens the list of Pylon, and
+// no landing page, which closes it, named divergences. Each holds hooks of the
+// engine alone, which the engine runs.
 function builtins(config) {
-  const before = [{ builtin: "viewer" }, { builtin: "errors" }, { builtin: "in-context", name: "in-context" }];
+  const before = [{ builtin: "errors" }, { builtin: "in-context", name: "in-context" }];
   const after = [];
-  if (config?.landingPage ?? true) after.push({ builtin: "landing" });
+  // The refusal of introspection on introspection false alone, a named
+  // divergence, where Pylon's handler installs it on graphiql false.
   if (config?.introspection === false) after.push({ builtin: "introspection" });
   return [before, after];
 }
@@ -612,10 +610,7 @@ async function runPass(config, args, target) {
   });
   const sentries = (config?.plugins ?? []).filter((plugin) => plugin.marker === "useSentry");
   for (const [index, plugin] of topoSortPlugins(pass).entries()) {
-    if (plugin.builtin !== undefined) {
-      builtinSetup(plugin.builtin, config, target);
-      continue;
-    }
+    if (plugin.builtin !== undefined) continue;
     if (plugin.marker !== undefined) {
       markerSetup(plugin, sentries.indexOf(plugin), target);
       continue;
@@ -630,17 +625,6 @@ async function runPass(config, args, target) {
     if (plugin.middleware) target.pluginsMiddleware.push(plugin.middleware);
   }
   target.config = config;
-}
-
-// Registers what the built in plugin `kind` of the boot of Pylon registers on
-// `target` in its setup where the configuration `config` switches it on: the
-// route /viewer of useViewer with viewer true and the not found handler of
-// useUnhandledRoute with landingPage true, each answered by the engine, while
-// the error logger, the in context plugin and the refusal of introspection hold
-// hooks of the engine alone.
-function builtinSetup(kind, config, target) {
-  if (kind === "viewer" && config?.viewer === true) target.get("/viewer", (c) => answerEngine(target, c));
-  if (kind === "landing" && config?.landingPage === true) target.notFound((c) => answerEngine(target, c));
 }
 
 // Runs the setup of the marker `plugin` of the engine on `target`: the

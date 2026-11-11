@@ -37,8 +37,8 @@
 //!    GraphQL middleware lets it fall through, and the rest of an app the
 //!    road serves is the not found handler of its router. The road answers
 //!    the not found answer of hono, since neither the router nor the booted
-//!    app hands out a handler an app sets, the landing page among them, and
-//!    a client of `GraphTP` reads either as the status 404 with an empty body.
+//!    app hands out a handler an app sets, and a client of `GraphTP` reads
+//!    either as the status 404 with an empty body.
 //!
 //! The call runs inside a context of its own, bound as the base pipeline binds
 //! the context of a request, so `getContext()` answers in every hook and
@@ -160,10 +160,9 @@ const NOT_FOUND: u16 = 404;
 /// which the router answers where the app sets no not found handler.
 ///
 /// The road answers it for every app it serves, since neither the router nor
-/// [`BootedApp`] hands out a handler an app sets, the landing page of
-/// `aosabi-landing` among them. The listener answers the text and the landing
-/// page alike, the status with substatus 0 and an empty body, since neither
-/// names the answer type.
+/// [`BootedApp`] hands out a handler an app sets. The listener answers the
+/// text as the status with substatus 0 and an empty body, since it names no
+/// answer type.
 const NOT_FOUND_TEXT: &str = "404 Not Found";
 
 /// The registrations of the core a call passes on every path, which the
@@ -470,12 +469,10 @@ fn straight_server(app: &BootedApp) -> Option<Straight> {
 /// `config.plugins`, which the boot labels by its index there whatever form it
 /// takes, a plugin in the form of the trait or of the HTTP layer joined
 /// through `from_http` naming none by default and a plugin object that spreads
-/// such a plugin naming none of its hooks, the viewer and the landing page,
-/// which the host hands the boot in [󰀅](crate::app::execute_config::Builtins)
-/// and which the boot labels by their role whatever the constructor of the
-/// host returns, the plugin a host puts before every plugin of a pass, which
-/// carries no label of the boot, and the refusal of introspection, a plugin of
-/// the HTTP layer joined through `from_http`.
+/// such a plugin naming none of its hooks, the plugin a host puts before every
+/// plugin of a pass in [`Builtins`](crate::app::execute_config::Builtins),
+/// which carries no label of the boot, and the refusal of introspection, a
+/// plugin of the HTTP layer joined through `from_http`.
 fn made_by_core(plugin: &PluginRecord) -> bool {
     matches!(
         plugin.label,

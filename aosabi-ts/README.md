@@ -200,28 +200,27 @@ a later release makes. The functions `requireAuth` and `authMiddleware` refuse a
 with the status 401 and the message `Authentication required`. The root `aosabi`, the file
 `lib/index.js`, re-exports the entry, so an import of the root keeps working.
 
-The class `App` is a Hono of the real hono, and the first pass of `executeConfig` installs the
-base pipeline on it in hono's own code: `compress()`,
-the bind of the async context, the request logger behind `except` of the internal prefix
-`/__aosabi/*`, the dispatch of the middleware of the plugins and the error answer. So the routes,
-the middleware, the error handlers, the children, the context `c` of a request, `HTTPException` and
-the helpers of an app run in hono's own code and in the order of the base pipeline. The engine
-answers the landing page where the configuration sets `landingPage: true` and the viewer where it
-sets `viewer: true`, divergences D47 and D48, and the three routes of the login of
-`zitadelLogin`. The engine reads its own variables of a request, the bag of `@inContext` and the
-info a root resolver stores under `graphqlResolveInfo`, through `c.get` and `c.var` of the same `c`
-for a key the app did not set, and the request of
-the engine lives until the chain of hono of the request has run and the fetch of the app has ended,
-so a middleware reads them after `next()`. Where the resolvers the glue hands `handler()` hold a
-type resolver of the form of the canary, the engine resolves its union or its interface by its
-checks over every property name of the value. The GraphQL handler of the engine takes the body of
-its request from `c.req.raw` at its first read, after any clone the app made of the request, through
-the import `iter_next` into one buffer of the length its `Content-Length` names once a quarter of
-that length has arrived, whose files the host reads at their place, or in the bytes of its own a
-file of a part in base64 holds. Each change of hono 4.13.14 against the 4.11.9 of the reference
-lockfile
-that an app sees is named with its case, HV1 to HV129, from a read of every ES module of both
-versions, and the changes of `@hono/node-server` 2.1.5 that reach an app of the side ts, HN1 to HN6.
+The class `App` is a Hono of the real hono, and the first pass of `executeConfig` installs the base
+pipeline on it in hono's own code: `compress()`, the bind of the async context, the request logger
+behind `except` of the internal prefix `/__aosabi/*`, the dispatch of the middleware of the plugins
+and the error answer. So the routes, the middleware, the error handlers, the children, the context
+`c` of a request, `HTTPException` and the helpers of an app run in hono's own code and in the order
+of the base pipeline.
+
+The engine answers the three routes of the login of `zitadelLogin`. The engine reads its own
+variables of a request, the bag of `@inContext` and the info a root resolver stores under
+`graphqlResolveInfo`, through `c.get` and `c.var` of the same `c` for a key the app did not set, and
+the request of the engine lives until the chain of hono of the request has run and the fetch of the
+app has ended, so a middleware reads them after `next()`. Where the resolvers the glue hands
+`handler()` hold a type resolver of the form of the canary, the engine resolves its union or its
+interface by its checks over every property name of the value. The GraphQL handler of the engine
+takes the body of its request from `c.req.raw` at its first read, after any clone the app made of
+the request, through the import `iter_next` into one buffer of the length its `Content-Length` names
+once a quarter of that length has arrived, whose files the host reads at their place, or in the
+bytes of its own a file of a part in base64 holds. Each change of hono 4.13.16 against the 4.11.9 of
+the reference lockfile that an app sees is named with its case, beside four changes of 4.13.16 named
+without one, from a read of every ES module of both versions, and so is each change of
+`@hono/node-server` 2.1.6 that reaches an app of the side ts.
 
 CORS and CSRF of an app are hono's own, `cors()` of `hono/cors` and `csrf()` of `hono/csrf`, which
 the app writes once for every route with the one list of its sites, before its routes and the
@@ -293,12 +292,12 @@ the Aosabi repository carries.
 ## The module
 
 The file `core.wasm` is the engine built from the crate `aosabi-js` of the Aosabi workspace in the
-profile `wasm`, and `core.wasm.sha256` holds its SHA-256. The row `aosabi_core_wasm` of
-`tools/provenance/products.lock` of the Aosabi repository anchors the sources it is built from. The
-router and the chain
-of the port of hono in the module still answer the routes of the plugins of the engine, the viewer,
-the landing page and the routes of the login of `zitadelLogin`, and its not found handler, so the
-router stays in the module until those routes leave it.
+profile `wasm`, and `core.wasm.sha256` holds its SHA-256. The sources it is built from are pinned as
+well. The module holds the engine, the hooks of `aosabi-hooks` and the server of
+`graphql-over-http`, which answers a request of the GraphQL endpoint with no router, as the hono of
+the app has routed it. The router and the chain of the port of hono in the module still answer the
+routes of the plugins of the engine, the routes of the login of `zitadelLogin`, and its not found
+handler, so the router stays in the module until those routes leave it.
 
 The file `strings.wasm` is the module through which the wrapper hands the short strings of a record
 under the compatibility flag `wasm_esm_integration_builtins` of workerd, which

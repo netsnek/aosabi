@@ -3,11 +3,11 @@
  * aoviewer-core: the shared core of aoviewer and of the documentation
  * generator.
  *
- * No file of the reference is translated here. aoviewer replaces the Voyager
- * page of the /viewer route.
- * The core answers what a route looks like under a set of options, as a page
- * model and a graph scene, and the viewer and the documents call the same
- * function.
+ * No file of the reference is translated here. aoviewer is the schema viewer
+ * of Aosabi in the place of the Voyager page the reference serves on its
+ * /viewer route, which no build of a service serves since 0.1.1. The core
+ * answers what a route looks like under a set of options, as a page model and
+ * a graph scene, and the viewer and the documents call the same function.
  */
 
 //! The shared core of aoviewer and of the documentation generator.

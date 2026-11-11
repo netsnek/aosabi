@@ -13,10 +13,8 @@ dependencies = [
  "aosabi-hooks",
  "aosabi-http",
  "aosabi-json",
- "aosabi-landing",
  "aosabi-macros",
  "aosabi-serve",
- "aosabi-viewer",
 ]
 
 [[package]]
@@ -121,14 +119,6 @@ name = "aosabi-kernel"
 version = "0.0.0"
 
 [[package]]
-name = "aosabi-landing"
-version = "0.0.0"
-dependencies = [
- "aosabi-core",
- "aosabi-http",
-]
-
-[[package]]
 name = "aosabi-lang"
 version = "0.0.0"
 dependencies = [
@@ -184,14 +174,6 @@ dependencies = [
  "aosabi-json",
  "aosabi-lang",
  "aosabi-type",
-]
-
-[[package]]
-name = "aosabi-viewer"
-version = "0.0.0"
-dependencies = [
- "aosabi-core",
- "aosabi-http",
 ]
 
 [[package]]

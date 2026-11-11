@@ -3,8 +3,9 @@
 //! A small bookshelf, a service of the native Rust layer of Aosabi.
 //!
 //! The shelf lives in memory. Two queries read it, a mutation adds a book, a
-//! route beside `/graphql` answers the health of the service, and a middleware
-//! stamps the size of the shelf on every answer.
+//! route the service writes itself beside `/graphql` answers its health, which
+//! the server of Aosabi does not answer on its own, and a middleware stamps the
+//! size of the shelf on every answer.
 
 use std::sync::{LazyLock, Mutex, MutexGuard, PoisonError};
 
@@ -139,7 +140,8 @@ pub fn app() -> impl IntoApp {
             c.header("x-shelf-size", &shelf().len().to_string());
             Ok(c.res())
         })
-        // A route beside `/graphql`, which answers the health of the service.
+        // A route of the service beside `/graphql` that answers its health,
+        // which the server does not answer on its own.
         .get("/health", |c| async move {
             c.json(&json::Value::from(json::Map::from([
                 ("status", json::Value::from("ok")),

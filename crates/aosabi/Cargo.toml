@@ -161,10 +161,6 @@ aosabi-sentry = { path = "../../plugins/aosabi-sentry", optional = true }
 # The Zitadel integration, behind the feature auth-zitadel. It builds on
 # every target, and on one that is not cfg(unix) without its signer.
 aosabi-auth-zitadel = { path = "../../plugins/aosabi-auth-zitadel", optional = true }
-# The two plugins every boot adds, the viewer in the first slot and the
-# landing page of the unhandled route.
-aosabi-landing = { path = "../../plugins/aosabi-landing" }
-aosabi-viewer = { path = "../../plugins/aosabi-viewer" }
 # Federation behind the feature federation, on every target, the worker card
 # on wasm32 among them, since a delegation leaves through the network
 # capability and never through a socket of its own.

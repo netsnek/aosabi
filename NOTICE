@@ -26,14 +26,14 @@ The code of Pylon that Aosabi carries was written by Nico Schett, as git blame
 of Pylon's history reads it. Aosabi carries it in two forms. Its compatibility
 layer, through which Pylon v3 apps run unchanged, carries the declaration files
 of Pylon as its build emits them and the texts Pylon writes into its answers,
-such as its landing page and its messages, which Aosabi writes byte for byte as
-Pylon does. Other files of Aosabi, in TypeScript, JavaScript and Rust, are
-translated from Pylon's code. Every file that carries code added to Pylon on or
-after 2024-05-29, the day Pylon took the Apache License 2.0, names Apache-2.0 in
-its SPDX line, as MIT AND Apache-2.0 where Aosabi's own code is mixed in,
-credits Nico Schett and Pylon in its header and says that the Aosabi authors
-changed it. Documentation/licensing.md names the files that keep Pylon's bytes
-and so carry no SPDX line.
+such as its messages, which Aosabi writes byte for byte as Pylon does. Other
+files of Aosabi, in TypeScript, JavaScript and Rust, are translated from Pylon's
+code. Every file that carries code added to Pylon on or after 2024-05-29, the
+day Pylon took the Apache License 2.0, names Apache-2.0 in its SPDX line, as MIT
+AND Apache-2.0 where Aosabi's own code is mixed in, credits Nico Schett and
+Pylon in its header and says that the Aosabi authors changed it.
+Documentation/licensing.md names the files that keep Pylon's bytes and so carry
+no SPDX line.
 
 Pylon ships the NOTICE file below, reproduced as it reads at the commit Aosabi
 follows:

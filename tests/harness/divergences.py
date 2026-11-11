@@ -865,7 +865,7 @@ def in_process_without_multipart(request_headers: dict, expected: dict) -> dict:
 # of `http.py`, a recorded golden `{status, headers, body}` and a recorded answer
 # of the in process capture `{status, status_text, headers, body}`.
 
-#: The root of the tree whose landing template the steps read.
+#: The root of the tree whose sources the steps read, the landing page of the reference among them.
 ROOT = Path(__file__).resolve().parents[2]
 
 #: The keys of the variants of docs/harness.md section 8 that tests/sidecar/config-overlay.mjs spreads over
@@ -899,16 +899,89 @@ TS_KEYS = ("graphiql", "landingPage")
 #: The keys of the instances of the in process capture, which leave multipart and cors unset.
 IN_PROCESS_KEYS = {}
 
-#: The keys a boot in process of the twin carries in step 7 of 60_plugins, one entry per row: the switches
-#: of the secure defaults that turn on a plugin the reference adds under every configuration, so the twin boots the
-#: plugins of the reference's boot.
-BOOT_KEYS = {
-    # D47: the landing page, which the reference adds unless the key is `false`.
-    "landing_page": True,
+#: The built in plugins of the reference that the side under test does not have: the viewer and the landing page.
+EMPTY_SLOTS = ("viewer", "landing")
 
-    # D48: the viewer, which the reference adds under every configuration.
-    "viewer": True,
-}
+#: The label of an unnamed plugin in the message of a failed setup, its index in the sorted list of the pass.
+UNNAMED = re.compile(r"(Pylon plugin #)(\d+)( \(unnamed\) failed during setup: )")
+
+#: The route of the viewer of the reference, which its setup registers.
+VIEWER_ROUTE = "/viewer"
+
+
+def slot_label(text: str, shift: int = 1) -> str:
+    """Return the message `text` of a failed setup with the index of its unnamed plugin lowered by `shift`.
+
+    The viewer opens the sorted list of the first pass of the reference,
+    so an unnamed plugin of that pass stands one place lower on the side under
+    test, which has no viewer.
+    """
+    return UNNAMED.sub(lambda m: "%s%d%s" % (m.group(1), int(m.group(2)) - shift, m.group(3)), text)
+
+
+def boot_slots(line: dict, description: dict, slots: tuple = EMPTY_SLOTS) -> dict:
+    """Return the answer `line` of the reference to a boot `description` of tests/gen/plugins.py as the side
+    under test answers it, with the built in plugins of `slots` out of the arrays, the sorted and the loaded
+    labels of its passes.
+
+    A failed setup of an unnamed plugin of the first pass names an index one
+    lower where the viewer is among `slots`, and one of the strategy `last`
+    fails in the second pass, whose sorted list holds no viewer.
+    """
+    def kept(label):
+        return not (isinstance(label, dict) and label.get("builtin") in slots)
+
+    if "passes" in line:
+        passes = [dict(one, array=[entry for entry in one["array"] if kept(entry[0])],
+                       sorted=[label for label in one["sorted"] if kept(label)],
+                       loaded=[label for label in one["loaded"] if kept(label)]) for one in line["passes"]]
+        return dict(line, passes=passes)
+    if "thrown" in line and "viewer" in slots:
+        thrower = next((row for row in description.get("plugins", [])
+                        if str(row.get("setup", "")).startswith("throw")), None)
+        if thrower is not None and thrower.get("strategy") != "last":
+            return dict(line, thrown=slot_label(line["thrown"]))
+    return line
+
+
+def boot_stream(stream: bytes, descriptions: list, slots: tuple = EMPTY_SLOTS) -> bytes:
+    """Return the answers `stream` of the reference to the boots `descriptions`, one JSON line each, with
+    `boot_slots` applied, a line it leaves as it is kept as its bytes."""
+    by_id = {description["id"]: description for description in descriptions}
+    lines = []
+    for text in stream.decode("utf-8").splitlines():
+        line = json.loads(text)
+        held = boot_slots(line, by_id.get(line.get("id"), {}), slots)
+        lines.append(text if held == line else json.dumps(held, ensure_ascii=False, separators=(",", ":")))
+    return "".join(text + "\n" for text in lines).encode("utf-8")
+
+
+def report_slots(report: dict, slots: tuple = EMPTY_SLOTS) -> dict:
+    """Return the boot report `report` of the reference as the side under test writes it, with the built in
+    plugins of `slots` out of the array written back and the route of the viewer out of its routes."""
+    after = [entry for entry in report.get("config_plugins_after_boot") or []
+             if not (isinstance(entry.get("label"), dict) and entry["label"].get("builtin") in slots)]
+    routes = report.get("routes") or []
+    if "viewer" in slots:
+        routes = [route for route in routes if not (route.get("method") == "GET" and route.get("path") == VIEWER_ROUTE)]
+    return dict(report, config_plugins_after_boot=after, routes=routes)
+
+
+def boot_keys(boot: dict) -> dict:
+    """Return a boot description `boot` of tests/gen/plugins.py as a boot of the twin takes it.
+
+    It carries `introspection: false` where it sets `graphiql: false`, the
+    key that adds on the twin the refusal the reference adds on
+    `graphiql: false`. The keys `graphiql` and `landing_page` leave it,
+    since the twin has neither.
+    """
+    keys = dict(boot)
+    if boot.get("graphiql") is False:
+        keys.setdefault("introspection", False)
+    keys.pop("graphiql", None)
+    keys.pop("landing_page", None)
+    return keys
+
 
 
 #: The key under which `keys_of` hands the steps the middleware cors() of the app of a fixture, its entries of
@@ -1059,14 +1132,24 @@ CORS_VARY = ("Origin", "Access-Control-Request-Headers")
 TEXT_TYPE = "text/plain; charset=UTF-8"
 NOT_FOUND_BODY = b"404 Not Found"
 
-#: The version the landing page of the reference names, quirk Q04.
+#: The version the landing page of the reference names.
 LANDING_VERSION = "2.9.5"
+#: The source of the landing page of the reference and the text that opens its template.
+LANDING_SOURCE = Path("vendor") / "pylon" / "packages" / "pylon" / "src" / "plugins" / "use-unhandled-route.ts"
+LANDING_ANCHOR = "html`<!doctype html>"
 
 
 def landing_page() -> bytes:
-    """Return the landing page of the reference, the template of aosabi-landing with its version, and Q04."""
-    template = (ROOT / "plugins" / "aosabi-landing" / "src" / "landing.html.tmpl").read_text(encoding="utf-8")
-    return template.replace("${version}", LANDING_VERSION, 1).encode("utf-8")
+    """Return the landing page of the reference, the template of its source with its version.
+
+    The template is the raw slice between the backticks its anchor opens.
+    """
+    text = (ROOT / LANDING_SOURCE).read_text(encoding="utf-8")
+    opened = text.index("`", text.index(LANDING_ANCHOR)) + 1
+    closed = opened
+    while text[closed] != "`":
+        closed += 2 if text[closed] == "\\" else 1
+    return text[opened:closed].replace("${version}", LANDING_VERSION, 1).encode("utf-8")
 
 
 def is_cors_line(name: str, value: str) -> bool:
@@ -1198,10 +1281,9 @@ def qd228(reply, ask, keys):
     """QD-228, D48: the viewer only on `viewer: true`, a key the reference does not read.
 
     The reference serves its viewer at `/viewer` under every configuration, and the
-    function hands the route on as one no handler answers unless the key is
-    `true`.
+    function hands the route on as one no handler answers.
     """
-    if keys.get("viewer") is True or ask.path != "/viewer" or ask.method not in ("GET", "HEAD"):
+    if ask.path != "/viewer" or ask.method not in ("GET", "HEAD"):
         return reply
     if reply.status != 200:
         return reply

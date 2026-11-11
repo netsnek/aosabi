@@ -32,19 +32,17 @@
 //! and its handle in the table of the boot, 0 for a function the engine runs
 //! none of, or a byte 1 and a plugin of the app.
 //!
-//! A plugin of the app is the record of [`crate::plugin::read`], the keys the
-//! host reports of its object: its name, its strategy, its roles, its
-//! dependencies, its hook `onExecute` and the other hooks of Envelop and Yoga
-//! it holds, which fail the boot. Its middleware and the routes its setup
-//! registers run in the hono of the host, `aosabi/pylon`, as do the routes and
-//! the middleware of the app, the base pipeline and the children of the
-//! app. So the app the engine boots holds no route of the app and installs no
-//! base pipeline,
-//! [`App::hosted_pipeline`]: its first middleware puts the context of the
-//! dispatch and the logger of the request the host opened in place, [`seed`],
-//! and then come the routes the plugins of the engine register in their
-//! setups, the viewer, the landing page and the login of Zitadel, each of
-//! which the host hands a request where its own routing reaches it.
+//! A plugin of the app is the record of [`crate::plugin::read`], the keys the host
+//! reports of its object: its name, its strategy, its roles, its dependencies, its
+//! hook `onExecute` and the other hooks of Envelop and Yoga it holds, which fail
+//! the boot. Its middleware and the routes its setup registers run in the hono of
+//! the host, `aosabi/pylon`, as do the routes and the middleware of the app, the
+//! base pipeline and the children of the app. So the app the engine boots holds no
+//! route of the app and installs no base pipeline, [`App::hosted_pipeline`]: its
+//! first middleware puts the context of the dispatch and the logger of the request
+//! the host opened in place, [`seed`], and then come the routes the plugins of the
+//! engine register in their setups, the login of Zitadel, which the host hands a
+//! request where its own routing reaches it.
 //!
 //! The boot runs the two passes of [`aosabi_core::boot`] with the GraphQL layer
 //! built between them, the server of `graphql-over-http` over the schema of the
@@ -114,7 +112,6 @@ use std::{
 
 use aosabi::{
     AppConfig,
-    BUILTINS,
     ExecutionOutcome,
     IntoApp as _, //
 };
@@ -537,12 +534,10 @@ fn flag(byte: u8) -> Option<bool> {
     }
 }
 
-/// The built in plugins of the boot: the viewer and the landing page of the
-/// facade, and before every plugin of a pass the plugin of [`finish_plugin`].
+/// The plugins the host hands the boot: before every plugin of a pass the
+/// plugin of [`finish_plugin`].
 const HOST_BUILTINS: Builtins = Builtins {
     first: Some(finish_plugin),
-    viewer: BUILTINS.viewer,
-    unhandled_route: BUILTINS.unhandled_route,
 };
 
 /// Returns the plugin that makes the reads of the thrown errors of

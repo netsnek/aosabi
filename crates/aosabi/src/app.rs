@@ -42,9 +42,8 @@
 //! | `.middleware(path, mw)` | `app.use(path, mw)` of Hono, named `middleware` because `use` is a keyword of Rust |
 //! | `.compose(child)` | `compose(...children)`, one child per call, the parent's roots first and the children's in the order of the calls |
 //! | `.plugin(..)` | one element of `plugins` of `aosabi.config.ts`, in the order of the calls |
-//! | `.graphiql(..)`, `.landing_page(..)`, `.logger(..)`, `.masked_errors(..)`, `.graphql_endpoint(..)`, `.health_check_endpoint(..)`, `.multipart(..)` | the other keys of the configuration that Aosabi ports |
+//! | `.logger(..)`, `.masked_errors(..)`, `.graphql_endpoint(..)`, `.multipart(..)` | the other keys of the configuration that Aosabi ports |
 //! | `.introspection(..)` | the key `introspection` of Aosabi |
-//! | `.viewer(..)` | the key `viewer` of Aosabi |
 //! | `.max_tokens(..)` | the key `maxTokens` of Aosabi, the cap on the tokens of a request document |
 //!
 //! The plugins and the keys make the configuration the app carries, which
@@ -418,22 +417,6 @@ impl App {
         self
     }
 
-    /// Sets `landingPage`. The landing page of an unhandled route is served
-    /// only when it is `true`, the named divergence D47.
-    #[must_use]
-    pub fn landing_page(mut self, enabled: bool) -> Self {
-        self.config().landing_page = Some(enabled);
-        self
-    }
-
-    /// Sets `viewer`, the key of Aosabi that serves the viewer at `/viewer`
-    /// only when it is `true`, the named divergence D48.
-    #[must_use]
-    pub fn viewer(mut self, enabled: bool) -> Self {
-        self.config().viewer = Some(enabled);
-        self
-    }
-
     /// Sets `logger`, `false` for no access line or the object form.
     #[must_use]
     pub fn logger(mut self, logger: impl Into<LoggerOption>) -> Self {
@@ -452,13 +435,6 @@ impl App {
     #[must_use]
     pub fn graphql_endpoint(mut self, endpoint: &str) -> Self {
         self.config().graphql_endpoint = Some(String::from(endpoint));
-        self
-    }
-
-    /// Sets `healthCheckEndpoint` of Yoga.
-    #[must_use]
-    pub fn health_check_endpoint(mut self, endpoint: &str) -> Self {
-        self.config().health_check_endpoint = Some(String::from(endpoint));
         self
     }
 
