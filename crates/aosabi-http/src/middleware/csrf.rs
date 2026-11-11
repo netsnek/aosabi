@@ -17,15 +17,15 @@
 //! answers, and it checks the origin only where the `Sec-Fetch-Site` allows
 //! nothing.
 //!
-//! The type is the field `Content-Type`, or `text/plain` where it is missing
-//! or empty, and a form type is `application/x-www-form-urlencoded`,
-//! `multipart/form-data` or `text/plain` at its start in any case of ASCII,
-//! followed by no letter, digit or `_`. A missing `Sec-Fetch-Site`, or one
-//! that is none of `same-origin`, `same-site`, `none` and `cross-site`, allows
-//! nothing, and the default allows `same-origin` alone. A missing `Origin`
-//! allows nothing, and the default allows the origin of the request's own URL.
-//! An option that is an empty string reads as the default, since the reference
-//! reads it as false.
+//! The type is the field `Content-Type`, or `text/plain` where it is missing or
+//! empty, and a form type is `application/x-www-form-urlencoded`,
+//! `multipart/form-data`, `text/plain` or `text/ping`, the type of the ping of
+//! a link, at its start in any case of ASCII, followed by no letter, digit or
+//! `_`. A missing `Sec-Fetch-Site`, or one that is none of `same-origin`,
+//! `same-site`, `none` and `cross-site`, allows nothing, and the default allows
+//! `same-origin` alone. A missing `Origin` allows nothing, and the default
+//! allows the origin of the request's own URL. An option that is an empty
+//! string reads as the default, since the reference reads it as false.
 //!
 //! The base pipeline of a Rust service runs the check with the defaults on a
 //! request that carries a `Cookie` field, where a cookie can carry a session,
@@ -65,11 +65,13 @@ use crate::{
 /// The values of `Sec-Fetch-Site` the middleware knows.
 const SEC_FETCH_SITE_VALUES: [&str; 4] = ["same-origin", "same-site", "none", "cross-site"];
 
-/// The types a form element sends.
-const FORM_TYPES: [&str; 3] = [
+/// The types a form element sends, and `text/ping`, the type of the ping of a
+/// link, which the check reads as one of them.
+const FORM_TYPES: [&str; 4] = [
     "application/x-www-form-urlencoded",
     "multipart/form-data",
     "text/plain",
+    "text/ping",
 ];
 
 /// A function of the service over a value of a request and its context, which
