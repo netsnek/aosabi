@@ -12,31 +12,37 @@
 //! The middleware lets a request with no body through. Where the request has a
 //! `Content-Length` and no `Transfer-Encoding`, a length over the option
 //! `max_size` answers the option `on_error` before the body is read, and any
-//! other length goes on. Every other request goes on with its body counted as
-//! it is read: the read fails with `Payload Too Large` once the bytes pass the
-//! bound, and the answer of the chain gives way to the answer of `on_error`.
-//! The default `on_error` throws an `HTTPException` of the status 413 over the
-//! text `Payload Too Large`, which the error handler answers.
+//! other length goes on. Every other request has its body read through the
+//! count before the chain runs, where hono counts the body as the route reads
+//! it: a body that passes the bound answers `on_error` before the chain, and
+//! the bytes read go on to the chain as the body of the request, a named
+//! divergence. A body limit after it on the same request reads the length of
+//! those bytes as a declared length. The default `on_error` throws an
+//! `HTTPException` of the status 413 over the text `Payload Too Large`, which
+//! the error handler answers.
 //!
 //! The base pipeline of a Rust service holds every read of a body to
 //! [`DEFAULT_MAX_SIZE`], 1 MiB, through [`behind_default_body_limit`] in the
-//! entry of the plugin middleware and around it, divergence D76 of
-//! `docs/byte-equality.md`. The first read checks the declared length before
-//! a byte is read, and every read counts the bytes, so a route that never
-//! reads its body answers as it would without the bound. A `body_limit` of the
-//! app takes the place of the default on every request it matches, wherever it
-//! stands in the chain, since the body limits of one request share one bound,
-//! and where two of the app's own match, the smaller bound holds, as each of
-//! hono's counts what the one before it lets through. Where a read passed the
-//! bound, the answer gives way to the answer of the bound even where the route
-//! caught the failed read, as the GraphQL handler does, where hono replaces an
-//! answer only when the error of the read reached the error handler. The answer
-//! of the bound takes every header of the answer it replaces but
-//! `content-type`, as the setter of `c.res` carries them, and
-//! `content-length`, which measures the body it replaces. The TypeScript
-//! option keeps the pipeline of a TypeScript app, which bounds no body, so under the feature
-//! `host-platform` there is no default, and a body its host holds reads as no
-//! body to the middleware.
+//! entry of the plugin middleware and around it, a named divergence. The first
+//! read checks the declared length before a byte is read, and every read counts
+//! the bytes, so a route that never reads its body answers as it would without
+//! the bound. The default keeps this late decision where a `body_limit` of the
+//! app decides before the chain: the default reads nothing ahead of the route
+//! and lets a route that never reads its body answer, while the app's own reads
+//! a body with no usable `Content-Length` before any route runs. A `body_limit`
+//! of the app takes the place of the default on every request it matches,
+//! wherever it stands in the chain, since the body limits of one request share
+//! one bound, and where two of the app's own match, the smaller bound holds, as
+//! each of hono's counts what the one before it lets through. Where a read
+//! passed the bound, the answer gives way to the answer of the bound even where
+//! the route caught the failed read, as the GraphQL handler does, where hono
+//! replaces an answer only when the error of the read reached the error
+//! handler. The answer of the bound takes every header of the answer it
+//! replaces but `content-type`, as the setter of `c.res` carries them, and
+//! `content-length`, which measures the body it replaces. The TypeScript option
+//! keeps the pipeline of a TypeScript app, which bounds no body, so under the
+//! feature `host-platform` there is no default, and a body its host holds reads
+//! as no body to the middleware.
 
 use core::{
     cell::Cell,
@@ -58,6 +64,7 @@ use crate::{
             BodyError,
             BodyStream,
             Chunk,
+            Chunks,
             LocalBoxFuture,
             Stream, //
         },
@@ -115,6 +122,9 @@ struct BodyBound {
     /// place of the error of the read, so a body limit further out finds no
     /// `BodyLimitError` in `c.error`.
     thrown: Cell<bool>,
+    /// The bytes a body limit of the app read ahead of the chain, which every
+    /// body limit after it reads as the declared length.
+    ahead: Cell<Option<u128>>,
 }
 
 /// The body of a request counted against its bound as it is read.
@@ -175,6 +185,14 @@ impl Stream for Bounded {
 }
 
 /// Returns the middleware `body_limit(options)`.
+///
+/// A body over the bound answers `on_error` before any route, whether the route
+/// reads its body or not, where the default of the base pipeline,
+/// [`behind_default_body_limit`], counts the bytes as the route reads them. The
+/// closure is a [`MiddlewareFn`] and also what `.middleware(path, f)` of the
+/// app of the facade takes, as the closure of `serve_static` is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
 pub fn body_limit<E: RouteError + From<HttpException>>(
     options: BodyLimitOptions<E>,
 ) -> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
@@ -185,7 +203,11 @@ pub fn body_limit<E: RouteError + From<HttpException>>(
             let Some(bound) = bind(&c, options.max_size, true) else {
                 return next.run(c).await;
             };
-            if declared_length(&c).is_some_and(|length| passes(length, options.max_size)) {
+            let length = match declared_length(&c).or_else(|| bound.ahead.get()) {
+                Some(length) => length,
+                None => read_ahead(&c, &bound).await,
+            };
+            if bound.crossed.get() || passes(length, options.max_size) {
                 return answer(&options, &bound, &c).await;
             }
             let response = next.run(c.clone()).await?;
@@ -267,6 +289,7 @@ fn bind(c: &Context, max_size: usize, by_app: bool) -> Option<Rc<BodyBound>> {
         crossed: Cell::new(false),
         by_app: Cell::new(by_app),
         thrown: Cell::new(false),
+        ahead: Cell::new(None),
     });
     raw.set_body(Body::Stream(BodyStream::new(Bounded {
         inner,
@@ -278,6 +301,36 @@ fn bind(c: &Context, max_size: usize, by_app: bool) -> Option<Rc<BodyBound>> {
     })));
     c.set_extension(Rc::clone(&bound));
     Some(bound)
+}
+
+/// Reads the body of `c` through the count of `bound` before the chain runs and
+/// returns the number of bytes read, a named divergence.
+///
+/// The pieces read go back in place of the body of the request, with the
+/// failure of a read after them, so the route reads the bytes the count let
+/// through. A read that passes the bound sets `crossed`, and the length is
+/// kept for the body limits after this one.
+async fn read_ahead(c: &Context, bound: &BodyBound) -> u128 {
+    let raw = c.req().raw();
+    let Some(stream) = raw.body().to_stream() else {
+        return 0;
+    };
+    let mut pieces = Vec::new();
+    let mut read = 0_usize;
+    while let Some(piece) = stream.next().await {
+        let failed = piece.is_err();
+        if let Ok(bytes) = &piece {
+            read = read.saturating_add(bytes.len());
+        }
+        pieces.push(piece);
+        if failed {
+            break;
+        }
+    }
+    raw.set_body(Body::Stream(BodyStream::new(Chunks::new(pieces))));
+    let length = u128::try_from(read).unwrap_or(u128::MAX);
+    bound.ahead.set(Some(length));
+    length
 }
 
 /// Returns the answer of `options` to the body of `c` over the bound,
