@@ -61,8 +61,10 @@
 //! generated module, which hands the app the glue of its parts. The runner of
 //! `inspect` reads the source path through `aosabi_build::inspect_source_from`.
 //! A plain crate names no build side, so both packages name `aosabi-build` from
-//! where the facade comes: the package beside a path facade, or the version or
-//! the commit of the facade.
+//! where the facade comes: the package beside a path facade, or the repository
+//! of the facade by its reference. Aosabi is released through its repository
+//! alone, and the loader refuses a facade of a registry, `AO-C0108`, so no
+//! generated manifest names the facade or the build side by a version.
 //!
 //! A git dependency is named by the reference the manifest of the project names
 //! it by, a tag, a branch, a revision or none for the default branch, so the
@@ -390,8 +392,8 @@ pub fn write_source_copy(
 }
 
 /// Returns the source of `aosabi-build` for a plain crate, which names no
-/// build side: the package beside a path facade, or the version or the
-/// commit of the facade.
+/// build side: the package beside a path facade, or the repository of the
+/// facade by its reference.
 ///
 /// # Errors
 ///
@@ -410,9 +412,6 @@ fn build_side_of_facade(project: &Project) -> Result<DepSource, CliError> {
                 .ok_or_else(|| codes::not_a_service(&project.name, true))?;
             DepSource::Path(side)
         }
-        DepSource::Registry { version } => DepSource::Registry {
-            version: version.clone(),
-        },
         DepSource::Git { url, reference } => DepSource::Git {
             url: url.clone(),
             reference: reference.clone(),
@@ -860,9 +859,6 @@ pub fn spec(source: &DepSource, dir: &Path) -> Result<String, CliError> {
     Ok(match source {
         DepSource::Path(path) => {
             format!("path = {}", toml_string(&utf8(&relative_path(dir, path))?))
-        }
-        DepSource::Registry { version } => {
-            format!("version = {}", toml_string(&format!("={version}")))
         }
         DepSource::Git { url, reference } => git_spec(url, reference),
     })

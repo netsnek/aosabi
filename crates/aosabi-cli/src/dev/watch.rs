@@ -9,20 +9,44 @@
 
 //! The watcher.
 //!
-//! [`Watcher`] polls the sets of its role every
-//! [`POLL_INTERVAL`] with `std::fs::metadata`, since an event interface of the
-//! kernel needs a binding in `unsafe` code. The web role watches `src/**`,
-//! `aosabi.config.rs`, `Cargo.toml` and `Cargo.lock` of the project, the
-//! worker role `src/**` and `aosabi.config.rs`, and a directory named `target`
-//! or `.git` is never entered. A path counts when it ends in `.rs` or `.toml`
-//! or is `Cargo.lock`, so a file a request writes into the project starts no rebuild. A path
-//! counts as changed when it appears, vanishes, or changes its modification
-//! time with its nanoseconds, its length or its inode, so a save that keeps
-//! the length and the time to the nanosecond and writes the file in place is
-//! the one change a poll misses.
+//! The reference watches the whole working directory with chokidar, leaves
+//! `node_modules`, `.pylon` and `.git` out, reacts to a path that matches
+//! `/\.([cm]?[jt]sx?|css)$/` alone, and ranks the kind of a path `pages` below
+//! `server` below `config`. Its worker role watches `src` and the
+//! configuration file.
+//!
+//! [`Watcher`] polls its set every [`POLL_INTERVAL`] with `std::fs::metadata`,
+//! since an event interface of the kernel needs a binding in `unsafe` code.
+//! Both roles watch `src/**`, `aosabi.config.rs`, `Cargo.toml` and
+//! `Cargo.lock` of the project, the worker role the manifest and the lock
+//! beyond the set of the reference, since only a reload reads the manifest
+//! again with the refusals of the loader, `AO-C0108` among them, and a
+//! directory named `target` or `.git` is never entered. Both roles also watch
+//! the files the last load that succeeded lists beside those: the manifest of
+//! every path package of the graph of the default features, a package outside
+//! the root among them, the root manifest and the lock of the workspace of the
+//! project where they lie above the root, and `config.toml` and `config` of
+//! the folder `.cargo` of the root and of every directory above it and of the
+//! cargo home, so an edit of one reads the project again with the refusals of
+//! the loader before the next build. The set holds no file a configuration
+//! pulls in with `include`, no root manifest of the workspace of a path
+//! package outside the root and no manifest of a path package behind a feature
+//! the default graph leaves off. A change of one of those alone, or one that
+//! lands while a reload runs, starts no reload, and the next build reads the
+//! lock of the project and the lock it derives with the pin check of the
+//! loader, so it refuses a crate of Aosabi from a registry such a change
+//! brings in with `AO-C0108` before cargo compiles. A path counts when it ends
+//! in `.rs` or `.toml` or is `Cargo.lock`, so a file a request writes into the
+//! project starts no rebuild. A path counts as changed when it appears,
+//! vanishes, or changes its modification time with its nanoseconds, its length
+//! or its inode, so a save that keeps the length and the time to the
+//! nanosecond and writes the file in place is the one change a poll misses,
+//! which the next build meets in the same way.
 //!
 //! [`classify`] answers [`Kind::Config`] for `aosabi.config.rs`, `Cargo.toml`
-//! and `Cargo.lock` at the root and [`Kind::Server`] for every other path, and
+//! and `Cargo.lock` at the root and [`Kind::Server`] for every other path,
+//! the watcher answers [`Kind::Config`] for every other file the last load
+//! lists as well, a manifest of a path package under `src` among them, and
 //! the order of [`Kind`] ranks `server` below `config`.
 
 use std::{
@@ -109,28 +133,92 @@ struct Stamp {
 pub struct Watcher {
     /// The project root.
     root: PathBuf,
-    /// Whether the set is the one of the worker role.
-    worker: bool,
+    /// The other files the last load lists, outside `src` and beside the
+    /// three files of the root, which the walk does not stamp, in the order
+    /// of their paths.
+    loaded: Vec<PathBuf>,
+    /// Every file the last load lists, those under `src` among them, which
+    /// count as [`Kind::Config`], in the order of their paths.
+    config: Vec<PathBuf>,
     /// The stamp of every watched file with its path, in the order of the
     /// paths.
     snapshot: Vec<(PathBuf, Stamp)>,
 }
 
 impl Watcher {
-    /// Returns a watcher of the project at `root` for the worker role when
-    /// `worker`, with the snapshot of the files as they stand.
+    /// Returns a watcher of the project at `root`, the same set in both
+    /// roles, with the other files `loaded` a load of the project reads, and
+    /// with the snapshot of the files as they stand.
     ///
     /// # Errors
     ///
     /// Returns the error of the root, which the walk cannot read.
-    pub fn new(root: &Path, worker: bool) -> io::Result<Self> {
+    pub fn new(root: &Path, loaded: &[PathBuf]) -> io::Result<Self> {
         let mut watcher = Self {
             root: root.to_path_buf(),
-            worker,
+            loaded: Vec::new(),
+            config: sorted(loaded),
             snapshot: Vec::new(),
         };
+        watcher.loaded = watcher.others(loaded);
         watcher.snapshot = watcher.scan()?;
         Ok(watcher)
+    }
+
+    /// Takes `loaded` as the other files a load of the project reads, as the
+    /// last load that succeeded lists them, and changes the snapshot for the
+    /// files that join or leave that set alone, stamped as they stand now, so
+    /// a change of any other watched file since the last poll still counts at
+    /// the next one.
+    pub fn watch_loaded(&mut self, loaded: &[PathBuf]) {
+        self.config = sorted(loaded);
+        let loaded = self.others(loaded);
+        if loaded == self.loaded {
+            return;
+        }
+        let was = std::mem::replace(&mut self.loaded, loaded);
+        self.snapshot.retain(|(path, _)| {
+            was.binary_search(path).is_err() || self.loaded.binary_search(path).is_ok()
+        });
+        for path in &self.loaded {
+            if was.binary_search(path).is_err()
+                && let Some(stamp) = stamp_of(path)
+            {
+                self.snapshot.push((path.clone(), stamp));
+            }
+        }
+        self.snapshot.sort_by(|a, b| a.0.cmp(&b.0));
+    }
+
+    /// Returns the files of `loaded` that the walk of `src` and the three
+    /// files of the root leave out, in the order of their paths.
+    fn others(&self, loaded: &[PathBuf]) -> Vec<PathBuf> {
+        let sources = self.root.join(SOURCE_DIR);
+        let mut others: Vec<PathBuf> = loaded
+            .iter()
+            .filter(|path| {
+                !path.starts_with(&sources) && classify(&self.root, path) == Kind::Server
+            })
+            .cloned()
+            .collect();
+        others.sort();
+        others.dedup();
+        others
+    }
+
+    /// Returns the kind of the watched path `path`: [`Kind::Config`] for a
+    /// file the last load lists, and the answer of [`classify`] for every
+    /// other.
+    fn kind(&self, path: &Path) -> Kind {
+        if self
+            .config
+            .binary_search_by(|loaded| loaded.as_path().cmp(path))
+            .is_ok()
+        {
+            Kind::Config
+        } else {
+            classify(&self.root, path)
+        }
     }
 
     /// Returns the source paths that appeared, vanished or changed since the
@@ -175,7 +263,7 @@ impl Watcher {
                     }
                 },
             };
-            out.push((changed.clone(), classify(&self.root, changed)));
+            out.push((changed.clone(), self.kind(changed)));
         }
         self.snapshot = next;
         Ok(out)
@@ -187,20 +275,28 @@ impl Watcher {
         fs::metadata(&self.root)?;
         let mut out = Vec::new();
         walk(&self.root.join(SOURCE_DIR), &mut out);
-        let roots: &[&str] = if self.worker {
-            &[CONFIG_FILE]
-        } else {
-            &[CONFIG_FILE, MANIFEST_FILE, LOCK_FILE]
-        };
-        for name in roots {
+        for name in [CONFIG_FILE, MANIFEST_FILE, LOCK_FILE] {
             let path = self.root.join(name);
             if let Some(stamp) = stamp_of(&path) {
                 out.push((path, stamp));
             }
         }
+        for path in &self.loaded {
+            if let Some(stamp) = stamp_of(path) {
+                out.push((path.clone(), stamp));
+            }
+        }
         out.sort_by(|a, b| a.0.cmp(&b.0));
         Ok(out)
     }
+}
+
+/// Returns the paths `paths` in their order, each once.
+fn sorted(paths: &[PathBuf]) -> Vec<PathBuf> {
+    let mut paths = paths.to_vec();
+    paths.sort();
+    paths.dedup();
+    paths
 }
 
 /// Adds the stamp of every source below the directory `dir` to `out`,

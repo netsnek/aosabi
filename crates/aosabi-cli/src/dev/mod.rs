@@ -87,7 +87,7 @@ fn setup(
     let cargo = Cargo::from_env(env_file);
     let project = project::load(&cwd, global.manifest_path.as_deref(), args.lock, &cargo)?;
     let card = cards::by_name(DEFAULT_CARD).ok_or_else(|| codes::no_builtin_card(DEFAULT_CARD))?;
-    let watcher = watch::Watcher::new(&project.root, args.worker).map_err(|error| {
+    let watcher = watch::Watcher::new(&project.root, &project.watched).map_err(|error| {
         CliError::new(format!(
             "the project root {} is unreadable: {error}",
             project.root.display()

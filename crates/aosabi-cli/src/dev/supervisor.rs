@@ -188,6 +188,9 @@ pub struct Supervisor {
     child: Option<Child>,
     /// Whether the box or the worker line was printed.
     announced: bool,
+    /// Whether a reload of the project failed since the last one that
+    /// succeeded, so the next build reads the project again first.
+    stale: bool,
 }
 
 impl Supervisor {
@@ -198,16 +201,19 @@ impl Supervisor {
             setup,
             child: None,
             announced: false,
+            stale: false,
         }
     }
 
     /// Runs the first build, then polls `watcher` and rebuilds after every
-    /// burst of changes until the process ends.
+    /// burst of changes until the process ends, and after each reload hands
+    /// `watcher` the other files the project as last read lists, before the
+    /// build.
     ///
     /// It returns only when the root of the project can no longer be read,
     /// with [`ExitCode::FAILURE`].
     pub fn run(&mut self, watcher: &mut Watcher) -> ExitCode {
-        self.cycle(None);
+        self.cycle(None, watcher);
         let mut pending: Option<Kind> = None;
         let mut last_change = Instant::now();
         loop {
@@ -237,7 +243,7 @@ impl Supervisor {
                 && last_change.elapsed() >= self.quiet()
             {
                 pending = None;
-                self.cycle(Some(kind));
+                self.cycle(Some(kind), watcher);
             }
         }
     }
@@ -254,11 +260,17 @@ impl Supervisor {
     /// Builds and, on success, restarts the child: the first build when
     /// `burst` is `None`, else a rebuild after a burst whose highest kind is
     /// `burst`.
-    fn cycle(&mut self, burst: Option<Kind>) {
+    ///
+    /// The files of a reload join the set of `watcher` before the build, so
+    /// a change of one of them while cargo builds counts at the next poll.
+    fn cycle(&mut self, burst: Option<Kind>, watcher: &mut Watcher) {
         if burst.is_some() {
             eprintln!("{REBUILDING_LINE}");
         }
-        let built = self.reload(burst).and_then(|()| self.build());
+        let built = self.reload(burst).and_then(|()| {
+            watcher.watch_loaded(&self.setup.project.watched);
+            self.build()
+        });
         let binary = match built {
             Ok(binary) => binary,
             Err(error) => {
@@ -300,15 +312,24 @@ impl Supervisor {
         }
     }
 
-    /// Reads the project again after a burst of the kind `config`.
+    /// Reads the project again after a burst of the kind `config`, and before
+    /// every build after a reload that failed until one succeeds.
+    ///
+    /// The build takes the manifest from the disk, so a build after a failed
+    /// reload would resolve a manifest the loader refused with the project of
+    /// the last good reload. Each reload runs every refusal of the loader,
+    /// `AO-C0108` first, so such a manifest is refused again before each
+    /// build and cargo resolves nothing of it.
     fn reload(&mut self, burst: Option<Kind>) -> Result<(), CliError> {
-        if burst == Some(Kind::Config) {
+        if burst == Some(Kind::Config) || self.stale {
+            self.stale = true;
             self.setup.project = project::load(
                 &self.setup.cwd,
                 self.setup.manifest_path.as_deref(),
                 self.setup.lock,
                 &self.setup.cargo,
             )?;
+            self.stale = false;
         }
         Ok(())
     }

@@ -214,7 +214,8 @@ pub struct NewArgs {
     pub features: Vec<Feature>,
     /// `--force`.
     pub force: bool,
-    /// `--aosabi-path`, the Aosabi checkout the scaffold names by path.
+    /// `--aosabi-path`, the Aosabi checkout the scaffold names by path,
+    /// without which `new` refuses, `AO-C0405`.
     pub aosabi_path: Option<PathBuf>,
 }
 
@@ -556,7 +557,7 @@ const NEW_OPTIONS: [Opt; 5] = [
         "--aosabi-path <dir>",
         None,
         "--aosabi-path",
-        "Name aosabi by path from the Aosabi checkout at <dir>",
+        "Required, the Aosabi checkout at <dir> the scaffold names aosabi from by path",
     ),
     VERBOSE,
 ];

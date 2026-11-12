@@ -202,7 +202,8 @@ pub const GITIGNORE_WORKERS: &str = "/target
 
 /// Returns the `Cargo.toml` of the service `name`, whose facade is `aosabi`,
 /// the value of its key, and whose table of the facade for a Unix target is
-/// `unix`.
+/// `unix`, with the checkout `excluded` of Aosabi left out of its workspace
+/// where the checkout lies below the target.
 ///
 /// The manifest names no `[lib]` table, so the crate root is cargo's default
 /// `src/lib.rs`, and it names no build dependency and no lint table. The
@@ -210,9 +211,25 @@ pub const GITIGNORE_WORKERS: &str = "/target
 /// packages the engine takes from a registry only through it: a scaffold
 /// without it is refused with `AO-C0301` for `rustix`, `libc` and six more
 /// packages the generated workspace needs.
+///
+/// Cargo takes every path package inside the folder of a workspace as its
+/// member unless the workspace excludes it, so a checkout below the target, a
+/// workspace of its own, stands in the list `exclude` of the workspace table,
+/// written relative to the target. Without it the first cargo call stops on
+/// the facade, whose edition cargo then inherits from the workspace of the
+/// service, which defines none.
 #[must_use]
-pub fn cargo_toml(name: &str, aosabi: &str, unix: &str) -> String {
+pub fn cargo_toml(name: &str, aosabi: &str, unix: &str, excluded: Option<&str>) -> String {
     let name = toml_string(name);
+    let exclude = excluded.map_or_else(String::new, |checkout| {
+        format!(
+            "# The checkout of Aosabi below this folder is a workspace of its own,
+# whose packages cargo would take as members of this one.
+exclude = [{}]
+",
+            toml_string(checkout)
+        )
+    });
     format!(
         "[package]
 name = {name}
@@ -223,7 +240,7 @@ publish = false
 # A service is a cargo workspace of its own, so it builds wherever it is
 # created, also below another workspace.
 [workspace]
-
+{exclude}
 [dependencies]
 aosabi = {aosabi}
 
@@ -274,17 +291,35 @@ command = \"cargo aosabi build --device worker\"
     )
 }
 
+/// The note `new` prints for a scaffold of `native` whose checkout of Aosabi
+/// lies outside the target, since a runner of the publish workflow checks
+/// out the repository of the service alone and finds no command line to
+/// install there.
+pub const WORKFLOW_NOTE: &str = "note: the publish workflow needs the checkout of Aosabi inside the repository of the service, since a runner checks out that repository alone, and this checkout lies outside it
+note: add the checkout to the repository of the service, as a submodule for example, and name it with --aosabi-path before the first push
+";
+
 /// Returns the publish workflow of the `native` runtime for the image
-/// `image` of the command line of version `version`.
+/// `image`, which installs the command line from the package `cli`,
+/// `crates/aosabi-cli` of the checkout of Aosabi whose facade the manifest
+/// names, written relative to the service as the manifest writes the facade.
 ///
-/// It is the reference's workflow with two steps changed: the command line
-/// installs before the build, and `cargo aosabi build --device docker
-/// --locked` with the engine `docker` builds the image in place of `docker
-/// build`, after which the push step tags `localhost/<image>:0.0.1`. The
-/// licence lines the reference ends the file with are its own and left out,
-/// as a scaffold carries no repository header.
+/// It is the reference's workflow with three steps changed: the checkout
+/// fetches the submodules of the repository, so a checkout of Aosabi that
+/// the service holds as a submodule reaches the runner, the command line
+/// installs from that checkout before the build, since Aosabi is released
+/// through its repository alone, and
+/// `cargo aosabi build --device docker --locked` with the engine `docker`
+/// builds the image in place of `docker build`, after which the push step
+/// tags `localhost/<image>:0.0.1`. The path stands in single quotes for the
+/// shell inside a literal block of YAML, so no character of a folder name
+/// ends the value or the word, and the caller refuses a path with a control
+/// character or the marker of an expression of the workflow. The licence
+/// lines the reference ends the file with are its own and left out, as a
+/// scaffold carries no repository header.
 #[must_use]
-pub fn publish_yml(image: &str, version: &str) -> String {
+pub fn publish_yml(image: &str, cli: &str) -> String {
+    let cli = format!("'{}'", cli.replace('\'', "'\\''"));
     format!(
         "name: publish
 
@@ -303,9 +338,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install the Aosabi command line
-        run: cargo install --locked aosabi-cli --version {version}
+        run: |
+          cargo install --locked --path {cli}
 
       - name: Build image
         run: cargo aosabi build --device docker --locked

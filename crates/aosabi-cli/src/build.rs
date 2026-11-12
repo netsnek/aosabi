@@ -19,14 +19,22 @@
 //! 2. [`cards::resolve`], with its refusals.
 //! 3. For a card that compiles the server package, [`prepare`]: the
 //!    generated workspace, the derived lock and its check, and the bytes of
-//!    `target/aosabi/schema.graphql` as they stand before the build.
-//! 4. The cargo build, of the server package with `--locked`, the artifact
-//!    directory in `AOSABI_ARTIFACT_DIR` and in the release profile the
-//!    flags of the lean link, of the library of the service for `worker`
-//!    with the facade's `platform-coding` alone, or of
-//!    the kernel crates of a path facade for `esp32c3-devkitm1`. A failure of
-//!    cargo prints what cargo printed, the message of an invalid schema
-//!    among it, and the command exits 1.
+//!    `target/aosabi/schema.graphql` as they stand before the build. The
+//!    pin check of the loader reads the lock of the project before the
+//!    derived lock is seeded from it and the derived lock before its check,
+//!    `AO-C0108`, and step 4 reads the lock it builds over with it as well,
+//!    so no build rests on the last load alone. A derived lock the checks
+//!    refuse is removed, so no later cargo call reads it.
+//! 4. The cargo build with `--locked`, or `--frozen` offline, in every lock
+//!    mode, over the lock the pin check read: of the server package, with
+//!    the artifact directory in `AOSABI_ARTIFACT_DIR` and in the release
+//!    profile the flags of the lean link, of the library of the service for
+//!    `worker` with the facade's `platform-coding` alone, or of the kernel
+//!    crates of a path facade for `esp32c3-devkitm1` over the lock of the
+//!    workspace of the facade, which the build writes first where it is
+//!    missing and the lock mode allows it. A failure of cargo prints what
+//!    cargo printed, the message of an invalid schema among it, and the
+//!    command exits 1.
 //! 5. The build step of a card that serves, [`build_step::run_build_step`].
 //! 6. The canonical model, `target/aosabi/manifest.json`, the bytes
 //!    `aosabi inspect --json` prints, from the `ir.json` the build script
@@ -38,7 +46,9 @@
 //!    `--include`, `target/aosabi/dist/` with the binary it ships, stripped in
 //!    the release profile, and a copy of every included path at its project
 //!    relative path, a link refused.
-//! 9. For `docker`, the container files and the image of [`container`].
+//! 9. For `docker`, the container files and the image of [`container`],
+//!    after the derived lock the context carries is read with the pin check
+//!    and the check once more, since every run on the project shares it.
 //! 10. `target/aosabi/build.json`, the build record, and the build log of
 //!     `docs/cli-and-targets.md` section 5.0 on standard error.
 //!
@@ -211,6 +221,7 @@ use crate::{
     },
     project::{
         self,
+        CheckedLock,
         Project, //
     },
     report::{
@@ -606,31 +617,27 @@ fn run_source_app(
 
 /// Derives the lock of the generated copy at `copy` of the plain crate of
 /// `project` and checks it, as [`derive_lock`] derives the lock of the
-/// generated workspace, since the copy is a workspace of its own.
+/// generated workspace, since the copy is a workspace of its own, with the
+/// same two reads of the pin check of the loader and the same removal of a
+/// derived lock that fails.
 fn derive_copy_lock(
     project: &Project,
     copy: &Path,
     lock: LockMode,
     cargo: &Cargo,
 ) -> Result<LockReport, CliError> {
+    project::refuse_registry_lock(&project.lock, CheckedLock::Project)?;
     let manifest = copy.join("Cargo.toml");
     let copy_lock = copy.join(project::LOCK_FILE);
     if copy_lock.is_file()
         && cargo
             .metadata(&project.root, Some(&manifest), generated_lock_mode(lock))
             .is_ok()
-        && let Ok(report) = lock::check(&project.lock, &copy_lock)
+        && let Ok(report) = check_derived(&project.lock, &copy_lock)
     {
         return Ok(report);
     }
-    lock::seed(&project.lock, &copy_lock)?;
-    let resolve = if cargo::is_offline(lock) {
-        LockMode::Offline
-    } else {
-        LockMode::Normal
-    };
-    cargo.metadata(&project.root, Some(&manifest), resolve)?;
-    lock::check(&project.lock, &copy_lock)
+    resolve_derived(project, &manifest, &copy_lock, lock, cargo)
 }
 
 /// Returns the flags that remap the files of the generated copy `copy` of
@@ -707,8 +714,10 @@ pub fn source_failure(project: &Project, error: aosabi_build::BuildError) -> Cli
 ///
 /// # Errors
 ///
-/// Returns `AO-C0301` for a package the lock of the project does not pin,
-/// and the failure of a write or of a cargo call.
+/// Returns `AO-C0108` for a crate of Aosabi from a registry that the lock of
+/// the project or the derived lock pins, `AO-C0301` for a package the lock
+/// of the project does not pin, and the failure of a write or of a cargo
+/// call.
 pub fn prepare(
     project: &Project,
     package: &ServerPackage,
@@ -791,6 +800,12 @@ fn build(args: &BuildArgs, global: &Global, env_file: &DotEnv) -> Result<(), Cli
     let mut image = None;
     // A plain crate builds no binary yet, and the image carries one.
     if card.class == Class::Container && outcome.binary.is_some() {
+        // The builder compiles over the derived lock the context carries,
+        // which another run on the project may have derived again since
+        // step 3, so the lock is read with both checks right before.
+        if let Some(generated) = &outcome.generated {
+            check_derived(&project.lock, &generated.lock)?;
+        }
         let source = card
             .source
             .zip(outcome.source_crates.as_deref())
@@ -934,10 +949,19 @@ fn run_server(
 }
 
 /// Runs step 4 for a card that compiles the library of the service for its
-/// target with the features `features` of the facade.
+/// target with the features `features` of the facade, over the lock of the
+/// project, which it reads with the pin check of the loader first.
+///
+/// The build runs with `--locked`, or `--frozen` offline, in every lock mode,
+/// so cargo compiles over the lock the pin check read and refuses a manifest
+/// that changed since the load in place of a resolve. The loader leaves a
+/// lock that holds the whole graph of the project, which a lock holds for
+/// every feature and every target, so a project the load took builds as
+/// before.
 fn run_app(job: &Job<'_>, features: &[&str]) -> Result<BuildOutcome, CliError> {
     let project = job.project;
     let triple = target_of(job)?;
+    project::refuse_registry_lock(&project.lock, CheckedLock::Project)?;
     let compiled = job.cargo.build(&BuildRun {
         cwd: &project.root,
         manifest: Some(&project.manifest),
@@ -948,7 +972,7 @@ fn run_app(job: &Job<'_>, features: &[&str]) -> Result<BuildOutcome, CliError> {
         features,
         lib: true,
         release: job.release,
-        lock: job.lock,
+        lock: generated_lock_mode(job.lock),
         output: job.output,
         env: &[],
     })?;
@@ -963,8 +987,23 @@ fn run_app(job: &Job<'_>, features: &[&str]) -> Result<BuildOutcome, CliError> {
 }
 
 /// Runs step 4 for a card that compiles the packages `packages` of the
-/// workspace of a path facade for its target, and nothing for a facade that
-/// is no path facade.
+/// workspace of a path facade for its target, over the lock of that
+/// workspace, and nothing for a facade that is no path facade.
+///
+/// The lock of that workspace is written first where it is missing and the
+/// lock mode lets cargo write it, refused with `AO-C0302` under `--locked`
+/// and `--frozen`, and read with the pin check of the loader before any
+/// cargo call over it. Every build runs with `--locked`, or `--frozen`
+/// offline, over the lock so read, so cargo refuses a lock that lacks a pin
+/// of the manifests of that workspace rather than write it, and a build that
+/// fails in the default or the offline lock mode, where the user passed
+/// neither flag, ends with a note that names the flag, the lock and the
+/// command that brings that lock up to date in its folder, with `--offline`
+/// in the offline mode.
+/// `cargo generate-lockfile` and each build under `--locked` resolve the
+/// whole workspace from the index, while no full `cargo metadata` runs over
+/// it, which would download the crates of every member where the build
+/// downloads those of the packages of the kernel alone.
 fn run_kernel(job: &Job<'_>, packages: &[(&str, bool)]) -> Result<BuildOutcome, CliError> {
     let project = job.project;
     let Some(workspace) = &project.facade_workspace else {
@@ -980,6 +1019,22 @@ fn run_kernel(job: &Job<'_>, packages: &[(&str, bool)]) -> Result<BuildOutcome, 
     };
     let triple = target_of(job)?;
     let manifest = workspace.join("Cargo.toml");
+    let workspace_lock = workspace.join(project::LOCK_FILE);
+    if !workspace_lock.is_file() {
+        match job.lock {
+            LockMode::Locked => return Err(codes::lock_missing("--locked", Some(&workspace_lock))),
+            LockMode::Frozen => return Err(codes::lock_missing("--frozen", Some(&workspace_lock))),
+            LockMode::Normal | LockMode::Offline => {
+                job.cargo.generate_lockfile(
+                    workspace,
+                    Some(&manifest),
+                    cargo::is_offline(job.lock),
+                )?;
+                eprintln!("note: wrote {}", workspace_lock.display());
+            }
+        }
+    }
+    project::refuse_registry_lock(&workspace_lock, CheckedLock::Checkout(&workspace_lock))?;
     let mut outcome = BuildOutcome {
         release: job.release,
         note: Some(MCU_NOTE),
@@ -996,10 +1051,22 @@ fn run_kernel(job: &Job<'_>, packages: &[(&str, bool)]) -> Result<BuildOutcome, 
             features: &[],
             lib: false,
             release: job.release,
-            lock: job.lock,
+            lock: generated_lock_mode(job.lock),
             output: job.output,
             env: &[],
         })?;
+        if !compiled.status.success() && matches!(job.lock, LockMode::Normal | LockMode::Offline) {
+            let (flag, update) = if cargo::is_offline(job.lock) {
+                ("--frozen", "cargo update --workspace --offline")
+            } else {
+                ("--locked", "cargo update --workspace")
+            };
+            eprintln!(
+                "note: the crates of the kernel build with {flag} over the lock {} of the checkout, and where cargo names that lock above, this brings it up to date\n\n    {}",
+                workspace_lock.display(),
+                codes::in_checkout(&workspace_lock, update)
+            );
+        }
         check_compiled(&compiled, package, job.output)?;
         outcome.build_scripts += dependency_scripts(&compiled, &[package]);
         outcome.library = library_of(&compiled, &package.replace('-', "_"));
@@ -1068,9 +1135,9 @@ fn source_build(
 /// library of a package that the generated workspace `generated` resolves
 /// from a path inside the workspace of a path facade and outside the project
 /// and the generated workspace, the members of the facade and its forks, and
-/// for another facade every library of a package named `aosabi` or
-/// `aosabi-*` or listed in [`project::FRAMEWORK_PACKAGES`], `graphql-over-http`
-/// among them, that the generated workspace resolves, sorted.
+/// for a facade from a git source every library of a package whose name
+/// [`project::is_framework_crate`] answers for, the predicate of the refusal
+/// `AO-C0108`, that the generated workspace resolves, sorted.
 ///
 /// The metadata of the generated workspace names the packages the build
 /// compiles, so a facade whose workspace lists a member that is not on the
@@ -1096,11 +1163,7 @@ fn framework_crates(job: &Job<'_>, generated: &Generated) -> Result<Vec<String>,
                         && !manifest.starts_with(&generated.root)
                 })
         }
-        None => cargo::text(package, "name").is_some_and(|name| {
-            name == project::FACADE
-                || name.starts_with("aosabi-")
-                || project::FRAMEWORK_PACKAGES.contains(&name)
-        }),
+        None => cargo::text(package, "name").is_some_and(project::is_framework_crate),
     };
     let mut names: Vec<String> = cargo::items(&metadata, "packages")
         .iter()
@@ -1233,33 +1296,82 @@ fn target_of<'a>(job: &Job<'a>) -> Result<&'a str, CliError> {
 /// Derives the lock of the generated workspace `generated` of `project` and
 /// checks it.
 ///
-/// A derived lock that resolves under `--locked` and passes the check stands
-/// as it is, so a second build writes it no more. Otherwise the lock is
-/// seeded from the lock of the project, resolved by `cargo metadata`,
-/// offline under `--frozen` and `--offline`, and checked.
+/// The build may run with the project of an earlier load, as the
+/// development loop builds after a change it did not see, so the lock of the
+/// project is read first with the pin check of the loader, `AO-C0108`. A
+/// derived lock that resolves under `--locked`, whose every package the same
+/// call of `cargo metadata` lists, and that passes the pin check and the
+/// check stands as it is, so a second build writes it no more. Otherwise the
+/// lock is seeded from the lock of the project, resolved by `cargo
+/// metadata`, offline under `--frozen` and `--offline`, and read with the
+/// pin check before the check, so a crate of Aosabi from a registry that the
+/// resolve brought in is refused with `AO-C0108` and not `AO-C0301`. Every
+/// later cargo call on the generated workspace runs with `--locked` or
+/// `--frozen` over that lock, so cargo compiles no pin the pin check did not
+/// read. A resolve may download a crate of the graph before the pin check
+/// reads it, and no build script runs before it. Every run on the project
+/// derives into the same folder, so a derived lock that fails is removed
+/// before the refusal returns, and no cargo call of another run compiles
+/// over it.
 fn derive_lock(
     project: &Project,
     generated: &Generated,
     lock: LockMode,
     cargo: &Cargo,
 ) -> Result<LockReport, CliError> {
+    project::refuse_registry_lock(&project.lock, CheckedLock::Project)?;
     let manifest = generated.root.join("Cargo.toml");
     if generated.lock.is_file()
         && let Ok(metadata) =
             cargo.metadata(&project.root, Some(&manifest), generated_lock_mode(lock))
         && lists_lock(&metadata, &generated.lock)
-        && let Ok(report) = lock::check(&project.lock, &generated.lock)
+        && let Ok(report) = check_derived(&project.lock, &generated.lock)
     {
         return Ok(report);
     }
-    lock::seed(&project.lock, &generated.lock)?;
+    resolve_derived(project, &manifest, &generated.lock, lock, cargo)
+}
+
+/// Seeds the derived lock at `derived` of the generated manifest `manifest`
+/// from the lock of `project`, resolves it with `cargo metadata`, offline
+/// under `--frozen` and `--offline`, and checks it, removing it where the
+/// resolve or a check fails.
+fn resolve_derived(
+    project: &Project,
+    manifest: &Path,
+    derived: &Path,
+    lock: LockMode,
+    cargo: &Cargo,
+) -> Result<LockReport, CliError> {
+    lock::seed(&project.lock, derived)?;
     let resolve = if cargo::is_offline(lock) {
         LockMode::Offline
     } else {
         LockMode::Normal
     };
-    cargo.metadata(&project.root, Some(&manifest), resolve)?;
-    lock::check(&project.lock, &generated.lock)
+    let checked = cargo
+        .metadata(&project.root, Some(manifest), resolve)
+        .and_then(|_| check_derived(&project.lock, derived));
+    if checked.is_err() {
+        // The refusal stays the error the command reports, and the next
+        // derive reads a lock a failed removal leaves with both checks again.
+        let _ = fs::remove_file(derived);
+    }
+    checked
+}
+
+/// Checks the derived lock at `derived` against the lock of the project at
+/// `project_lock` after the pin check of the loader over it, so a crate of
+/// Aosabi from a registry is refused with `AO-C0108` before the check names
+/// it with `AO-C0301`.
+///
+/// # Errors
+///
+/// Returns `AO-C0108` for such a pin, `AO-C0301` for a package the lock of
+/// the project does not pin, and the failure of the read of a lock.
+fn check_derived(project_lock: &Path, derived: &Path) -> Result<LockReport, CliError> {
+    project::refuse_registry_lock(derived, CheckedLock::Derived)?;
+    lock::check(project_lock, derived)
 }
 
 /// Returns whether every package of the lock at `path` is among the packages
@@ -1284,9 +1396,10 @@ fn lists_lock(metadata: &JsValue, path: &Path) -> bool {
     })
 }
 
-/// Returns the lock mode of every cargo call on the generated workspace
-/// after its check, `--locked`, and `--frozen` where `lock` forbids the
-/// network.
+/// Returns the lock mode of every cargo call that compiles over a lock the
+/// pin check read, of the generated workspace after its check, of the
+/// library of the service and of the crates of a kernel, `--locked`, and
+/// `--frozen` where `lock` forbids the network.
 fn generated_lock_mode(lock: LockMode) -> LockMode {
     if cargo::is_offline(lock) {
         LockMode::Frozen

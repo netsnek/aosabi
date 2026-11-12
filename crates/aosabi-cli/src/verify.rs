@@ -30,9 +30,15 @@
 //!    with `cargo check clean.`, fails with [`last_lines`] of its output and
 //!    12, or is `skip` with `No Cargo.toml or cargo, skipped.` when the
 //!    project has no manifest or cargo does not start. It is not clippy,
-//!    because a lint has no counterpart in `tsc --noEmit`.
-//! 3. `migrations` passes when the build passed, with the detail of a
-//!    project with no model, `Schema captured; no uncaptured model changes.`.
+//!    because a lint has no counterpart in `tsc --noEmit`. The pin check of
+//!    the loader reads the lock of the project first, whose `AO-C0108` fails
+//!    the check, and cargo runs with `--locked`, or `--frozen` under
+//!    `--frozen` and `--offline`, so a change of the project since the load
+//!    compiles no build script of a crate of Aosabi from a registry.
+//! 3. `migrations` passes when the build passed, with the detail of a project
+//!    with no model, `Schema captured; no uncaptured model changes.`. That is
+//!    the answer for every service, since no service declares a model before
+//!    the database layer lands.
 //! 4. The harvest of the model is not run, because no output of the command line prints
 //!    it.
 //!
@@ -74,6 +80,7 @@ use crate::{
         DEFAULT_CARD, //
     },
     cargo::{
+        self,
         Cargo,
         Output, //
     },
@@ -90,6 +97,7 @@ use crate::{
     inspect,
     project::{
         self,
+        CheckedLock,
         Project, //
     },
     report::{
@@ -242,7 +250,7 @@ pub fn verify_app(project: &Project, lock: LockMode, cargo: &Cargo) -> VerifyRes
     let built = build_check(project, lock, cargo);
     let passed = built.status == CheckStatus::Pass;
     checks.push(built);
-    checks.push(typecheck(project, cargo));
+    checks.push(typecheck(project, lock, cargo));
     if passed {
         checks.push(VerifyCheck {
             name: "migrations",
@@ -422,8 +430,15 @@ fn first_error(stderr: &str) -> Option<String> {
     Some(block.join("\n"))
 }
 
-/// Runs check 2, `cargo check --all-targets` in the project.
-fn typecheck(project: &Project, cargo: &Cargo) -> VerifyCheck {
+/// Runs check 2, `cargo check --all-targets` in the project, after the pin
+/// check of the loader over the lock of the project, and with `--locked`, or
+/// `--frozen` where `lock` forbids the network.
+///
+/// The check runs after the build of check 1, while the project may have
+/// changed since the load, and cargo runs the build scripts of the packages
+/// it checks, so it checks the lock the pin check read and resolves no
+/// change of a manifest, which it refuses in place of the resolve.
+fn typecheck(project: &Project, lock: LockMode, cargo: &Cargo) -> VerifyCheck {
     let skip = VerifyCheck {
         name: "typecheck",
         status: CheckStatus::Skip,
@@ -432,7 +447,19 @@ fn typecheck(project: &Project, cargo: &Cargo) -> VerifyCheck {
     if !project.manifest.is_file() {
         return skip;
     }
-    match cargo.check_all_targets(&project.root, Output::Capture) {
+    if let Err(error) = project::refuse_registry_lock(&project.lock, CheckedLock::Project) {
+        return VerifyCheck {
+            name: "typecheck",
+            status: CheckStatus::Fail,
+            detail: one_line(&failure_text(&error)),
+        };
+    }
+    let checked = if cargo::is_offline(lock) {
+        LockMode::Frozen
+    } else {
+        LockMode::Locked
+    };
+    match cargo.check_all_targets(&project.root, checked, Output::Capture) {
         Ok(run) if run.status.success() => VerifyCheck {
             name: "typecheck",
             status: CheckStatus::Pass,

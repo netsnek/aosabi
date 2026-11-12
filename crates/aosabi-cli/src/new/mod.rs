@@ -7,15 +7,26 @@
 
 //! The command `new`.
 //!
-//! [`command`] names the project after the last component of the target or of
-//! the working directory for `.`, writes the project and runs nothing, no
-//! cargo and no install, and prompts for nothing. Its refusals stand in this
-//! order, the features first and the directory last:
+//! In the reference, `create-pylon` prompts for what is missing, names the
+//! project after the last component of the target or of the working directory
+//! for `.`, refuses a feature the runtime lacks with
+//! `Invalid feature selected: <feature>`, confirms a directory that is not
+//! empty, writes the files and installs. [`command`] names the project after
+//! the last component of the target or of the working directory for `.`, writes
+//! the project and runs nothing, no cargo and no install, and prompts for
+//! nothing. Its refusals stand in this order, its own first and then those of
+//! the reference in the order of the reference, the features first and the
+//! directory last, and each comes before the command writes a file:
 //!
+//! - `AO-C0405` for a command that names no checkout of Aosabi through
+//!   `--aosabi-path`. Aosabi is released through its repository alone, so
+//!   the scaffold names the facade by path from a checkout.
 //! - `AO-C0404` for a feature the runtime lacks. The runtime `native` carries
 //!   `auth` and `pages`, and `workers` carries `auth`.
 //! - `AO-C0402` for a target that gives no package name cargo takes.
 //! - `AO-C0401` for a target that exists and is not empty, unless `--force`.
+//!
+//! The hints of the last three name the checkout the command was given.
 //!
 //! The scaffold is a cargo workspace of its own with the one dependency on the
 //! facade, its index `src/lib.rs`, the crate root by cargo's default, and
@@ -33,15 +44,25 @@
 //! links no engine. The dependency names the version of the command line, and
 //! `--aosabi-path <dir>` names `<dir>/crates/aosabi` by path in its place,
 //! written relative to the target, so a scaffold inside a checkout builds
-//! against it there and in the context of an image. The scaffold names no
-//! build side, so the generated packages of its build name `aosabi-build` from
-//! where the facade comes, and the check of the derived lock passes the build
-//! side as path packages beside a path facade and by the pin of the facade
-//! beside a facade of a registry or of a repository. The command prints every
-//! file it wrote and `cd <target> && cargo aosabi dev` to standard error, and
-//! under `--features auth` the note [`templates::AUTH_NOTE`] between them: the
+//! against it there and in the context of an image, and the publish workflow
+//! checks out the submodules of the repository and installs the command line
+//! from `<dir>/crates/aosabi-cli` of the same checkout by the same relative
+//! path, which must hold both packages. A runner checks out the repository of
+//! the service alone, so the workflow runs where the checkout lies inside the
+//! target, as a submodule of the service for example, and where it lies
+//! outside, the command says so in a note. The scaffold names no build side, so
+//! the generated packages of its build name `aosabi-build` from where the
+//! facade comes, and the check of the derived lock passes the build side as
+//! path packages beside a path facade and by the pin of the facade beside a
+//! facade of a repository. The command prints every file it wrote and
+//! `cd <target> && cargo aosabi dev` to standard error, and between them the
+//! note [`templates::WORKFLOW_NOTE`] for a checkout outside the target on
+//! `native` and under `--features auth` the note [`templates::AUTH_NOTE`]: the
 //! issuer is a placeholder, the key comes from `AUTH_KEY` or `key.json`, the
-//! ignore file keeps `key.json` out of git and a changed key takes a restart.
+//! ignore file keeps `key.json` out of git and a changed key takes a restart. A
+//! checkout inside the target is a workspace of its own, which the workspace
+//! table of the scaffold excludes, since cargo takes every path package inside
+//! the folder of a workspace as its member.
 
 use std::{
     fmt::Write as _,
@@ -62,8 +83,7 @@ use crate::{
     args::{
         Feature,
         NewArgs,
-        Runtime,
-        VERSION, //
+        Runtime, //
     },
     codes,
     generate::{
@@ -106,15 +126,22 @@ pub fn command(args: &NewArgs) -> ExitCode {
         .map_err(|error| CliError::new(format!("the working directory is unreadable: {error}")))
         .and_then(|cwd| create_directory(args, &cwd));
     match created {
-        Ok(files) => {
+        Ok(created) => {
             let mut text = String::new();
-            for file in &files {
+            for file in &created.files {
                 text.push_str(&file.display().to_string());
                 text.push('\n');
             }
+            let mut notes = String::new();
+            if created.checkout_outside {
+                notes.push_str(templates::WORKFLOW_NOTE);
+            }
             if args.features.contains(&Feature::Auth) {
+                notes.push_str(templates::AUTH_NOTE);
+            }
+            if !notes.is_empty() {
                 text.push('\n');
-                text.push_str(templates::AUTH_NOTE);
+                text.push_str(&notes);
             }
             let _ = write!(text, "\ncd {} && cargo aosabi dev\n", args.target.display());
             let _ = io::stderr().lock().write_all(text.as_bytes());
@@ -127,30 +154,46 @@ pub fn command(args: &NewArgs) -> ExitCode {
     }
 }
 
+/// What [`create_directory`] wrote.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Created {
+    /// Every file it wrote, as the target and its path below it.
+    pub files: Vec<PathBuf>,
+    /// Whether it wrote a publish workflow that names a checkout of Aosabi
+    /// outside the target, which a runner of the workflow does not hold.
+    pub checkout_outside: bool,
+}
+
 /// Writes the scaffold `args` asks for, its target resolved against `cwd`,
-/// and answers every file it wrote as the target and its path below it.
+/// and answers every file it wrote and whether its publish workflow names a
+/// checkout outside the target.
 ///
 /// # Errors
 ///
-/// Returns `AO-C0404`, `AO-C0402` or `AO-C0401` as the module says, a
-/// failure for an `--aosabi-path` that holds no facade, and the failure of a
-/// write.
-pub fn create_directory(args: &NewArgs, cwd: &Path) -> Result<Vec<PathBuf>, CliError> {
-    check_features(args)?;
+/// Returns `AO-C0405`, `AO-C0404`, `AO-C0402` or `AO-C0401` as the module
+/// says, a failure for an `--aosabi-path` that holds no facade or no command
+/// line, or whose path the publish workflow cannot carry, and the failure of
+/// a write.
+pub fn create_directory(args: &NewArgs, cwd: &Path) -> Result<Created, CliError> {
+    let Some(checkout) = &args.aosabi_path else {
+        return Err(codes::no_checkout(args));
+    };
+    check_features(args, checkout)?;
     let target = resolve(cwd, &args.target);
     let name = target
         .file_name()
         .map_or_else(String::new, |name| name.to_string_lossy().into_owned());
     if let Err(rule) = check_name(&name) {
-        return Err(codes::bad_package_name(&name, rule));
+        return Err(codes::bad_package_name(&name, rule, args, checkout));
     }
     if target.exists() {
         let entries = fs::read_dir(&target).map_err(|error| io_failure(&target, &error))?;
         if !args.force && entries.count() > 0 {
-            return Err(codes::target_not_empty(&args.target));
+            return Err(codes::target_not_empty(args, checkout));
         }
     }
-    let files = files(args, &name, &target)?;
+    let (checkout, inside) = checkout_path(checkout, &target)?;
+    let files = files(args, &checkout, inside, &name)?;
     let mut written = Vec::with_capacity(files.len());
     for (path, text) in files {
         let full = target.join(path);
@@ -160,11 +203,15 @@ pub fn create_directory(args: &NewArgs, cwd: &Path) -> Result<Vec<PathBuf>, CliE
         fs::write(&full, text).map_err(|error| io_failure(&full, &error))?;
         written.push(args.target.join(path));
     }
-    Ok(written)
+    Ok(Created {
+        files: written,
+        checkout_outside: args.runtime == Runtime::Native && !inside,
+    })
 }
 
-/// Refuses a feature the runtime of `args` lacks, `AO-C0404`.
-fn check_features(args: &NewArgs) -> Result<(), CliError> {
+/// Refuses a feature the runtime of `args` lacks, `AO-C0404`, with the
+/// checkout `checkout` in its hint.
+fn check_features(args: &NewArgs, checkout: &Path) -> Result<(), CliError> {
     let supported: &[Feature] = match args.runtime {
         Runtime::Native => &NATIVE_FEATURES,
         Runtime::Workers => &WORKERS_FEATURES,
@@ -174,22 +221,18 @@ fn check_features(args: &NewArgs) -> Result<(), CliError> {
         .iter()
         .find(|feature| !supported.contains(feature))
     {
-        let values: Vec<&str> = args
-            .features
-            .iter()
-            .map(|feature| feature_name(*feature))
-            .collect();
         return Err(codes::invalid_feature(
             feature_name(*feature),
-            &args.target,
-            &values.join(" "),
+            args,
+            checkout,
         ));
     }
     Ok(())
 }
 
 /// Returns the name of `feature` as `--features` spells it.
-const fn feature_name(feature: Feature) -> &'static str {
+#[must_use]
+pub const fn feature_name(feature: Feature) -> &'static str {
     match feature {
         Feature::Auth => "auth",
         Feature::Pages => "pages",
@@ -262,16 +305,18 @@ fn resolve(cwd: &Path, target: &Path) -> PathBuf {
 }
 
 /// Returns every file of the scaffold `args` asks for, the service named
-/// `name` in `target`, as its path below the target and its text, in the
-/// order the scaffold writes them.
+/// `name` from the checkout `checkout`, written relative to the target, which
+/// lies inside the target where `inside` holds, as its path below the target
+/// and its text, in the order the scaffold writes them.
 fn files(
     args: &NewArgs,
+    checkout: &Path,
+    inside: bool,
     name: &str,
-    target: &Path,
 ) -> Result<Vec<(&'static str, String)>, CliError> {
     let pages = args.features.contains(&Feature::Pages);
     let auth = args.features.contains(&Feature::Auth);
-    let aosabi = facade_spec(args, target)?;
+    let aosabi = Spec::path(&generate::utf8(&checkout.join("crates").join("aosabi"))?);
     let facade = if auth {
         format!(
             "{{ {}, features = [{}] }}",
@@ -291,16 +336,39 @@ fn files(
         features.join(", ")
     );
     let image = name.to_ascii_lowercase();
+    // A checkout below the target leaves the workspace of the scaffold, and
+    // a checkout that is the target holds no package of its own to leave.
+    let excluded = if inside && checkout != Path::new(".") {
+        Some(generate::utf8(checkout)?)
+    } else {
+        None
+    };
     let mut files: Vec<(&'static str, String)> = vec![
-        ("Cargo.toml", templates::cargo_toml(name, &facade, &unix)),
+        (
+            "Cargo.toml",
+            templates::cargo_toml(name, &facade, &unix, excluded.as_deref()),
+        ),
         ("src/lib.rs", templates::lib_rs(auth, pages).to_owned()),
     ];
     match args.runtime {
         Runtime::Native => {
+            let cli = generate::utf8(&checkout.join("crates").join("aosabi-cli"))?;
+            // A reader of YAML 1.1 takes the line and the paragraph separator
+            // as line breaks, as it takes a line feed, so either ends the
+            // literal block of the step.
+            if cli
+                .chars()
+                .any(|c| c.is_control() || matches!(c, '\u{2028}' | '\u{2029}'))
+                || cli.contains("${{")
+            {
+                return Err(CliError::new(format!(
+                    "the path {cli} of the command line holds a control character, a line or paragraph separator or the marker ${{{{ of an expression, which the publish workflow cannot carry"
+                )));
+            }
             files.push((".gitignore", templates::GITIGNORE.to_owned()));
             files.push((
                 ".github/workflows/publish.yml",
-                templates::publish_yml(&image, VERSION),
+                templates::publish_yml(&image, &cli),
             ));
         }
         Runtime::Workers => {
@@ -317,21 +385,13 @@ fn files(
 /// The dependency of a scaffold on the facade, as the value of its key and as
 /// the pairs inside an inline table.
 struct Spec {
-    /// The value of the key, a version requirement or an inline table.
+    /// The value of the key, an inline table.
     value: String,
     /// The pairs that name the source inside an inline table.
     inner: String,
 }
 
 impl Spec {
-    /// Returns the dependency on the version `version` of a registry.
-    fn version(version: &str) -> Self {
-        Self {
-            value: toml_string(version),
-            inner: format!("version = {}", toml_string(version)),
-        }
-    }
-
     /// Returns the dependency on the path `path`.
     fn path(path: &str) -> Self {
         let inner = format!("path = {}", toml_string(path));
@@ -342,27 +402,28 @@ impl Spec {
     }
 }
 
-/// Returns the dependency `aosabi` of the scaffold in `target`: the version
-/// of the command line, or under `--aosabi-path` the facade of that checkout
-/// by path.
-fn facade_spec(args: &NewArgs, target: &Path) -> Result<Spec, CliError> {
-    let Some(checkout) = &args.aosabi_path else {
-        return Ok(Spec::version(VERSION));
-    };
-    let facade = checkout.join("crates").join("aosabi");
-    let checkout = fs::canonicalize(checkout)
+/// Returns the checkout `checkout` of `--aosabi-path` written relative to the
+/// target `target`, the path the scaffold names the facade and the command
+/// line by, and whether the checkout lies inside the target.
+fn checkout_path(checkout: &Path, target: &Path) -> Result<(PathBuf, bool), CliError> {
+    let crates = checkout.join("crates");
+    let missing = ["aosabi", "aosabi-cli"]
+        .into_iter()
+        .find(|package| !crates.join(package).join("Cargo.toml").is_file());
+    let real = fs::canonicalize(checkout)
         .ok()
-        .filter(|_| facade.join("Cargo.toml").is_file())
+        .filter(|_| missing.is_none())
         .ok_or_else(|| {
             CliError::new(format!(
-                "the directory {} holds no crates/aosabi/Cargo.toml, which --aosabi-path names",
-                checkout.display()
+                "the directory {} holds no crates/{}/Cargo.toml, which --aosabi-path names",
+                checkout.display(),
+                missing.unwrap_or("aosabi")
             ))
         })?;
-    let relative = generate::relative_path(target, &checkout);
-    Ok(Spec::path(&generate::utf8(
-        &relative.join("crates").join("aosabi"),
-    )?))
+    Ok((
+        generate::relative_path(target, &real),
+        real.starts_with(target),
+    ))
 }
 
 /// Returns the failure of a read or a write of `path`.

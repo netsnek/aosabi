@@ -36,8 +36,28 @@
 //! workspace name `aosabi-build` from where the facade comes, and the derived
 //! lock holds `aosabi-build` and the two crates only it reaches,
 //! `aosabi-infer` and `aosabi-ir`, which the lock of the project does not
-//! pin. Beside a path facade they are path packages and pass. Every other
-//! package the lock of the project does not pin still refuses.
+//! pin. Beside a path facade they are path packages and pass. Beside a facade
+//! of a repository each of them passes when it comes from the source of the
+//! facade at the version of the facade, which the lock of the project pins,
+//! so the pin of the facade stands for its build side. The loader refuses
+//! every crate of Aosabi from a registry, `AO-C0108` of `crate::project`, in
+//! a manifest, in the lock of the project and in the graph cargo resolved,
+//! before the derived lock is written, and every build reads the lock of the
+//! project before the seed and the derived lock before this check with the
+//! same pin check of the loader. Every other package the lock of the project
+//! does not pin still refuses.
+//!
+//! Cargo takes a dependency of a member that no package of the lock it starts
+//! from matches for a change of the manifest, and it resolves every package
+//! of the source of that dependency again. Beside a facade of a repository
+//! the resolve then reads the reference the manifest names again, from the
+//! clone of the repository under `--frozen`, where a locked fetch of the
+//! project, which fetches by the pinned commit, leaves no tag where cargo
+//! reads one, and over the network otherwise, with the index of the registry.
+//! So [`seed`] adds the three beside a facade of a repository at the version
+//! and from the source of the facade, which the check passes as it passes
+//! them after a resolve, and the resolve keeps every pin of the project and
+//! needs no more than the pinned commit.
 //!
 //! The reader reads the subset cargo writes, the `[[package]]` tables with
 //! their `name`, `version`, `source`, `checksum` and `dependencies`, and

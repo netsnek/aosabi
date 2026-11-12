@@ -59,14 +59,13 @@
 //! script and a proc macro carry no `--target`, so they take no flag of the
 //! set, and the app's own crate and every crate it names itself keep their
 //! Debug text and their locations. A profile entry of `rustflags` would reach
-//! the host build of the same crate, whose generated code `aosabi-build`
-//! writes through `{:?}`, and would need the bootstrap for every cargo call on
-//! the generated workspace, the dev build among them, so no profile carries
-//! the flags. The crates of the framework are the packages cargo resolves from
-//! a path in the workspace of a path facade, its members and its forks, and
-//! for a facade from a registry or a git source the packages named `aosabi` or
-//! `aosabi-*` and those of [`crate::project::FRAMEWORK_PACKAGES`],
-//! `graphql-over-http` among them.
+//! the host build of the same crate, whose generated code `aosabi-build` writes
+//! through `{:?}`, and would need the bootstrap for every cargo call on the
+//! generated workspace, the dev build among them, so no profile carries the
+//! flags. The crates of the framework are the packages cargo resolves from a
+//! path in the workspace of a path facade, its members and its forks, and for a
+//! facade from a git source the packages whose names
+//! [`crate::project::is_framework_crate`] answers for.
 
 use std::{
     ffi::OsString,
