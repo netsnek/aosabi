@@ -1245,9 +1245,9 @@ fn derive_lock(
 ) -> Result<LockReport, CliError> {
     let manifest = generated.root.join("Cargo.toml");
     if generated.lock.is_file()
-        && cargo
-            .metadata(&project.root, Some(&manifest), generated_lock_mode(lock))
-            .is_ok()
+        && let Ok(metadata) =
+            cargo.metadata(&project.root, Some(&manifest), generated_lock_mode(lock))
+        && lists_lock(&metadata, &generated.lock)
         && let Ok(report) = lock::check(&project.lock, &generated.lock)
     {
         return Ok(report);
@@ -1260,6 +1260,28 @@ fn derive_lock(
     };
     cargo.metadata(&project.root, Some(&manifest), resolve)?;
     lock::check(&project.lock, &generated.lock)
+}
+
+/// Returns whether every package of the lock at `path` is among the packages
+/// of `metadata`, the answer of `cargo metadata` over its workspace, by name
+/// and version.
+///
+/// Cargo leaves out a path package of a lock that the workspace no longer
+/// reaches when it reads the lock, so `--locked` passes a lock that still
+/// names one, such as a crate that a newer facade dropped. The name and the
+/// version suffice, since `--locked` already holds every package with a
+/// source to the resolve.
+fn lists_lock(metadata: &JsValue, path: &Path) -> bool {
+    let Ok(entries) = lock::read(path) else {
+        return false;
+    };
+    let packages = cargo::items(metadata, "packages");
+    entries.iter().all(|entry| {
+        packages.iter().any(|package| {
+            cargo::text(package, "name") == Some(entry.name.as_str())
+                && cargo::text(package, "version") == Some(entry.version.as_str())
+        })
+    })
 }
 
 /// Returns the lock mode of every cargo call on the generated workspace
