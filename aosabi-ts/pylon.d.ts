@@ -17,7 +17,14 @@
  * 3.0.0-canary-20260206115650, which lib/canary.js exports for an app that build makes, are
  * declared at the end of this file in the package's own words after the declarations of the
  * canary's dist/plugins/use-auth/auth-require.d.ts and use-auth.d.ts, which no tree of Aosabi
- * vendors (docs/ts1-surface.md of the Aosabi repository, section 11).
+ * vendors. The options of useAuth take
+ * the key cookieName beside the canary's, the name of its session cookie.
+ *
+ * The configuration AppConfig is declared in this file as the AppConfig of types/pylon/core, which
+ * carries the keys introspection and maskedErrors of Aosabi in the place of the two keys of Pylon's pages
+ * for development, which no build of Aosabi serves, with the key maxTokens of Aosabi beside them, which
+ * lib/core.js writes into the boot record of the engine, and AppConfigFactory and defineConfig take that
+ * configuration, so an app sets the key in aosabi.config.ts under the checker.
  */
 
 import type { MiddlewareHandler } from 'hono'

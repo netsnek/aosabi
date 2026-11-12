@@ -660,7 +660,7 @@ function sentryMiddleware(target, index) {
 }
 
 // Answers the request of `c` on the app of the engine of `target`, a route
-// of a plugin of the engine or its not found handler, and returns its
+// of a plugin of the engine, and returns its
 // response over the prepared header fields of c, with its body in the form
 // the engine wrote it, the string or the bytes of a whole body, `bodyOf`, as
 // the route of Pylon the route of the engine stands for answers the body of

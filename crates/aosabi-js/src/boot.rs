@@ -50,12 +50,11 @@
 //! The boot runs the two passes of [`aosabi_core::boot`] with the GraphQL layer
 //! built between them, the server of `graphql-over-http` over the schema of the
 //! app, which the function `answer` of that crate answers with, mounted on `*`
-//! where the boot of a Rust app mounts its handler, and keeps that server
-//! beside the app, [`Booted`]. The host routes a request of the GraphQL
-//! endpoint in its own hono, so the engine hands it to that server with no
-//! router, [`crate::endpoint`], and the router and the chain of the port of
-//! hono run for the routes of the plugins of the engine and its not found
-//! handler alone.
+//! where the boot of a Rust app mounts its handler, and keeps that server beside
+//! the app, [`Booted`]. The host routes a request of the GraphQL endpoint in its
+//! own hono, so the engine hands it to that server with no router,
+//! [`crate::endpoint`], and the router and the chain of the port of hono run for
+//! the routes of the plugins of the engine, the login of Zitadel, alone.
 //!
 //! A boot with no handle of a graphql object, [`ABSENT`], boots the logger
 //! alone, before the glue of the app runs, so a logger call of the app at the
@@ -207,7 +206,7 @@ const POLLS: usize = 1_000_000;
 /// The booted app and the GraphQL layer it answers its endpoint with.
 pub struct Booted {
     /// The app of the engine, the routes the plugins of the engine register
-    /// and its not found handler.
+    /// in their setups.
     pub app: BootedApp,
     /// The server of `graphql-over-http` over the schema of the app, which
     /// the function `answer` of that crate answers the GraphQL endpoint with.

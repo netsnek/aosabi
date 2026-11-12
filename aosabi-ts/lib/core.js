@@ -350,10 +350,10 @@ const KINDS = [undefined, GRAPHQL, FORBIDDEN, AGGREGATE];
 // fulfilment, crates/aosabi-js/src/value.rs.
 const ADOPTED = 2;
 
-// The forms of the record of js_project: the own enumerable keys, the reads
-// of the members a projection selects, and the names the projection of a
-// build of the canary holds, crates/aosabi-js/src/value.rs.
-const OWN_KEYS = 0;
+// The forms of the record of js_project beside the own enumerable keys, the
+// form 0 that crates/aosabi-js/src/value.rs names OWN_KEYS and that js_project
+// reads for any form but these two: the reads of the members a projection
+// selects, and the names the projection of a build of the canary holds.
 const SELECTED = 1;
 const NAMES = 2;
 
@@ -557,8 +557,8 @@ const MARK_PUSHED = 64;
 // The byte after the record of a request the export fetch takes, which names
 // what answers it, crates/aosabi-js/src/request.rs: the server of the
 // GraphQL endpoint with no router, for the handler of the glue,
-// crates/aosabi-js/src/endpoint.rs, or the app of the engine, the routes of
-// the plugins of the engine and its not found handler.
+// crates/aosabi-js/src/endpoint.rs, or the app of the engine, which answers the
+// routes of the plugins of the engine with no not found handler of its own.
 export const TO = { ENDPOINT: 0, APP: 1 };
 
 // The forms of the record of iter_next, crates/aosabi-js/src/value.rs: the

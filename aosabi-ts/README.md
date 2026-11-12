@@ -230,9 +230,9 @@ CORS and CSRF of an app are hono's own, `cors()` of `hono/cors` and `csrf()` of 
 the app writes once for every route with the one list of its sites, before its routes and the
 GraphQL handler of the glue, and the engine adds no check of its own. The engine parses a form at
 `/graphql` as Yoga parses it, so a page of a listed site keeps working, while an app without
-`csrf()` takes a form of every site there, and `csrf()` refuses a form, a multipart
-body or a text body that a page of another site sends with a method that is not safe, with the
-status 403 before the endpoint runs.
+`csrf()` takes a form of every site there, and `csrf()` refuses a form, a multipart body, a text
+body or the ping of a link that a page of another site sends with a method that is not safe, with
+the status 403 before the endpoint runs.
 
 The marker `useSentry` crosses into the engine with its options as JSON and its option `skip` as a
 function of the app, an option that holds any other function failing the boot, and its middleware in

@@ -19,7 +19,7 @@
 //! hono of the host has routed it: the byte 0 for the server of the GraphQL
 //! endpoint with no router, the request the handler of the glue hands in,
 //! [`crate::endpoint`], and the byte 1 for the app of the engine, the routes
-//! of the plugins of the engine and its not found handler.
+//! of the plugins of the engine, the login of Zitadel.
 //!
 //! The host runs the routes and the middleware of an app in its own hono and
 //! opens a request here before it hands it to the engine, the op `OPEN` of
@@ -223,7 +223,7 @@ const SHARE: usize = 4;
 const TO_ENDPOINT: u8 = 0;
 
 /// The byte after the record of a request that hands it to the app of the
-/// engine, the routes of its plugins and its not found handler.
+/// engine, the routes of its plugins.
 const TO_APP: u8 = 1;
 
 /// The mark of an answer the host leaves alone.

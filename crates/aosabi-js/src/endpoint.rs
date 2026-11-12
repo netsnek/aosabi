@@ -47,10 +47,10 @@
 //! registers every route of a plugin of the engine itself, each answered by
 //! the app of the engine, so the request ends with the same answer.
 //!
-//! The routes of the plugins of the engine and its not found handler run in
-//! the app of the engine, whose chain runs the same server on `*` between
-//! the routes of the two passes of the boot, [`middleware`], as the handler
-//! of a Rust app runs it there.
+//! The routes of the plugins of the engine run in the app of the engine,
+//! whose chain runs the same server on `*` between the routes of the two
+//! passes of the boot, [`middleware`], as the handler of a Rust app runs it
+//! there.
 
 #![forbid(unsafe_code)]
 
