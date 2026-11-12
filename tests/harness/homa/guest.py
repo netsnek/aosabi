@@ -77,7 +77,7 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..paths import find_root
+from ..paths import find_root, socket_dir
 
 ROOT = find_root(Path(__file__).resolve().parent)
 GUESTS = ROOT / "tests" / "guests"
@@ -600,8 +600,9 @@ class Hub:
 
     def __init__(self, name="bridge"):
         self.name = name
-        self.dir = HUBS / name
-        self.dir.mkdir(parents=True, exist_ok=True)
+        # The folder of the hub's socket, or a short one of socket_dir when a
+        # long checkout root leaves no room for the socket's name in it.
+        self.dir = socket_dir(HUBS / name, len("hub.sock"))
         self.path = self.dir / "hub.sock"
         self.path.unlink(missing_ok=True)
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
@@ -673,6 +674,8 @@ class Guest:
         self.hubs = tuple(hubs)
         self.log = log
         self.dir = STATE / name
+        # The folder of the guest's sockets, set when it starts.
+        self.sockets = None
         self.proc = None
         self.slot = None
         self.agent = None
@@ -854,8 +857,12 @@ class Guest:
         qemu = tools(self.log)
         self.slot = Slot()
         (self.dir / "xfer").mkdir(parents=True, exist_ok=True)
-        for name in ("qga.sock", "qemu.pid"):
-            (self.dir / name).unlink(missing_ok=True)
+        # The sockets sit in the guest's folder, or in a short one of
+        # socket_dir when a long checkout root leaves no room for their names.
+        self.sockets = socket_dir(self.dir, max([len("qga.sock")]
+                                                + [len("hub-%s.sock" % hub.name) for hub in self.hubs]))
+        (self.sockets / "qga.sock").unlink(missing_ok=True)
+        (self.dir / "qemu.pid").unlink(missing_ok=True)
         index = sorted(definitions()).index(self.name) + 1
         argv = [qemu.qemu, "-name", "homa-" + self.name,
                 "-machine", "virt,accel=kvm,gic-version=3", "-cpu", "host",
@@ -870,7 +877,7 @@ class Guest:
                 "-device", "virtio-rng-pci,rng=rng0",
                 "-virtfs", "local,path=%s,mount_tag=tree,security_model=none,readonly=on" % ROOT,
                 "-virtfs", "local,path=xfer,mount_tag=xfer,security_model=none",
-                "-chardev", "socket,path=qga.sock,server=on,wait=off,id=qga0",
+                "-chardev", "socket,path=%s,server=on,wait=off,id=qga0" % (self.sockets / "qga.sock"),
                 "-device", "virtio-serial-pci",
                 "-device", "virtserialport,chardev=qga0,name=" + AGENT_PORT]
         for label, directory in ((SEED_LABEL, seed), (ARTIFACTS_LABEL, artifacts)):
@@ -882,7 +889,7 @@ class Guest:
         for number, hub in enumerate(self.hubs):
             # The hub answers each guest at the address its datagrams come
             # from, so the guest's socket takes an absolute path.
-            local = self.dir / ("hub-%s.sock" % hub.name)
+            local = self.sockets / ("hub-%s.sock" % hub.name)
             local.unlink(missing_ok=True)
             hub.attach(local)
             argv += ["-netdev", "dgram,id=hub%d,local.type=unix,local.path=%s,remote.type=unix,remote.path=%s"
@@ -913,7 +920,7 @@ class Guest:
                 raise GuestFailed("guest %s: no answer of its agent within %.0f s, see %s"
                                   % (self.name, BOOT_TIMEOUT, self.dir / "console.log"))
             try:
-                self.agent = Agent(self.dir / "qga.sock", timeout=5.0)
+                self.agent = Agent(self.sockets / "qga.sock", timeout=5.0)
                 self.agent.call("guest-ping")
                 if provisioning:
                     probe = self.run("test -e /run/homa-guest-ready", timeout=30, check=False)
@@ -1045,8 +1052,9 @@ class Guest:
     # Shutting down.
 
     def _stop(self):
-        for hub in self.hubs:
-            hub.detach(self.dir / ("hub-%s.sock" % hub.name))
+        if self.sockets is not None:
+            for hub in self.hubs:
+                hub.detach(self.sockets / ("hub-%s.sock" % hub.name))
         if self.proc is not None:
             if self.proc.poll() is None and self.agent is not None:
                 try:

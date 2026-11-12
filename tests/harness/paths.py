@@ -23,6 +23,10 @@ class RootNotFound(RuntimeError):
     """No ancestor of the starting directory carries a Cargo.toml."""
 
 
+class SocketDirUnfit(RuntimeError):
+    """No folder whose sockets fit `sun_path` can be made for a path."""
+
+
 @dataclass(frozen=True)
 class Paths:
     """The directories a notebook needs, all absolute, all derived from root."""
@@ -93,7 +97,8 @@ def paths(start=None, goldens_dir=None) -> Paths:
     )
 
 
-# Rust's std and Node refuse a longer path.
+# The bytes of `sun_path` in `struct sockaddr_un` on Linux, the closing NUL
+# included. Rust's std and Node refuse a longer path.
 SUN_PATH = 108
 # The bytes a socket directory keeps free below SUN_PATH, for the separator,
 # the closing NUL and a margin.
@@ -104,19 +109,34 @@ def socket_dir(path, longest_name: int) -> Path:
     """A directory whose sockets of up to `longest_name` bytes fit `sun_path`.
 
     The directory is `path` when `path`, a separator and the longest name fit,
-    and otherwise a directory of mode 0700 under `$XDG_RUNTIME_DIR` (or /tmp)
-    named by a hash of `path`, so each entry and each worktree keeps one of
-    its own. A worktree with a longer path then binds the same sockets as one
-    with a shorter path, where it failed with "path must be shorter than
-    SUN_LEN" before. The directory is created and not emptied.
+    and otherwise a directory named by a hash of `path` inside
+    `$XDG_RUNTIME_DIR/aosabi-sock-<uid>/`, or `/tmp/aosabi-sock-<uid>/` where
+    that variable is unset, a folder kept at mode 0700, so each entry and each
+    worktree keeps one of its own. A worktree with a longer path then binds
+    the same sockets as one with a shorter path, where it failed with "path
+    must be shorter than SUN_LEN" before. The directory is created and not
+    emptied. A `$XDG_RUNTIME_DIR` that names no directory, and a hashed
+    directory whose sockets do not fit either, raise `SocketDirUnfit` here
+    rather than at the first bind.
     """
     path = Path(path)
-    if len(os.fsencode(str(path))) + 1 + longest_name <= SUN_PATH - SUN_MARGIN:
+    if _fits(path, longest_name):
         path.mkdir(parents=True, exist_ok=True)
         return path
-    base = Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp") / ("aosabi-sock-%d" % os.getuid())
+    runtime = os.environ.get("XDG_RUNTIME_DIR")
+    if runtime and not Path(runtime).is_dir():
+        raise SocketDirUnfit("XDG_RUNTIME_DIR names %s, which is no directory" % runtime)
+    base = Path(runtime or "/tmp") / ("aosabi-sock-%d" % os.getuid())
+    short = base / hashlib.sha256(os.fsencode(str(path))).hexdigest()[:16]
+    if not _fits(short, longest_name):
+        raise SocketDirUnfit("a socket name of %d bytes fits neither in %s nor in %s"
+                             % (longest_name, path, short))
     base.mkdir(mode=0o700, exist_ok=True)
     os.chmod(base, 0o700)
-    short = base / hashlib.sha256(os.fsencode(str(path))).hexdigest()[:16]
     short.mkdir(exist_ok=True)
     return short
+
+
+def _fits(folder: Path, longest_name: int) -> bool:
+    """Whether `folder`, a separator and a name of `longest_name` bytes fit `sun_path`."""
+    return len(os.fsencode(str(folder))) + 1 + longest_name <= SUN_PATH - SUN_MARGIN
