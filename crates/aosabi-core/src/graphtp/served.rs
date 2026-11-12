@@ -223,8 +223,12 @@ struct Straight {
 /// pair of an incoming and an outgoing message of Node. A call the road
 /// rejects answers with no media type and an empty body, 504 for an error
 /// named `TimeoutError` and 500 for every other, as `handleFetchError` of the
-/// adapter of Node answers, which the listener answers as 504.0 and 500.0 by
-/// step 4.
+/// adapter of Node answers, which the listener answers as 504.0 and 500.0.
+/// Each call keys the thread that makes it with [`seed_keys`] before
+/// it reads the call, the straight road among them, which passes the fetch
+/// of the booted app, and where the key fails answers the refusal of that
+/// fetch unread, which `Documentation/guides/graphtp.md` carries as 503.0 with
+/// an empty body.
 #[must_use]
 pub fn fetch(app: Rc<BootedApp>) -> Fetch {
     let straight = straight_server(&app);
