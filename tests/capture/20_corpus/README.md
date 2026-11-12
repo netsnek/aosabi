@@ -33,7 +33,7 @@ name in every run and a changed document is a changed id.
 | Schema | Where it comes from | Cases in `plain` | Cases in `pylon` |
 | --- | --- | --- | --- |
 | `rich` | `tests/gen/schemas.py`, one of every construct | 1212 | 1224 |
-| `blog-app` |  | 604 | 604 |
+| `blog-app` | `blog-app-schema.graphql` beside this file, the schema of the capture corpus | 604 | 604 |
 | `errors-app` | the built fixture under `tests/fixtures/ts/errors-app` | 155 | 155 |
 | `async-order-app` | the built fixture under `tests/fixtures/ts/async-order-app` | 158 | 158 |
 | `numbers-app` | the built fixture under `tests/fixtures/ts/numbers-app` | 350 | 350 |

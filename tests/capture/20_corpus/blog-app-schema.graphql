@@ -1,0 +1,136 @@
+type Query {
+  me: User
+  post(id: String!): Post
+  posts(filter: PostsFilterInput!): [Post!]!
+  search(query: String!): [SearchResult!]!
+  feed: [Post!]!
+}
+
+type Mutation {
+  createPost(input: CreatePostInput!): Post!
+  addComment(postId: String!, input: AddCommentInput!): Comment!
+  publishPosts(ids: [String!]!): [Post!]!
+}
+
+type User implements SearchResult {
+  id: String!
+  name: String!
+  email: String
+  role: Role!
+  avatar: Image
+}
+
+type Media implements IMedia {
+  id: String!
+  url: String!
+}
+
+type Image implements IMedia {
+  width: Number!
+  height: Number!
+  altText: String
+  id: String!
+  url: String!
+}
+
+type Post implements SearchResult {
+  id: String!
+  title: String!
+  body: String!
+  status: PostStatus!
+  author: User!
+  tags: [String!]!
+  comments: [Comment!]!
+  media: [IMedia!]!
+  trailer: Video
+  related: [Post!]!
+  tagMatrix: [[String!]!]!
+  createdAt: Date!
+}
+
+type Comment {
+  id: String!
+  body: String!
+  author: User!
+  replies: [Comment!]!
+  createdAt: Date!
+}
+
+type Video implements IMedia {
+  durationSeconds: Number!
+  captions: [String!]!
+  id: String!
+  url: String!
+}
+
+input PostsFilterInput {
+  status: PostStatus
+  tag: String
+  limit: Number
+}
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  tags: [String!]!
+  status: PostStatus
+}
+
+input AddCommentInput {
+  body: String!
+}
+
+interface SearchResult {
+  id: String!
+}
+
+interface IMedia {
+  id: String!
+  url: String!
+}
+
+scalar String
+
+scalar ID
+
+scalar Int
+
+scalar Float
+
+scalar Boolean
+
+scalar Number
+
+scalar Any
+
+scalar Void
+
+scalar JSONObject
+
+scalar File
+
+scalar Date
+
+scalar JSON
+
+enum Role {
+  ADMIN
+  AUTHOR
+  READER
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+
+directive @inContext(
+  """The locale for this operation, e.g. `en` or `de-AT`."""
+  locale: String
+  """Per-operation context, as JSON (an app-typed `OperationContext` bag). Carried as a
+  variable so it folds into the client cache key. INERT until the server acts on it — e.g.
+  `useDatabase({operationContext})` honouring an acting tenant; a bare value grants nothing."""
+  context: String
+) on QUERY | MUTATION | SUBSCRIPTION
