@@ -73,11 +73,5 @@
   ],
   "peerDependencies": {
     "hono": "^4.13.16"
-  },
-  "optionalDependencies": {
-    "aosabi-linux-x64-gnu": "0.0.0",
-    "aosabi-linux-arm64-gnu": "0.0.0",
-    "aosabi-linux-x64-musl": "0.0.0",
-    "aosabi-linux-arm64-musl": "0.0.0"
   }
 }

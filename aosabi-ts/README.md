@@ -37,11 +37,28 @@ export default new App({
 })
 ```
 
+The app installs this package, the dev package `aosabi-build` and the platform package of its
+machine as the tarballs that `npm pack` makes in a checkout of the Aosabi repository, never from a
+registry by name. The checkout first builds the native library and
+copies it into the folder of the platform package, here on an arm64 machine with glibc, since the
+ignore file keeps the library out of git and `npm pack` packs the folder without it otherwise. The
+first three commands run in the checkout and the last in the folder of the app:
+
+```sh
+cargo build --locked -p aosabi-js --features native --profile release \
+  --target aarch64-unknown-linux-gnu
+cp target/aarch64-unknown-linux-gnu/release/libaosabi_js.so \
+  aosabi-ts-native/aosabi-linux-arm64-gnu/libaosabi.so
+npm pack ./aosabi-ts ./aosabi-ts-build ./aosabi-ts-native/aosabi-linux-arm64-gnu
+npm install <checkout>/aosabi-build-<version>.tgz <checkout>/aosabi-<version>.tgz \
+  <checkout>/aosabi-linux-arm64-gnu-<version>.tgz
+```
+
 With this package, its peer hono, the dev package `aosabi-build` and Bun 1.3.14, the app builds and
 serves in two commands:
 
 ```sh
-npx aosabi build
+npx --no aosabi build
 PORT=3000 bun --preload aosabi/bun .aosabi/server.mjs
 ```
 
@@ -157,10 +174,27 @@ specifier.
 On Linux `aosabi/bun` runs the engine as a native library over `bun:ffi` in place of `core.wasm`.
 The library comes in one platform package per target, `aosabi-linux-x64-gnu`,
 `aosabi-linux-arm64-gnu`, `aosabi-linux-x64-musl` and `aosabi-linux-arm64-musl`, whose source
-folders stand under `aosabi-ts-native/` and which this package names as its `optionalDependencies`,
-so a package manager installs the one whose `os`, `cpu` and `libc` match. Where none is installed
-`aosabi/bun` takes `core.wasm`, and the variable `AOSABI_ENGINE` of the environment forces either,
-`wasm` for `core.wasm` and `native` for the library, which then must load.
+folders stand under `aosabi-ts-native/`. They are released through the repository of Aosabi alone,
+so this package names none of them. An app installs the one of its machine from a checkout of the
+Aosabi repository by the path of its folder, or as the tarball `npm pack` makes of that folder, once
+the library is built and copied into it as `libaosabi.so`, on an arm64 machine with glibc
+`npm install <checkout>/aosabi-ts-native/aosabi-linux-arm64-gnu`, and builds and copies the library
+again after every update of the checkout. The entry `aosabi/bun` looks for the platform package in
+two folders alone and in no folder above them: the folder `node_modules` that holds this package,
+where an install of the tarballs puts the two side by side, and the folder `node_modules` of the
+root of the app, where the app installs it while this package is a link into a checkout, whose files
+Bun loads from the checkout, or into the store of a package manager such as pnpm. It takes the root
+of the app from the entry Bun runs and never from the working directory: for an entry in a folder
+`.aosabi` the folder that holds it, for any other entry the folder of the entry, and for an entry
+Bun runs from no file, such as the code of `bun -e`, none, so the entry reads the first folder
+alone. So a package of that name elsewhere on the machine never loads, and an app whose package
+`aosabi` is a link starts from an entry in its folder `.aosabi` or at its root. The command
+`bun --preload aosabi/bun .aosabi/server.mjs` of the quick start runs in the folder of the app,
+since Bun resolves the preloaded entry from the working directory. Where no platform package is
+installed, where its folder holds no library and where it carries another version than this package,
+`aosabi/bun` takes `core.wasm` with a reason that names the folder and the cause, and the variable
+`AOSABI_ENGINE` of the environment forces either, `wasm` for `core.wasm` and `native` for the
+library, which then must load.
 
 ## The host of the containers on Bun
 
@@ -310,10 +344,15 @@ its SHA-256.
 
 ## Dependencies
 
-The app installs the peer and owns its version within the range, the hono its lock resolves. Its optional dependencies are the four platform packages above, the project's own
-packages. Its wrapper uses the platform's own `WebAssembly`, `TextEncoder`, `queueMicrotask` and
-`AsyncLocalStorage` of `node:async_hooks`, which a Worker reaches under the flag `nodejs_compat_v2`,
-and on Bun its `bun:ffi`. Under the compatibility flag
+The package depends on no npm package outside the project and runs no install script, because it
+ships with an app, and it names one peer, hono in the range `^4.13.16`, under which the class `App`
+runs. The peer is the one exception to the dependency rule: an app of Pylon imports hono and runs
+its routes on hono, so the binary compatibility with Pylon asks for hono itself, the one ground the
+rule admits. The app installs the peer and owns its version within the range, the hono its lock
+resolves. It names none of the four platform packages above, the project's own packages, which an
+app installs from a checkout. Its wrapper uses the platform's own `WebAssembly`, `TextEncoder`,
+`queueMicrotask` and `AsyncLocalStorage` of `node:async_hooks`, which a Worker reaches under the
+flag `nodejs_compat_v2`, and on Bun its `bun:ffi`. Under the compatibility flag
 `wasm_esm_integration_builtins` of workerd the wrapper hands the strings of a record through the
 module `strings.wasm` of the package and the JS String Builtins of V8, and without that flag it
 takes `TextEncoder` and `TextDecoder`, so the flag is an option for a Worker and no requirement. The

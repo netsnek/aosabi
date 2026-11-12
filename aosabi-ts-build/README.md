@@ -9,35 +9,57 @@ published.
 
 ## A path to show
 
-An app written for Pylon v3 becomes an app of Aosabi in four commands, the path a presentation
-shows. The folder of the app installs `aosabi-build` beside it, or runs it from an install of its
-own, and `aosabi`, which `aosabi migrate` names in place of the old dependency in its `package.json`:
+An app written for Pylon v3 becomes an app of Aosabi in eight commands, the path a presentation
+shows. The three packages come from a checkout of the Aosabi repository, never from a registry by
+name: the tarballs that `npm pack` makes in the checkout from the folders `aosabi-ts`,
+`aosabi-ts-build` and the platform package of the machine under `aosabi-ts-native`, here of an arm64
+machine with glibc. The checkout first builds the native library and copies it into the folder of
+the platform package, since the ignore file keeps the library out of git and `npm pack` packs the
+folder without it otherwise. The first three commands run in the checkout and the others in the
+folder of the app. The app installs `aosabi-build` as a dev dependency before its first `npx`, the
+step `aosabi migrate` names `aosabi` in place of the old dependency in its `package.json`, and the
+app then installs `aosabi` with its platform package. Each `npx --no aosabi` runs the command
+`aosabi` that the install of `aosabi-build` links into the folder `node_modules/.bin` of the app, or
+where the app holds none, the first one of such a folder above the app or of the global prefix of
+npm, and where none of them holds one it asks the registry for the metadata of a package `aosabi`
+and stops with no install, where a plain `npx` would install that package and run it:
 
 ```sh
-npx aosabi migrate .          # the import specifiers, the dependency, the scripts and the file names
-npm install                   # aosabi, its platform package of this machine and aosabi-build
-npx aosabi build              # .aosabi/ with the schema, the transpiled sources and the glue
+cargo build --locked -p aosabi-js --features native --profile release \
+  --target aarch64-unknown-linux-gnu
+cp target/aarch64-unknown-linux-gnu/release/libaosabi_js.so \
+  aosabi-ts-native/aosabi-linux-arm64-gnu/libaosabi.so
+npm pack ./aosabi-ts ./aosabi-ts-build ./aosabi-ts-native/aosabi-linux-arm64-gnu
+npm install --save-dev <checkout>/aosabi-build-<version>.tgz
+npx --no aosabi migrate .    # the import specifiers, the dependency, the scripts and the file names
+npm install <checkout>/aosabi-<version>.tgz <checkout>/aosabi-linux-arm64-gnu-<version>.tgz
+npx --no aosabi build        # .aosabi/ with the schema, the transpiled sources and the glue
 PORT=4000 bun --preload aosabi/bun .aosabi/server.mjs
 ```
 
 Bun serves the default export of the glue, the app, and the preloaded entry `aosabi/bun` hands it
 the engine of the native library of its platform package, or `core.wasm` where none loads, and the
 IR the glue exposes. A Worker takes `.aosabi/worker.mjs` as the main of its Wrangler configuration,
-with the flag `nodejs_compat_v2` and `import.meta.url` defined. On the e2e fixture `blog-app` of
-the compatibility corpus, `aosabi build` writes `schema.graphql`, `schema.mjs` and `resolvers.js`
-byte equal to those of the reference build of the same source, and the build answers every case
-the harness sends it with 0 diffs, on workerd and on Bun in both modes. The four
-commands above ran over that fixture installed from the tarballs of the three packages of this
-repository with `typescript` 5.9.3 alone beside them, where the build took 0.72 s and four requests,
-a query of data, an introspection that the configuration of the app refuses, a query that misses a
-required argument and a mutation whose resolver answers a value the schema refuses, answered byte
-equal to the reference on Node on both engines.
+with the flag `nodejs_compat_v2` and `import.meta.url` defined. On the e2e fixture `blog-app` of the
+compatibility corpus, `aosabi build` writes `schema.graphql`, `schema.mjs` and `resolvers.js` byte
+equal to those of the reference build of the same source, and the build answers every case the
+harness sends it with 0 diffs, on workerd and on Bun in both modes. An earlier form of the commands
+ran over that fixture, with the three packages installed from their tarballs and `typescript` 5.9.3
+alone beside them, where the build took 0.72 s and four requests, a query of data, an introspection
+that the configuration of the app refused then, a query that misses a required argument and a
+mutation whose resolver answers a value the schema refuses, answered byte equal to the reference on
+Node on both engines. The configuration of that app refuses no introspection today, since only the
+key `introspection` set to `false` refuses it, so the introspection answers its data. The eight
+commands run as printed over a copy of an app written for Pylon v3, which holds hono and
+`typescript` from their tarballs and a stand in of `@getcronit/pylon`, with no registry in reach and
+the library the harness builds in place of the output of `cargo build`, and Bun serves the built app
+on the native library of the platform package the app installed.
 
 ## The step `aosabi migrate`
 
 ```sh
-npx aosabi migrate <dir>
-npx aosabi migrate --reverse <dir>
+npx --no aosabi migrate <dir>
+npx --no aosabi migrate --reverse <dir>
 ```
 
 - The step reads every `.ts`, `.mts`, `.js` and `.mjs` file under `<dir>`, outside `node_modules`
@@ -163,7 +185,7 @@ not know.
 ## The step `aosabi build`
 
 ```sh
-npx aosabi build
+npx --no aosabi build
 ```
 
 The step builds the app of the working directory in the order of the inference, the transpile and
