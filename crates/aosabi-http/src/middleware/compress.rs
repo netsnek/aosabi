@@ -23,13 +23,20 @@
 //! that `Accept-Encoding` accepts, codes the body as a stream, deletes
 //! `Content-Length` and sets `Content-Encoding`. It reads the field as a list
 //! of codings with their weights, [`accepted_coding`], where hono takes the
-//! first coding whose name is a substring of the field, the named divergence
-//! D71 of `docs/byte-equality.md` section 3. The list is `deflate` alone, since
-//! Aosabi codes no gzip, so an answer a TypeScript app codes as `gzip` is
-//! `deflate` or identity here, the named divergence D43 of the same section, with the body
-//! equal after decoding. A coding is never forced, so the option `encoding` of
-//! the reference, which codes one coding whatever the request accepts, is not
-//! ported.
+//! first coding whose name is a substring of the field, a named divergence. The
+//! list is `deflate` alone, since Aosabi codes no gzip, so an answer a
+//! TypeScript app codes as `gzip` is `deflate` or identity here, a named
+//! divergence, with the body equal after decoding. A coding is never forced, so
+//! the option `encoding` of the reference, which codes one coding whatever the
+//! request accepts, is not ported.
+//!
+//! On every answer it does not leave alone, coded or not, `compress()` adds
+//! `Accept-Encoding` to the field `Vary` after the names the field holds,
+//! before it picks the coding, and leaves a `Vary` of `*` or one that names
+//! `Accept-Encoding` already as it is, so a cache keys the plain and the coded
+//! answer of a type it codes by `Accept-Encoding`, a named divergence. The
+//! `compress()` of the hono of the TypeScript option writes the field the same
+//! way on the answers it does not leave alone.
 //!
 //! The base pipeline of a TypeScript app installs `compress()` on every route,
 //! while the base
@@ -154,6 +161,8 @@ pub fn compress_with<E: RouteError>(
             if skips(&c, &res, options.threshold) {
                 return Ok(res);
             }
+            vary_accept_encoding(&c, &res);
+            let res = c.res();
             let accepted = c.req().header("Accept-Encoding");
             let Some(encoding) = accepted_coding(accepted.as_deref()) else {
                 return Ok(res);
@@ -192,6 +201,36 @@ fn encode<E: RouteError>(
         .map_err(|error| E::type_error(&error.message))?;
     mark_host_coding(&res);
     Ok(res)
+}
+
+/// Adds `Accept-Encoding` to the field `Vary` of the answer `res` of `c`, after
+/// the names the field holds, and leaves a field of `*` or one that names
+/// `Accept-Encoding` already as it is, a named divergence.
+///
+/// The field is written through `c.header`, which remakes a finalized answer
+/// first, and a name of the field matches in any case of ASCII between optional
+/// white space, as the `compress()` of the hono of the TypeScript option writes
+/// and tests the field, `ctx.header("Vary", ...)` after the test
+/// `/(?:^|,)\s*accept-encoding\s*(?:,|$)/i`. A build with neither `web-deflate`
+/// nor `platform-coding` codes no answer, so it leaves the field as it is.
+fn vary_accept_encoding(c: &Context, res: &Response) {
+    if !cfg!(any(feature = "web-deflate", feature = "platform-coding")) {
+        return;
+    }
+    let value = match res.header("Vary") {
+        Some(held) if held == "*" || names_accept_encoding(&held) => return,
+        Some(held) if !held.is_empty() => format!("{held}, Accept-Encoding"),
+        _ => String::from("Accept-Encoding"),
+    };
+    c.header("Vary", &value);
+}
+
+/// Returns whether the field `Vary` whose value is `vary` names `Accept-Encoding`.
+fn names_accept_encoding(vary: &str) -> bool {
+    vary.split(',').any(|name| {
+        name.trim_matches(is_js_space)
+            .eq_ignore_ascii_case("Accept-Encoding")
+    })
 }
 
 /// Returns whether the answer `res` stays uncoded before the coding is picked.
