@@ -13,16 +13,17 @@
 //! of the app through `resolversToGraphQLResolvers`, the build side resolver
 //! map merged one level deep with the build side winning, and the bound
 //! scalars. It builds Yoga with the options in the order
-//! `graphqlEndpoint: '/graphql'`, `maskedErrors: false` when `NODE_ENV` is
-//! `development`, the whole configuration spread, `landingPage: false`,
-//! `graphiql` as a function of the playground, named Aosabi's by D52, only
-//! when `config.graphiql === true`, the named divergence D48 of
-//! `docs/byte-equality.md` section 3, and the schema. The spread carries
-//! `config.plugins`, which the first pass of the boot wrote back, into the
-//! plugins of Yoga, which places them after its result processors, so the
-//! hooks of the error logger and of the in context plugin run because of it.
-//! The key `logger` reaches Yoga through the spread and Yoga reads `logging`,
-//! so it is ignored there.
+//! `graphqlEndpoint: '/graphql'`, the whole configuration spread,
+//! `landingPage: false` and the schema, with no page of `GraphiQL`, a named
+//! divergence. Pylon puts `maskedErrors: false` before the spread where
+//! `NODE_ENV` is `development`, and the handler puts it there under every
+//! `NODE_ENV` and reads none, so an unexpected error answers its own message
+//! unless the key `maskedErrors` turns the mask on, a named divergence. The
+//! spread carries `config.plugins`, which the first pass of the boot wrote
+//! back, into the plugins of Yoga, which places them after its result
+//! processors, so the hooks of the error logger and of the in context plugin
+//! run because of it. The key `logger` reaches Yoga through the spread and
+//! Yoga reads `logging`, so it is ignored there.
 //!
 //! The middleware answers through
 //! `yoga.fetch(c.req.raw, c.env, executionContext)`, the function

@@ -199,8 +199,7 @@ impl HttpServer {
     ///
     /// The request parse, the run of the one operation, and the result
     /// processing, where every throw of the chain is handled into a result
-    /// that is processed in turn. A batch is refused, the named divergence D58
-    /// of `docs/byte-equality.md` section 3.
+    /// that is processed in turn. A batch is refused, a named divergence.
     pub fn handle(
         self: &Rc<Self>,
         request: Rc<Request>,

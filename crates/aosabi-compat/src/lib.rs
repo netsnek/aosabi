@@ -9,11 +9,23 @@
  * default, because the acceptance rule is byte equality and a fixed defect is a
  * byte difference.
  *
- * Q02 is retired and is never reused: it names the unmatched brace inside the
- * Voyager stylesheet, and Aosabi ships no Voyager stylesheet, so there is no
- * stray brace to reproduce. The quirks of Node and llhttp, Q18 to Q60, live
- * with the HTTP layer and its table in docs/byte-equality.md section 13.1. The
- * tenant null of the provider takes Q85, the next free id after Q83 and Q84.
+ * The register holds twenty one entries, among them the four of the
+ * subscriptions, the tenant null of the provider of Zitadel, the four quirks of
+ * Federation, and the Date argument of a typed delegation and the headers a
+ * redirect of a delegation carries to every hop, which the fixes of the audits
+ * register. An id names a quirk by what it is. One id is retired and is never
+ * reused, `VIEWER_STRAY_BRACE`: it names the unmatched brace inside the Voyager
+ * stylesheet, and Aosabi ships no Voyager stylesheet, so there is no stray
+ * brace to reproduce. The quirks of Node and llhttp live with the HTTP layer.
+ * NOT_PORTED holds 58 entries, among them the five parts of openid-client and
+ * oauth4webapi the two halves of zitadel.ts never turn on, the four of
+ * Federation, the executor every federation of a URL shares and the list a
+ * delegation stores for the field of a union, the transport of the Sentry
+ * plugin to a DSN on a port undici refuses, the RSA keys of a client assertion
+ * that ring 0.17.14 does not sign, the lookup of a host for every connection
+ * the fetch of Node opens, the five parts of the fetch of pylon pull that its
+ * client leaves out, the wait of the three issuer calls of openid-client beyond
+ * 30 seconds and the parse done hooks a failed text runs again.
  */
 
 //! The register of Pylon defects Aosabi reproduces on purpose.
@@ -292,7 +304,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the GraphQL Voyager page served on /viewer",
-        reason: "aoviewer owns that route and Aosabi carries no Voyager text, see docs/decisions/ADR-0009-aoviewer-owns-viewer.md",
+        reason: "Aosabi has no viewer since 0.1.1 and answers the route as one no handler answers, a named divergence",
     },
     NotPorted {
         what: "the development hot swap seam that rebuilds the schema and the Yoga server in a running process, vendor/pylon/packages/pylon/src/app/pylon-handler.ts:353-361",
@@ -316,7 +328,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the coding gzip of compress(), the first entry of its list of codings, vendor/pylon/node_modules/.pnpm/hono@4.11.9/node_modules/hono/dist/middleware/compress/index.js:3, which Pylon answers wherever Accept-Encoding holds that name",
-        reason: "Aosabi codes no gzip by the owner's word of 2026-09-27, so compress() takes the list deflate alone and answers deflate or identity where Pylon answers gzip, with the body equal after decoding, the divergence D43 of docs/byte-equality.md and docs/decisions/ADR-0027-graphtp.md, section Amendment of 2026-09-27, no gzip",
+        reason: "Aosabi codes no gzip, so compress() takes the list deflate alone and answers deflate or identity where Pylon answers gzip, with the body equal after decoding, a named divergence",
     },
     NotPorted {
         what: "the option eventTarget of createPubSub, vendor/pylon/node_modules/.pnpm/@graphql-yoga+subscription@5.0.5/node_modules/@graphql-yoga/subscription/cjs/create-pub-sub.js:10",

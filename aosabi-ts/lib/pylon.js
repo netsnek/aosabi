@@ -333,16 +333,15 @@ export class App extends Hono {
       });
     }));
 
-    // The middleware of the plugins in their order, each around the rest of
-    // the chain. A middleware that returns nothing once the rest of the
-    // chain has answered with a Response hands that Response on, so the
-    // answer of a later middleware reaches hono behind middlewares that
-    // await the rest and return nothing, where Pylon's dispatch loses it and
-    // hono answers 500 with the records of the error logger, divergence D80
-    // of docs/byte-equality.md of the Aosabi repository (row QD-003 of the
-    // rated table). A middleware that returns a value hands hono that value,
-    // and one that returns nothing over a rest that has not answered or has
-    // answered no Response hands on nothing, each as on Pylon.
+    // The middleware of the plugins in their order, each around the rest of the
+    // chain. A middleware that returns nothing once the rest of the chain has
+    // answered with a Response hands that Response on, so the answer of a later
+    // middleware reaches hono behind middlewares that await the rest and return
+    // nothing, where Pylon's dispatch loses it and hono answers 500 with the
+    // records of the error logger, a named divergence. A middleware that
+    // returns a value hands hono that value, and one that returns nothing over
+    // a rest that has not answered or has answered no Response hands on
+    // nothing, each as on Pylon.
     this.use("*", (c, next) => {
       const dispatch = (i) => {
         const middleware = this.pluginsMiddleware[i];

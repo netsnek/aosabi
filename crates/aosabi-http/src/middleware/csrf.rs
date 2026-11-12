@@ -156,7 +156,8 @@ pub fn csrf<E: RouteError + From<HttpException>>(options: CsrfOptions<E>) -> imp
 
 /// Returns the future of `rest` behind the default csrf of the base pipeline,
 /// the check of `csrf()` on a request of `c` that carries a `Cookie` field and
-/// that no `csrf` of the app matches, divergence D70.
+/// where no `csrf` of the app stands ahead of the handlers of the routes it
+/// matches, a named divergence.
 ///
 /// The check runs when the future is first polled, and `rest` is called with
 /// the context once the check lets the request through, so nothing of `rest`

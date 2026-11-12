@@ -5,8 +5,7 @@
  *
  * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
- * It carries the half of the adapter of the quirk Q59_NODE_RECORD_CHECK_500
- * of docs/byte-equality.md section 13.1.
+ * It carries the half of the adapter of the quirk NODE_RECORD_CHECK_500.
  */
 
 //! `handleRequestError`, `handleFetchError` and `handleResponseError`.

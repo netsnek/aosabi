@@ -54,12 +54,11 @@
 //! `TypeError`, and Hono's dispatch hands that one to the handler again, whose
 //! 500 is the answer.
 //!
-//! The coding layer stands first, as `compress()`, and reads
-//! the answer once the rest has run. It codes the answer only under the
-//! feature `base-compress`, which `aosabi-js` turns on for the module and the
-//! native library of the TypeScript option, so the base pipeline of a Rust
-//! service codes no answer and an app codes the routes it chooses with
-//! `compress()`, divergence D72 of `docs/byte-equality.md` section 3.
+//! The coding layer stands first, as `compress()`, and reads the answer once the
+//! rest has run. It codes the answer only under the feature `base-compress`,
+//! which `aosabi-js` turns on for the module and the native library of the
+//! TypeScript option, so the base pipeline of a Rust service codes no answer and
+//! an app codes the routes it chooses with `compress()`, a named divergence.
 //!
 //! A method that registers a route bounds its closure by `Fn` directly, so rustc
 //! gives the closure its parameter types. The gate takes a closure that answers

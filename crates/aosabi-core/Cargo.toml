@@ -79,12 +79,11 @@ exec-eager-projection = ["runtime"]
 # library, and a Rust service, whose schema its build describes at compile
 # time, gains no byte for it.
 prebuilt = ["canary-types"]
-# The coding of the base pipeline, whose first layer is then
-# compress(), which codes a large answer where the request accepts a coding.
-# aosabi-js turns it on for the module and the native library, which code
-# that way. Without it the base pipeline codes no answer, and a Rust service
-# codes one only where it writes compress(), divergence D72 of
-# docs/byte-equality.md section 3.
+# The coding of the base pipeline, whose first layer is then compress(), which
+# codes a large answer where the request accepts a coding. aosabi-js turns it
+# on for the module and the native library, which code that way. Without it the
+# base pipeline codes no answer, and a Rust service codes one only where it
+# writes compress(), a named divergence.
 base-compress = ["runtime"]
 
 [dependencies]

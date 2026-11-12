@@ -32,8 +32,8 @@
 //! object, a `None` inside a list is `null`, a file is the host object it
 //! holds, and a date is a host object too, the `Date` a TypeScript registry
 //! types the argument as, which the federation writes as an input object with
-//! no field and sends as `{}`, quirk
-//! `Q83_FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT`.
+//! no field and sends as `{}`, quirk `FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT`.
+//! The federation builds on these traits and decides how a file travels.
 //!
 //! A record a delegation hands back keeps the remote object it was read from,
 //! so the executor reads every member of that object and not a view over the

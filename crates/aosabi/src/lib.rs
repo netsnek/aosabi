@@ -277,7 +277,7 @@ pub use crate::{
 };
 
 /// Returns the decorator of `callback`, `createDecorator(callback)` of the
-/// derive path, which retires.
+/// derive path, which is retired for application code.
 ///
 /// Under the default features every call answers a compile error that names the
 /// native form, a guard function the body of a method calls first, since no
@@ -312,8 +312,12 @@ pub const BUILTINS: Builtins = Builtins { first: None };
 
 /// The JSON value types a resolver builds and a `ServiceError` carries.
 ///
-/// [󰀀](json::Map) and [󰀁](json::Value) are the object and the value under the
-/// names of `serde_json`, which an application builds with no macro.
+/// [`Map`](json::Map) and [`Value`](json::Value) are the object and the value
+/// under the names of `serde_json`, which an application builds with no macro.
+/// The hidden feature `mirror` adds the same two types under the names of the
+/// engine, `JsObject` and `JsValue`, with the string `JsString` and the
+/// conversion `IntoJson`, which the forms of the derive path and the registries
+/// `aosabi pull` writes name, since they are retired for application code.
 pub mod json {
     #[cfg(feature = "mirror")]
     pub use aosabi_json::{

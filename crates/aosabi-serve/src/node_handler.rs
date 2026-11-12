@@ -8,9 +8,8 @@
  *
  * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
- * It carries the halves of the serve layer of the quirks
- * Q51_NODE_ADAPTER_NULL_BODY and Q60_NODE_REASON_TABLE of docs/byte-equality.md
- * section 13.1.
+ * It carries the halves of the serve layer of the quirks NODE_ADAPTER_NULL_BODY
+ * and NODE_REASON_TABLE.
  */
 
 //! `NodeHandler`.

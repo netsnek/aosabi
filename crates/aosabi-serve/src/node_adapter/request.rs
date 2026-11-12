@@ -8,7 +8,7 @@
  * Derived from @hono/node-server 1.19.9, dist/server.js, MIT.
  *
  * It carries the quirks NODE_ADAPTER_URL, NODE_ADAPTER_HEADERS and
- * Q56_NODE_ADAPTER_BODY_METHODS of docs/byte-equality.md section 13.1.
+ * NODE_ADAPTER_BODY_METHODS.
  */
 
 //! The request of the Node adapter.

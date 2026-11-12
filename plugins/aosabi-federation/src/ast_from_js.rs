@@ -23,8 +23,7 @@
 //! object with no field. `InlineArgsTransform` hands an [`UploadCollector`],
 //! and then a file becomes the variable `_aosabiUpload_<n>`, numbered by the
 //! files collected before it, which the request sends as a variable for the
-//! multipart body of the executor. Its name is the named divergence D55 of
-//! `docs/byte-equality.md` section 3.
+//! multipart body of the executor. Its name is a named divergence.
 //!
 //! A value is one of the JSON model of `aosabi-json`. A host object it
 //! carries through unread is a file when the marker [`File`] of the core
