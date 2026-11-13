@@ -155,6 +155,198 @@ def upload_text(text: str) -> str:
     return text.replace(UPLOAD, UPLOAD_REFERENCE)
 
 
+#: The name the messages of the plugins of a Rust service give a plugin, its dependency cycle and its failed setup.
+PLUGIN = "Aosabi plugin "
+
+#: The name the reference's messages give it.
+PLUGIN_REFERENCE = "Pylon plugin "
+
+
+def _plugin_names(text):
+    """Return the names of the plugins in the type of `text`, str or bytes, the side's first."""
+    if isinstance(text, bytes):
+        return PLUGIN.encode("ascii"), PLUGIN_REFERENCE.encode("ascii")
+    return PLUGIN, PLUGIN_REFERENCE
+
+
+def plugin_text(text):
+    """Return the text `text` of the side under test, str or bytes, with the plugins named as the reference names them."""
+    own, reference = _plugin_names(text)
+    return text.replace(own, reference)
+
+
+def plugin_reasons(reference, side) -> list:
+    """Return why the text `side` of the side under test breaks the messages of the plugins beside the text `reference` of the reference.
+
+    Each message in which the reference names a plugin after itself names it
+    an Aosabi plugin on the side under test, so the two texts hold the two
+    names as often, and the side holds no name of the reference.
+    """
+    if reference is None or side is None:
+        return []
+    own, theirs = _plugin_names(side)
+    expected = reference.count(_plugin_names(reference)[1])
+    if side.count(own) != expected or theirs in side:
+        return ["the side writes Aosabi plugin %d times and Pylon plugin %d times where the reference writes "
+                "Pylon plugin %d times" % (side.count(own), side.count(theirs), expected)]
+    return []
+
+
+#: The refusals of a build that name Aosabi since the release, each the text of the reference and the text of the
+#: side: the schema the glue refuses, which aosabi-build writes for `cargo aosabi build` and for `aosabi build`
+#: through infer.wasm, and the configuration that throws at its load, which `aosabi build` writes with a comma in
+#: place of the dash, and the entry `aosabi build` cannot find and the entry with no default export, which name the
+#: entrypoint and the class of Aosabi.
+BUILD_REFUSALS = (("Pylon generated an invalid GraphQL schema:", "Aosabi generated an invalid GraphQL schema:"),
+                  ("Failed to load pylon.config \u2014 aborting build", "Failed to load aosabi.config, aborting build"),
+                  ("Could not find index.ts (pylon entrypoint)", "Could not find index.ts (aosabi entrypoint)"),
+                  ("Pylon entry must `export default` the app (e.g. `export default new Pylon(...)`).",
+                   "Aosabi entry must `export default` the app (e.g. `export default new App(...)`)."))
+
+
+def build_refusal(text: str) -> str:
+    """Return the refusal `text` of the side under test with the texts that name Aosabi as the reference writes them."""
+    for reference, side in BUILD_REFUSALS:
+        text = text.replace(side, reference)
+    return text
+
+
+def build_refusal_reasons(reference: str | None, side: str | None) -> list:
+    """Return why the refusal `side` of the side under test breaks the refusals that name Aosabi beside the refusal `reference` of the reference.
+
+    Each such text the reference writes, the side writes in its own form.
+    """
+    return ["the side writes no %r where the reference writes %r" % (own, theirs)
+            for theirs, own in BUILD_REFUSALS if theirs in (reference or "") and own not in (side or "")]
+
+
+#: The cookies of the login of Zitadel that name Aosabi since the release, each the name of the reference and the
+#: name of the side: the session the identity reads, the callback sets and the logout deletes, and the verifier of
+#: PKCE the login sets and the callback reads. The generators of tests/gen write the names of the side, one case in
+#: the upper case form, while the goldens and the reference served live keep the names of the reference. Since
+#: 0.1.1 the option `cookie_name` of both halves, `cookieName` on the TypeScript side and in the options of
+#: `useAuth` of the names of Pylon's canary, names the session cookie of the side, which a run whose variant sets
+#: it reads through `login_cookies`, while the verifier keeps its name.
+LOGIN_COOKIES = (("pylon-auth", "aosabi-auth"), ("pylon_code_verifier", "aosabi_code_verifier"))
+
+#: A field of a head that sets a cookie, with the name of the cookie it sets.
+SET_COOKIE = re.compile(rb"(?im)^(set-cookie:[ \t]*)([^=\r\n;]*)(?==)")
+
+
+def login_cookies(session: str | None = None) -> tuple:
+    """Return the pairs of LOGIN_COOKIES of a run whose side names its session cookie `session`, the name the
+    option `cookieName` of its variant gives, or LOGIN_COOKIES for None and the name of Aosabi."""
+    if session is None or session == LOGIN_COOKIES[0][1]:
+        return LOGIN_COOKIES
+    return ((LOGIN_COOKIES[0][0], session),) + LOGIN_COOKIES[1:]
+
+
+def login_cookie(name: str, cookies: tuple = LOGIN_COOKIES) -> str:
+    """Return the name the reference gives the cookie `name` of the side under test, with the
+    pairs `cookies` of the run."""
+    for reference, side in cookies:
+        if name == side:
+            return reference
+    return name
+
+
+def login_cookie_request(raw: bytes, cookies: tuple = LOGIN_COOKIES) -> bytes:
+    """Return the request `raw` written for the side under test with the cookies of the login named as the reference
+    names them, in the lower and the upper case form and in the head alone, so a reference served live reads the
+    cookies it sets itself and the body keeps its length, with the pairs `cookies` of the run."""
+    head, separator, body = raw.partition(b"\r\n\r\n")
+    for reference, side in cookies:
+        for theirs, own in ((reference, side), (reference.upper(), side.upper())):
+            head = head.replace(own.encode("ascii"), theirs.encode("ascii"))
+    return head + separator + body
+
+
+def login_cookie_answer(data: bytes, cookies: tuple = LOGIN_COOKIES) -> bytes:
+    """Return the answer `data` of the side under test with each cookie of the login its head sets named as the reference
+    names it, every other byte as the side wrote it, with the pairs `cookies` of the run."""
+    head, separator, body = data.partition(b"\r\n\r\n")
+    names = {side.encode("ascii"): reference.encode("ascii") for reference, side in cookies}
+    head = SET_COOKIE.sub(lambda match: match.group(1) + names.get(match.group(2), match.group(2)), head)
+    return head + separator + body
+
+
+def login_cookie_reasons(data: bytes, cookies: tuple = LOGIN_COOKIES) -> list:
+    """Return why the answer `data` of the side under test breaks the names of the cookies, a cookie of the login it sets under the name
+    the reference gives it, where the side names each of them after Aosabi or as the pairs `cookies` of the run
+    name it."""
+    head = data.partition(b"\r\n\r\n")[0]
+    references = {reference.encode("ascii") for reference, side in cookies if reference != side}
+    return ["the side sets the cookie %s under the name of the reference" % name.decode("ascii")
+            for name in (match.group(2) for match in SET_COOKIE.finditer(head)) if name in references]
+
+
+def login_cookie_field(value: str, cookies: tuple = LOGIN_COOKIES) -> str:
+    """Return the value `value` of a `Set-Cookie` field of the side under test with the cookie of the login it sets named
+    as the reference names it, any other value as it is, with the pairs `cookies` of the run."""
+    name, mark, rest = value.partition("=")
+    return login_cookie(name, cookies) + mark + rest if mark else value
+
+
+def login_cookie_field_reasons(values: list, cookies: tuple = LOGIN_COOKIES) -> list:
+    """Return why the `Set-Cookie` values `values` of the side under test break the names of the cookies, as `login_cookie_reasons` reads
+    a whole answer."""
+    references = {reference for reference, side in cookies if reference != side}
+    return ["the side sets the cookie %s under the name of the reference" % value.split("=", 1)[0]
+            for value in values if value.split("=", 1)[0] in references]
+
+
+def login_cookie_text(text: str) -> str:
+    """Return the text `text` written for the side under test with the cookies of the login named as the reference names
+    them, in the lower and the upper case form, such as a request shape of tests/gen/zitadel.py, whose cookie the
+    reference reads under its own name."""
+    for reference, side in LOGIN_COOKIES:
+        for theirs, own in ((reference, side), (reference.upper(), side.upper())):
+            text = text.replace(own, theirs)
+    return text
+
+
+def login_cookie_outbound(records: list, cookies: tuple = LOGIN_COOKIES) -> list:
+    """Return the requests the side under test sent the issuer, each with the cookies of the login its body names
+    named as the reference names them, in the lower and the upper case form. The cases `z-40` to `z-45` send the
+    cookies of a request in two `Cookie` fields, and on some hosts the token that a side then sends the issuer
+    holds the name of a cookie of the login, so a side and the reference send there each its own name, every other
+    byte as the side sent it, with the pairs `cookies` of the run."""
+    out = []
+    for record in records:
+        body = record.get("body")
+        if body:
+            for reference, side in cookies:
+                for theirs, own in ((reference, side), (reference.upper(), side.upper())):
+                    body = body.replace(own, theirs)
+            record = dict(record, body=body)
+        out.append(record)
+    return out
+
+
+#: The texts of the typed client that name Aosabi since the release, each the text of the reference and the text of
+#: the side: the head of `index.ts` and of the bundled `index.js`, which names the generator, and the regions of
+#: the bundle, which name the client folder under the artifact directory.
+CLIENT_TEXTS = (("Generated by @getcronit/pylon/query.", "Generated by Aosabi."),
+                ("//#region .pylon/client/", "//#region .aosabi/client/"))
+
+
+def client_text(text: str) -> str:
+    """Return the client text `text` of the side under test with the texts that name Aosabi as the reference writes them."""
+    for reference, side in CLIENT_TEXTS:
+        text = text.replace(side, reference)
+    return text
+
+
+def client_text_reasons(reference: str | None, side: str | None) -> list:
+    """Return why the client text `side` of the side under test breaks the texts that name Aosabi beside the text `reference`.
+
+    Each such text the reference writes, the side writes in its own form as often.
+    """
+    return ["the side writes %r %d times where the reference writes %r %d times"
+            % (own, (side or "").count(own), theirs, (reference or "").count(theirs))
+            for theirs, own in CLIENT_TEXTS if (reference or "").count(theirs) != (side or "").count(own)]
+
+
 #: The cap on the tokens of a request document a served engine parses where the app sets none, `REQUEST_TOKENS` of
 #: crates/aosabi-lang/src/parser.rs.
 REQUEST_TOKENS = 120_008
@@ -220,6 +412,58 @@ def listed_document(tokens: int, head: str = "query", directive: str = "") -> st
     document = before + "[1]" * odd + "[]" * (pairs - odd) + after
     assert count_tokens(document) == tokens, (tokens, count_tokens(document))
     return document
+
+
+#: The place of the current schema a build writes since 0.1.1, each relative to the folder of the project: the
+#: reference writes the schema under its output folder alone, which the ignore file of its scaffold keeps out of
+#: git, and the side writes it to the folder of the project as well, the folder of Cargo.toml for
+#: `cargo aosabi build` and the folder of package.json for `aosabi build`, with the bytes of the copy under its
+#: output folder, which stays. No answer changes, so no comparison reads the file.
+SCHEMA_PLACE_REFERENCE = ".pylon/schema.graphql"
+SCHEMA_PLACE = "schema.graphql"
+
+
+def schema_place_reasons(project, copy) -> list:
+    """Return why the build of the project in the folder `project` does not write its schema there as it writes the copy `copy`.
+
+    A build that writes the copy under its output folder writes SCHEMA_PLACE in the folder of the
+    project with the same bytes.
+    """
+    place = Path(project) / SCHEMA_PLACE
+    if not place.is_file():
+        return ["the build writes no %s in the folder of the project" % SCHEMA_PLACE]
+    if not Path(copy).is_file():
+        return ["the build writes %s in the folder of the project and no copy %s"
+                % (SCHEMA_PLACE, Path(copy).name)]
+    if place.read_bytes() != Path(copy).read_bytes():
+        return ["%s in the folder of the project differs from the copy under the output folder"
+                % SCHEMA_PLACE]
+    return []
+
+
+#: The type of the ping of a link, which the csrf of a Rust service, an app's own `csrf(options)` and the default
+#: of the base pipeline, checks as it checks the types a form element sends, a named divergence.
+PING_TYPE = "text/ping"
+
+#: The type a comparison sends the reference in the place of `PING_TYPE`, which the check of the reference reads
+#: as a type a form element sends, so both sides check the request alike.
+PING_TYPE_REFERENCE = "text/plain"
+
+
+def ping_type(value: str) -> str:
+    """Return the `Content-Type` value `value` of a request as a comparison sends it the reference, the type
+    `PING_TYPE` at its start, in any case, written as `PING_TYPE_REFERENCE`, any other value as it is."""
+    if value[:len(PING_TYPE)].lower() == PING_TYPE:
+        return PING_TYPE_REFERENCE + value[len(PING_TYPE):]
+    return value
+
+
+def ping_type_case(case: dict) -> dict:
+    """Return a case `case` of the csrf middleware as a comparison sends it the reference, its `Content-Type` field
+    through `ping_type`, every other field as it is."""
+    headers = [[name, ping_type(value) if name.lower() == "content-type" else value]
+               for name, value in case["headers"]]
+    return dict(case, headers=headers)
 
 
 #: The codings the compress() of the reference writes, ENCODING_TYPES of hono 4.11.9, and x-gzip, the alias of gzip
@@ -1475,9 +1719,81 @@ def qd680(reply, ask, keys):
     return dataclasses.replace(done, lines=kept + done.lines) if kept else done
 
 
+def no_health_check(reply, ask, keys):
+    """The function answers no health check, which falls through to the web server.
+
+    Yoga's health check answers every method on a URL that ends in `/health` with 200, no body and `x-yoga-id`
+    before Pylon's routes run, and the function hands such a request on as an unhandled route, to the not found
+    answer of the web server where it is served and to the empty 404 of the unhandled route in process. An
+    `OPTIONS` request takes this line as well, since the health check answers it before Yoga's CORS.
+    """
+    if reply.status != 200 or reply.header(HEALTH_FIELD) is None:
+        return reply
+    if not ask.served:
+        return Reply(404, "Not Found", [("content-type", "text/plain;charset=UTF-8")], b"")
+    return fallthrough(ask, False)
+
+
+def endpoint_by_path(reply, ask, keys):
+    """The function matches its endpoint by its whole path.
+
+    Yoga runs a request whose whole URL ends in the endpoint or in the endpoint and a slash as one to the endpoint,
+    and the function hands such a request on as an unhandled route, to the not found answer of the web server where
+    it is served and to the empty 404 of the unhandled route in process. A request under a prefix the app strips
+    before it dispatches the request through the app again reaches the function with the target after the prefix,
+    which the step reads.
+    """
+    endpoint = keys.get("graphqlEndpoint") or "/graphql"
+    target = app_target(ask, keys)
+    if target.split("?")[0] in (endpoint, endpoint + "/") or not target.endswith((endpoint, endpoint + "/")):
+        return reply
+    if reply.status == 404:
+        return reply
+    if not ask.served:
+        return Reply(404, "Not Found", [("content-type", "text/plain;charset=UTF-8")], b"")
+    return fallthrough(ask, False)
+
+
+def endpoint_path_alone(reply: Reply, ask: Ask, keys: dict) -> Reply:
+    """The function takes the path of its endpoint alone for its endpoint.
+
+    Yoga runs a request to the endpoint and a slash as one to the endpoint, and the function hands it on as an
+    unhandled route, as the step `endpoint_by_path` hands on a URL that merely ends in the endpoint.
+    """
+    endpoint = keys.get("graphqlEndpoint") or "/graphql"
+    if app_target(ask, keys).split("?")[0] != endpoint + "/" or reply.status == 404:
+        return reply
+    if not ask.served:
+        return Reply(404, "Not Found", [("content-type", "text/plain;charset=UTF-8")], b"")
+    return fallthrough(ask, False)
+
+
 #: The refusal of the plugin `useDisableIntrospection`, which the handler of the reference adds on
 #: `graphiql: false`.
 INTROSPECTION_REFUSAL = b"GraphQL introspection has been disabled"
+
+#: The answer of the document `{__schema{queryType{name}}}` of family K, which the
+#: reference refuses with one error per field of introspection the document holds.
+INTROSPECTION_ANSWER = b'{"data":{"__schema":{"queryType":{"name":"Query"}}}}'
+
+
+def introspection_on_key(reply: Reply, ask: Ask, keys: dict) -> Reply:
+    """The function refuses introspection on `introspection: false` alone.
+
+    The handler of the reference adds the refusal on `graphiql: false`, and the function answers the document under
+    that key. The step holds the one document of the cases, which it knows by the two fields its refusal names, so
+    the refusal of any other document stays a difference of the comparison.
+    """
+    if not introspection_refused(keys):
+        return reply
+    if reply.body.count(INTROSPECTION_REFUSAL) != 2:
+        return reply
+    if b'\\"__schema\\"' not in reply.body or b'\\"queryType\\"' not in reply.body:
+        return reply
+    lines = [(name, str(len(INTROSPECTION_ANSWER)) if name.lower() == "content-length" else value)
+             for name, value in reply.lines]
+    return Reply(200, reply.reason if reply.status == 200 else "OK", lines, INTROSPECTION_ANSWER)
+
 
 #: The steps `steps` runs, in the order they rewrite an answer, each with the divergence its row names.
 NAMED_STEPS = ((qd055, "D46"), (qd024, "D46"), (qd275, "D46"), (qd228, "D48"), (qd122, "D48"),
@@ -1988,6 +2304,59 @@ def unmasked_stream(stream, guide, ask: Ask, keys: dict):
     return dataclasses.replace(stream, header_lines=lines, headers={name.lower(): value for name, value in lines},
                                framing="chunked" if chunked else "content-length", body=body,
                                wire_body=raw[raw.index(b"\r\n\r\n") + 4:])
+
+
+def introspection_refused(keys: dict) -> bool:
+    """Return whether the reference refuses introspection that the side under test answers under the keys `keys`:
+    under `graphiql: false` with no key `introspection` of the value false."""
+    return keys.get("graphiql") is False and keys.get("introspection") is not False
+
+
+def introspection_refusal_result(result: bytes, guide: bytes, keys: dict) -> bytes:
+    """Return the GraphQL result `result` of the reference with its refusal of introspection read off the result
+    `guide` of the side under test, under the keys `keys` of the side.
+
+    The side under test answers a document of introspection under
+    `graphiql: false` as under a configuration without that key, so `guide`
+    stands for the answer where the reference refused every field of the
+    document and `guide` holds data and no error. Every other pair returns
+    `result` as it is, which stays a difference of the comparison.
+    """
+    if not introspection_refused(keys) or INTROSPECTION_REFUSAL not in result:
+        return result
+    try:
+        refused, ours = json.loads(result), json.loads(guide)
+    except ValueError:
+        return result
+    errors = refused.get("errors") if isinstance(refused, dict) else None
+    if not errors or "data" in refused or any(
+            INTROSPECTION_REFUSAL.decode() not in str(error.get("message")) for error in errors):
+        return result
+    if not isinstance(ours, dict) or "errors" in ours or not isinstance(ours.get("data"), dict):
+        return result
+    return guide
+
+
+def introspection_refusal_served(answer, guide, case, keys: dict):
+    """Return the answer `answer` of the reference, an answer of `http.py`, to the case `case` with its refusal of
+    introspection read off the answer `guide` of the side under test, under the keys `keys` of the side.
+
+    The step `introspection_on_key` knows the answer of one document, and the
+    operations of family O send other documents of introspection, whose answer
+    the refusal of the reference does not carry. Their bodies read through
+    `introspection_refusal_result`, and an answer whose body it reads takes the body of the
+    guide through `with_body`. Every other pair is returned as it is and stays
+    a difference of the comparison.
+    """
+    if answer is None or guide is None or case is None or not introspection_refused(keys):
+        return answer
+    before = plain_body(answer)
+    if INTROSPECTION_REFUSAL not in before:
+        return answer
+    body = introspection_refusal_result(before, plain_body(guide), keys)
+    if body == before:
+        return answer
+    return with_body(answer, Ask(case.method, case.target, list(case.headers)), before, body)
 
 
 def unmasked_message(answer: bytes, guide: bytes, request: bytes, keys: dict) -> bytes:
@@ -2568,6 +2937,36 @@ def oracle_h2(old: dict, request: dict, names) -> dict | None:
     done = oracle_chain(before, request, ask, oracle_keys(request), "rs", names)
     return old if done == before else dict(old, status=done.status, headers=oracle_head(done.lines),
                                            body=coded_body(done.body, done.header("content-encoding")))
+
+
+#: The first word of a line the logger of the old pipeline wrote below the message of a located error, its excerpt
+#: of the source per location: the name of the source, `GraphQL request`, a line number or a prefix padded with
+#: blanks.
+EXCERPT_WORD = re.compile(r"GraphQL|[0-9]+|")
+
+
+def log_without_excerpts(form: dict) -> dict:
+    """Return the compared form `form` of a log of the old pipeline with the excerpts of its errors gone.
+
+    The logger of the tree writes a thrown error as the first line of its
+    stack, one line that opens with ERR, where the logger of the old pipeline wrote
+    an excerpt of the source per location below a located error, so each
+    word of an excerpt line after a word ERR of the verdict leaves.
+    """
+    verdict = form.get("verdict")
+    if not verdict:
+        return form
+    out, inside = [], False
+    for word in verdict.split(" "):
+        if word == "ERR":
+            inside = True
+        elif inside and EXCERPT_WORD.fullmatch(word):
+            continue
+        else:
+            inside = False
+        out.append(word)
+    done = " ".join(out)
+    return form if done == verdict else dict(form, verdict=done)
 
 
 def oracle_log(old: dict, request: dict, names) -> dict:
