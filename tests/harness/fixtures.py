@@ -97,10 +97,15 @@ SENTRY_NODE_VERSION = "8.55.0"
 #: The variable each side reads the file of an extra CA from, by side.
 CA_VARIABLES = {"reference": "NODE_EXTRA_CA_CERTS", "twin": "AOSABI_EXTRA_CA_CERTS"}
 
-#: The variants of docs/harness.md section 8, which the overlay spreads by name,
-#: and the two configurations of subscription-app, `identity` and `database`,
-#: which the overlay lets through as names that spread no key, because the fixture
-#: selects its plugins by `AOSABI_CONFIG` itself.
+#: The variants, which the overlay spreads by name, and the two configurations of
+#: subscription-app, `identity` and `database`, which the overlay lets through as
+#: names that spread no key, because the fixture selects its plugins by
+#: `AOSABI_CONFIG` itself. The variants `switches_on`, `cors_star` and `cors_list`
+#: of in-context-app judge the secure defaults, and its variants `tokens_low` and
+#: `tokens_high` the key `maxTokens` of Aosabi below and above the cap of an app
+#: that sets none, a named divergence. The variant `introspection_false` of
+#: in-context-app holds the key `introspection`, and the variant
+#: `masked_errors_true` of errors-app the key `maskedErrors` that hardens an app.
 VARIANTS = ("default", "graphiql_false", "landing_false", "both", "logger_false", "identity", "database",
             "switches_on", "cors_star", "cors_list", "tokens_low", "tokens_high", "introspection_false",
             "masked_errors_true")

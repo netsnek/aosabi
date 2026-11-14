@@ -8,13 +8,13 @@ lone surrogate escape, a duplicate key, a number of 400 digits and trailing
 bytes. The same step feeds 10,000 documents mutated from the fixtures by
 truncation, byte flips and depth, which [`mutations`] draws from the seed.
 
-A document names what the plan lets a reader answer. `read` is a document the
-reader must take, such as a lone surrogate escape, which the pull parser
-replaces by U+FFFD, `refuse` is one it must answer with a `ReadError`, such as
-a nesting past `max_depth`, and `either` is one where the plan leaves the
-answer to the reader, such as a duplicate key, which the parser passes on. The
-gate of step 8 is the same for all three, a `ReadError` or a model with 0
-panics. The bounds are those of `ReadLimits::DEFAULT`.
+A document names what a reader may answer. `read` is a document the reader must
+take, such as a lone surrogate escape, which the pull parser replaces by U+FFFD,
+`refuse` is one it must answer with a `ReadError`, such as a nesting past
+`max_depth`, and `either` is one that leaves the answer to the reader, such as a
+duplicate key, which the parser passes on. For all three the gate is the same, a
+`ReadError` or a model with 0 panics. The bounds are those of
+`ReadLimits::DEFAULT`.
 
 An attack the reader meets only by pulling tokens through it stands under the
 key `extensions` in front of `data`, because a GraphQL response may carry that
@@ -140,7 +140,7 @@ class Document:
 
 
 def json_documents() -> list[Document]:
-    """Returns the 24 hostile JSON documents of step 8 of `51_viewer_core`.
+    """Returns the 24 hostile JSON documents.
 
     Each is a complete input of the introspection reader, and each but the
     malformed ones wraps the attack in an otherwise valid result of one type,

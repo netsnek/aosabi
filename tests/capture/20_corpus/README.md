@@ -34,9 +34,9 @@ name in every run and a changed document is a changed id.
 | --- | --- | --- | --- |
 | `rich` | `tests/gen/schemas.py`, one of every construct | 1212 | 1224 |
 | `blog-app` | `blog-app-schema.graphql` beside this file, the schema of the capture corpus | 604 | 604 |
-| `errors-app` | the built fixture under `tests/fixtures/ts/errors-app` | 155 | 155 |
-| `async-order-app` | the built fixture under `tests/fixtures/ts/async-order-app` | 158 | 158 |
-| `numbers-app` | the built fixture under `tests/fixtures/ts/numbers-app` | 350 | 350 |
+| `errors-app` | the built fixture `errors-app` | 155 | 155 |
+| `async-order-app` | the built fixture `async-order-app` | 158 | 158 |
+| `numbers-app` | the built fixture `numbers-app` | 350 | 350 |
 
 That is 4970 cases over 268 behaviour tables. The budget `max_ops` is 5000 per corpus and no corpus
 reaches it, so every enumeration is exhaustive and none of the ten is a sample, which the `sampled`

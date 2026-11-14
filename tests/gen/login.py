@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: MIT
-"""tests/gen: the served login cases of zitadel-login-app, the cases of `61_oidc_login`.
+"""tests/gen: the served login cases of zitadel-login-app.
 
-A step is one request with the scenario the issuer answers it under, so a run that changes the scenario between two
-steps, `lg-22` and `lg-23`, says so on each step.
+Each of the 25 cases, `lg-01` to `lg-14`, `lg-20` to `lg-24` and `lg-30` to `lg-35`, is one or more steps of a
+run, and a run is one variant served fresh on both sides against a mocked issuer started fresh in one scenario.
+A step is one request with the scenario the issuer answers it under, so a run that changes the scenario between
+two steps, `lg-22` and `lg-23`, says so on each step.
 
 Every request sends `Host: app.example.invalid`, so the `redirect_uri` both sides build from the request URL is one
 string, and its own `x-request-id`, so no side generates one. A step that needs a cookie a side set names it as a
@@ -12,24 +14,27 @@ challenge the token endpoint checks says so in `hands_challenge`, and the notebo
 `code_challenge` of its `Location` before the next step. A callback case that needs a verifier of its own run, a
 case after `lg-07` under another scenario, starts its run with a login step of the same case.
 
-Case `lg-13` keeps the plan's request, which answers 400 because the query carries no `code`. The extra case
-`lg-13b` sends `code` beside `error`, which reaches the authorization error of the callback, and counts apart from
-the 25. The hostile run sends a login while the issuer cuts the record of its answer and then `{__typename}`, step 7
-of the notebook, and counts apart as well. Every run serves under `NODE_ENV=production`, where a 500 writes its log
-record as one line of JSON, the records step 6 compares.
+Case `lg-13` sends `error` without `code` and answers 400, because the query carries no `code`. The extra case
+`lg-13b` sends `code` beside `error`, which reaches the authorization error of the callback, and counts apart
+from the 25. The hostile run sends a login while the issuer cuts the record of its answer and then
+`{__typename}`, step 7 of the notebook, and counts apart as well. Every run serves under `NODE_ENV=production`,
+where a 500 writes its log record as one line of JSON, the records step 6 compares.
 
-The last run carries the verifier of its login in one of two `Cookie` fields, after another cookie in `lg-40` and
-before it in `lg-41`, the two orders of a client that sends one field per cookie, which RFC 9113 allows over HTTP/2,
-so the `Headers` of each side joins the two fields before the callback reads the verifier. Both count apart from the
-25, and the run stands after every run of the plan, so no step before it moves.
+The last run carries the verifier of its login in one of two `Cookie` fields, after another cookie in `lg-40`
+and before it in `lg-41`, the two orders of a client that sends one field per cookie, which RFC 9113 allows
+over HTTP/2, so the `Headers` of each side joins the two fields before the callback reads the verifier. Both
+count apart from the 25, and the run stands after the runs of the 25 cases and the hostile run, so no step
+before it moves.
 
-Three runs after it hold every token and refusal of capture rows C80 and C81 the plan's table leaves out, so each
-observation of those rows runs on both sides: one login whose verifier the callbacks of the ID tokens `lg-11-iss`,
-`lg-11-exp`, `lg-11-iat` and `lg-11-sub` carry, with the positive case `lg-zitadel` in the shape of an ID token of
-Zitadel, `aud` a list with `azp`, and the malformed answers `lg-malformed-id-token` and `lg-malformed-token`, then
-the malformed discovery of `lg-malformed-discovery`, and the refused connection of `lg-refused`, whose issuer port
-nothing listens on. Each counts apart from the 25, and the case of each step that a row holds is the key of its
-observation.
+Three runs after it hold every token and refusal the capture records that the 25 cases leave out, so each
+observation of the capture runs on both sides: one login whose verifier the callbacks of the ID tokens
+`lg-11-iss`, `lg-11-exp`, `lg-11-iat` and `lg-11-sub` carry, with the positive case `lg-zitadel` in the shape
+of an ID token of Zitadel, `aud` a list with `azp`, and the malformed answers `lg-malformed-id-token` and
+`lg-malformed-token`, then the malformed discovery of `lg-malformed-discovery`, and the refused connection of
+`lg-refused`, whose issuer port nothing listens on. Each counts apart from the 25, and the case of each step
+the capture holds is the key of its observation.
+
+Runs after them hold the hostile inputs, each counted apart from the 25:
 
 - **The key cases.** A login and its callback under each RSA key of
   `KEY_SIZES` in each form of `KEY_FORMS`, two primes of 1024 to 8192 bits and
@@ -45,12 +50,20 @@ observation.
 - **The bytes of `AUTH_KEY`.** `lg-auth-key-byte` logs in with the key of the
   run in a variable `AUTH_KEY` that holds the byte 0xFF after the value of
   `type`, a byte that is no UTF-8, which node reads as U+FFFD.
+- **The lone surrogates.** One login whose verifier the callbacks `lg-surrogate-access-token`,
+  `lg-surrogate-token-type` and `lg-surrogate-id-token` carry, each answered by a token answer that escapes a
+  lone surrogate in that value.
 - **The blocked port.** `lg-blocked-port` logs in against an issuer that
   listens on a port of the list of bad ports of the Fetch standard, which
   the issuer of every other run never takes.
 
-The run of the tokens of C80 and C81 carries the verifier of its login into three more kinds of callbacks after its
-malformed answers, each counted apart from the 25:
+The run after them holds the token type, counted apart from the 25: one login whose verifier the callback
+`lg-token-type-kelvin` carries, whose token answer names the type `Bearer` with U+212A KELVIN SIGN, which the
+lower case of `toLowerCase` writes as `bearerk`, so the sign lowers to the ASCII `k` on both sides and the type
+names no type either side takes.
+
+The run of the tokens of the capture carries the verifier of its login into three more kinds of callbacks after
+its malformed answers, each counted apart from the 25:
 
 - **The audiences of an ID token.** `lg-aud-no-client`, an `aud` list without
   the client, `lg-aud-no-azp`, a list of two with no `azp`, and
@@ -88,10 +101,10 @@ FAMILY = "M7b"
 APP_HOST = "app.example.invalid"
 #: The node environments every run serves under.
 NODE_ENVS = ("production",)
-#: The count of cases of the exit number of `61_oidc_login`.
+#: The count of cases of the exit number, `lg-01` to `lg-14`, `lg-20` to `lg-24` and `lg-30` to `lg-35`.
 CASE_COUNT = 25
-#: The cases of the tokens and refusals of capture rows C80 and C81 beyond the plan's table, the positive case in
-#: Zitadel's shape and the malformed answers, which run after every run of the plan.
+#: The cases of the tokens and refusals the capture records beyond the 25 cases, the positive case in Zitadel's
+#: shape and the malformed answers, which run after the 25 cases.
 ROW_CASES = ("lg-11-iss", "lg-11-exp", "lg-11-iat", "lg-11-sub", "lg-zitadel", "lg-malformed-id-token",
              "lg-malformed-token", "lg-malformed-discovery", "lg-refused")
 #: The RSA keys of the key cases, by name: the bits of the modulus and the count of its primes.
@@ -125,10 +138,12 @@ KEY_VALUES = {
 AUTH_KEY_BYTE_KEY = "byte"
 #: The byte that run writes, which is no UTF-8.
 AUTH_KEY_BYTE = b"\xff"
+#: The cases of the hostile inputs.
 HOSTILE_CASES = (tuple("lg-key-%s-%s" % (name, form) for name in KEY_SIZES for form in KEY_FORMS)
                  + tuple("lg-key-" + name for name in KEY_VALUES)
                  + ("lg-auth-key-byte", "lg-surrogate-access-token", "lg-surrogate-token-type", "lg-surrogate-id-token",
                     "lg-state-ff", "lg-state-twice", "lg-blocked-port"))
+#: The case of the token type, a type with U+212A KELVIN SIGN.
 TOKEN_TYPE_CASES = ("lg-token-type-kelvin",)
 #: The cases of the audiences of an ID token the code grant refuses, an `aud` list without the client, a list of two
 #: with no `azp` and an `azp` of another client.
@@ -270,7 +285,7 @@ def _login(step_id: str, case: str, scenario: str | None, pins: str, endpoint: s
 
 
 def login_runs() -> list:
-    """Every run of zitadel-login-app in the order of the plan's table, the extra and the hostile run included."""
+    """Every run of zitadel-login-app, the runs of the 25 cases first, the extra and the hostile run included."""
     fixture = "zitadel-login-app"
     runs = []
 
@@ -485,8 +500,8 @@ def refusal_step(step_id: str) -> str | None:
 
 
 def login_h2_run() -> Run:
-    """The run of step 9 of `61_oidc_login`: a login and its callback with the verifier in one field and in one of
-    two fields in both orders, which the twin answers over HTTP/2 and the reference over HTTP/1.1.
+    """The run `login-h2-cookie-fields`: a login and its callback with the verifier in one field and in one of two
+    fields in both orders, which the twin answers over HTTP/2 and the reference over HTTP/1.1.
 
     The run has no golden. The reference serves HTTP/1.1 alone, so each answer of the twin over HTTP/2 is held to the
     reference's answer over HTTP/1.1 to the same fields.
@@ -525,7 +540,7 @@ def login_manifest() -> dict:
     runs = login_runs()
     cases = counted_cases(runs)
     if len(cases) != CASE_COUNT:
-        raise AssertionError("the login runs hold %d cases where the plan counts %d" % (len(cases), CASE_COUNT))
+        raise AssertionError("the login runs hold %d counted cases, not %d" % (len(cases), CASE_COUNT))
     return {
         "runs": len(runs),
         "steps": sum(len(run.steps) for run in runs),

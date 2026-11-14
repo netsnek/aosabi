@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
-"""The module writes what the federation notebooks send to both sides:
+"""tests/gen: the seeded corpora of Federation.
+
+The module writes what the federation notebooks send to both sides:
 
 - `operations`, the client documents over a front schema with aliases,
   fragments on the abstract types, the forced and the allowed argument of a
@@ -53,7 +55,7 @@ from .sdl import EnumValue, TypeRef, print_value
 #: The seed a run takes when its parameters name none.
 SEED = 20261003
 
-#: The counts of the plan, section The notebooks and section The Federation cases.
+#: The count of distinct cases each family holds.
 COUNTS = {
     "operations_g1": 120,
     "operations_g2": 80,
@@ -159,7 +161,7 @@ def _distinct(count: int, draw, first=()) -> list:
     with the next index until the count is reached. A draw reads only the
     streams of its own index, so the cases of a smaller count are a prefix of
     the cases of a larger one. A family whose space is too small for its count
-    raises rather than return fewer cases than the plan counts.
+    raises rather than return fewer cases than its count.
     """
     out: list = []
     seen: set = set()

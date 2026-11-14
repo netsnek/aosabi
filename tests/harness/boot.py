@@ -53,7 +53,7 @@ REFERENCE_ROLE = "PYLON_ROLE"
 BOOT_MASKS = ("time", "boot-port")
 
 #: The masks a boot log of the side under test is compared after, whose listen line
-#: names Aosabi, divergence D53 of docs/byte-equality.md section 3.
+#: names Aosabi, a named divergence.
 SIDE_MASKS = BOOT_MASKS + ("boot-port-aosabi",)
 
 #: The prefixes of the two lines of standard error a failing boot is compared on.

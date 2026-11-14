@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""tests/gen: the Zitadel corpora of `63_zitadel_auth` and the served cases of zitadel-auth-app.
+"""tests/gen: the Zitadel corpora and the served cases of zitadel-auth-app.
 
 Step 2 of `63_zitadel_auth` sends four generated corpora to the sidecar `tests/sidecar/zitadel.mjs`
 and to the sub commands of `aosabi-devtool zitadel` and compares the two response streams:
@@ -16,15 +16,17 @@ and to the sub commands of `aosabi-devtool zitadel` and compares the two respons
   over an issuer, a token and the extra parameters, with the client key of the
   run in either form.
 
-A fifth corpus beside the four, `read_token_fields`, holds hand written request shapes of
-`read_token` whose `cookie` is a list, the value of each `Cookie` field of a request that carries
-its cookies in several, in both orders. It draws nothing and stands in files of its own, so the four
-corpora keep their counts and their goldens. A claim a mapper reads keeps the type the reference's
-options declare, a string or an absent email, a string or a number of the organisation, a list of
-strings of the permissions, so the Rust side, whose mappers are typed function pointers, can answer
-every request. Every other claim is any JSON value. The client key never enters a corpus: an
-`introspection_body` request carries `{"$form": "pkcs1"}` or `{"$form": "pkcs8"}` as its `auth_key`,
-which `bind_auth_keys` replaces with the record of the key of the run.
+Each corpus starts with hand written requests that name an edge of the reference, and is filled to its count
+with draws that each name a purpose in the `Rng` of `tests/gen/rng.py`, so a corpus is the same bytes on every
+machine for one seed. A fifth corpus beside the four, `read_token_fields`, holds hand written request shapes
+of `read_token` whose `cookie` is a list, the value of each `Cookie` field of a request that carries its
+cookies in several, in both orders. It draws nothing and stands in files of its own, so the four corpora keep
+their counts and their goldens. A claim a mapper reads keeps the type the reference's options declare, a
+string or an absent email, a string or a number of the organisation, a list of strings of the permissions, so
+the Rust side, whose mappers are typed function pointers, can answer every request. Every other claim is any
+JSON value. The client key never enters a corpus: an `introspection_body` request carries `{"$form": "pkcs1"}`
+or `{"$form": "pkcs8"}` as its `auth_key`, which `bind_auth_keys` replaces with the record of the key of the
+run.
 
 The served cases `z-01` to `z-31` of zitadel-auth-app are runs of the shape of tests/gen/login.py,
 one variant and one issuer scenario served fresh each, with the hostile run of step 5 counted apart.
@@ -36,16 +38,15 @@ of a login into its callback, `z-42` and `z-43`, and the verifier with the sessi
 token is a neutral test string, `t1` to `t13`, `t-admin` and the `t-login` the issuer answers, and
 the email is `probe@example.invalid`.
 
-Four runs after them hold every JWT answer of capture row C82 the plan's table leaves out, so each
-observation of the row runs on both sides. The row holds each JWT case twice, behind a discovery
-that names the signing algorithms, its keys with the suffix `-alg`, and behind the plain discovery,
-its keys without it. The cases `z-12` and `z-20` of the plan stand for the first form, the run of
-the claims adds `z-12-aud` to `z-20-typ` in that form, and the run of the plain discovery runs every
-case of the row in the second, `z-12-plain` to `z-20-typ-plain`. The JWT answers of `z-12` and
-`z-20` and of their plain forms carry the header and the placeholder signature of the capture, which
-no key verifies, as the tokens of the capture that answer success did. The last run sends the
-introspection answer cut in its middle, `z-malformed-introspect`. Each counts apart from the 31,
-with the tokens `t7` and `t9` of the capture row and `t14` to `t17`.
+Four runs after them hold every JWT answer the capture records that the 31 cases leave out, so each
+observation of the capture runs on both sides. The capture holds each JWT case twice, behind a discovery that
+names the signing algorithms, its keys with the suffix `-alg`, and behind the plain discovery, its keys
+without it. The cases `z-12` and `z-20` stand for the first form, the run of the claims adds `z-12-aud` to
+`z-20-typ` in that form, and the run of the plain discovery runs every case of the capture in the second,
+`z-12-plain` to `z-20-typ-plain`. The JWT answers of `z-12` and `z-20` and of their plain forms carry the
+header and the placeholder signature of the capture, which no key verifies, as the tokens of the capture that
+answer success did. The last run sends the introspection answer cut in its middle, `z-malformed-introspect`.
+Each counts apart from the 31, with the tokens `t7` and `t9` of the capture row and `t14` to `t17`.
 
 Runs after them hold the hostile inputs, as tests/gen/login.py lays them out for the login routes, each
 counted apart from the 31: a principal under each key case of `KEY_SIZES` in each form, `z-key-rsa1024-pkcs1`
@@ -86,10 +87,10 @@ REQUEST_SHAPE_COUNT = 60
 CLAIM_VALUE_COUNT = 100
 PARAMETER_SET_COUNT = 40
 
-#: The count of cases of the exit number of `63_zitadel_auth`.
+#: The count of cases of the exit number, `z-01` to `z-31`.
 CASE_COUNT = 31
-#: The JWT cases of capture row C82 beyond the plan's table, each with the scenario of the mocked issuer and the
-#: token of the row, in the order of the row.
+#: The JWT cases the capture records beyond the 31 cases, each with the scenario of the mocked issuer and the
+#: token the capture sent, in the order of the capture.
 JWT_ROW_CASES = (
     ("z-12-aud", "userinfo_jwt_bad_aud", "t7"),
     ("z-12-iss", "userinfo_jwt_bad_iss", "t7"),
@@ -98,7 +99,7 @@ JWT_ROW_CASES = (
     ("z-20-iat", "introspect_jwt_no_iat", "t9"),
     ("z-20-typ", "introspect_jwt_no_typ", "t9"),
 )
-#: The cases of the plain discovery, every JWT case of the row once more.
+#: The cases of the plain discovery, every JWT case of the capture once more.
 PLAIN_ROW_CASES = tuple((case + "-plain", scenario + "_plain", token) for case, scenario, token in (
     ("z-12", "userinfo_jwt", "t7"),
     *JWT_ROW_CASES[:2],
@@ -107,9 +108,11 @@ PLAIN_ROW_CASES = tuple((case + "-plain", scenario + "_plain", token) for case, 
 ))
 #: The cases of Zitadel's own shapes and the malformed introspection answer.
 SHAPE_CASES = ("z-zitadel", "z-roles-project", "z-roles-per-project", "z-malformed-introspect")
+#: The cases of the hostile inputs.
 HOSTILE_CASES = (tuple("z-key-%s-%s" % (name, form) for name in KEY_SIZES for form in KEY_FORMS)
                  + ("z-auth-key-byte", "z-surrogate-access-token", "z-surrogate-token-type", "z-surrogate-id-token",
                     "z-state-ff", "z-state-twice", "z-blocked-port", "z-roles-value-of"))
+#: The case of the type of a JWT, a `typ` with U+212A KELVIN SIGN.
 TOKEN_TYPE_CASES = ("z-typ-kelvin",)
 #: The case of the session cookie the option `cookieName` names on both halves.
 COOKIE_NAME_CASES = ("z-cookie-name",)
@@ -250,6 +253,7 @@ def principal_requests(seed: int = DEFAULT_SEED) -> list:
 
 # ── read_token ───────────────────────────────────────────────────────────────
 
+#: The hand written request shapes, after the readers of hono.
 TOKEN_SHAPES = (
     {},
     {"authorization": "Bearer t1"},
@@ -366,7 +370,7 @@ COOKIE_FIELD_SHAPES = (
 def cookie_field_requests() -> list:
     """The request shapes of the operation `read_token` whose cookies arrive in several fields, `fields-001` on.
 
-    The shapes stand in a corpus of their own beside the four of the plan, so
+    The shapes stand in a corpus of their own beside the four corpora, so
     those keep their counts and every line of their goldens.
     """
     shapes = [dict(shape) for shape in COOKIE_FIELD_SHAPES]
@@ -377,6 +381,7 @@ def cookie_field_requests() -> list:
 
 # ── roles ────────────────────────────────────────────────────────────────────
 
+#: The hand written claims: objects with canonical integer keys, strings, arrays and the falsy values.
 ROLE_CLAIMS = (
     UNDEFINED,
     None,
@@ -440,6 +445,7 @@ def role_requests(seed: int = DEFAULT_SEED) -> list:
 
 # ── introspection_body ───────────────────────────────────────────────────────
 
+#: The hand written parameter sets, after the `set` of the client authentication.
 PARAMETER_SETS = (
     (ISSUERS[0], "t1", PROVIDER_PARAMETERS, "pkcs1"),
     (ISSUERS[0], "t1", PROVIDER_PARAMETERS, "pkcs8"),
@@ -510,7 +516,7 @@ def corpora_manifest(seed: int = DEFAULT_SEED) -> dict:
     expected = {"principal": CLAIM_SET_COUNT, "read_token": REQUEST_SHAPE_COUNT, "roles": CLAIM_VALUE_COUNT,
                 "introspection_body": PARAMETER_SET_COUNT}
     if counts != expected:
-        raise AssertionError("the corpora hold %r where the plan counts %r" % (counts, expected))
+        raise AssertionError("the corpora hold %r, not %r" % (counts, expected))
     with_mappers = sum(1 for request in sets["principal"] if "mappers" in request)
     return {"seed": seed, "counts": counts, "principal_with_mappers": with_mappers,
             "principal_without_mappers": counts["principal"] - with_mappers}
@@ -524,8 +530,8 @@ def _bearer(token: str) -> list:
 
 
 def provider_runs() -> list:
-    """Every run of zitadel-auth-app in the order of the plan's table, the hostile run and the runs of the cookie
-    fields last."""
+    """Every run of zitadel-auth-app, the runs of the 31 cases first, then the hostile run and the runs of the cookie
+    fields."""
     fixture = "zitadel-auth-app"
     runs = []
     me = "{me{id tenant roles permissions email}}"
@@ -748,9 +754,9 @@ def refusal_step(step_id: str) -> str | None:
 
 
 def provider_h2_run() -> Run:
-    """The run of the cookies over HTTP/2 of `63_zitadel_auth`: a login, its callback with the verifier in one field
-    and in one of two fields in both orders, and the principal with the verifier and the session in two fields in
-    both orders, which the twin answers over HTTP/2 and the reference over HTTP/1.1.
+    """The run of the cookies over HTTP/2: a login, its callback with the verifier in one field and in one of two
+    fields in both orders, and the principal with the verifier and the session in two fields in both orders, which the
+    twin answers over HTTP/2 and the reference over HTTP/1.1.
 
     The run has no golden. The reference serves HTTP/1.1 alone, so each answer of the twin over HTTP/2 is
     held to the reference's answer over HTTP/1.1 to the same fields.
@@ -783,7 +789,7 @@ def provider_manifest() -> dict:
     runs = provider_runs()
     cases = counted_cases(runs, EXTRA_CASES)
     if len(cases) != CASE_COUNT:
-        raise AssertionError("the provider runs hold %d cases where the plan counts %d" % (len(cases), CASE_COUNT))
+        raise AssertionError("the provider runs hold %d counted cases, not %d" % (len(cases), CASE_COUNT))
     return {
         "runs": len(runs),
         "steps": sum(len(run.steps) for run in runs),

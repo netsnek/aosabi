@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: MIT
-"""tests/gen: the served cases of `40_sse`, a fixed list with their canonical requests.
+"""tests/gen: the served stream cases, a fixed list with their canonical requests.
 
-No case of this module is drawn.
+No case of this module is drawn. Each one is a question of the streams, written
+once with the request that asks it.
 
 - **S01 to S31**, the stream cases over `subscription-app`, each sent under
   `NODE_ENV` unset and `test`, and **N01 to N04**, the four subscriptions whose
@@ -210,8 +211,7 @@ def _s(name: str, question: str, request: dict, **extra) -> StreamCase:
     return StreamCase(name, SUBSCRIPTION_APP, question, request, **extra)
 
 
-#: The fields S11 to S21 ask one question each of, in the order of the table of
-#: the plan, section The TypeScript side, first.
+#: The fields S11 to S21 ask one question each of, in the order of their case ids.
 FIELD_CASES = (
     ("S11", "failBeforeYield", "an error before the first yield, status 500"),
     ("S12", "failInExecutor", "the executor's rejection surfacing through the last iteration"),

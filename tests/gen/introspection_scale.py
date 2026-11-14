@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: MIT
 """tests/gen: the generated schemas of the huge introspection answers.
 
-The map of `aosabi-json` builds, looks up and writes every object of an
-answer, and an introspection answer is the heaviest work it meets, thousands
-of small objects with `name`, `kind`, `fields`, `type` and `ofType`. So the
-section The cost of the insertion ordered map of `01_json_writer` measures the
-map on the introspection answers of schemas of 100, 1,000 and 5,000 object
-types that this module writes, and on one schema whose descriptions are
-Japanese.
+The map of `aosabi-json` builds, looks up and writes every object of an answer,
+and an introspection answer is the heaviest work it meets, thousands of small
+objects with `name`, `kind`, `fields`, `type` and `ofType`. So a notebook
+measures the map on the introspection answers of schemas of 100, 1,000 and
+5,000 object types that this module writes, and on one schema whose
+descriptions are Japanese.
 
 [`scale_schema`] writes a schema text of `types` object types of ten fields
 each, with interfaces, enums, input objects, arguments with and without

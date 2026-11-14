@@ -22,7 +22,8 @@ A notebook imports it with the repository tests directory on the path:
 tests/run.py also exports the tests directory on PYTHONPATH, so under the
 runner the loop above finds the package on the first try.
 
-The names below are the ones every notebook needs.
+The seven helpers of the documentation notebooks are modules of their own,
+reached as `from harness import docs, svg, pdf, wasm, arch, estate, fetch`.
 
 A notebook imports the last two by name.
 

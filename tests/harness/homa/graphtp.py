@@ -1,16 +1,15 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the codec of GraphTP/1 in Python, written apart from the crate.
 
-This module writes and reads every message of GraphTP/1 that the notebook
-24_graphtp compares the crate graphtp against: the status byte and its mapping,
-the registry of status and substatus with its names, the heads of a request and
-of an answer, the checks of the credential, the first byte rule of a body, the
-whole request with the 11 rules of refusal, the whole answer with its shapes, the
-stream bodies, and the test vectors of section 9.2. It codes and decodes with
-Python's zlib, which is C zlib, at wbits 12, a window of 4 KiB. It is written
-from docs/graphtp.md, sections 2.2, 2.4, 2.5, 3.2 to 3.4, 5.1 to 5.5 and 9.2, and
-from the IANA registry of HTTP status codes, and never from the source of the
-crate, so the notebook never judges the crate against itself.
+This module writes and reads every message of GraphTP/1 that a notebook compares
+the crate graphtp against: the status byte and its mapping, the registry of
+status and substatus with its names, the heads of a request and of an answer, the
+checks of the credential, the first byte rule of a body, the whole request with
+the 11 rules of refusal, the whole answer with its shapes, the stream bodies, and
+the test vectors. It codes and decodes with Python's zlib, which is C zlib, at
+wbits 12, a window of 4 KiB. It is written from the specification and from the
+IANA registry of HTTP status codes, and never from the source of the crate, so
+the notebook never judges the crate against itself.
 
 Every integer of a head is big endian. A refusal of a request raises
 `Refused` with the code a server answers, and an answer a client cannot read

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""tests/gen: the pub sub, repeater and hub scripts of `40_pubsub`, drawn from a seed.
+"""tests/gen: the pub sub, repeater and hub scripts, drawn from a seed.
 
 Three kinds of script, each drawn from a stream of its own of `rng.py`, so a
 kind added later leaves the draws of the others where they are.

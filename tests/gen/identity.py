@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: MIT
-"""Each case is one request of the table of the plan, `id-01` to `id-31` under
-the variant `default`, `as-01` to `as-04` under `async`, `nu-01` and `nu-02`
-under `numeric`, `fa-01` to `fa-03` under `failing`, `no-01` to `no-03` under
-`none` and `tw-01` under `twice`. Every case runs under `NODE_ENV` `test`,
-unset and `development`, and is sent as it stands and again with
-`Accept-Encoding: identity`. The principal of a case is the trusted headers
-the provider of the fixture reads, `x-user-id`, `x-org`, `x-role` and
-`x-perm`, as the header lists of this module write them. Every identifier is a
-neutral test string, `u1`, `u2`, `42`, `orgA` and `orgB`, and names no
-customer.
+"""tests/gen: the served cases of use-identity-app, the identity fixture.
+
+Each case is one request, `id-01` to `id-31` under the variant `default`, `as-01` to
+`as-04` under `async`, `nu-01` and `nu-02` under `numeric`, `fa-01` to `fa-03` under
+`failing`, `no-01` to `no-03` under `none` and `tw-01` under `twice`. Every case runs
+under `NODE_ENV` `test`, unset and `development`, and is sent as it stands and again
+with `Accept-Encoding: identity`. The principal of a case is the trusted headers the
+provider of the fixture reads, `x-user-id`, `x-org`, `x-role` and `x-perm`, as the
+header lists of this module write them. Every identifier is a neutral test string,
+`u1`, `u2`, `42`, `orgA` and `orgB`, and names no customer.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def role(name: str) -> list:
 
 
 def identity_cases() -> list:
-    """Every served case of use-identity-app in the order of the table of the plan."""
+    """Every served case of use-identity-app, variant by variant in the order of their ids."""
     cases = []
 
     def add(case_id, variant, request, pins):
@@ -94,7 +94,7 @@ def identity_cases() -> list:
 
 
 def log_case():
-    """Case `log-01` of `65_logs`: `{adminOnly}` anonymous under `NODE_ENV=production`, quirk."""
+    """Case `log-01`: `{adminOnly}` anonymous under `NODE_ENV=production`."""
     return served("log-01", "use-identity-app", "default", post("{adminOnly}"),
                   "the graphql error record of a refusal before the remap", ("production",))
 

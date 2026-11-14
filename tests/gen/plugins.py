@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: MIT
-"""`60_plugins` sends three generated corpora to the sidecar
-`tests/sidecar/plugins.mjs` and to the primitive `plugins` of aosabi-devtool
-and compares the two response streams as bytes:
+"""tests/gen: the plugin corpora, the served cases of plugins-app and its boots.
+
+A notebook sends three generated corpora to the plugins sidecar and to the
+primitive `plugins` of aosabi-devtool and compares the two response streams as
+bytes:
 
 - **The order vectors**, 2000 requests of the operation `topo_sort`, each of 1
   to 12 plugins with names drawn from 6, a tenth of them unnamed, a tenth
@@ -22,8 +24,10 @@ cases `pl-01` to `pl-15` of `plugins-app`, the boots of its table, and the
 `tests/gen/sentry.py` are made of. Cases `pl-12` and `pl-13` send the cookie of
 `pl-10` in one of two `Cookie` fields, after another cookie and before it,
 which the `Headers` of each side joins before the route reads the cookie, and
-they follow `pl-11`, so no case before them moves. Every name and value is a
-neutral test string.
+they follow `pl-11`, so no case before them moves. Cases `pl-14` and `pl-15`
+run the operations `ReadsData` and `WritesData`, whose done hook of the plugin
+`a` reads the data of the result and writes it, and they follow `pl-13`. Every
+name and value is a neutral test string.
 """
 
 from __future__ import annotations
@@ -202,7 +206,7 @@ def order_vectors(seed: int = DEFAULT_SEED, count: int = ORDER_VECTOR_COUNT) -> 
 
 
 def order_counts(vectors: list) -> dict:
-    """The counts step 5 of `60_plugins` prints: collisions, self and missing dependencies, cycles planned."""
+    """The counts of the order vectors a notebook prints: collisions, self and missing dependencies, cycles planned."""
     counts = {"vectors": len(vectors), "collisions": 0, "self": 0, "missing": 0, "cycles planned": 0,
               "unnamed": 0, "empty names": 0}
     for index, vector in enumerate(vectors):

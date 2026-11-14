@@ -15,16 +15,21 @@ and the raw client of `tests/harness/http.py` writes the fields as they stand.
   and without `Origin`, `PUT`, `DELETE` and `PATCH`, one `Accept` per
   negotiated type and for `text/event-stream` and `multipart/mixed`, two
   charsets other than utf-8, five values of `Accept-Encoding` and nine corners
-  of the URL. Those are 36 cases, and four more complete the 40 of the plan:
+  of the URL. Those are 36 cases, and four more complete the 40:
   the plain GET spelling, a GET with `operationName`, `Accept: */*` and a
   `POST` whose type names `charset=utf-8`.
 - **K, the static routes**, seven cases per variant under each of the five
-  variants of `docs/harness.md` section 8, 35 cases.
+  variants of the configuration matrix, 35 cases.
+- **D, the secure defaults**, one function per secure default, which each
+  answer the cases of their default under a variant.
 - **U, uploads**, the twelve cases of the multipart request specification over
   `upload` and `uploadNested` of `surface-app`.
 - **R, the routes a fixture registers**, one request per route with its
   method, one with a wrong method, and a `HEAD` per `GET` route, from a list of
   routes a boot report or the authoring map gives.
+
+The operation families run over HTTP through `over_http`, as a `POST`
+with `application/json` and, for a query, as the GET form as well.
 
 The command line prints the counts:
 
@@ -44,9 +49,11 @@ DOCUMENT = "{__typename}"
 #: The variants of the configuration matrix.
 VARIANTS = ("default", "graphiql_false", "landing_false", "both", "logger_false")
 
+#: The variants of in-context-app that judge the secure defaults, which family
+#: K takes beside the five and leaves out of the counts of the five.
 DEFAULTS_VARIANTS = ("switches_on", "cors_star", "cors_list")
 
-#: The counts of the plan.
+#: The case counts of family T, of family K per variant and of family U.
 TRANSPORT_COUNT = 40
 STATIC_PER_VARIANT = 7
 UPLOAD_COUNT = 12
@@ -189,7 +196,7 @@ def transport_cases() -> list[HttpCase]:
         make("T", "t40", "POST", "/graphql", [("Content-Type", "application/json; charset=utf-8")], body),
     ]
     if len(cases) != TRANSPORT_COUNT:
-        raise AssertionError("family T holds %d cases, the plan asks %d" % (len(cases), TRANSPORT_COUNT))
+        raise AssertionError("family T holds %d cases, not %d" % (len(cases), TRANSPORT_COUNT))
     return cases
 
 
@@ -211,8 +218,10 @@ def static_cases(variant: str) -> list[HttpCase]:
 
 
 def defaults_cases(variant: str) -> list[HttpCase]:
-    """Each function below answers the cases of one row of the rated table under
-    the variants that judge it, and none while its row waits.
+    """Family D, the cases of the secure defaults under `variant`.
+
+    Each function below answers the cases of one secure default under the
+    variants that judge it, and none while its default waits.
     """
     if variant not in VARIANTS + DEFAULTS_VARIANTS:
         raise ValueError("no variant named %s" % variant)
@@ -332,7 +341,7 @@ def upload_cases() -> list[HttpCase]:
     ]
     cases = [make("U", name, "POST", "/graphql", [kind], body) for name, body in bodies]
     if len(cases) != UPLOAD_COUNT:
-        raise AssertionError("family U holds %d cases, the plan asks %d" % (len(cases), UPLOAD_COUNT))
+        raise AssertionError("family U holds %d cases, not %d" % (len(cases), UPLOAD_COUNT))
     return cases
 
 
@@ -360,7 +369,7 @@ def route_cases(routes: list[tuple[str, str]]) -> list[HttpCase]:
 
 
 def over_http(document: str, variables: dict | None, operation_name: str | None, name: str) -> list[HttpCase]:
-    """An operation families as a `POST` and, for a query, as a GET."""
+    """An operation of a family of `tests/gen` as a `POST` and, for a query, as a GET."""
     extra = {}
     if variables is not None:
         extra["variables"] = variables
