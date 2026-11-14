@@ -60,6 +60,7 @@ impl PluginOrderError {
     ///
     /// The path is the names on the walk and the name of the plugin met twice,
     /// joined by a space, U+2192 and a space, so the cycle of `a` and `b`
+    /// reads `Aosabi plugin dependency cycle: a → b → a`.
     #[must_use]
     pub fn message(&self) -> &str {
         &self.message
