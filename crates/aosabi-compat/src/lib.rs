@@ -31,9 +31,10 @@
 //! The register of Pylon defects Aosabi reproduces on purpose.
 //!
 //! Reproducing a defect is the default, because the acceptance rule is byte
-//! equality and a fixed defect is a byte difference. [`NOT_PORTED`] carries the
-//! other direction, which is reference behaviour Aosabi deliberately leaves
-//! out, each with its reason.
+//! equality and a fixed defect is a byte difference. Every entry carries the
+//! file of the reference that decides it, most of them its line.
+//! [`NOT_PORTED`] carries the other direction, which is reference behaviour
+//! Aosabi deliberately leaves out, each with its reason.
 //!
 //! Byte equality with Pylon is a phase of the project, so an entry may carry
 //! the condition on which it drops and what Aosabi does then. Each of those
@@ -260,7 +261,7 @@ pub const QUIRKS: &[Quirk] = &[
 /// why it is retired.
 pub const RETIRED: &[(&str, &str)] = &[(
     "VIEWER_STRAY_BRACE",
-    "the unmatched closing brace inside the Voyager stylesheet. Retired with docs/decisions/ADR-0009-aoviewer-owns-viewer.md, because Aosabi carries no Voyager text",
+    "the unmatched closing brace inside the Voyager stylesheet. Retired because Aosabi carries no Voyager text",
 )];
 
 /// One piece of reference behaviour Aosabi does not port, with its reason.
