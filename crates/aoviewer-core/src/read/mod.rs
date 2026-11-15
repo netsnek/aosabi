@@ -11,10 +11,10 @@
 //!
 //! [`from_introspection`] reads the answer of an introspection query and
 //! [`from_ir_json`] maps the `ir.json` of a build, both into a
-//! [󰀃](crate::model::Builder), and [`to_introspection`] writes the
-//! introspection result a model answers. The readers are the one place the
-//! core parses untrusted bytes, so every count, length and nesting they accept
-//! is capped by [`ReadLimits`] and every defect is a [`ReadError`].
+//! [`Builder`](crate::model::Builder), and [`to_introspection`] writes the
+//! introspection result a model answers. The readers are the one place the core
+//! parses untrusted bytes, so every count, length and nesting they accept is
+//! capped by [`ReadLimits`] and every defect is a [`ReadError`].
 //!
 //! Every loop that parses reads at least one token per iteration, and the
 //! parser yields at most one token per byte of an input that

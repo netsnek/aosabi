@@ -31,10 +31,12 @@
 //!
 //! A client whose request meets `RPC_UNKNOWN` before a byte of its answer
 //! arrived sends the request again from offset 0, as `HomaModule` does, unless
-//! the request asked with [󰀃](crate::RequestOptions::report_unknown) for
-//! [`Failure::RpcUnknown`] in place of the restart, or the request no longer
-//! fits the peer's `max_message`, which fails it with [`Failure::TooLong`]. An
-//! RPC that received a byte of its answer never restarts.
+//! the request asked with
+//! [`RequestOptions::report_unknown`](crate::RequestOptions::report_unknown)
+//! for [`Failure::RpcUnknown`] in place of the restart, or the request no
+//! longer fits the peer's `max_message`, which fails it with
+//! [`Failure::TooLong`]. An RPC that received a byte of its answer never
+//! restarts.
 
 use core::hash::Hash;
 
@@ -422,7 +424,8 @@ impl<P: Copy + Eq + Hash + PeerPort> Cx<'_, '_, P> {
 
     /// Returns the marks of a new request: [`INCAST`] where incast control
     /// acts and the client RPCs outstanding before it exceed its threshold,
-    /// which the request counts in [󰀁](crate::Stats::incast_marked).
+    /// which the request counts in
+    /// [`Stats::incast_marked`](crate::Stats::incast_marked).
     #[cfg(feature = "client")]
     fn incast_mark(&mut self) -> u8 {
         let Some(incast) = self.core.profile.incast else {

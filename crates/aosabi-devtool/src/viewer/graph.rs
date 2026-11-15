@@ -7,11 +7,11 @@
 //! The `graph` operation.
 //!
 //! The request `{input, options, root}` answers `form`, the text
-//! [󰀂](aoviewer_core::graph::Graph::voyager_form) writes for the schema built
-//! under the transforms of the option string `options`, from the root `root`,
-//! `query`, `mutation` or `subscription`, the query root when the request
-//! names none. The four option sets of SV0 are option strings of the routes,
-//! such as `relay=0&nodes=composite&descdep=0`.
+//! [`Graph::voyager_form`](aoviewer_core::graph::Graph::voyager_form) writes
+//! for the schema built under the transforms of the option string `options`,
+//! from the root `root`, `query`, `mutation` or `subscription`, the query root
+//! when the request names none. The four option sets of SV0 are option strings
+//! of the routes, such as `relay=0&nodes=composite&descdep=0`.
 //!
 //! Beside the form it answers `relay`, the Relay detection that the same
 //! capture judges and step 5 of `51_viewer_core` counts: `connections` and

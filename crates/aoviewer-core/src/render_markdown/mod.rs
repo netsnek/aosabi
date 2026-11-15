@@ -50,13 +50,13 @@
 //! A link inside the tree is relative to the file being written, and its
 //! fragment is the anchor of its target. [`page_path`] names the file of every
 //! page of the tree. An element links to the page [`page_of`] answers under its
-//! anchor from [󰀂](crate::id::Anchors), which writes its anchor exactly once.
-//! The section of the arguments of a field carries the anchor of the field with
-//! `args-` in place of `field-`, and the entry of a description in the details
-//! the anchor of its element behind `details-`. Neither prefix starts the
-//! anchor of an element, which is the text of a stable id, so no two anchors
-//! meet. In the single layout a page that documents no element carries an
-//! anchor of its own, `home`, `clusters`, `scalars`, `relay`, `unreachable`,
+//! anchor from [`Anchors`](crate::id::Anchors), which writes its anchor exactly
+//! once. The section of the arguments of a field carries the anchor of the
+//! field with `args-` in place of `field-`, and the entry of a description in
+//! the details the anchor of its element behind `details-`. Neither prefix
+//! starts the anchor of an element, which is the text of a stable id, so no two
+//! anchors meet. In the single layout a page that documents no element carries
+//! an anchor of its own, `home`, `clusters`, `scalars`, `relay`, `unreachable`,
 //! `deprecated` or `cluster-<slug>`, since every page shares one file there.
 //! None of them starts as the anchor of an element does, with `type`, `field`,
 //! `arg`, `enumvalue` or `inputfield` and a hyphen. A route whose page the tree

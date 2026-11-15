@@ -14,9 +14,10 @@
 //! `undefined` or a thrown error as a refusal. The five specified scalars
 //! answer by rules the pass knows, and a custom scalar answers through
 //! [`Scalars`], which a table built from a schema of the type layer fills
-//! with the literal parse of each custom scalar ([󰀂](super::SchemaScalars)).
-//! A table with no scalar handles, such as the static form, answers through
-//! [`NoScalars`], which leaves every literal at a custom scalar to the rules.
+//! with the literal parse of each custom scalar
+//! ([`SchemaScalars`](super::SchemaScalars)). A table with no scalar handles,
+//! such as the static form, answers through [`NoScalars`], which leaves every
+//! literal at a custom scalar to the rules.
 //!
 //! The pass asks only about a literal of a scalar kind. A `null` keeps the
 //! check of a non null position that the reference makes apart from the

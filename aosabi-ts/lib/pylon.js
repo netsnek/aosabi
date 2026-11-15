@@ -1063,15 +1063,15 @@ function pin(at) {
 // below that level returns before its message, its bindings and its fields are
 // read, as the emit of Pylon returns at its gate before it builds the record.
 // The second writes the record with the bindings of the host spread before its
-// fields. The engine builds a record as {time, level, msg..bindings..fields},
-// so the bindings of its own logger, then those of the host and then the fields
-// give the keys of Pylon's record in Pylon's order, the bindings of a child
-// spread after those of its parent. The bindings of child() and createLogger()
-// stay on the side of the host as Pylon keeps them, the spread child() makes at
-// its call and the object createLogger() is handed, unread, so they reach the
-// engine only as the fields of a record the logger writes, and a binding the
-// JSON of the host cannot write throws only there, as the sink of Pylon throws
-// it.
+// fields. The engine builds a record as {time, level, msg, ...bindings,
+// ...fields}, so the bindings of its own logger, then those of the host and
+// then the fields give the keys of Pylon's record in Pylon's order, the
+// bindings of a child spread after those of its parent. The bindings of child()
+// and createLogger() stay on the side of the host as Pylon keeps them, the
+// spread child() makes at its call and the object createLogger() is handed,
+// unread, so they reach the engine only as the fields of a record the logger
+// writes, and a binding the JSON of the host cannot write throws only there, as
+// the sink of Pylon throws it.
 function makeLogger(resolve) {
   const emit = (level) => (msg, fields) => {
     const at = pin(resolve());

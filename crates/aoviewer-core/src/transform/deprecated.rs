@@ -26,9 +26,9 @@
 //! The marks are the whole rule, and no type is ever deleted by it, not even
 //! one whose every field the graph hides, because a schema may carry the
 //! directive inconsistently and a live field may still point at a type whose
-//! fields are all deprecated. [󰀀](super::Transformed::hides) applies the
-//! filter to the members in the graph alone, and the documents list every
-//! member with its mark.
+//! fields are all deprecated. [`Transformed::hides`](super::Transformed::hides)
+//! applies the filter to the members in the graph alone, and the documents list
+//! every member with its mark.
 //!
 //! The marks cover the fields and input fields, the arguments of fields and
 //! the enum values. An argument of a directive has no element id, so it

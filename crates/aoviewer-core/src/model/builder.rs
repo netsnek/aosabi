@@ -173,7 +173,7 @@ struct StageDirective {
 /// Names resolve at [`Builder::finish`], so a field may name a type declared
 /// later, as introspection JSON and the intermediate representation both do.
 /// The builder never sorts: schema order is kept where order has meaning, and
-/// everything else sorts later by [󰀁](crate::sort::name_order).
+/// everything else sorts later by [`name_order`](crate::sort::name_order).
 ///
 /// A method without a `Result` records its first defect, and
 /// [`Builder::finish`] returns it.

@@ -11,8 +11,8 @@
 //! The ambient state of a running agent.
 //!
 //! Two things are ambient. The first is the agent itself. A free function
-//! such as [󰀀](crate::promise::sleep) takes no agent, so the agent that runs
-//! pushes itself on a stack of the thread for as long as it runs, and
+//! such as [`sleep`](crate::promise::sleep) takes no agent, so the agent that
+//! runs pushes itself on a stack of the thread for as long as it runs, and
 //! [`Agent::current`] reads the top. The second is the state of the layer
 //! above, the context and the resolve info of a request in a store that
 //! follows an async function across every await. The layer above keeps that

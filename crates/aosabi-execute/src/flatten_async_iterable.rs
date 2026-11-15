@@ -81,9 +81,9 @@ struct FlattenState {
 /// The outer iterable is replaced by its iterator at once. A throw of that call
 /// leaves the function in the reference, while the answer here is a value, so
 /// the throw moves to every method of the answer, as
-/// [󰀂](crate::map_async_iterator()) moves it. The one caller hands over the
-/// answer of `mapAsyncIterator`, which answers itself, so no answer reaches
-/// that throw.
+/// [`map_async_iterator`](crate::map_async_iterator()) moves it. The one caller
+/// hands over the answer of `mapAsyncIterator`, which answers itself, so no
+/// answer reaches that throw.
 #[must_use]
 pub fn flatten_async_iterable(agent: &Agent, iterable: &Value) -> Value {
     let (top_iterator, failure) = match get_async_iterator(agent, iterable) {

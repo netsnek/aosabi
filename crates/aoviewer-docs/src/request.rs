@@ -12,8 +12,8 @@
 //! files of its inputs. The build step fills it from `aosabi.docs.toml` alone
 //! and the command from the file and its flags, where a flag wins over a key.
 //! So the command applies the file to a new request through
-//! [󰀂](crate::config::Config::apply) first and sets its flags after, since a
-//! request keeps no mark of which of its fields a flag set.
+//! [`Config::apply`](crate::config::Config::apply) first and sets its flags
+//! after, since a request keeps no mark of which of its fields a flag set.
 //!
 //! The PDF is a switch of the request and no format of the tree, since the
 //! core never compiles one. The PDF standard and the date epoch of the PDF are

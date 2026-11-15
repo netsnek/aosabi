@@ -599,14 +599,18 @@ type FirstRecord = Option<(u64, Option<JsValue>)>;
 /// resolves it from the file system only when its event loop turns, so every
 /// record before that turn is the fallback line and every record after it is
 /// pretty. The sink reads the turns the runtime notes,
-/// [󰀄](crate::clock::turns), and a process that runs no runtime notes none, so
-/// its sink stays on the fallback line. A later record of the request whose
-/// record started the import, the one that carries the same `requestId`, is
-/// pretty within the turn as well, since the chain of the request in the
-/// reference outlasts the import, so the access line of the first request of a
-/// fresh process carries the time while the record of its error before it
-/// carries none. The two modes of the reference write the same terminal line
-/// here, because a Rust process has no inspector to send the record to.
+/// [`turns`](crate::clock::turns), and a process that runs no runtime notes
+/// none, so its sink stays on the fallback line. A sink made later in the
+/// process, which `configureLogger` makes for each pass, is taken to wait for
+/// a turn as well, since the reference imports a module it has loaded once
+/// from its cache and the boot logs show the first record of such a sink
+/// alone. A later record of the request whose record started the import, the
+/// one that carries the same `requestId`, is pretty within the turn as well,
+/// since the chain of the request in the reference outlasts the import, so the
+/// access line of the first request of a fresh process carries the time while
+/// the record of its error before it carries none. The two modes of the
+/// reference write the same terminal line here, because a Rust process has no
+/// inspector to send the record to.
 fn lazy_dev_sink() -> LogSink {
     let first: Rc<RefCell<FirstRecord>> = Rc::new(RefCell::new(None));
     let fallback = line_sink();

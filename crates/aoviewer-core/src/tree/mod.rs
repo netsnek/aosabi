@@ -21,16 +21,18 @@
 //! [`LAYOUT_VERSION`](crate::LAYOUT_VERSION) appear in `manifest.json` alone.
 //!
 //! - A Markdown page is the page model of its route written by
-//!   [󰀀](crate::render_markdown::render_markdown), its file and every link it
-//!   makes named by [󰀁](crate::render_markdown::page_path). A diagram is a
-//!   `picture` element over the files of both themes, or a plain image over the
-//!   one theme written, and under `mermaid` a neighbourhood diagram of at most
-//!   12 boxes gains its Mermaid form beside it.
+//!   [`render_markdown`](crate::render_markdown::render_markdown), its file and
+//!   every link it makes named by
+//!   [`page_path`](crate::render_markdown::page_path). A diagram is a `picture`
+//!   element over the files of both themes, or a plain image over the one theme
+//!   written, and under `mermaid` a neighbourhood diagram of at most 12 boxes
+//!   gains its Mermaid form beside it.
 //! - A Typst chapter opens with `#import "/sabi-theme.typ": *`, or with
 //!   `#import "/template.typ": *` under `typst_template`, since an included
 //!   file sees no binding of the file that includes it, and holds its pages
-//!   written by [󰀃](crate::render_typst::render_typst_page_with_diagrams), each
-//!   diagram the `#sv-diagram(..)` call of its scene, or under
+//!   written by
+//!   [`render_typst_page_with_diagrams`](crate::render_typst::render_typst_page_with_diagrams),
+//!   each diagram the `#sv-diagram(..)` call of its scene, or under
 //!   [`TypstDiagrams::Svg`] the image of its SVG file in the theme of the
 //!   document. A chapter is never split by its size.
 //! - `api.typ` imports the theme, sets the document with `date: none`, or with

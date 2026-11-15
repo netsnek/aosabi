@@ -16,9 +16,11 @@
 //! scalar in place and building every other bound type a second time from its
 //! config with the hooks of the map set on it. A type of this crate sits
 //! behind an `Arc` and takes its hooks at construction, so the map enters the
-//! one build instead: the builders of [󰀄](mod@crate::extend_schema) read the
-//! bindings of a type and of a field at the moment they build its config, and
-//! [󰀅](crate::build_schema_with_bindings) is the entry that hands them in.
+//! one build instead: the builders of
+//! [`extend_schema`](mod@crate::extend_schema) read the bindings of a type and
+//! of a field at the moment they build its config, and
+//! [`build_schema_with_bindings()`](crate::build_schema_with_bindings) is the
+//! entry that hands them in.
 //!
 //! A binding that names no type, or a field no type has, is ignored here. The
 //! validation pass of the caller refuses such an entry before the build, so
@@ -46,9 +48,10 @@ use crate::definition::{
 /// The reference copies every enumerable property of the instance over the
 /// config the scalar was built from, so a description or a URL the instance
 /// holds as `undefined` clears what the SDL declared. That is the outer
-/// `Option` of [󰀃](Self::description) and of [󰀄](Self::specified_by_url):
-/// `None` leaves the built value alone and `Some(None)` clears it.
-/// `extensions` is merged over the built extensions, key by key.
+/// `Option` of [`description`](Self::description) and of
+/// [`specified_by_url`](Self::specified_by_url): `None` leaves the built value
+/// alone and `Some(None)` clears it. `extensions` is merged over the built
+/// extensions, key by key.
 #[derive(Clone, Debug, Default)]
 pub struct ScalarBinding {
     /// The description, where `Some(None)` clears the built one.

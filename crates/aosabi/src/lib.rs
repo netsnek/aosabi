@@ -38,7 +38,7 @@
 //! | [`ID`], [`Int`], [`Float`], [`Number`], [`Date`], [`File`], [`JSON`], [`Any`] | the scalar markers, the twins of the TypeScript types that name a built in scalar, and of `number` |
 //! | [`Service`], [`request_stream`] |  |
 //! | [`mod@json`] | the JSON value types a resolver builds, `json::Map` and `json::Value`, and [`json!`] of the derive path, a compile error under the default features |
-//! | [󰀀](mod@fetch) | the Fetch types a route answers with, `Response` over a string, bytes or a stream |
+//! | [`fetch`](mod@fetch) | the Fetch types a route answers with, `Response` over a string, bytes or a stream |
 //! | [`time`], [`task`] | the timers of a request and of a setup and the job queue of a request, `sleep`, `set_timeout`, `delay` and `tick` |
 //! | [`create_graphql_error`], [`GraphQLError`], [`GraphQLErrorOptions`], [`MaskedErrors`] | `createGraphQLError` of graphql-yoga, the `GraphQLError` it makes and its options, and the type of the key of Yoga a configuration sets, `MaskedErrors` with its options |
 //! | [`get_cookie`], [`get_cookies`], [`set_cookie`], [`delete_cookie`], [`CookieOptions`] | the cookie helpers of hono, the signed forms aside |

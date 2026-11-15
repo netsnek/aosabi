@@ -11,15 +11,14 @@
 //! return.
 //!
 //! A TypeScript property may hold a function, `org: () => Org` or
-//! `orders(status?: string, limit?: number): Order[]`, and the checker then
-//! answers its type with one call signature. The walk of a TypeScript build reads the
-//! parameters of that signature as the arguments of the field and its return
-//! as the type of the field. A Rust field holds no such type with a
-//! description, because a closure and a trait object implement
-//! [󰀂](super::Described) nowhere, so a named type that stands for a function
-//! describes itself through [󰀃](super::TypeExpr::Callable) and the record
-//! below. `Lazy` of the run time is the one such type of this crate, a
-//! callable with no parameter.
+//! `orders(status?: string, limit?: number): Order[]`, and the checker then answers
+//! its type with one call signature. The walk of a TypeScript build reads the
+//! parameters of that signature as the arguments of the field and its return as the
+//! type of the field. A Rust field holds no such type with a description, because a
+//! closure and a trait object implement [`Described`](super::Described) nowhere, so a
+//! named type that stands for a function describes itself through
+//! [`TypeExpr::Callable`](super::TypeExpr::Callable) and the record below. `Lazy` of
+//! the run time is the one such type of this crate, a callable with no parameter.
 
 use super::{
     info::ParamInfo,

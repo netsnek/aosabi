@@ -84,7 +84,9 @@
 //! names, so the same callers compile in both builds, and no stub names the
 //! walk, the checks after it, the builder of a table or the feed of the lexer,
 //! so no build of the conventional validation compiles them into a binary at
-//! any level of optimization.
+//! any level of optimization. The kernel builds a configuration that leaves a
+//! function out the same way, with "no-op stub versions in the #else case" that
+//! its callers call unconditionally.
 //!
 //! An optimizing build inlines the stubs, so the served twin of
 //! `in-context-app`, the Worker module of `tests/budget/worker`, the RV32 probe

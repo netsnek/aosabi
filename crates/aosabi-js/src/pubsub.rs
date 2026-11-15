@@ -12,10 +12,10 @@
 //! The pub subs of the app in the pub sub of the engine.
 //!
 //! The function `createPubSub` of the entry `aosabi`, which the entry also exports as
-//! `experimentalCreatePubSub`, answers a pub sub of the host that
-//! holds a number and no topic of its own. Its `subscribe(routingKey, id)` answers a
-//! marker, which crosses as the tag [󰀄](crate::host::Tag::Topic) where a resolver
-//! answers it, and [`topic`] reads it into the repeater of the topic that
+//! `experimentalCreatePubSub`, answers a pub sub of the host that holds a number and
+//! no topic of its own. Its `subscribe(routingKey, id)` answers a marker, which
+//! crosses as the tag [`Tag::Topic`](crate::host::Tag::Topic) where a resolver answers
+//! it, and [`topic`] reads it into the repeater of the topic that
 //! [`aosabi_core::PubSub::subscribe_value`] answers, the repeater of the executor a
 //! Rust service subscribes through. Its `publish(routingKey, ...args)` crosses through
 //! the export `publish` in a microtask of the host, never inside an import, with each

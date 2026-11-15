@@ -32,11 +32,11 @@
 //!
 //! Voyager seeds one root at a time, the query root by default or the root a
 //! reader picks, so it never seeds the mutation root beside the query root.
-//! [󰀀](super::Graph::voyager_form) walks from one root. [`Walks::voyager`]
-//! seeds the query and the mutation root, because the exit number of the walks
-//! counts 36 of 77 under stock Voyager with both roots seeded, and the
-//! subscription root as well, as the other two walks do, so the three sets
-//! answer over the same seeds.
+//! [`Graph::voyager_form`](super::Graph::voyager_form) walks from one root.
+//! [`Walks::voyager`] seeds the query and the mutation root, because the exit
+//! number of the walks counts 36 of 77 under stock Voyager with both roots
+//! seeded, and the subscription root as well, as the other two walks do, so
+//! the three sets answer over the same seeds.
 //!
 //! A walk runs over the graph it is given. The strict walk over the
 //! uncollapsed node set of the section is the strict walk of a graph built

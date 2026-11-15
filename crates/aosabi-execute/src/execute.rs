@@ -3700,7 +3700,7 @@ pub fn invalid_return_type_error(
 ///
 /// The sub fields are the node of the plan for `field` on `return_type`, which
 /// the plan collects once, as `collectSubfields` does with its memo at
-/// `execute.js:28` (see [󰀆](crate::plan::Plan)).
+/// `execute.js:28` (see [`Plan::sub`](crate::plan::Plan)).
 ///
 /// # Errors
 ///

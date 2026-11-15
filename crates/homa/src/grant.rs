@@ -17,17 +17,17 @@
 //! The grant scheduler.
 //!
 //! A receiver grants to the messages it receives on one downlink: every peer
-//! is its own downlink under [󰀀](crate::Scope::PerPeer), and every peer
-//! shares one under [󰀁](crate::Scope::Shared). The messages it grants to at
-//! once are its active messages: the ones with the fewest bytes not yet
-//! received, ties to the older, one a sender, up to `max_overcommit` of them,
-//! since a sender sends its shortest message first anyway. It grants each
-//! active message in that order up to the bytes it received and its
-//! [`window`], never past the message, once the bytes granted and not
-//! received fall to half of the window where the profile batches its grants
-//! and below the window where it grants as data arrives, and only while the
-//! bytes the downlink expects, unscheduled or granted and not received, stay
-//! within `max_incoming`.
+//! is its own downlink under [`Scope::PerPeer`](crate::Scope::PerPeer), and
+//! every peer shares one under [`Scope::Shared`](crate::Scope::Shared). The
+//! messages it grants to at once are its active messages: the ones with the
+//! fewest bytes not yet received, ties to the older, one a sender, up to
+//! `max_overcommit` of them, since a sender sends its shortest message first
+//! anyway. It grants each active message in that order up to the bytes it
+//! received and its [`window`], never past the message, once the bytes
+//! granted and not received fall to half of the window where the profile
+//! batches its grants and below the window where it grants as data arrives,
+//! and only while the bytes the downlink expects, unscheduled or granted and
+//! not received, stay within `max_incoming`.
 //!
 //! **The FIFO share.** On a point to point profile every `fifo_every`th grant
 //! of a downlink goes to the oldest message rather than the active one, which

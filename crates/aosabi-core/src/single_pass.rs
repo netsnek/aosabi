@@ -32,7 +32,8 @@
 //! Worker module and the RV32 probe built that way hold no symbol of the
 //! module, while an unoptimized build keeps the stubs a caller calls out of
 //! line. That crate compiles before this one, so the module and the server
-//! read one value. [󰀄](crate::app::handler::build_http_options) sets the
+//! read one value.
+//! [`build_http_options`](crate::app::handler::build_http_options) sets the
 //! option `single_pass` of Yoga to [`SINGLE_PASS`] and its bound on nesting to
 //! [`TARGET`], so no field of `HandlerOptions` names either. Neither setting
 //! changes an answer: a build of the conventional validation validates every

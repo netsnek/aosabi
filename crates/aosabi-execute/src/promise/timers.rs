@@ -28,8 +28,8 @@
 //!
 //! # The rules
 //!
-//! The plan of the timers states seven rules. This module implements rules 1,
-//! 3, 4 and 5, and [󰀀](crate::promise::host) the other three.
+//! The timers follow seven rules. This module implements rules 1, 3, 4 and 5,
+//! and [`host`](crate::promise::host) the other three.
 //!
 //! 1. In host mode the time of the agent is `now_ms()` of the clock minus
 //!    the reading taken when [`Agent::set_host_clock`] installed it, a
@@ -251,11 +251,11 @@ impl Agent {
     /// counts as 1, which is the rule of node. A delay of 0 and a delay of 1
     /// therefore share a deadline and fire in creation order. The current time
     /// is the one of [`Agent::now`], the time since the host clock was
-    /// installed under [󰀂](crate::promise::TimerMode::Host) and the virtual
-    /// time otherwise. The other half of that rule, a delay above 2147483647,
-    /// is not reproduced, because no timer of a behaviour table or of a
-    /// fixture comes near it. The returned id clears the timer before it fires
-    /// (rule 5).
+    /// installed under [`TimerMode::Host`](crate::promise::TimerMode::Host)
+    /// and the virtual time otherwise. The other half of that rule, a delay
+    /// above 2147483647, is not reproduced, because no timer of a behaviour
+    /// table or of a fixture comes near it. The returned id clears the timer
+    /// before it fires (rule 5).
     // A caller that never clears the timer writes the call as a statement,
     // so the id is no `must_use` value.
     #[expect(clippy::must_use_candidate)]
@@ -274,7 +274,7 @@ impl Agent {
     /// reschedules the interval before the callback runs (rule 3), and the
     /// interval runs until [`Agent::clear_timer`] ends it. On the virtual
     /// clock nothing else ends it, so an agent with a live interval never runs
-    /// out of work there (rule 6 of [󰀂](crate::promise::host)).
+    /// out of work there (rule 6 of [`host`](crate::promise::host)).
     #[must_use = "the id is the one way to end the interval"]
     pub fn set_interval(&self, period: u64, callback: Rc<dyn Fn(&Agent)>) -> TimerId {
         let period = period.max(1);

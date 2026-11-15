@@ -9,15 +9,15 @@
 //! `EpollReactor` and `platform_reactor`.
 //!
 //! The epoll reactor adds a source once, edge triggered, for reading and for
-//! writing, with its [󰀀](crate::runtime::reactor::SourceId) as the event data,
-//! keeps the waker per source and interest, and waits in `epoll_wait` up to the
-//! least deadline, at most `c_int::MAX` milliseconds a wait, so no processor time
-//! is spent while nothing is ready, whatever the deadline. A deadline that is due,
-//! the turn of an executor that holds a woken task, gives `epoll_wait` a timeout
-//! of 0, which reads the sources ready now with no wait. A socket tries its read
-//! or write before it registers, and one thread runs the loop, so an edge that
-//! comes after a `WouldBlock` is read by the next wait and never lost. The calls
-//! are the safe `rustix::event::epoll`.
+//! writing, with its [`SourceId`](crate::runtime::reactor::SourceId) as the event
+//! data, keeps the waker per source and interest, and waits in `epoll_wait` up to
+//! the least deadline, at most `c_int::MAX` milliseconds a wait, so no processor
+//! time is spent while nothing is ready, whatever the deadline. A deadline that is
+//! due, the turn of an executor that holds a woken task, gives `epoll_wait` a
+//! timeout of 0, which reads the sources ready now with no wait. A socket tries
+//! its read or write before it registers, and one thread runs the loop, so an edge
+//! that comes after a `WouldBlock` is read by the next wait and never lost. The
+//! calls are the safe `rustix::event::epoll`.
 
 use std::io;
 

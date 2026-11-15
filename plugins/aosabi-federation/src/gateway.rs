@@ -18,7 +18,7 @@
 //! the options, the table of the patches and the policies collected from them
 //! once. `delegate` takes the arguments struct of a remote root field, which
 //! fixes the path, the registry and the record the field answers, and the
-//! literal [󰀅](crate::needs!), whose closure is typed by that record. It
+//! literal [`needs!`](crate::needs!), whose closure is typed by that record. It
 //! answers a [`DelegateCall`], a future that owns a handle of its federation,
 //! so a `Lazy` member that moves it in answers a `'static` future. The value it
 //! answers is read through `FromDelegated<D::Return>`, so a resolver states
@@ -332,7 +332,7 @@ impl Config {
     /// copy of what the headers function of the configuration answers for the
     /// context of the request, or no header without one. The introspection
     /// carries no context, so the function of the configuration answers for
-    /// none (quirk Q77).
+    /// none (quirk `FEDERATION_INTROSPECTION_HEADERS`).
     fn executor(&self) -> Executor {
         let headers = self.headers;
         #[cfg(feature = "host-headers")]

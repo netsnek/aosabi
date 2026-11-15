@@ -105,7 +105,7 @@ pub const MAX_DECLARED: usize = 256;
 /// The most globs of one declared cluster [`Clustering::pick`] reads.
 ///
 /// A longer list is cut after this many globs, the cap of `hide=` as well,
-/// [󰀁](crate::transform::MAX_HIDE_GLOBS).
+/// [`MAX_HIDE_GLOBS`](crate::transform::MAX_HIDE_GLOBS).
 pub const MAX_DECLARED_GLOBS: usize = 64;
 
 /// The size under which an automatic group merges into its strongest

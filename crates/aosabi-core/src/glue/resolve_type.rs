@@ -7,11 +7,10 @@
  * packages/pylon/src/cli/builder/schema/schema-parser.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * Evaluates as function resolveType(node) { if (!node || typeof node !==
- * 'object') return null.. }, and of the names the projection of the canary
- * 3.0.0-canary-20260206115650 holds, getAllPropertyNames and
- * wrapFunctionsRecursively of its with a downstream patch, which no tree
- * of Aosabi vendors.
+ * Evaluates as function resolveType(node) { if (!node || typeof node !== 'object')
+ * return null; ... }, and of the names the projection of the canary
+ * 3.0.0-canary-20260206115650 holds, getAllPropertyNames and wrapFunctionsRecursively of
+ * its with a downstream patch, which no tree of Aosabi vendors.
  */
 
 //! `ResolveTypeRule` and `resolve_type`.

@@ -22,15 +22,15 @@
 //! one merged resolver.
 //!
 //! A clearing binding is spelled out here, since the bindings of
-//! [󰀀](crate::schema_bindings) lay a present member over the built one and
-//! never clear one. A client schema carries none of the cleared members, so
-//! the clearing changes no type a remote describes, and it is kept because
-//! the reference clears them and a schema built another way may carry them.
-//! `mapSchema` also serializes the default value of every argument and input
-//! field with the old leaf types and parses it with the new ones. The leaf
-//! types of a client schema and of its wrapping schema have the identity
-//! hooks and the same enum names, so the round trip answers the value it was
-//! given and the port keeps the value as it stands.
+//! [`schema_bindings`](crate::schema_bindings) lay a present member over the
+//! built one and never clear one. A client schema carries none of the
+//! cleared members, so the clearing changes no type a remote describes, and
+//! it is kept because the reference clears them and a schema built another
+//! way may carry them. `mapSchema` also serializes the default value of
+//! every argument and input field with the old leaf types and parses it with
+//! the new ones. The leaf types of a client schema and of its wrapping
+//! schema have the identity hooks and the same enum names, so the round trip
+//! answers the value it was given and the port keeps the value as it stands.
 //!
 //! [`ast_from_type`] writes a type as the type node of a variable
 //! definition, which the request builder of a delegation reads off the

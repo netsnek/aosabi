@@ -14,10 +14,10 @@
 //!   [`SINGLE_BOXES`] boxes of the graph and the split layout above. The
 //!   single layout writes every page into `API.md`, and the split layout
 //!   writes the home page as `README.md` and every other page under `md/`,
-//!   each file named by [󰀅](crate::render_markdown::page_path). The single
-//!   layout gives a type no neighbourhood diagram, since the overview shows
-//!   every type at that size, so it leaves the diagram blocks of a type page
-//!   out in every format.
+//!   each file named by [`page_path`](crate::render_markdown::page_path). The
+//!   single layout gives a type no neighbourhood diagram, since the overview
+//!   shows every type at that size, so it leaves the diagram blocks of a type
+//!   page out in every format.
 //! - **The pages.** The home page, the root pages in the order Query,
 //!   Mutation, Subscription, then per cluster in the order of the clustering
 //!   its page and the pages of its types, then the types no cluster holds in

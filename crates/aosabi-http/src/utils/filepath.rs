@@ -10,9 +10,10 @@
 //! The adapters of hono for Bun, Deno and Workers read a file at the path
 //! [`get_file_path`] or [`get_file_path_without_default_document`] makes of
 //! the request path and the root. Both refuse a path with a `..` segment,
-//! which is the rule [󰀃](crate::middleware::serve_static) shares. An option
-//! the reference reads with `||` is an empty string here where the caller
-//! gives none, since `||` treats the empty string and `undefined` alike.
+//! which is the rule [`serve_static`](crate::middleware::serve_static) shares.
+//! An option the reference reads with `||` is an empty string here where the
+//! caller gives none, since `||` treats the empty string and `undefined`
+//! alike.
 
 /// The document a directory path names, `index.html`.
 pub const DEFAULT_DOCUMENT: &str = "index.html";
