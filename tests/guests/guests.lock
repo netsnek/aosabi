@@ -42,8 +42,8 @@ size = 62181829
 guests = ["A"]
 
 # The build tree of the image's kernel, for dummy_hcd, which Fedora does not
-# build (CONFIG_USB_DUMMY_HCD is not set in its .config), and for the crate's
-# kernel module of stage H5.
+# build (CONFIG_USB_DUMMY_HCD is not set in its .config), and for the kernel
+# module of the crate homa.
 [[artifact]]
 name = "kernel-devel-6.17.1-300.fc43"
 kind = "kernel"

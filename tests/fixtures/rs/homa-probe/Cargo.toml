@@ -35,7 +35,7 @@ frame-only = []
 # 23_homa_budget holds the image of a card that federates to the bound of the
 # server image.
 client = ["homa/client"]
-# The HT-CT62 of stage H6, one feature per part of the LoRa cell of
+# The image of the HT-CT62, one feature per part of the LoRa cell of
 # 23_homa_budget, each build the one before it and one part more, so the
 # difference of two builds is the bytes of one part: the budget pacer the
 # airtime ledger runs over, the AEAD of chacha20poly1305 through the seal of

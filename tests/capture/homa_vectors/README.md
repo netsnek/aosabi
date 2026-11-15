@@ -1,9 +1,9 @@
-# The published vectors of the Homa track
+# The published vectors of the Homa notebooks
 
-This directory holds the vectors the Homa track's notebooks judge against, each parsed out of a
-published text that `tests/harness/homa/vectors.py` fetches from a pinned URL. The script checks the
-SHA-256 each text had when it was read and stops before it writes a file when a text moved, so no
-vector is typed by hand and a changed source is seen before it changes a vector.
+This directory holds the vectors the Homa notebooks judge against, each parsed out of a published
+text that `tests/harness/homa/vectors.py` fetches from a pinned URL. The script checks the SHA-256
+each text had when it was read and stops before it writes a file when a text moved, so no vector is
+typed by hand and a changed source is seen before it changes a vector.
 
 The files are written by the script, from `tests/`:
 
