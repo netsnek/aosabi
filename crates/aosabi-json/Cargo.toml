@@ -4,7 +4,7 @@
 # kernel and the player link it.
 [package]
 name = "aosabi-json"
-version = "0.0.0"
+version.workspace = true
 description = "The only crate that turns a number, a string or an object into JSON bytes, the way V8 writes them."
 edition.workspace = true
 rust-version.workspace = true

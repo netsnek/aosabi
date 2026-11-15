@@ -3,7 +3,7 @@
 # native targets of cfg(unix).
 [package]
 name = "aosabi-carrier-unix"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier Unix Socket: HTTP(Unix Socket) in the runtime directory of the user, served through aosabi-serve, with the peer check on Linux."
 edition.workspace = true
 rust-version.workspace = true

@@ -9,7 +9,7 @@
 # product and an app ships none of it.
 [package]
 name = "aosabi-infer-wasm"
-version = "0.0.0"
+version.workspace = true
 description = "The module infer.wasm of the npm package aosabi-build: the schema inference of Aosabi over the live TypeScript checker, answered through the host."
 edition.workspace = true
 rust-version.workspace = true

@@ -5,7 +5,7 @@
 # never published, since the package carries its module as a build product.
 [package]
 name = "graphtp-wasm"
-version = "0.0.0"
+version.workspace = true
 description = "The wasm module of the npm package graphtp: the GraphTP/1 codec, its zlib profile and the Homa client role, with no import."
 edition.workspace = true
 rust-version.workspace = true

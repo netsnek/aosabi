@@ -1,6 +1,6 @@
 {
   "name": "aosabi-build",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "description": "The dev package of the TypeScript option of Aosabi, the command aosabi with aosabi migrate and aosabi build, whose module infer.wasm infers the schema over the live checker of typescript 5.9.3, installed beside the package aosabi and never shipped with an app",
   "private": true,
   "type": "module",

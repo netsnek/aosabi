@@ -3,7 +3,7 @@
 # introspection refusal an app installs.
 [package]
 name = "graphql-over-http"
-version = "0.0.0"
+version.workspace = true
 description = "GraphQL over HTTP as one function, the jobs of graphql-yoga 5.18.0 as Aosabi runs it: the request parsers, the multipart parser, the checks, the result processors, masking, the cache of documents, the logger and the introspection refusal."
 edition.workspace = true
 rust-version.workspace = true

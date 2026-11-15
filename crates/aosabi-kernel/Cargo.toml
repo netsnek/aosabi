@@ -9,7 +9,7 @@
 # Aosabi.
 [package]
 name = "aosabi-kernel"
-version = "0.0.0"
+version.workspace = true
 description = "Layer 0 of Aosabi: the framing, the publish primitive and the entry below HTTP, with no standard library and allocation optional."
 edition.workspace = true
 rust-version.workspace = true

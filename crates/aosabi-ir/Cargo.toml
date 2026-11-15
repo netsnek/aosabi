@@ -3,7 +3,7 @@
 # its printer need an allocator and nothing else of a host.
 [package]
 name = "aosabi-ir"
-version = "0.0.0"
+version.workspace = true
 description = "The intermediate representation of Aosabi: the model, its JSON shape, the SDL printer and the collation of the implements sort."
 edition.workspace = true
 rust-version.workspace = true

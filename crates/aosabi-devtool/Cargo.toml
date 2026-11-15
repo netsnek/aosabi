@@ -4,7 +4,7 @@
 # its own code.
 [package]
 name = "aosabi-devtool"
-version = "0.0.0"
+version.workspace = true
 description = "The Python seam. One byte level primitive per sub command, called by the notebooks under tests/notebooks."
 edition.workspace = true
 rust-version.workspace = true

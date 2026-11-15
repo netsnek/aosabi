@@ -6,7 +6,7 @@
 # it.
 [package]
 name = "graphtp"
-version = "0.0.0"
+version.workspace = true
 description = "GraphTP, the Graph Transfer Protocol: the types and the wire codec of GraphQL requests and answers over a message transport"
 categories = ["network-programming", "no-std", "compression"]
 keywords = ["graphql", "protocol", "homa", "no-std", "deflate"]

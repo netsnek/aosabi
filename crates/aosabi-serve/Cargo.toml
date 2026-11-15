@@ -5,7 +5,7 @@
 # facade, so a Worker build and the default ESP32-C3 build link none of it.
 [package]
 name = "aosabi-serve"
-version = "0.0.0"
+version.workspace = true
 description = "The engine of Aosabi: serve_with, the node server plugin, the runtime of one thread, the TCP listener, the protocol selection, the node handler and the Node adapter of @hono/node-server 1.19.9, with TLS and HTTP/2 behind features of the Linux cards."
 edition.workspace = true
 rust-version.workspace = true

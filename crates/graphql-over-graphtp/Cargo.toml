@@ -5,7 +5,7 @@
 # it.
 [package]
 name = "graphql-over-graphtp"
-version = "0.0.0"
+version.workspace = true
 description = "GraphQL over GraphTP: the listener that serves an app's fetch over Homa with the fixed fields of GraphTP, its status and substatus, and its streams."
 edition.workspace = true
 rust-version.workspace = true

@@ -3,7 +3,7 @@
 # uses the standard library.
 [package]
 name = "aosabi-query"
-version = "0.0.0"
+version.workspace = true
 description = "The TypeScript client of a service: the schema descriptor, the root type and the files types.ts, index.ts and index.js."
 edition.workspace = true
 rust-version.workspace = true

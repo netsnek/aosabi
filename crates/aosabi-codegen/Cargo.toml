@@ -5,7 +5,7 @@
 # alone, so it reaches no card.
 [package]
 name = "aosabi-codegen"
-version = "0.0.0"
+version.workspace = true
 description = "The emission of the run time glue of Aosabi, which the derive macros and the builder of a plain crate share."
 edition.workspace = true
 rust-version.workspace = true

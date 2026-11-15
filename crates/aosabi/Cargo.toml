@@ -30,7 +30,7 @@
 # size profile.
 [package]
 name = "aosabi"
-version = "0.0.0"
+version.workspace = true
 description = "Aosabi in Rust: the facade crate a service depends on."
 edition.workspace = true
 rust-version.workspace = true

@@ -4,7 +4,7 @@
 # reaches them through the facade crate aosabi and never by this name.
 [package]
 name = "aosabi-macros"
-version = "0.0.0"
+version.workspace = true
 description = "The procedural macros of Aosabi: the derive and the two attributes that record the static type descriptors the schema inference reads."
 edition.workspace = true
 rust-version.workspace = true

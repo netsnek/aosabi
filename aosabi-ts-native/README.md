@@ -76,6 +76,6 @@ target of musl builds with `-C target-feature=-crt-static` and links through `ru
 the compiler driver of the host links the C library of glibc. On an aarch64 host
 `x86_64-unknown-linux-gnu` links with `x86_64-linux-gnu-gcc` over the sysroot
 `/usr/x86_64-linux-gnu/sys-root`, and `aarch64-unknown-linux-gnu` links with the compiler driver of
-the host. Every package is `private` at version `0.0.0` and the owner alone publishes, as with
-`aosabi`. They are the project's own packages and hold no code from outside the project, so `aosabi`
-still depends on no npm package outside the project.
+the host. Every package is `private` at version `0.1.1`. They are the project's own packages and
+hold no code from outside the project, so `aosabi` still depends on no npm package outside the
+project.

@@ -3,7 +3,7 @@
 # served crate depends on it, so no byte of it reaches a served binary.
 [package]
 name = "aoviewer-docs"
-version = "0.0.0"
+version.workspace = true
 description = "The documentation generator of Aosabi: reads a schema and writes or checks the tree of its reference."
 edition.workspace = true
 rust-version.workspace = true

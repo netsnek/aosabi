@@ -3,7 +3,7 @@
 # links it, riscv32imc-unknown-none-elf among them.
 [package]
 name = "aosabi-auth-contract"
-version = "0.0.0"
+version.workspace = true
 description = "The authorization contract of Aosabi: the principal, its role and permission checks, the identity provider seam and ForbiddenError, with no standard library."
 edition.workspace = true
 rust-version.workspace = true

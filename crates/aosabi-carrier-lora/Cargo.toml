@@ -6,7 +6,7 @@
 # model on the host.
 [package]
 name = "aosabi-carrier-lora"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier LoRa: one compact Homa packet in one sealed LoRa packet, an airtime ledger inside the duty cycle, and the SX1262."
 edition.workspace = true
 rust-version.workspace = true

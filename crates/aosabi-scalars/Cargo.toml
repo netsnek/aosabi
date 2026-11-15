@@ -2,7 +2,7 @@
 # link every crate below the execution layer.
 [package]
 name = "aosabi-scalars"
-version = "0.0.0"
+version.workspace = true
 description = "The four graphql-scalars 1.25.0 scalars Aosabi binds, DateTimeISO, JSON, JSONObject and Void, translated with their message strings."
 edition.workspace = true
 rust-version.workspace = true

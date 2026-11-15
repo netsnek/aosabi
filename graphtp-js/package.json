@@ -1,6 +1,6 @@
 {
   "name": "graphtp",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "description": "graphtpFetch, a fetch that speaks GraphTP/1 over Homa to a GraphQL service, for Apollo Client, urql, graphql-request, GraphiQL, Relay and the federation of Aosabi",
   "private": true,
   "type": "module",

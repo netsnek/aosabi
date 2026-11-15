@@ -6,7 +6,7 @@
 # of the runtime of aosabi-serve, beside its HTTP(TCP).
 [package]
 name = "aosabi-carrier-network"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier Network: GraphTP(Homa) over raw IP 146 on the crate's engine, beside HTTP(TCP) on a Linux card."
 edition.workspace = true
 rust-version.workspace = true

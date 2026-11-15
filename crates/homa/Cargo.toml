@@ -4,7 +4,7 @@
 # commit writes the values the workspace supplies below.
 [package]
 name = "homa"
-version = "0.0.0"
+version.workspace = true
 description = "The Homa transport protocol over any carrier that moves whole packets, from a UART to raw IP 146 and the Linux kernel."
 # The kernel builds with edition 2021 and rustc 1.85 at least (the design note
 # section 4.9), so the engine keeps both, and clippy's incompatible_msrv lint

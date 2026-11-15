@@ -5,7 +5,7 @@
 # It runs on the build host and uses the standard library.
 [package]
 name = "aosabi-cli"
-version = "0.0.0"
+version.workspace = true
 description = "The command line of Aosabi: cargo aosabi build and dev, and aosabi inspect, verify, mcp, pull and new."
 edition.workspace = true
 rust-version.workspace = true

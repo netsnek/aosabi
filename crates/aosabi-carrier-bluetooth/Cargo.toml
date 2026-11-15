@@ -7,7 +7,7 @@
 # as a local task of the runtime of aosabi-serve.
 [package]
 name = "aosabi-carrier-bluetooth"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier Bluetooth: compact Homa packets on the GATT data path and on the L2CAP LE credit based channel, and GraphTP(Homa) on a Linux card through BlueZ."
 edition.workspace = true
 rust-version.workspace = true

@@ -6,7 +6,7 @@
 # verdict, so it names no type of the GraphQL crates.
 [package]
 name = "aosabi-cache"
-version = "0.0.0"
+version.workspace = true
 description = "The request side cache of Aosabi: parsed documents and the verdicts of their validations in one bounded table, with no standard library."
 edition.workspace = true
 rust-version.workspace = true

@@ -10,7 +10,7 @@
 # aosabi-ts-native carry its libraries as build products.
 [package]
 name = "aosabi-js"
-version = "0.0.0"
+version.workspace = true
 description = "The module core.wasm of the npm package aosabi and its native library for Bun on Linux: the engine with every default layer behind the host boundary of the TypeScript option."
 edition.workspace = true
 rust-version.workspace = true

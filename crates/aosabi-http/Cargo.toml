@@ -10,7 +10,7 @@
 # Worker links the web layer alone.
 [package]
 name = "aosabi-http"
-version = "0.0.0"
+version.workspace = true
 description = "The HTTP layer of Aosabi below the server: the zlib wrapper of HTTP, the neutral messages of a served request and its answer, the tables of Node, and the web layer of every Rust target, the routes, the middleware, the context, the cookies, compress, cors and serve_static of hono 4.11.9 over the Fetch types."
 edition.workspace = true
 rust-version.workspace = true

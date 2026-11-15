@@ -7,7 +7,7 @@
 # context, the seven bound scalars and the service.
 [package]
 name = "aosabi-core"
-version = "0.0.0"
+version.workspace = true
 description = "The core of Aosabi: the static type descriptors the derive macros emit, and behind the feature runtime the resolver wrapping, the context, the bound scalars and the service."
 edition.workspace = true
 rust-version.workspace = true

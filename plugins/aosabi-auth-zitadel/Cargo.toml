@@ -5,7 +5,7 @@
 # auth-zitadel, which turns fetch on.
 [package]
 name = "aosabi-auth-zitadel"
-version = "0.0.0"
+version.workspace = true
 description = "The Zitadel integration of Aosabi: zitadelLogin, zitadelAuth and the OIDC client subset the two reach."
 edition.workspace = true
 rust-version.workspace = true

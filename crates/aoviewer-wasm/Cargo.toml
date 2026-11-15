@@ -4,7 +4,7 @@
 # same code the module carries.
 [package]
 name = "aoviewer-wasm"
-version = "0.0.0"
+version.workspace = true
 description = "The wasm module of aoviewer: nine exports over aoviewer-core and no import."
 edition.workspace = true
 rust-version.workspace = true

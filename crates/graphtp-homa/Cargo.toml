@@ -5,7 +5,7 @@
 # with alloc, because the listener of a microcontroller links it.
 [package]
 name = "graphtp-homa"
-version = "0.0.0"
+version.workspace = true
 description = "GraphTP over Homa: the sans I/O server and client of GraphTP/1 with streams over one parked PULL per peer, and the one adapter that calls Homa"
 categories = ["network-programming", "no-std"]
 keywords = ["graphql", "protocol", "homa", "no-std"]

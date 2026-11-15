@@ -5,7 +5,7 @@
 # aosabi-serve.
 [package]
 name = "aosabi-carrier-serial"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier Serial Line: compact Homa packets in delimited AoFrame over a UART, and GraphTP(Homa) on a Linux tty."
 edition.workspace = true
 rust-version.workspace = true

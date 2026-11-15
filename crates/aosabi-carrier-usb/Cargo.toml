@@ -6,7 +6,7 @@
 # listener as a local task of the runtime of aosabi-serve.
 [package]
 name = "aosabi-carrier-usb"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier USB: compact Homa packets over USB bulk through FunctionFS and over USB serial, and GraphTP(Homa) on the gadget of a Linux card."
 edition.workspace = true
 rust-version.workspace = true

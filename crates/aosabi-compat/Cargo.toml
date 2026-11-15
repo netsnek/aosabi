@@ -4,7 +4,7 @@
 # dependency and no code beyond the register itself.
 [package]
 name = "aosabi-compat"
-version = "0.0.0"
+version.workspace = true
 description = "The register of Pylon defects Aosabi reproduces on purpose, and the list of what it deliberately does not port."
 edition.workspace = true
 rust-version.workspace = true

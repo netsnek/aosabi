@@ -6,7 +6,7 @@
 # wasm32-unknown-unknown as it builds for a host.
 [package]
 name = "aosabi-execute"
-version = "0.0.0"
+version.workspace = true
 description = "The GraphQL executor of Aosabi: the promise job model of ECMA-262 and the executor of @graphql-tools/executor 1.5.1, translated with its message strings."
 edition.workspace = true
 rust-version.workspace = true

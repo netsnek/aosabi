@@ -4,7 +4,7 @@
 # on it.
 [package]
 name = "xtask"
-version = "0.0.0"
+version.workspace = true
 description = "The task runner of the repository: cargo xtask viewer-assets writes the committed viewer products and assets.lock."
 publish = false
 edition.workspace = true
