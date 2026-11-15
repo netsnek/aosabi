@@ -15,8 +15,7 @@
 //! build it links. The PDF is byte identical across processes, because the
 //! identity is fixed, no clock is read and the compiler version is pinned.
 //!
-//! The judging notebook is `tests/notebooks/76_docs_pdf.ipynb`. There is no
-//! test in this crate, which is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #[cfg(feature = "pdf")]
 mod compile;

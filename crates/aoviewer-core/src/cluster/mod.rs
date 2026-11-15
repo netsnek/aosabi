@@ -10,10 +10,10 @@
 //!
 //! [`Clustering::pick`] places the nodes of a [`Schema`]'s graph into
 //! clusters. The nodes it places are every node of the graph but the roots,
-//! which are pages of their own. The clusters, the other bucket and the types
-//! outside of `zitadel-gql` add up to 75 of its 77 composite types. The two
-//! types the counts leave out are its query and its mutation root, so every
-//! node but the roots is placed.
+//! which are pages of their own. On the largest measured schema the clusters,
+//! the other bucket and the types outside add up to 75 of its 77 composite
+//! types. The two types the counts leave out are its query and its mutation
+//! root, so every node but the roots is placed.
 //!
 //! Three sources place the nodes.
 //!

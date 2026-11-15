@@ -19,8 +19,8 @@
 //! core never compiles one. The PDF standard and the date epoch of the PDF are
 //! no field of the request. The caller of `emit_pdf` of `aoviewer-docs-pdf`
 //! passes both in its `PdfRequest`, so this crate names no type of that crate
-//! and its manifest keeps the four crates the plan gives it. The date the
-//! Typst document states stays [`DocsOptions::document_date`].
+//! and its manifest keeps its four dependencies. The date the Typst document
+//! states stays [`DocsOptions::document_date`].
 
 use std::path::PathBuf;
 
@@ -49,7 +49,8 @@ pub struct Request {
     pub pdf: bool,
     /// The old schema of `--since`, whose differences the change log lists.
     pub since: Option<Input>,
-    /// The device card of `--device`, refused lands the device chapter.
+    /// The device card of `--device`, refused until the device cards land the
+    /// device chapter.
     pub device: Option<PathBuf>,
     /// Whether the run checks the tree under `out` rather than writing it,
     /// `--check`.

@@ -32,7 +32,11 @@
 //!   `typ/81-scalars.typ`, `typ/82-unreachable.typ`, `typ/83-deprecated.typ`
 //!   and `typ/99-index.typ`, so the byte order of the paths is the order
 //!   `api.typ` includes them in. The cluster number counts from 1 with two
-//!   digits, or with as many as the count of the cluster chapters needs.
+//!   digits, or with as many as the count of the cluster chapters needs. The
+//!   device cards write `typ/05-device.typ` and
+//!   [`seal_tree`](super::seal_tree) takes it in, and
+//!   [`render_tree`](super::render_tree) writes `typ/90-changes.typ` with the
+//!   change log.
 //! - **The drawings.** One file per diagram a page draws and per theme,
 //!   `svg/overview.<theme>.svg`, `svg/type/<Name>.<theme>.svg`,
 //!   `svg/op/<root>.<field>.<theme>.svg` and `svg/cluster/<slug>.<theme>.svg`,

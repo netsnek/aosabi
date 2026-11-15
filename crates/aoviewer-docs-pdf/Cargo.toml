@@ -18,7 +18,8 @@ workspace = true
 [features]
 default = []
 # The compilation of api.typ into a PDF. It names nothing yet, so a
-# cfg(feature = "pdf") is a known condition.
+# cfg(feature = "pdf") is a known condition. What it takes is still open, and
+# the dependency rule decides it.
 pdf = []
 
 [dependencies]

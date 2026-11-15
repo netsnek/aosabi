@@ -10,7 +10,8 @@
 //!
 //! [`render_svg`] writes a [`Scene`] as one SVG document in the literal form of
 //! one theme, which is the file the generator writes and the export of the
-//! viewer, byte for byte.
+//! viewer, byte for byte. The classed form of the viewer, `render_svg_classed`,
+//! comes in a later release.
 //!
 //! The document follows the rules a Markdown host's sanitizer imposes. It uses
 //! presentation attributes only, no `style` element and no baseline attribute,

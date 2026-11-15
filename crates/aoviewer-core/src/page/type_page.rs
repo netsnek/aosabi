@@ -14,13 +14,12 @@
 //! sits after the pagination note, since the section lists it last among the
 //! blocks and places it nowhere in its order.
 //!
-//! - An object and an interface have the fields table with the columns of the
-//!   plan's example, `Field`, `Type`, `Arguments`, `Description` and
-//!   `Deprecated`, and a column `Inherited from` when a field comes from an
-//!   interface, which is how an implementation lists its inherited fields with
-//!   the interface they come from. The arguments of a field are a count in the
-//!   table that links to one section per field with its arguments table under
-//!   it.
+//! - An object and an interface have the fields table with the columns
+//!   `Field`, `Type`, `Arguments`, `Description` and `Deprecated`, and a
+//!   column `Inherited from` when a field comes from an interface, which is
+//!   how an implementation lists its inherited fields with the interface they
+//!   come from. The arguments of a field are a count in the table that links
+//!   to one section per field with its arguments table under it.
 //! - The group of a union is the name grid of its possible types, of an
 //!   interface the name grid of its implementers, of an enum its values table
 //!   and of an input its input fields table. A custom scalar names the

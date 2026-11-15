@@ -38,7 +38,7 @@
 //!   `#sv-anchor(label("..."))`, before the heading or inside the cell of its
 //!   element. A link to an element whose page the tree does not write is no
 //!   link, so every label a page links to is one the document holds, and a dead
-//!   label is a compile error that `76_docs_pdf` counts.
+//!   label is a compile error that the checks of the PDF count.
 //! - The title of a page is a heading of the outline, level 1 for a page that
 //!   opens a chapter and level 2 for a type page and the pages that follow a
 //!   chapter opener, since the type pages of a cluster follow the page of the

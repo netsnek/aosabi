@@ -1,19 +1,24 @@
 // SPDX-License-Identifier: MIT
 /*
  * aoviewer-docs device: the device chapter as data and its two writers.
+ *
+ * The device cards fill the chapter from a card and these writers write it, so
+ * the chapter goldens of the device cards are goldens of these writers.
  */
 
 //! The device chapter.
 //!
 //! A [`DeviceChapter`] is everything the chapter of a device prints, as plain
 //! data: the identity and the hash of the card, its signature status, the
-//! blueprint as tables with the provenance mark of every fact, the payload,
-//! the code that ran and the code that linked, and the knowledge annex.
+//! blueprint as tables with the provenance mark of every fact, the payload, the
+//! code that ran and the code that linked, and the knowledge annex. The device
+//! cards fill it from a card and write nothing of the rendering, so nothing
+//! fills one yet, `--device` answers `AO-D0010`, and a hand written fixture
+//! stands for a card.
 //!
-//! [`render_device_markdown`] writes `md/device.md` and
-//! [`render_device_typst`] writes `typ/05-device.typ`, the two file names the
-//! plan fixes. Both write the same parts in the same order, which one walk of
-//! the chapter drives:
+//! [`render_device_markdown`] writes `md/device.md` and [`render_device_typst`]
+//! writes `typ/05-device.typ`. Both write the same parts in the same order,
+//! which one walk of the chapter drives:
 //!
 //! - The title, then the picture. The Markdown references the original PNG of
 //!   the card, and the Typst places the thumbnail, a picture the caller
@@ -56,9 +61,12 @@
 //! [`DocsOptions::document_date`], since PDF/A-3 refuses an attached file
 //! without any of the three, while PDF/A-2 refuses every attached file. So PDF
 //! 1.7 and PDF/A-3b take the attachment and PDF/A-2b refuses it, and with it
-//! every document that holds the chapter. The relationship is `source`, since
-//! the chapter is rendered from the card, and the PDF writes it under PDF/A-3
-//! alone.
+//! every document that holds the chapter. Whether the text of a chapter
+//! compiles under PDF/A-3b is a question of its own, since every profile of
+//! PDF/A-2 and PDF/A-3 refuses a character no embedded face can draw, which the
+//! archival fold of the device cards answers. The relationship is `source`,
+//! since the chapter is rendered from the card, and the PDF writes it under
+//! PDF/A-3 alone.
 //!
 //! Every loop runs over the tables, rows, sources, candidates, pages or
 //! bytes of one chapter, which the caller holds in memory, or over the bytes
@@ -84,7 +92,8 @@ use aoviewer_core::{
     render_typst::typst_str,
 };
 
-/// Everything the device chapter prints, as plain data, filled from a card.
+/// Everything the device chapter prints, as plain data, filled from a device
+/// card.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DeviceChapter {
     /// The path of the original PNG of the card relative to the root of the
@@ -93,7 +102,7 @@ pub struct DeviceChapter {
     /// there.
     pub card_file: String,
     /// The SHA-256 of the card in lower case hexadecimal, printed in the
-    /// document and recorded's lock.
+    /// document and recorded by the lock of the device cards.
     pub card_sha256: String,
     /// The id of the device.
     pub id: String,
@@ -309,7 +318,8 @@ const TITLE_LEVEL: u8 = 1;
 const PART_LEVEL: u8 = 2;
 
 /// The level of the heading of a table of the blueprint and of a knowledge
-/// page, which the headings of the page sit below, as demotes them.
+/// page, which the headings of the page sit below, as the device cards demote
+/// them.
 const HEADING_LEVEL: u8 = 3;
 
 /// The label of the chapter in the Typst document, which no anchor of an

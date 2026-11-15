@@ -608,6 +608,9 @@ fn graph_page(
 }
 
 /// Returns the page of a search, which names the text searched for.
+///
+/// The results are the viewer's search over the arena of names, which a later
+/// release writes in `search/` and this module does not write.
 fn search_page(route: &Route, text: &str) -> PageModel {
     PageModel {
         route: route.clone(),

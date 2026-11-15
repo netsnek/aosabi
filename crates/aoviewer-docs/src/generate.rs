@@ -14,8 +14,12 @@
 //! declared map of the options, and renders every file through [`render_tree`]
 //! of the core, the text change log of `--since` included. It reads the files
 //! of its inputs and no other file, so the check mode compares a tree that no
-//! file under `out` shaped, and [󰀇](crate::write::write) or
-//! [󰀈](crate::check::check) takes the tree from here.
+//! file under `out` shaped, and [`write`](crate::write::write) or
+//! [`check`](crate::check::check) takes the tree from here.
+//!
+//! A request that names a card is refused with `AO-D0010` before any input is
+//! read, as device cards bring its chapter. So is `--svg-text outlines` with
+//! `AO-D0015`, since the outlines need the face a later release vendors.
 //!
 //! Every input is read under [`ReadLimits::DEFAULT`], the limits of the
 //! command and of the seam.

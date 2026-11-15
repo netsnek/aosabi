@@ -14,6 +14,8 @@ repository.workspace = true
 
 # The workspace table, unchanged. A wasm export needs its symbol name, which is
 # an unsafe attribute in edition 2024, and forbid(unsafe_code) refuses it.
+# Until this crate alone may write deny in place of forbid, it keeps forbid and
+# carries no export.
 [lints]
 workspace = true
 

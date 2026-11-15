@@ -11,7 +11,7 @@
 //!
 //! A column taller than its budget wraps into sub columns inside the same
 //! rank band. The wrap aims at a picture between one to two and three to one,
-//! the range the design names for the rule and step 13 of `51_viewer_core`
+//! the range the design names for the rule and a check of the viewer core
 //! measures. The budget is one height for every band. A picture that is not
 //! taller than two times its width keeps its columns whole, and a taller one
 //! searches the height by bisection between the tallest item and the tallest

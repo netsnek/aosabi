@@ -13,8 +13,8 @@
 //! `aoviewer-core`, and writes the tree or checks it against the tree on
 //! disk. It runs on the host alone, and no served crate depends on it.
 //!
-//! The judging notebook is `tests/notebooks/75_docgen.ipynb`. There is no
-//! test in this crate, which is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md
+//! section 3.
 
 pub mod check;
 pub mod config;

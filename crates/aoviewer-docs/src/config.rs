@@ -116,7 +116,8 @@ use crate::{
 /// The name of the file beside `Cargo.toml`.
 pub const FILE: &str = "aosabi.docs.toml";
 
-/// The keys of the root of the file, in the order of the plan.
+/// The keys of the root of the file, in the order the refusal of an
+/// unknown key lists them.
 const KEYS: [&str; 12] = [
     "docs",
     "out",

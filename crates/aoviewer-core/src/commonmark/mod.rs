@@ -15,7 +15,12 @@
 //! ATX headings, thematic breaks, fenced and indented code blocks, block
 //! quotes, bullet and ordered lists, GitHub tables, blank lines, emphasis,
 //! strong emphasis, code spans, links, autolinks and hard and soft line
-//! breaks, and everything else is text.
+//! breaks, and everything else is text. Raw HTML, entity and numeric character
+//! references, link reference definitions and their uses, images and setext
+//! headings are therefore text, and their examples in the specification are
+//! left out. Thematic breaks are recognized, because their section is judged
+//! and a line of three dashes between two paragraphs would otherwise join
+//! them.
 //!
 //! A link or an autolink whose destination names a scheme other than `http`,
 //! `https` or `mailto` is no link, and its brackets stay text. A destination
@@ -68,6 +73,8 @@ const ROOT: u32 = 0;
 const MAX_TYPST_NESTING: usize = 16;
 
 /// What happens to raw HTML in a description.
+///
+/// [`RawHtml::Verbatim`] is the default, [`RawHtml::Escaped`] the alternative.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum RawHtml {
     /// The source bytes pass unchanged, and a Markdown host's sanitizer
@@ -590,6 +597,10 @@ pub fn to_typst(doc: &Doc, source: &str, out: &mut String) {
     Typst::new(doc, out).write();
 }
 
+/// Writes HTML with raw HTML escaped and only `http`, `https` and `mailto`
+/// linked, judged by the examples of the [CommonMark specification] and
+/// reused by the viewer.
+///
 /// The HTML is the markup the examples of that specification expect for the
 /// constructs of the subset, and a table the markup of the [GitHub Flavored
 /// Markdown specification]. `source` is the text `doc` was read from, which

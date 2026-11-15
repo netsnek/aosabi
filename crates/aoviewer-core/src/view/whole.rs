@@ -22,13 +22,13 @@
 //! `leaf=0` hides. A box is at [`Level::L2`] when the view holds at most 80 of
 //! them and at [`Level::L1`] above. The node set is the graph's, so
 //! `nodes=composite` draws the composite types and the default of the option
-//! grammar, `nodes=all`, draws every layer, which is 127 boxes for
-//! `zitadel-gql`. The design opens the mode on the composite set with layer
-//! chips for the inputs and the enums, and those chips are filters of the
-//! viewer that set the node set before a view is asked for. Under `hideRoot=1`
-//! the roots leave after the walk. The whole graph mode folds no
-//! implementation in the viewer, since it is the Voyager view, and the first
-//! reduction of a page folds them as in the ego and the cluster views.
+//! grammar, `nodes=all`, draws every layer, 127 boxes on the largest measured
+//! schema. The design opens the mode on the composite set with layer chips for
+//! the inputs and the enums, and those chips are filters of the viewer that
+//! set the node set before a view is asked for. Under `hideRoot=1` the roots
+//! leave after the walk. The whole graph mode folds no implementation in the
+//! viewer, since it is the Voyager view, and the first reduction of a page
+//! folds them as in the ego and the cluster views.
 //!
 //! A walk settles each node once, so its loop runs over the nodes of one
 //! graph.

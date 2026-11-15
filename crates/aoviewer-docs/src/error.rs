@@ -13,7 +13,9 @@
 //! `Display` writes the code first and the text after it, in one place.
 //!
 //! A tree the core does not draw takes `AO-D0023`, the first code no plan held
-//! before it.
+//! before it. The codes `AO-D0001` to `AO-D0015` are the refusals of the
+//! generator, `AO-D0016` and `AO-D0017` are held for its Typst program, and
+//! `AO-D0018` to `AO-D0022` belong to the device cards.
 
 use core::fmt;
 use std::{
@@ -202,7 +204,7 @@ pub enum DocsError {
     /// The model builder refuses the schema an input describes, or the SDL
     /// path refuses its counts before the build.
     Model(ModelError),
-    /// `AO-D0010`: `--device`, which lands the device chapter.
+    /// `AO-D0010`: `--device` before the device cards land the device chapter.
     Device {
         /// The card the flag names.
         path: PathBuf,
@@ -226,7 +228,7 @@ pub enum DocsError {
     },
     /// `AO-D0014`: `--since` names a schema that does not load.
     Since(Box<DocsError>),
-    /// `AO-D0015`: `--svg-text outlines` before the face vendors.
+    /// `AO-D0015`: `--svg-text outlines` before a later release vendors the face.
     SvgOutlines,
     /// `AO-D0023`: the core draws no tree of a model its builder took.
     ///

@@ -15,7 +15,8 @@
 //! border. The neutrals are the canvas, the card, the text ink, the muted
 //! ink, the border and the edge of the same section. A generated file carries
 //! the literal values of one theme, and the values are the numbers the viewer
-//! uses, so the contrast gate of `54_viewer_a11y` covers both.
+//! uses, so the contrast gate of the accessibility checks of the viewer
+//! covers both.
 
 use super::Theme;
 use crate::model::Kind;

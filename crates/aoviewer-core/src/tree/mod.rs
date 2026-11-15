@@ -15,10 +15,10 @@
 //! names the files and [`render_job`] writes one of them, so the native build
 //! and the wasm module write the same bytes for one path.
 //!
-//! The bytes of a tree follow the rules of the plan. Every text is UTF-8 with
-//! line feeds and holds no timestamp, no absolute path, no host name and no
-//! environment value, and the generator string and [󰀀](crate::LAYOUT_VERSION)
-//! appear in `manifest.json` alone.
+//! The bytes of a tree follow these rules. Every text is UTF-8 with line feeds
+//! and holds no timestamp, no absolute path, no host name and no environment
+//! value, and the generator string and
+//! [`LAYOUT_VERSION`](crate::LAYOUT_VERSION) appear in `manifest.json` alone.
 //!
 //! - A Markdown page is the page model of its route written by
 //!   [󰀀](crate::render_markdown::render_markdown), its file and every link it
@@ -142,8 +142,7 @@ const TYPST_MAIN: &str = "api.typ";
 /// The path of the manifest.
 const MANIFEST: &str = "manifest.json";
 
-/// The path of the change log in Markdown, which the fixture table of the plan
-/// names for every layout.
+/// The path of the change log in Markdown, the same in every layout.
 const CHANGES_MD: &str = "md/changes.md";
 
 /// The path of the change log in Typst.
@@ -373,9 +372,12 @@ pub fn render_tree(
 /// Writes `api.typ` over every chapter `tree` holds and `manifest.json` over
 /// every other file, and puts the files in the byte order of their paths.
 ///
-/// [`render_tree`] seals every tree it writes. `api.typ` is written when the
-/// tree holds a file under `typ/` and the build carries the Typst writer, and
-/// an `api.typ` or a `manifest.json` the tree held before is replaced.
+/// [`render_tree`] seals every tree it writes. A caller that adds a file
+/// afterwards, such as the device chapter `typ/05-device.typ` that the
+/// device cards write, seals the tree again, so `api.typ` includes the
+/// chapter and the manifest hashes it. `api.typ` is written when the tree
+/// holds a file under `typ/` and the build carries the Typst writer, and an
+/// `api.typ` or a `manifest.json` the tree held before is replaced.
 pub fn seal_tree(tree: &mut Tree, schema: &Schema, options: &DocsOptions) {
     tree.files
         .retain(|f| f.path != MANIFEST && f.path != TYPST_MAIN);

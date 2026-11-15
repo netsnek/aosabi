@@ -25,11 +25,11 @@
 //!    relative order.
 //! 3. **Wrap.** The whole graph mode alone wraps a tall column into sub columns
 //!    of its rank band. The wrap aims at a picture between one to two and three
-//!    to one, the range the design names for the rule and step 13 of
-//!    `51_viewer_core` measures. It judges the picture stacked from the top
-//!    with gutters of 70 px, before the placement moves an item by its pulls
-//!    and before the gutters grow, and a single item taller than the range
-//!    allows cannot wrap, so the placed picture can leave the range.
+//!    to one, the range the design names for the rule and a check of the viewer
+//!    core measures. It judges the picture stacked from the top with gutters of
+//!    70 px, before the placement moves an item by its pulls and before the
+//!    gutters grow, and a single item taller than the range allows cannot wrap,
+//!    so the placed picture can leave the range.
 //! 4. **Place.** The columns nearest the focus are placed first. Each box is
 //!    pulled to the mean height of the ports it connects to, overlaps resolve
 //!    in [`OVERLAP_PASSES`] forward pass, and the column shifts back by the
@@ -69,9 +69,9 @@
 //! items, pulls, bands or columns of one view, or under one of the caps below,
 //! and counts one step per element it visits against [`MAX_STEPS`], a sort one
 //! per element it orders, which is the count [`Scene::iterations`] reports and
-//! `51_viewer_core` judges, never time. The loops over the characters of one
-//! text and over the wrappers of one type expression are not counted, since the
-//! limits of the reader cap both.
+//! a check of the viewer core judges, never time. The loops over the characters
+//! of one text and over the wrappers of one type expression are not counted,
+//! since the limits of the reader cap both.
 
 mod ego;
 mod map;
