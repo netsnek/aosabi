@@ -594,9 +594,11 @@ fn file_place(file: &FileBody) -> (usize, usize) {
 /// holds none, so an empty object of extensions crosses as `undefined`, which
 /// the class of the wrapper makes an empty object again. An `AggregateError`
 /// gives its errors as its members, each a value record, so the host makes the
-/// intrinsic class with them. Any other error gives its name and its message
-/// alone. The class the brand names makes the host side instance, so
-/// `instanceof` holds in the app.
+/// intrinsic class with them. An error of a class with members of its own gives
+/// those members, and the brand of a `ForbiddenError` when the Rust value behind
+/// it is one, as a throw of `aosabi-auth` carries it. Any other error gives its
+/// name and its message alone. The class the brand names makes the host side
+/// instance, so `instanceof` holds in the app.
 pub fn encode_error(out: &mut Vec<u8>, error: &ErrorObject, depth: usize) {
     let (brand, path, locations, members) = match error {
         ErrorObject::GraphQL(error) => {

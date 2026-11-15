@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT AND Apache-2.0
 /*
+ * aosabi-auth: the auth root of Aosabi.
+ *
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/auth/index.ts, Apache-2.0. Changed by the Aosabi authors.
  *

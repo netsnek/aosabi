@@ -6,6 +6,11 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/auth/plugin.ts and packages/pylon/src/auth/authz.ts,
  * Apache-2.0. Changed by the Aosabi authors.
+ *
+ * The plugin is named identity, the anchor of the order of the plugins, its
+ * middleware binds the principal the provider of the app answers on the
+ * context c of every request, and its hook onExecute is the map of the
+ * engine, map_forbidden_errors of the crate aosabi-auth.
  */
 import { ENGINE_HOOK } from "./core.js";
 import { PRINCIPAL_KEY } from "./auth-contract.js";

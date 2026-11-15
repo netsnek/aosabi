@@ -143,26 +143,29 @@
 //! record, the bound the host keeps as well, so neither side follows a deep
 //! or cyclic value without end.
 //!
-//! The classes of the wrapper stamp a brand the host reports. The host reads an
-//! error in one of three forms, by the place the module met it. A thrown error,
-//! one a call threw, a promise rejected with or a field answered, is read while
-//! the execution runs as the executor reads it there, in
-//! `locatedError` of graphql-js and of its utilities and in the handler of each
-//! place the error reaches, whose levels the module hands the host from the
-//! place it met the error up to the field of the root: its `path`, its
-//! `coordinate` for a path that is an array, and else its `message`, `nodes`,
-//! `source` and `positions`, the locations of its blame, its `extensions` once
-//! more when they are an object and its `stack` once more when it is true, then
-//! the member `CRITICAL_ERROR` of its extensions at each place that may hold
-//! null, and for a path that is an array its `path` and `coordinate` at each
-//! handler above the first and its `errors` at the root. The handler of a field
-//! takes an `AggregateError` apart, so it crosses with the errors of it that
-//! handler handles, each read in turn, up to the first the handler throws on,
-//! and an item of it that is no error crosses as the error `coerceError` makes
-//! of it. The host keeps a record of each thrown error, and the error of the
-//! engine holds a [`Deferred`] in place of its original error or of the Rust
-//! value behind it, so [`finish`] makes the reads Yoga makes at the end of the
-//! request once the execution has ended: the original error as
+//! An error of the host crosses as its handle, and the module reads it through
+//! the import `js_error` into the [`ErrorObject`] a throw of a Rust app of the
+//! same class makes, so the masking of `graphql-over-http` and the map of
+//! `aosabi-auth` see the classes an app tells apart with `instanceof`. The
+//! classes of the wrapper stamp a brand the host reports. The host reads an error
+//! in one of three forms, by the place the module met it. A thrown error, one a
+//! call threw, a promise rejected with or a field answered, is read while the
+//! execution runs as the executor reads it there, in `locatedError` of graphql-js
+//! and of its utilities and in the handler of each place the error reaches, whose
+//! levels the module hands the host from the place it met the error up to the
+//! field of the root: its `path`, its `coordinate` for a path that is an array,
+//! and else its `message`, `nodes`, `source` and `positions`, the locations of
+//! its blame, its `extensions` once more when they are an object and its `stack`
+//! once more when it is true, then the member `CRITICAL_ERROR` of its extensions
+//! at each place that may hold null, and for a path that is an array its `path`
+//! and `coordinate` at each handler above the first and its `errors` at the root.
+//! The handler of a field takes an `AggregateError` apart, so it crosses with the
+//! errors of it that handler handles, each read in turn, up to the first the
+//! handler throws on, and an item of it that is no error crosses as the error
+//! `coerceError` makes of it. The host keeps a record of each thrown error, and
+//! the error of the engine holds a [`Deferred`] in place of its original error or
+//! of the Rust value behind it, so [`finish`] makes the reads Yoga makes at the
+//! end of the request once the execution has ended: the original error as
 //! `isOriginalGraphQLError` reads it, which tells whether the mask keeps the
 //! error, and then the reads of the mask or of the writer of the result, which
 //! makes every error of the result anew from its message, its path, its
