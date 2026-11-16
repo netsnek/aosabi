@@ -9,14 +9,15 @@ From this folder, install the packages `aosabi` and `aosabi-build` of this repos
 with the TypeScript compiler the build needs, then build the service and serve it on Bun:
 
 ```sh
-npm install --install-links --omit=optional --no-audit
-npx aosabi build
+npm install --install-links --no-audit
+npx --no aosabi build
 PORT=4000 bun --preload aosabi/bun .aosabi/server.mjs
 ```
 
-The install leaves out the optional packages of the native engine, so Bun runs `core.wasm` as a
-Worker does, and the build writes the schema it inferred to `.aosabi/schema.graphql`. Ask the
-service from a second terminal:
+The install brings no platform package of the native engine, so Bun runs `core.wasm` as a Worker
+does, and the build writes the schema it inferred to `.aosabi/schema.graphql` and beside
+`package.json` to `schema.graphql`, which the ignore file of the repository keeps out of git. Ask
+the service from a second terminal:
 
 ```sh
 curl -s localhost:4000/graphql -H 'content-type: application/json' \

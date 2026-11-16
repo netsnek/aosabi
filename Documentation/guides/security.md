@@ -1,8 +1,10 @@
 # Security defaults
 
 Aosabi puts security before features: a feature is off until a service names it, and the defaults
-are the safe ones. This page lists the defaults with the code that sets them. A security issue goes
-to the private vulnerability reporting of the repository, as [SECURITY.md](../../SECURITY.md) says.
+are the safe ones. This page lists the defaults with the code that sets them, and
+[hardening.md](hardening.md) lists the steps by which a service hardens itself for production, each
+with its line on both layers. A security issue goes to the private vulnerability reporting of the
+repository, as [SECURITY.md](../../SECURITY.md) says.
 
 ## 1. TLS
 
@@ -29,8 +31,23 @@ crypto stacks.
 ## 2. CORS and CSRF
 
 The engine adds no CORS header of its own and guesses no origin. A service names the sites a browser
-may call it from, once for every route, with the middleware `cors()` and `csrf()` and their option
-`origin`:
+may call it from with the middleware `cors()` and `csrf()` and their option `origin`, which carry
+the same names and the same options on both layers:
+
+```rust
+use aosabi::{CorsOptions, CorsOrigin, cors, prelude::*};
+
+pub fn app() -> impl IntoApp {
+    App::new().query(Query).middleware(
+        "*",
+        cors(CorsOptions {
+            origin: CorsOrigin::List(vec![String::from("https://app.example")]),
+            credentials: true,
+            ..CorsOptions::default()
+        }),
+    )
+}
+```
 
 ```ts
 import {cors} from 'hono/cors'
@@ -43,11 +60,14 @@ app.use('*', csrf({origin: SITES}))
 ```
 
 - Without `cors()` a browser on another site gets no CORS header, so it cannot read an answer.
-- Without `csrf()` the app accepts a form that another site posts, so a service that a browser
-  reaches with cookies writes `csrf()` beside `cors()`.
-- A TypeScript app takes both from `hono`, which runs its routes. A Rust service takes the `cors`
-  and `csrf` of the facade, which carry the same names and the same options, so one rule holds on
-  both layers and no second check runs beside it.
+- The base pipeline of a Rust service runs `csrf()` with its defaults on every request that carries
+  a `Cookie` field, so a form that another site posts with the cookies of a session answers 403
+  `Forbidden` there. A `csrf(options)` of the service takes its place where it stands ahead of the
+  handlers of the routes a request matches, the GraphQL endpoint among them, which
+  [hardening.md](hardening.md) section 3 shows.
+- The TypeScript layer runs no check of its own, so an app that a browser reaches with cookies
+  writes `csrf()` of `hono` beside `cors()`. Both come from `hono`, which runs its routes and which
+  the package `aosabi` takes as a peer dependency in the range `^4.13.16`.
 
 ## 3. What a default build leaves out
 
@@ -63,9 +83,13 @@ Every optional feature of the facade is off until a service or its card names it
 | `federation` | Delegation to other GraphQL services |
 | `serial`, `usb`, `bluetooth`, `homa-network`, `lora` | The carriers of GraphTP |
 
-The pages of development stay off as well. The landing page, GraphiQL and the route `/viewer` answer
-only where the app turns them on, and uploads only where it sets `multipart: true`. The helper
-`requireAuth` refuses a request with no user with 401.
+The server holds no page for development, such as a page that runs queries or shows the schema, and
+no route of its own beside the GraphQL endpoint, a health check among them. A request to any other
+path, `/health` and `/graphql/` among them, reaches the routes of the app and gets its not found
+answer where no route of the app matches it. The explorer of a schema runs on the site of Aosabi and
+reads a service across sites, where the service admits it with `cors()`. Uploads stay off on the
+Rust layer until the app sets `.multipart(true)`, and the TypeScript layer takes none in this
+release. The helper `requireAuth` refuses a request with no user with 401.
 
 Aosabi sends no telemetry of any kind, in the server, the command line and the npm packages.
 
@@ -135,3 +159,25 @@ The release profile aborts on a panic, so a panic of a release build never unwin
 frames. The single pass denies indexing, `unwrap`, `expect`, `panic!` and `unreachable!` in its
 whole module, reads every buffer through a checked access, and hands a document to the validation
 rules on any state it holds impossible.
+
+## 8. Bounds and refusals
+
+- Every parse of a request document stops at 1,000 levels of nesting with the syntax error
+  `Document nests deeper than 1000 levels. Parsing aborted.`, and at the cap of its tokens, 120,008
+  unless the app sets another, on every road that parses a request.
+- The base pipeline of a Rust service bounds a request body at 1 MiB and answers 413 past it. The
+  native server answers 400 to a request whose path holds a `\`.
+- The writer of a cookie refuses a name that is no valid cookie name, and a `domain` or a `path`
+  that holds `;`, a carriage return or a line feed, with an error in place of the cookie. The reader
+  of the `Cookie` field trims the space and the tab alone and takes the first value of a name it
+  meets twice. On the Rust layer the prefixes `__Secure-` and `__Host-` hold in any case of their
+  letters.
+- `serve_static` names a file by the routed path, decoded once, and serves no file for a path that
+  holds a `%`, a segment of one or two dots, a run of two or more `/` or a `\`. It answers `GET` and
+  `HEAD` alone.
+- An event of the Sentry plugin carries no credential of the request and no address of its client
+  whatever its options say, and no variable of an operation unless the app sets
+  `include_execute_variables` or `includeExecuteVariables`, as [hardening.md](hardening.md) section
+  9 says.
+- On a target with no source of random bytes the engine answers no request until the host installs
+  one, as [hardening.md](hardening.md) section 11 says.

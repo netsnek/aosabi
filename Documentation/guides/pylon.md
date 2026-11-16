@@ -39,29 +39,88 @@ The layer keeps the surface an app was written against:
   `aosabi/auth/plugin`, `aosabi/auth/contract` and `aosabi/auth/zitadel`.
 
 The parity suite of the project runs its fixture apps of Pylon v3 on the layer, on workerd and on
-Bun, on `core.wasm` and on the native library, with Pylon v3 fetched by `tests/fetch_oracles.py` at
-the commit `tests/oracles.toml` pins. It reads recorded answers and parts of the test harness that
-this repository does not carry, so it runs in the project's own pipeline. Every difference the suite
-allows is one of section 3.
+Bun, on `core.wasm` and on the native library, with Pylon v3 at a pinned commit. It reads recorded
+answers and parts of the test harness that this repository does not carry, so it runs in the
+project's own pipeline. Section 3 lists the differences an app of Pylon v3 meets in its code.
 
 ## 3. Where Aosabi answers otherwise
 
 Each of these differences is deliberate, small and named, and the test suite holds it apart from the
-comparison by name.
+comparison by name. [security.md](security.md) gives the defaults of Aosabi in full.
 
-1. An answer travels as deflate where the client names deflate and plain otherwise, since Aosabi
-   codes no gzip, and its body is the same after decoding.
-2. The route `/viewer` answers a page of Aosabi's own, which loads nothing from a CDN.
-3. The engine adds no CORS header until the app writes `cors()` with the origins it allows.
-4. The landing page, GraphiQL and `/viewer` answer only when the app turns them on, with
-   `landingPage: true`, `graphiql: true` or `viewer: true`.
-5. Uploads are accepted once the app sets `multipart: true`.
-6. The helper `requireAuth` refuses a request with no user with 401.
-7. Aosabi sends no telemetry.
-8. An outbound call of a native Rust build speaks TLS 1.3 alone and ends after 30 seconds. A
-   TypeScript app takes its outbound calls from its host.
+The endpoint and the server:
 
-[security.md](security.md) gives the defaults of Aosabi in full.
+1. The endpoint is the path `/graphql` alone. A request to `/graphql/` takes the steps of any other
+   path and gets the not found answer of the app, so an app that serves the form with the slash adds
+   a route that redirects it with 308.
+2. The server answers no health check and serves no page for development. A request to `/health`
+   takes the steps of any other path, and the configuration has no key `healthCheckEndpoint`. The
+   explorer of a schema runs on the site of Aosabi.
+3. The engine adds no CORS header until the app writes `cors()` with the origins it allows. The
+   preflight of `cors()` with an option `origin` other than `*` appends `Origin` to a field `Vary`
+   that a middleware before it set.
+4. On the Rust layer the base pipeline codes no answer, and `compress()` codes the answers of the
+   routes after it as deflate where the client names deflate and leaves them plain otherwise, since
+   the native server codes no gzip, and adds `Accept-Encoding` to the field `Vary` of each answer it
+   may code. A coded answer carries the same body after decoding. The TypeScript layer codes its
+   answers as `compress()` of `hono` codes them.
+
+Errors and the schema:
+
+5. An unexpected error keeps its own message in every build and whatever `NODE_ENV` says, until the
+   app sets `maskedErrors: true`, or `.masked_errors(MaskedErrors::On)` on the Rust layer. The mask
+   then answers `Unexpected error.` with the code `INTERNAL_SERVER_ERROR`.
+6. Introspection stays on until the app sets `introspection: false`, a key of Aosabi's own, or
+   `.introspection(false)` on the Rust layer.
+7. A build writes the current schema to `schema.graphql` in the folder of the project as well,
+   beside `package.json` or `Cargo.toml`, as its last step and only where the text changed, and a
+   new project keeps that file in git.
+
+Requests:
+
+8. A request document stops at 1,000 levels of nesting with the syntax error `Document nests deeper
+   than 1000 levels. Parsing aborted.`, and at 120,008 tokens with the syntax error of graphql-js
+   that names the cap, which the key `maxTokens`, or `.max_tokens(..)` on the Rust layer, raises or
+   lowers.
+9. On the Rust layer the base pipeline bounds a request body at 1 MiB and answers 413 `Payload Too
+   Large` past it. An app's own `body_limit` takes its place on its path and reads a body with no
+   usable `Content-Length` through its bound before the routes run.
+10. On the Rust layer the base pipeline refuses with 403 a form that another site posts with a
+    cookie, unless a `csrf(options)` of the app stands ahead of the handlers of the routes the
+    request matches, the GraphQL endpoint among them. The TypeScript layer registers no csrf of its
+    own, and an app there writes `csrf()`.
+11. `csrf()` reads `text/ping`, the type of the ping of a link, as a type that a form sends.
+12. On the Rust layer uploads are accepted once the app sets `.multipart(true)`.
+13. The query of a URL ends at its first `#`. On the Rust layer a query key that holds `&` or `=`
+    matches the name of a parameter, the native server answers 400 to a request whose path holds a
+    `\`, and a route whose parameter carries a constraint, such as `:id{[0-9]+}`, is refused at its
+    registration with a panic that names the route.
+14. On the Rust layer `serve_static` names a file by the routed path, decoded once, serves no file
+    for a path that holds a `%`, a segment of one or two dots, a run of two or more `/` or a `\`,
+    and answers `GET` and `HEAD` alone.
+
+Cookies and the login:
+
+15. The writer of a cookie refuses a name that is no valid cookie name, and a `domain` or a `path`
+    that holds `;`, a carriage return or a line feed, with an error in place of the cookie. The
+    reader of the `Cookie` field trims the space and the tab alone and answers the first value of a
+    name the field holds twice. On the Rust layer the prefixes `__Secure-` and `__Host-` hold in any
+    case of their letters.
+16. The login routes name the session cookie `aosabi-auth` and the cookie of the verifier
+    `aosabi_code_verifier`. The option `cookieName` of `zitadelAuth`, `zitadelLogin` and `useAuth`,
+    `cookie_name` on the Rust layer, names the session cookie, so an app that moves over keeps the
+    name its sessions carry.
+17. The helper `requireAuth` refuses a request with no user with 401.
+
+Sentry and the rest:
+
+18. An event of the Sentry plugin carries the variables of an operation only where the app sets
+    `includeExecuteVariables`, and an app that calls `init` with `enabled: false` sends no event.
+19. Aosabi sends no telemetry.
+20. An outbound call of a native Rust build speaks TLS 1.3 alone and ends after 30 seconds. A
+    TypeScript app takes its outbound calls from its host.
+
+[upgrading.md](upgrading.md) says what a service written for an earlier release of Aosabi changes.
 
 ## 4. What the layer does not cover yet
 
@@ -73,6 +132,8 @@ comparison by name.
 - The watch and reload of `pylon dev` for a TypeScript app.
 - Node.js and Deno as hosts of an app, beside Bun and Cloudflare Workers.
 - The signed forms of the cookie helpers.
+- Uploads in the TypeScript layer, whose configuration has no key `multipart` yet, so an app there
+  takes no upload of the GraphQL multipart request form.
 
 The command `aosabi migrate` stops on a specifier or a name of one of these with its file and its
 line, so an app never reaches a missing part at run time.

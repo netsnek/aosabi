@@ -136,10 +136,10 @@ worker() {
   readme=$root/examples/worker/README.md
   cd "$root/examples/worker"
   run "$readme" <<'EOF'
-npm install --install-links --omit=optional --no-audit
+npm install --install-links --no-audit
 EOF
   run "$readme" <<'EOF'
-npx aosabi build
+npx --no aosabi build
 EOF
   serve "$readme" 4000 <<'EOF'
 PORT=4000 bun --preload aosabi/bun .aosabi/server.mjs

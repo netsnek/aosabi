@@ -16,28 +16,44 @@ differs.
 | `aosabi-linux-x64-gnu` and three more | `aosabi-ts-native/` | The engine as a native library |
 | `aosabi-build` | `aosabi-ts-build/` | The commands `aosabi migrate` and `aosabi build` |
 
-The package `aosabi` names its four platform packages, for x64 and arm64 with glibc or musl, as
-optional dependencies, so a package manager installs the one that matches the machine. The dev
-package `aosabi-build` depends on `typescript` 5.9.3 alone, pinned exact, runs on Node.js at build
-time and never ships with an app.
+The four platform packages, for x64 and arm64 with glibc or musl, each carry the engine as the
+native library `libaosabi.so`, and the package `aosabi` names none of them. The dev package
+`aosabi-build` depends on `typescript` 5.9.3 alone, pinned exact, runs on Node.js at build time and
+never ships with an app.
 
-The packages are not published to npm yet, so an app installs them from a checkout of this
-repository, as the example under [examples/](../../examples/) shows. A platform package carries the
-native library once it is built into it with
-`cargo build --release -p aosabi-js --features native --target <triple>`, since the library is a
-build product the repository does not hold, and an install without it runs on `core.wasm`.
+Aosabi is released through its repository alone, so an app installs the packages from a checkout of
+this repository, as the tarballs that `npm pack` makes of their folders or by the paths of the
+folders, as section 2 and the example under [examples/](../../examples/) show. A platform package
+carries the native library once the checkout builds it with
+`cargo build --locked -p aosabi-js --features native --profile release --target <triple>` and copies
+it into the folder of the package as `libaosabi.so`, since the library is a build product the
+repository does not hold. The entry `aosabi/bun` looks for the platform package in two folders
+alone, the folder `node_modules` that holds `aosabi` and the one of the root of the app, as the
+[README of aosabi-ts-native](../../aosabi-ts-native/README.md) says.
 
 ## 2. Building an app
 
-An app keeps its index at `src/index.ts`. With the packages installed from a checkout, four
-commands take an app from its folder to a running server:
+An app keeps its index at `src/index.ts`. Eight commands take an app from its folder to a running
+server, here on an arm64 machine with glibc. The first three run in the checkout: they build the
+native library, copy it into the folder of its platform package and make the tarballs of the three
+packages. The others run in the folder of the app:
 
 ```sh
-npx aosabi migrate .
-npm install
-npx aosabi build
+cargo build --locked -p aosabi-js --features native --profile release \
+  --target aarch64-unknown-linux-gnu
+cp target/aarch64-unknown-linux-gnu/release/libaosabi_js.so \
+  aosabi-ts-native/aosabi-linux-arm64-gnu/libaosabi.so
+npm pack ./aosabi-ts ./aosabi-ts-build ./aosabi-ts-native/aosabi-linux-arm64-gnu
+npm install --save-dev <checkout>/aosabi-build-<version>.tgz
+npx --no aosabi migrate .
+npm install <checkout>/aosabi-<version>.tgz <checkout>/aosabi-linux-arm64-gnu-<version>.tgz
+npx --no aosabi build
 PORT=4000 bun --preload aosabi/bun .aosabi/server.mjs
 ```
+
+The app installs `aosabi-build` as a dev dependency before its first `npx`, and `aosabi` with its
+platform package once `aosabi migrate` names `aosabi` in its `package.json`. Each `npx --no` runs
+the command of the installed `aosabi-build` and fails where none is installed.
 
 1. `aosabi migrate` rewrites the import specifiers of the app by one table, swaps the dependency of
    its `package.json` and the build command of its scripts, points the paths of its scripts into the
