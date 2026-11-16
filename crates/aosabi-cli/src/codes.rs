@@ -136,7 +136,7 @@ pub const CODES: [Code; 21] = [
     },
     Code {
         id: AO_C0106,
-        meaning: "a package of the derive path, whose roots a fragment of graphql! holds and whose entry is the function default, whose facade, one that declares the feature mirror, it names without that feature, since item A11 of APL1 retires that path for application code",
+        meaning: "a package of the derive path, whose roots a fragment of graphql! holds and whose entry is the function default, whose facade, one that declares the feature mirror, it names without that feature, since that path is retired for application code",
     },
     Code {
         id: AO_C0107,
@@ -148,7 +148,7 @@ pub const CODES: [Code; 21] = [
     },
     Code {
         id: AO_C0201,
-        meaning: "a card file, an installed card id, a card in devices/, or a card or registry verb, which arrive with the device card track",
+        meaning: "a card file, an installed card id, a card in devices/, or a card or registry verb, which arrive with device cards",
     },
     Code {
         id: AO_C0202,
@@ -192,7 +192,7 @@ pub const CODES: [Code; 21] = [
     },
     Code {
         id: AO_C0601,
-        meaning: "a db sub command, which lands with M9, docs, which lands with M14, or bridge, which lands with M12",
+        meaning: "a db sub command, docs or bridge, each of which lands with a later release",
     },
     Code {
         id: AO_C0701,
@@ -207,7 +207,7 @@ pub const CODES: [Code; 21] = [
 /// meets one in another document finds out where it went.
 pub const RETIRED: &[Code] = &[Code {
     id: "AO-C0403",
-    meaning: "new --features auth before M7b, which brings zitadel_auth. Retired with the landing of M7b, which ends the refusal, because the facade carries zitadel_auth under the feature auth-zitadel and new writes the scaffold",
+    meaning: "new --features auth before the release that brings zitadel_auth. Retired with that release, which ends the refusal, because the facade carries zitadel_auth under the feature auth-zitadel and new writes the scaffold",
 }];
 
 /// The names of the built in cards, as a refusal lists them.
@@ -405,7 +405,7 @@ pub fn derive_path_retired(package: &str) -> CliError {
     CliError::coded(
         AO_C0106,
         format!(
-            "the package `{package}` holds its roots in a fragment of `graphql!` with the entry `default` of the derive path, which is retired, and an application registers its roots on the chain of its entry, a public function of the crate root that answers an app, as docs/authoring.md section 4 writes it"
+            "the package `{package}` holds its roots in a fragment of `graphql!` with the entry `default` of the derive path, which is retired, and an application registers its roots on the chain of its entry, a public function of the crate root that answers an app"
         ),
     )
     .with_hint(
@@ -432,7 +432,7 @@ pub fn config_retired(package: &str) -> CliError {
     CliError::coded(
         AO_C0107,
         format!(
-            "the package `{package}` holds aosabi.config.rs, which is retired, and the chain of the entry carries the plugins and the options of a configuration, which aosabi::serve_app serves, as docs/authoring.md section 6 writes it"
+            "the package `{package}` holds aosabi.config.rs, which is retired, and the chain of the entry carries the plugins and the options of a configuration, which aosabi::serve_app serves"
         ),
     )
     .with_hint(
@@ -588,26 +588,26 @@ pub fn card_track_verb(command: &str) -> CliError {
 }
 
 /// Returns the refusal of the device `device`, a card file or an installed
-/// card id, which the build reads from the track row `lands` on, `AO-C0201`.
+/// card id, which a build reads once device cards land, `AO-C0201`.
 #[must_use]
-pub fn card_file(device: &str, lands: &str) -> CliError {
+pub fn card_file(device: &str) -> CliError {
     CliError::coded(
         AO_C0201,
         format!(
-            "the device {device} names a card file or an installed card, which a build reads from {lands} of the device card track on, and until then a build names one of the built in cards {BUILTIN_CARD_NAMES}"
+            "the device {device} names a card file or an installed card, which a build reads once device cards land, and until then a build names one of the built in cards {BUILTIN_CARD_NAMES}"
         ),
     )
     .with_hint("cargo aosabi build --device server")
 }
 
-/// Returns the refusal of a card under `devices/`, which a build reads from
-/// the track row `lands` on, `AO-C0201`.
+/// Returns the refusal of a card under `devices/`, which a build reads once
+/// device cards land, `AO-C0201`.
 #[must_use]
-pub fn devices_folder(lands: &str) -> CliError {
+pub fn devices_folder() -> CliError {
     CliError::coded(
         AO_C0201,
         format!(
-            "devices/ holds a card, which a build reads from {lands} of the device card track on, and until then a build names one of the built in cards {BUILTIN_CARD_NAMES}"
+            "devices/ holds a card, which a build reads once device cards land, and until then a build names one of the built in cards {BUILTIN_CARD_NAMES}"
         ),
     )
     .with_hint("cargo aosabi build --device server")

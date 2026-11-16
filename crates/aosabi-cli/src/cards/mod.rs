@@ -37,10 +37,6 @@ use crate::{
 pub mod builtin;
 pub mod digests;
 
-/// The row of the device card track that reads a card file, an installed
-/// card and the folder `devices/` in a build.
-pub const CARD_FILE_ROW: &str = "DC5";
-
 /// The name of the card a build takes with no `--device`.
 pub const DEFAULT_CARD: &str = "server";
 
@@ -217,7 +213,7 @@ impl Encoding {
 pub fn resolve(arg: Option<&str>, project: &Project) -> Result<&'static Card, CliError> {
     let Some(name) = arg else {
         if holds_a_card(project) {
-            return Err(codes::devices_folder(CARD_FILE_ROW));
+            return Err(codes::devices_folder());
         }
         return by_name(DEFAULT_CARD).ok_or_else(|| codes::no_builtin_card(DEFAULT_CARD));
     };
@@ -225,7 +221,7 @@ pub fn resolve(arg: Option<&str>, project: &Project) -> Result<&'static Card, Cl
         .extension()
         .is_some_and(|extension| extension.eq_ignore_ascii_case("png"));
     if picture || name.contains('/') {
-        return Err(codes::card_file(name, CARD_FILE_ROW));
+        return Err(codes::card_file(name));
     }
     by_name(name).ok_or_else(|| codes::no_builtin_card(name))
 }
