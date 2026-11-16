@@ -523,7 +523,7 @@ fn text(op: &JsObject, key: &str) -> Result<String, String> {
 }
 
 /// Returns the integer field `key` of `op` from 0 to `bound`, the `_integer` of the model.
-fn integer(op: &JsObject, key: &str, bound: u32) -> Result<u32, String> {
+pub(crate) fn integer(op: &JsObject, key: &str, bound: u32) -> Result<u32, String> {
     let refusal = || format!("{key} is no integer from 0 to {bound}");
     let Some(JsValue::Number(value)) = op.get(key) else {
         return Err(refusal());

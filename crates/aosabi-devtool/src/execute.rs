@@ -85,6 +85,13 @@
 //! [`project`] describes, so a notebook holds the keys of the view to those
 //! of the object of the reference, which no answer of the reference reads.
 //!
+//! The operation `persisted` hands the id `number` of a persisted document to
+//! the `Execute` of a loaded table, the general executor of a table of the
+//! mode `plain` or the service of a service table, and answers
+//! `{"result":"<text>"}` with the result text of the one result its stream
+//! yields, so a notebook holds the answer of both executors to an operation
+//! that names a persisted document, which no request of the protocol carries.
+//!
 //! The operation `revisions` subscribes to a topic of the pub sub of the
 //! request on one road of a loaded service table, through
 //! `Service::subscribe`, over HTTP or on the served road of `GraphTP`, runs a
@@ -196,6 +203,7 @@ const OPERATIONS: &Operations = &[
     ("roots", op_roots),
     ("coerce", op_coerce),
     ("project", project::op_project),
+    ("persisted", op_persisted),
     ("revisions", revisions::op_revisions),
 ];
 
@@ -585,6 +593,32 @@ fn op_execute(request: &JsObject) -> Result<JsObject, JsString> {
         .with_borrow(|session| call.run(session, name))
         .ok_or_else(|| format!("{NAME}: {}", no_table(name)))?;
     payload(executed, call.trace)
+}
+
+/// Answers the operation `persisted`, which hands the id `number` of a
+/// persisted document to the `Execute` of a loaded table and answers the
+/// result text of the one result its stream yields.
+///
+/// A table the run does not hold, a `number` that is no integer a `u32`
+/// holds and a stream that yields other than one result are mistakes of the
+/// harness and answer `fatal`.
+fn op_persisted(request: &JsObject) -> Result<JsObject, JsString> {
+    let name = batch::require_string(request, "table")?;
+    let id = crate::push::integer(request, "number", u32::MAX)
+        .map_err(|reason| format!("persisted: {reason}"))?;
+    begin_request();
+    let results = SESSION
+        .with_borrow(|session| session.persisted(name, id))
+        .ok_or_else(|| format!("persisted: {}", no_table(name)))?;
+    let [result] = results.as_slice() else {
+        return Err(JsString::from(format!(
+            "persisted: the stream yields {} results and not one",
+            results.len()
+        )));
+    };
+    let mut payload = JsObject::new();
+    payload.insert("result", result_text(result));
+    Ok(payload)
 }
 
 /// Returns the text of the outcome of one run: the result text, `thrown: `

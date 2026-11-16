@@ -32,7 +32,12 @@
 
 use std::{
     rc::Rc,
-    sync::Arc, //
+    sync::Arc,
+    task::{
+        Context,
+        Poll,
+        Waker, //
+    }, //
 };
 
 use aosabi_core::{
@@ -41,6 +46,11 @@ use aosabi_core::{
     Resolvers,
     Service,
     carrier::CarrierPolicy,
+    kernel::execute_closed::{
+        Execute,
+        Operation,
+        ResultStream, //
+    },
     make_executable_schema,
     resolvers::resolvers_to_graphql_resolvers::read_root_member, //
 };
@@ -64,11 +74,14 @@ use aosabi_execute::{
         Agent,
         AgentOptions, //
     },
+    result::ExecutionResult,
     value::{
         Completion,
+        ContextValue,
         Value, //
     }, //
 };
+use aosabi_json::JsValue;
 use aosabi_lang::REQUEST_TOKENS;
 use aosabi_type::{
     ObjMap,
@@ -258,6 +271,35 @@ impl Session {
         Some(subscribed)
     }
 
+    /// Hands the id `id` of a persisted document to the `Execute` of the
+    /// table `name` and returns the results its stream yields.
+    ///
+    /// A table of [`Mode::Plain`] runs it through its general executor with a
+    /// context value that holds nothing, and a table of [`Mode::Service`]
+    /// through its service with the policy of Network. Returns `None` when
+    /// the session holds no table of that name.
+    pub fn persisted(&self, name: &str, id: u32) -> Option<Vec<ExecutionResult>> {
+        let operation = Operation::Persisted { id };
+        let results = match self.tables.get(name)? {
+            Runner::Plain(executor) => {
+                let context: ContextValue = Rc::new(());
+                ready_results(Execute::execute(
+                    executor,
+                    operation,
+                    &JsValue::Undefined,
+                    &context,
+                ))
+            }
+            Runner::Service { service, .. } => ready_results(Execute::execute(
+                service,
+                operation,
+                &JsValue::Undefined,
+                &CarrierPolicy::NETWORK,
+            )),
+        };
+        Some(results)
+    }
+
     /// Returns the schema of the table `name`, `None` when the session holds no such table.
     pub fn schema(&self, name: &str) -> Option<&Arc<Schema>> {
         match self.tables.get(name)? {
@@ -298,6 +340,20 @@ impl Session {
             } => Some((type_defs, roots.clone())),
         }
     }
+}
+
+/// Returns the results `stream` yields until it ends or waits.
+///
+/// The stream of a persisted document yields its one result on the first
+/// poll and ends on the second, so no waker is ever woken.
+fn ready_results<S: ResultStream<Item = ExecutionResult>>(stream: S) -> Vec<ExecutionResult> {
+    let mut stream = Box::pin(stream);
+    let mut context = Context::from_waker(Waker::noop());
+    let mut results = Vec::new();
+    while let Poll::Ready(Some(result)) = stream.as_mut().poll_next(&mut context) {
+        results.push(result);
+    }
+    results
 }
 
 /// Builds the executor of a table of [`Mode::Plain`].
