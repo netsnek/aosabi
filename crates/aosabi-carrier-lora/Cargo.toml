@@ -29,11 +29,9 @@ model = ["homa/sim"]
 # The engine the carrier moves the packets of, with the role server of a
 # device, the compact form and the budget pacer the airtime ledger runs over.
 homa = { path = "../homa", default-features = false, features = ["server", "wire-compact", "pacer-budget"] }
-# The AEAD of RFC 8439, reason 1 of ADR-0024, the reviewed version as the
-# floor and the exact version in Cargo.lock (docs/dependencies.md section
-# 3.17).
+# The AEAD of RFC 8439, a crate from outside since it is more secure than own
+# code, the reviewed version as the floor and the exact version in Cargo.lock.
 chacha20poly1305 = { version = "0.11.0", default-features = false }
 # The traits of the SPI bus and the pins of the card's HAL, a platform crate
-# of the LoRa card reached through sx1262 alone (docs/dependencies.md section
-# 3.18).
+# of the LoRa card reached through sx1262 alone.
 embedded-hal = { version = "1.0.0", optional = true }

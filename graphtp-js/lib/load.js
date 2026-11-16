@@ -5,15 +5,14 @@
  * Outside Node.js the loader fetches the file new URL('../graphtp.wasm', import.meta.url) names,
  * and in Node.js it reads the file with readFile of node:fs/promises behind a dynamic import that
  * runs in Node.js alone, since the fetch of Node.js refuses a file: URL and an import of a .wasm
- * module is experimental there (docs/graphtp-fetch.md section 2.2). The module imports nothing, so
+ * module is experimental there. The module imports nothing, so
  * it is instantiated with an empty import object, once per process or page.
  *
  * An exception that leaves a call of an export, a trap or a stack overflow of the host inside it,
  * may leave the module with a borrowed cell or a lower stack, so the loader drops it: the Module
  * calls no export again, the next load instantiates a fresh one and each listener of onDrop learns
  * of it. A buffer the module refuses throws NO_MEMORY and one of a dropped module LINK_DOWN, which
- * lib/engine.js turns into the end of the link where the event loop entered it
- * (docs/graphtp-fetch.md section 8).
+ * lib/engine.js turns into the end of the link where the event loop entered it.
  */
 
 /** The promise of the one module, made on the first call of load and after a drop. */

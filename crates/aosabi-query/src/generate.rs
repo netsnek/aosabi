@@ -6,9 +6,8 @@
  * packages/pylon/src/query/build/index.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * The template of index.ts is the literal client_index_template of
- * tools/provenance/provenance.toml, which the tool writes into index_ts.tmpl
- * beside this file and nothing else does.
+ * The template of index.ts is the pinned literal client_index_template, in
+ * index_ts.tmpl beside this file.
  */
 
 //! The client sources.

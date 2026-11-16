@@ -5,27 +5,28 @@
  *
  * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
- * It carries the quirks Q49 to Q52, Q58 and Q59 of docs/byte-equality.md
- * section 13.1, the adapter's halves of them.
+ * It carries the adapter's halves of the quirks NODE_ADAPTER_RECORD,
+ * NODE_ADAPTER_FIRST_READS, NODE_ADAPTER_NULL_BODY,
+ * NODE_ADAPTER_CACHED_LENGTH, NODE_ENCODING_FIRST_WRITE and
+ * NODE_RECORD_CHECK_500.
  */
 
 //! The answer of the Node adapter.
 //!
-//! The listener writes an answer on one of two paths (A2 to A4 of the plan's
-//! version 2 draft). A response whose adapter cache holds takes the cached
-//! path: its headers become the record through the Fetch iteration when they
-//! are a `Headers` and as given otherwise, a string, bytes or a blob append
-//! `Content-Length` with capitals, and a stream writes the head at once, quirk
-//! `Q52_NODE_ADAPTER_CACHED_LENGTH`. Every other response takes the object
-//! path: the record through the Fetch iteration with the default
-//! `content-type` appended, quirk `Q49_NODE_ADAPTER_RECORD`, and the body read
-//! without blocking, a length appended in lower case when it ended within
-//! those reads, quirk `Q50_NODE_ADAPTER_FIRST_READS`, and a null body written
-//! with `end()`, quirk `Q51_NODE_ADAPTER_NULL_BODY`. The path fixes the first
-//! write, which fixes the bytes of a value, quirk
-//! `Q58_NODE_ENCODING_FIRST_WRITE`, and Node's check of the record answers
-//! the 500 of `handleResponseError` where it refuses a line, quirk
-//! `Q59_NODE_RECORD_CHECK_500`.
+//! The listener writes an answer on one of two paths. A response whose adapter
+//! cache holds takes the cached path: its headers become the record through
+//! the Fetch iteration when they are a `Headers` and as given otherwise, a
+//! string, bytes or a blob append `Content-Length` with capitals, and a stream
+//! writes the head at once, quirk
+//! `NODE_ADAPTER_CACHED_LENGTH`. Every other response takes the object path:
+//! the record through the Fetch iteration with the default `content-type`
+//! appended, quirk `NODE_ADAPTER_RECORD`, and the body read without blocking,
+//! a length appended in lower case when it ended within those reads, quirk
+//! `NODE_ADAPTER_FIRST_READS`, and a null body written with `end()`, quirk
+//! `NODE_ADAPTER_NULL_BODY`. The path fixes the first write, which fixes the
+//! bytes of a value, quirk `NODE_ENCODING_FIRST_WRITE`, and Node's check of
+//! the record answers the 500 of `handleResponseError` where it refuses a
+//! line, quirk `NODE_RECORD_CHECK_500`.
 
 use core::{
     future::Future,
@@ -97,12 +98,11 @@ pub struct NodeBindings;
 /// fetch that rejects with 500, and the answer is written on the cached path
 /// or the object path. A request whose method is neither `GET` nor `HEAD`
 /// marks the answer for the cleanup of its unread body, the adapter's
-/// `autoCleanupIncoming`, which the app never turns off (A10 of the plan's
-/// version 2 draft). The future answers a request that cannot be built at its
-/// first poll, as the listener writes that answer before its first `await`,
-/// and waits once before the answer of `fetch`, the `await` of the promise of
-/// the app, so a connection that polls it once where Node runs the listener
-/// writes only the first inside the read.
+/// `autoCleanupIncoming`, which the app never turns off. The future answers a
+/// request that cannot be built at its first poll, as the listener writes that
+/// answer before its first `await`, and waits once before the answer of
+/// `fetch`, the `await` of the promise of the app, so a connection that polls
+/// it once where Node runs the listener writes only the first inside the read.
 pub fn serve<F, Fut, E>(incoming: NodeIncoming, fetch: F) -> LocalBoxFuture<'static, NodeOutgoing>
 where
     F: FnOnce(Rc<Request>, Env) -> Fut + 'static,
@@ -177,7 +177,7 @@ fn via_cache(status: u16, body: Body, headers: CachedHeaders) -> NodeOutgoing {
 /// third poll. A poll that fails ends the polls as the end does, since the
 /// adapter logs the error and sets `done`. A body that ended within the polls
 /// gets `content-length` over the chunks polled when the record has none,
-/// quirk `Q50_NODE_ADAPTER_FIRST_READS`, unless the record names
+/// quirk `NODE_ADAPTER_FIRST_READS`, unless the record names
 /// `transfer-encoding: chunked`, which skips the polls. A body that ended in
 /// one chunk is that chunk, so the bytes of an answer reach the connection
 /// with no copy here.
@@ -257,7 +257,7 @@ async fn via_object(res: Response) -> NodeOutgoing {
 /// Returns the answer of `status` with `record`, `body` and `first_write`, checked as Node's `writeHead` checks it.
 ///
 /// A record Node refuses is answered as `handleResponseError` answers it,
-/// quirk `Q59_NODE_RECORD_CHECK_500`.
+/// quirk `NODE_RECORD_CHECK_500`.
 fn answer(status: u16, record: Vec<Line>, body: NodeBody, first_write: FirstWrite) -> NodeOutgoing {
     if let Err(error) = check_record(&record) {
         return handle_response_error(&error.message(&record), status);
@@ -273,7 +273,7 @@ fn answer(status: u16, record: Vec<Line>, body: NodeBody, first_write: FirstWrit
     }
 }
 
-/// Returns the record of `headers` through the Fetch iteration, quirk `Q49_NODE_ADAPTER_RECORD`.
+/// Returns the record of `headers` through the Fetch iteration, quirk `NODE_ADAPTER_RECORD`.
 fn record_of(headers: &Headers) -> Vec<Line> {
     let entries: Vec<(String, String)> = headers
         .entries()

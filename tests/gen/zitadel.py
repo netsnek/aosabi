@@ -1,12 +1,11 @@
 # SPDX-License-Identifier: MIT
 """tests/gen: the Zitadel corpora and the served cases of zitadel-auth-app.
 
-Step 2 of `63_zitadel_auth` sends four generated corpora to the sidecar `tests/sidecar/zitadel.mjs`
-and to the sub commands of `aosabi-devtool zitadel` and compares the two response streams:
+A notebook sends four generated corpora to the Zitadel sidecar and to the sub commands of
+`aosabi-devtool zitadel` and compares the two response streams:
 
-- **The claim sets**, 200 requests of the operation `principal`, over a
-  subject, roles and a user info object, some with mappers of the table of
-  `tests/sidecar/zitadel.md` and some with none. The drawn sets alternate
+- **The claim sets**, 200 requests of the operation `principal`, over a subject, roles and a user info object,
+  some with mappers of the table of the sidecar's protocol and some with none. The drawn sets alternate
   between the two, and the hand written edges carry mappers as each edge needs.
 - **The request shapes**, 60 requests of the operation `read_token`, over an
   `Authorization` value, a query and a `Cookie` value, each optional.
@@ -121,7 +120,7 @@ EXTRA_CASES = (("z-hostile", "z-40", "z-41", "z-42", "z-43", "z-44", "z-45")
                + tuple(case for case, _, _ in JWT_ROW_CASES + PLAIN_ROW_CASES) + SHAPE_CASES + HOSTILE_CASES
                + TOKEN_TYPE_CASES + COOKIE_NAME_CASES)
 
-#: The mapper ids of each option, the table of tests/sidecar/zitadel.md, section principal.
+#: The mapper ids of each option, the table of the sidecar's protocol.
 MAPPERS = {
     "id": ("email", "sub_number", "null"),
     "tenant": ("resourceowner", "org_id", "null"),
@@ -567,7 +566,7 @@ def provider_runs() -> list:
         ("z-09", "introspect_401", "t4", "500 and {\"error\":\"Internal Server Error\"}", me),
         ("z-10", "userinfo_sub_mismatch", "t5", "500", me),
         ("z-11", "userinfo_challenge", "t6", "500, the WWW-Authenticate challenge", me),
-        ("z-12", "userinfo_jwt", "t7", "the principal from an unverified JWT user info answer, Q10-4", me),
+        ("z-12", "userinfo_jwt", "t7", "the principal from an unverified JWT user info answer", me),
         ("z-13", "roles_numeric", "t8", "the roles [\"1\", \"2\", \"admin\"]", "{me{id roles}}"),
     ):
         add("auth-default-" + scenario, "default", [ask(case, case, scenario, _bearer(token), pins, document)])
@@ -580,14 +579,13 @@ def provider_runs() -> list:
     ])
     add("auth-default-introspect_jwt", "default", [
         ask("z-20", "z-20", "introspect_jwt", _bearer("t9"), "the principal from an unverified "
-            "token-introspection+jwt answer chosen by its content type, Q10-4"),
+            "token-introspection+jwt answer chosen by its content type"),
     ])
     add("auth-default-closed", "default", [
         ask("z-21", "z-21", None, _bearer("t1"), "500 with the issuer's port closed"),
     ], issuer="closed")
     add("auth-two_keys", "two_keys", [
-        ask("z-22", "z-22", ok, _bearer("t1"), "one bootstrap, both client assertions signed with the key of "
-            "a.json, Q10-3"),
+        ask("z-22", "z-22", ok, _bearer("t1"), "one bootstrap, both client assertions signed with the key of a.json"),
     ])
     add("auth-key_file", "key_file", [
         ask("z-23", "z-23", ok, _bearer("t1"), "the key read from key.json"),

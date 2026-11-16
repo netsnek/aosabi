@@ -6,8 +6,7 @@
  *
  * The rule is hono's with the list of codings deflate alone, since Aosabi codes
  * no gzip, and with Accept-Encoding read as a list of codings and their weights
- * in place of hono's substring test, divergence D71 of docs/byte-equality.md
- * section 3.
+ * in place of hono's substring test, a named divergence.
  *
  * Derived from hono 4.11.9, dist/middleware/compress/index.js, MIT.
  * Derived from hono 4.11.9, dist/utils/compress.js, MIT.
@@ -39,10 +38,8 @@
 //! way on the answers it does not leave alone.
 //!
 //! The base pipeline of a TypeScript app installs `compress()` on every route,
-//! while the base
-//! pipeline of a Rust service of Aosabi codes no answer, so an app writes
-//! `compress()` before the routes it codes, the named divergence D72 of
-//! `docs/byte-equality.md` section 3.
+//! while the base pipeline of a Rust service of Aosabi codes no answer, so an
+//! app writes `compress()` before the routes it codes, a named divergence.
 //!
 //! Under the feature `web-deflate` the body is coded by
 //! `aosabi_http::coding::zlib::Encoder` over a scratch of the card's
@@ -62,8 +59,8 @@
 //!
 //! The coded body is a stream whose first poll is not ready, as the first read
 //! of a `CompressionStream` is not within the two ticks the adapter waits, so
-//! the adapter writes a coded answer chunked as the reference does (A2 and A5
-//! of the plan's version 2 draft, capture row C31).
+//! the adapter writes a coded answer chunked as the reference does (capture
+//! row C31).
 //!
 //! [`HostCoding::Deflate`]: crate::fetch::response::HostCoding::Deflate
 
@@ -89,7 +86,8 @@ pub const THRESHOLD: u64 = 1024;
 ///
 /// A head holds the newest position of one hash of 4 bytes, so eight times the
 /// 4,096 heads of `aosabi_http::coding::SERVER` leave fewer positions of
-/// another hash on a chain the search follows.
+/// another hash on a chain the search follows. The count is 32,768 heads on
+/// Linux, 64 KiB per coded stream, while the device cards keep 4,096.
 #[cfg(feature = "web-deflate")]
 pub const LINUX_HEADS: usize = 32_768;
 
@@ -119,8 +117,7 @@ impl Default for CompressOptions {
 /// blocks of 8,192 tokens and a buffer of 65,536 plain bytes, with
 /// [`LINUX_HEADS`] hash heads on a Linux target of 64 bits and with the 4,096
 /// heads of `SERVER` on every other target. The player on
-/// `mipsel-unknown-linux-musl` is among those, since the plan adds no memory on
-/// it.
+/// `mipsel-unknown-linux-musl` is among those, since its budget adds no memory.
 #[cfg(feature = "web-deflate")]
 #[must_use]
 pub const fn card_params() -> graphtp::deflate::Params {
@@ -278,8 +275,8 @@ fn should_transform(res: &Response) -> bool {
 /// request without the field gets identity, as from hono, where RFC 9110 would
 /// accept any coding. Hono takes the first coding whose name is a substring of
 /// the field, so `deflate;q=0` and `x-deflate` get deflate there and identity
-/// here, and `DEFLATE` and `*` get deflate here and identity there, the named
-/// divergence D71 of `docs/byte-equality.md` section 3.
+/// here, and `DEFLATE` and `*` get deflate here and identity there, a named
+/// divergence.
 #[must_use]
 pub fn accepted_coding(accept_encoding: Option<&str>) -> Option<&'static str> {
     let field = accept_encoding?;

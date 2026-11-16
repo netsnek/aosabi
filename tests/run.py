@@ -22,7 +22,7 @@ order in this process and injects no parameter of its own.
     python tests/run.py --matrix tests/matrix.yaml --jobs 4
 
 The exit code is non zero when any notebook failed, which is what the diff
-workflow of docs/harness.md section 11 reads.
+workflow reads.
 """
 
 from __future__ import annotations
@@ -73,7 +73,8 @@ PORT_PARAMETER = "port_offset"
 #: kernel binds them only once its process runs, so a sibling job that starts a
 #: kernel or a client in between can take one, and the kernel dies before it
 #: answers kernel_info. The system picks no port below 32768, no other slot
-#: reaches these, and the plans name ports up to 5789 and none of 5980 to 5999.
+#: reaches these, and the fixed ports of the notebooks go up to 5789 and take
+#: none of 5980 to 5999.
 KERNEL_PORT_FIRST = 5980
 KERNEL_PORT_LAST = 5999
 
@@ -117,9 +118,9 @@ def load_matrix(path: Path) -> list:
     many fixtures repeats the same pins.
 
     An entry with `sweep: false` stays out of a run unless `--only` names its
-    id whole, which keeps an entry that needs the network or the owner's
-    credentials out of the closing sweep and still runs it on demand. An entry
-    with `exclusive: true` runs alone under --jobs above 1, and the key changes
+    id whole, which keeps an entry that needs the network or real credentials
+    out of the closing sweep and still runs it on demand. An entry with
+    `exclusive: true` runs alone under --jobs above 1, and the key changes
     nothing under --jobs 1.
     """
     import yaml

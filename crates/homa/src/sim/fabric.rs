@@ -2,14 +2,13 @@
 /*
  * homa sim fabric: hosts on one top of rack switch with priority queues.
  *
- * The model is the Fabric of the Homa design note, second version,
- * homa/design.md section 7.8, lines 2784 to 2815: hosts with links of one
- * rate to one top of rack switch with strict priority queues on each port and
- * one buffer all ports share, enough to reproduce the experiments of SIGCOMM
- * 2018 section 5 at small scale. The bytes a packet takes on the wire beside
- * its Homa bytes are those of HomaModule's own accounting at commit 50d65305:
- * 18 bytes of Ethernet header and CRC and 24 of preamble, start delimiter and
- * gap, homa_wire.h lines 59 to 70, at
+ * The model is hosts with links of one rate to one top of rack switch with
+ * strict priority queues on each port and one buffer all ports share, enough
+ * to reproduce the experiments of SIGCOMM 2018 section 5 at small scale. The
+ * bytes a packet takes on the wire beside its Homa bytes are those of
+ * HomaModule's own accounting at commit 50d65305: 18 bytes of Ethernet header
+ * and CRC and 24 of preamble, start delimiter and gap, homa_wire.h lines 59
+ * to 70, at
  * https://github.com/PlatformLab/HomaModule/tree/50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3,
  * read, and the 20 bytes of an IPv4 header.
  */

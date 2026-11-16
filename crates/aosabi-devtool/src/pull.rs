@@ -3,10 +3,7 @@
  * aosabi-devtool pull: writes the Rust registry aosabi pull writes for the
  * answer of a remote to the introspection query.
  *
- * No analogue in the reference. The judging notebook is
- * tests/notebooks/70_pull.ipynb, which sends the same request lines to this
- * primitive and to the operation pull_types of the command line sidecar
- * and compares the two registries through the parsers of the harness.
+ * No analogue in the reference.
  */
 
 //! The `pull` primitive of the seam.
@@ -35,8 +32,8 @@
 //! write.
 //!
 //! The seam names the command line on a Unix host alone, the hosts of the
-//! runtime the plan gives the command line, so this primitive exists on such
-//! a host alone, and the seam still builds for `wasm32-unknown-unknown`.
+//! runtime meant for the command line, so this primitive exists on such a
+//! host alone, and the seam still builds for `wasm32-unknown-unknown`.
 
 use std::process::ExitCode;
 
@@ -70,8 +67,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "pull";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M8";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "cli";
 
 /// The status of the answer the stub of the oracle gives.
 const STATUS: u16 = 200;

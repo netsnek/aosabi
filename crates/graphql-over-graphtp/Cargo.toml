@@ -16,12 +16,12 @@ repository.workspace = true
 [lints]
 workspace = true
 
-# The owner's three crates and nothing else, so the listener takes 0 outside
-# crates.
+# Three crates of this workspace and nothing else, so the listener takes 0
+# outside crates.
 [dependencies]
 # The codes, the status registry and the stream handles of GraphTP, which the
-# listener names. The owner's crate outside the layers, with no outside crate
-# of its own.
+# listener names. A crate of this workspace outside the layers, with no outside
+# crate of its own.
 graphtp = { path = "../graphtp" }
 # The sans I/O server of GraphTP over Homa and its adapter, with the server
 # role alone, since a listener sends no request.

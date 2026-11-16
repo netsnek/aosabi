@@ -147,7 +147,7 @@ pub enum SvgText {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SvgError {
     /// [`SvgText::Outlines`] was asked for, and the outlines need the face,
-    /// which vendors.
+    /// which a later release vendors.
     OutlinesNeedFont,
 }
 

@@ -5,8 +5,8 @@
  * the core over texts.
  *
  * The module hashlib of Python judges the digests and the json primitive of
- * the seam the strings, the two small primitives of step 9 of
- * 51_viewer_core.
+ * the seam the strings, the two small primitives a check of the viewer core
+ * judges.
  */
 
 //! The `sha256` and `json-str` operations.
@@ -17,8 +17,8 @@
 //! `json`, the JSON string [`write_str`] of the core writes for each text,
 //! which step 9 compares with the `json` primitive of the seam. A text
 //! holding a lone surrogate is refused, since the writer takes a Rust
-//! string, and the two primitives sit together in this module because the
-//! plan names no operation of its own for the writer.
+//! string, and the two primitives sit together in this module as the two
+//! small primitives of step 9.
 
 use aosabi_json::{
     JsObject,

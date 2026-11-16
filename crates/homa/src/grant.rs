@@ -2,12 +2,9 @@
 /*
  * homa grant: the grant scheduler of one downlink.
  *
- * The scheduler is that of the Homa design note, second version,
- * homa/design.md sections 2.4 and 3.6, lines 335 to 350 and 607 to 620, one
- * per downlink over the grant heap in SRPT order, with the grants batched at
- * half a window and the FIFO share by count of its first version,
- * homa/design-v1.md sections 1.5 and 2.4, lines 282 to 320 and 504 to 565.
- * The window, the level of a grant and the FIFO share by interval are
+ * The scheduler is one per downlink over the grant heap in SRPT order, with
+ * the grants batched at half a window and the FIFO share by count. The
+ * window, the level of a grant and the FIFO share by interval are
  * HomaModule's at commit 50d65305, homa_grant.c lines 282 to 303, 792 to 864
  * and 1047 to 1200, at
  * https://github.com/PlatformLab/HomaModule/tree/50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3,
@@ -30,12 +27,12 @@
 //! not received, stay within `max_incoming`.
 //!
 //! **The FIFO share.** On a point to point profile every `fifo_every`th grant
-//! of a downlink goes to the oldest message rather than the active one, which
-//! is the share by count of the first version. On a shared downlink whose
-//! profile sets `fifo_permille` and no count, the oldest message is granted
-//! `fifo_grant_increment` bytes more every interval in which those bytes take
-//! `fifo_permille` of the link rate, as `HomaModule` times it, within
-//! `max_incoming` like every other grant.
+//! of a downlink goes to the oldest message rather than the active one, a
+//! share by count. On a shared downlink whose profile sets `fifo_permille`
+//! and no count, the oldest message is granted `fifo_grant_increment` bytes
+//! more every interval in which those bytes take `fifo_permille` of the link
+//! rate, as `HomaModule` times it, within `max_incoming` like every other
+//! grant.
 //!
 //! **Levels.** The grant to the active message of rank `r` among `n` names
 //! the level [`prio::scheduled`](crate::prio::scheduled) gives, which is

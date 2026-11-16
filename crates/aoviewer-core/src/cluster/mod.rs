@@ -115,8 +115,7 @@ const SMALL: usize = 3;
 /// The smallest size cap of a cluster.
 const MIN_CAP: usize = 24;
 
-/// The divisor of the size cap, the count of boxes docs/aoviewer.md gives as
-/// the bound of a cluster map.
+/// The divisor of the size cap, the count of boxes that bounds a cluster map.
 ///
 /// The size cap it enters as the divisor bounds the size of a part and not the
 /// count of the clusters, so the map of a large schema can hold more boxes

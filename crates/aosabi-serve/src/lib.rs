@@ -35,8 +35,7 @@
 //! features `h2c` and `tls` each enable `http2`.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/30_http_tier1.ipynb`
-//! and `tests/notebooks/33_http2_tls.ipynb`.
+//! section 3.
 
 pub mod build_step;
 #[cfg(feature = "http2")]

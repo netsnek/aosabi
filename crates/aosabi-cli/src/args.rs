@@ -44,7 +44,7 @@
 //!
 //! The help texts are commander's layout, wrapped at 80 columns as commander
 //! wraps them when standard output is no terminal, with the program named
-//! `aosabi`, as `docs/cli-and-targets.md` section 1 names it. An option that
+//! `aosabi`. An option that
 //! names the entry reads its default as the Rust entry, the crate root, which
 //! is cargo's default `src/lib.rs` in a scaffold of `aosabi new`. The
 //! descriptions write U+2014 and U+2192 and the source spells them as

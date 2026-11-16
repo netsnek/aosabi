@@ -12,8 +12,7 @@
 //! `Content-Encoding: none`, and its body is the prelude `:\n\n`, then
 //! `event: next\n` and `data: <json>\n\n` per result, then `event: complete\n`
 //! and `data:\n\n`. Each piece the reference enqueues is one item of the body
-//! stream, so the chunk boundaries on the wire are the reference's (section
-//! YOGA of the plan's version 2).
+//! stream, so the chunk boundaries on the wire are the reference's.
 //!
 //! A stream, the answer of a subscription, is the readable stream of
 //! `sse.js:26-78` over [`ReadableStream`]. Its `start` enqueues the prelude,
@@ -26,6 +25,12 @@
 //! for a done result, clears the interval and closes, and errors the stream
 //! when `next` rejects. Its `cancel` clears the interval and calls `return` of
 //! the iterator with the reason.
+//!
+//! A single result, the one answer the tests compare under
+//! `text/event-stream`, is the list of five pieces the reference writes for
+//! it: the fake iterator of `sse.js:42-52` answers the result and then done in
+//! the one pull that follows the prelude, which closes the stream before a
+//! ping is due.
 
 use core::cell::Cell;
 use std::rc::Rc;

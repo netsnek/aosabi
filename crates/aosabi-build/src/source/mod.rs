@@ -37,11 +37,7 @@
 //! The reader is a feature of the crate, `source`, so `syn` stays out of every
 //! build that leaves the feature off, the build script of every application
 //! and every wasm build among them. It ships in no artifact, and it adds no
-//! `unsafe`. The judging notebook is
-//! `tests/notebooks/12_authoring_parity.ipynb`, which runs it through the
-//! primitive `source` of `aosabi-devtool` over its builder cells under
-//! `tests/fixtures/rs/c6/builder/`, over every twin and every case of the
-//! builder corpus, and over the names of the goldens.
+//! `unsafe`.
 
 mod cfg;
 mod copy;

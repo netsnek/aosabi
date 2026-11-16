@@ -334,6 +334,9 @@ fn taken_dirs(artifact_dir: &str) -> Result<(PathBuf, PathBuf), BuildError> {
     Ok((manifest_dir.join(artifact_dir), var("OUT_DIR")?))
 }
 
+/// The exit status of a run with a wrong invocation, which is `EX_USAGE` of
+/// `sysexits.h`.
+///
 /// [sysexits(3)]: https://man.freebsd.org/cgi/man.cgi?query=sysexits&sektion=3
 const EX_USAGE: u8 = 64;
 
@@ -342,12 +345,11 @@ const EX_USAGE: u8 = 64;
 ///
 /// `entry` is the function `default` of the application crate, as for
 /// [`emit_from`]. The one argument of the program names the artifact
-/// directory, and a relative path resolves against the working directory.
-/// This is the post compile route of
-/// docs/decisions/ADR-0002-derive-inference-with-typesource-seam.md: the
-/// program links the application crate after it is compiled, its roots carry
-/// the declaration list as they do in a build script, and the harness writes
-/// the artifacts of a library that has no server crate.
+/// directory, and a relative path resolves against the working directory. This
+/// is the post compile route: the program links the application crate after it
+/// is compiled, its roots carry the declaration list as they do in a build
+/// script, and the harness writes the artifacts of a library that has no
+/// server crate.
 ///
 /// Nothing goes to stdout. There is no `OUT_DIR`, so the copy a server binary
 /// embeds is not written, and no directive for cargo is printed, because no

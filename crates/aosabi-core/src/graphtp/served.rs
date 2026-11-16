@@ -55,13 +55,12 @@
 //! The road serves an app a call would pass through the core alone, which
 //! `straight_server` decides once per app from what the boot built and never
 //! from what a plugin declares. A plugin of the configuration of the app in
-//! any form, `use_identity` above all, a plugin a host hands the boot, the
-//! viewer and the landing page among them, a plugin of the core with a member
-//! the road does not run, a middleware on the plugin chain, a route or
-//! middleware of the app on the path of a call, another endpoint or a health
-//! check on the path of a call keep the app on its fetch, the
-//! POST of `docs/graphtp-in-aosabi.md` section 3, so every check the app
-//! holds runs on every call as it runs over HTTP.
+//! any form, `use_identity` above all, a plugin a host hands the boot, a
+//! plugin of the core with a member the road does not run, a middleware on
+//! the plugin chain, a route or middleware of the app on the path of a call
+//! or another endpoint keep the app on its fetch, the POST of
+//! `Documentation/guides/graphtp.md`, so every check the app holds runs
+//! on every call as it runs over HTTP.
 //!
 //! A body the app writes whole reaches the listener whole, and a body the app
 //! writes as a stream reaches it as its [`Chunks`], which the listener reads

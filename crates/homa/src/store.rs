@@ -2,11 +2,8 @@
 /*
  * homa store: the configuration and the caller owned storage of an endpoint.
  *
- * The shapes are those of the Homa design note, second version, homa/design.md
- * section 7.3, lines 2327 to 2437, with the page store its section 7.3 argues
- * for, a slot of at most 72 bytes and a peer of at most 96 from its section
- * 8.3, lines 2941 to 2991, and the rules of storage the first version fixes,
- * homa/design-v1.md section 2.2, lines 364 to 401.
+ * The storage is a page store, with a slot of at most 72 bytes and a peer of
+ * at most 96.
  */
 
 //! The configuration, the storage and the page store of an endpoint.
@@ -265,8 +262,8 @@ pub struct Peer<P> {
 }
 
 /// The state of the priority machinery with one peer, in a part of its own
-/// beside the peers, so a peer of a build that sends at one level keeps the
-/// bytes of section 8.3 of the Homa design note.
+/// beside the peers, so a peer of a build that sends at one level stays within
+/// 96 bytes.
 ///
 /// It holds the peer's cutoffs as this end sends by them, when this end last
 /// sent the peer its own, and whether a change of the peer's cutoffs waits to

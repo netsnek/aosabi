@@ -3,9 +3,8 @@
  * aosabi-devtool execute pub_sub: the pub sub of one request of a behaviour
  * table and the payload its publishes carry.
  *
- * Follows `Run.pubSub`, `materializeTopic` and `materializePublish` of
- * tests/sidecar/execute.mjs, whose grammar is tests/sidecar/README.md, the
- * behaviour table. No analogue in the reference.
+ * Follows `Run.pubSub`, `materializeTopic` and `materializePublish` of the
+ * executor sidecar. No analogue in the reference.
  */
 
 //! The pub sub of a request.

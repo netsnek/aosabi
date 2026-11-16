@@ -3,8 +3,8 @@
  * aosabi-core: the crate of Aosabi an application links.
  *
  * This file holds the module list. The two extracted literals beside it,
- * in_context.graphql and number_scalar_messages.rs, are written by
- * tools/provenance and are no modules of this crate.
+ * in_context.graphql and number_scalar_messages.rs, are pinned byte for byte
+ * and are no modules of this crate.
  */
 
 //! The core of Aosabi.
@@ -65,14 +65,7 @@
 //! `graphql-over-graphtp`, which uses `core` and `alloc` alone, so a card with
 //! no standard library links the listener beside the descriptors.
 //!
-//! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/10_schema_tier1.ipynb`
-//! for the descriptors, `tests/notebooks/20_execute.ipynb` and
-//! `tests/notebooks/31_http_errors.ipynb` for the run time,
-//! `tests/notebooks/40_sse.ipynb` and `tests/notebooks/40_pubsub.ipynb` for
-//! the repeater, the pub sub and the subscriptions, and
-//! `tests/notebooks/25_carrier_unix.ipynb` and
-//! `tests/notebooks/38_card_limits.ipynb` for the listener.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![cfg_attr(not(feature = "runtime"), no_std)]
 

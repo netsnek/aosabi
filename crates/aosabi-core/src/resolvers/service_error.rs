@@ -6,6 +6,10 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/define-pylon.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * The field list of its extensions, its three arguments and the body of its
+ * constructor as the conversion to GraphQLError, with a builder of its own
+ * beside them.
  */
 
 //! The service error.

@@ -40,9 +40,9 @@ impl<'a> Credential<'a> {
 
     /// Returns the credential of the bytes `bytes`.
     ///
-    /// The checks are those of rule 6 of `docs/graphtp.md` section 5.3 for the
-    /// bytes, then the length of the head for the size, in that order, as a
-    /// server answers them.
+    /// The checks of the value are those of the wire form for the bytes, then
+    /// the length of the head for the size, in that order, as a server
+    /// answers them.
     ///
     /// # Errors
     ///
@@ -61,8 +61,7 @@ impl<'a> Credential<'a> {
 
     /// Returns the credential when it is within the server's bound `max`.
     ///
-    /// This is rule 7 of `docs/graphtp.md` section 5.3, which a server checks
-    /// after rule 6.
+    /// This is the rule of the wire form a server checks after the one above.
     ///
     /// # Errors
     ///

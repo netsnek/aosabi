@@ -3,11 +3,8 @@
  * homa endpoint: one Homa endpoint of the crate's engine, any number of peers,
  * both roles.
  *
- * The surface is the endpoint of the Homa design note, second version,
- * homa/design.md section 7.4, lines 2438 to 2539, over the rules of the engine
- * of its first version, homa/design-v1.md section 2.4, lines 504 to 565, with
- * the method reply_reserve and the local port of an RPC that the track plan
- * adds.
+ * The surface is one endpoint over the rules of the engine, with the method
+ * reply_reserve and the local port of an RPC that this crate adds.
  */
 
 //! The endpoint of the crate's engine.
@@ -474,13 +471,12 @@ fn short<P>(parts: &Parts<'_, P>, len: &crate::StorageLen) -> Option<ConfigError
 
 /// Returns the feature a profile needs that this build lacks, or `None`.
 ///
-/// All or nothing scheduling needs `START_MSG`, which the feature
-/// `start-msg` builds and the full form carries, incast control needs its
-/// feature and the full form, whose DATA carries the mark, more than one
-/// granted message a downlink needs `overcommit`, and the FIFO share by
-/// interval of Network needs the full form, whose feature builds it (the
-/// Homa design note, second version, section 7.1: a profile that asks for a
-/// mechanism the build left out fails at start and never falls back).
+/// All or nothing scheduling needs `START_MSG`, which the feature `start-msg`
+/// builds and the full form carries, incast control needs its feature and the
+/// full form, whose DATA carries the mark, more than one granted message a
+/// downlink needs `overcommit`, and the FIFO share by interval of Network
+/// needs the full form, whose feature builds it, and a profile that asks for a
+/// mechanism the build left out fails at start and never falls back.
 fn missing<W: Form>(profile: &Profile) -> Option<ConfigError> {
     let full = carries_start_msg::<W>();
     if profile.scheduling == Scheduling::AllOrNothing && !(cfg!(feature = "start-msg") && full) {

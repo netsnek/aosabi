@@ -5,8 +5,8 @@
     python3 website/assets-src/build_docs.py [--root DIR] [--site DIR] [--strict] [--report FILE]
 
 Every Markdown file of Documentation/ becomes one page under /docs/, in the address its path
-gives it: Documentation/graphtp.md is /docs/graphtp/, Documentation/decisions/ADR-0027-graphtp.md
-is /docs/decisions/ADR-0027-graphtp/, and the README.md of a folder is the page of the folder.
+gives it: Documentation/principles.md is /docs/principles/, Documentation/guides/graphtp.md is
+/docs/guides/graphtp/, and the README.md of a folder is the page of the folder.
 /docs/ itself is the index: the README.md of Documentation/ when there is one, then every page,
 grouped by its folder, with its path and its first sentence. Every page links to its file in the
 editor of GitHub and to the history of the file, so the documentation is edited where it lives.
@@ -25,7 +25,7 @@ Documentation/ goes to its page, with its section when it names one, a link to a
 folder of the repository goes to that file or folder on GitHub, and a link that leaves the
 repository or names a path that does not exist is shown as its text alone and counted. A link to a
 section that the page it names does not have is counted as well. With --strict either count fails
-the build. The documents also name files in code, as in `decisions/ADR-0030-single-pass.md` or
+the build. The documents also name files in code, as in `guides/security.md` or
 `crates/graphtp/src/body.rs`, so a code span that is exactly such a path, with a slash in it or as
 the name of a Markdown file beside the page, links to that file the same way when it exists.
 

@@ -23,7 +23,7 @@
 //! | `bare` | the binding of the ESP32-C3 under the feature `bare`, which arrives with device cards |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/26_carrier_serial.ipynb`.
+//! section 3.
 
 #![no_std]
 #![forbid(unsafe_code)]

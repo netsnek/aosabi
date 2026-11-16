@@ -20,8 +20,9 @@
 //! merged over the copy with its members winning, as
 //! `{...processedData, ...patchedData}` merges them, so a member under an
 //! alias the patch does not name stays, and any other answer replaces the
-//! object. The `errors` of a result are walked as its `data` is, and every
-//! error in them stays as it is.
+//! object. Under `strict` an object whose `__typename` names no patch is
+//! refused with a plain `Error`. The `errors` of a result are walked as its
+//! `data` is, and every error in them stays as it is.
 //!
 //! [`PatchTable`] is the patch map of the configuration with no type over
 //! it, a patch per remote type name with the policy `pass` attached to it.

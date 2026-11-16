@@ -96,8 +96,7 @@ pub type GraphQLFormattedErrorExtensions = JsObject;
 /// One segment of the path into the execution response.
 ///
 /// The reference types a segment as `string | number`, a field key or a list
-/// index, and the two variants are what row D22 of docs/byte-equality.md asks
-/// for.
+/// index, and the enum has the same two variants.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PathSegment {
     /// A response key.
@@ -494,7 +493,7 @@ fn undefined_if_empty<T>(array: Option<Vec<T>>) -> Option<Vec<T>> {
 ///
 /// The conversions into [`JsObject`] and [`JsValue`] insert `message`,
 /// `locations`, `path` and `extensions` in that order and skip an absent one,
-/// which is the key order of docs/byte-equality.md section 8.1.
+/// which is the key order of the graphql-js layer of the error format.
 ///
 /// Derived from graphql-js 16.12.0, src/error/GraphQLError.ts, MIT.
 #[derive(Debug, Clone, PartialEq)]

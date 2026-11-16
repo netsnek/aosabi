@@ -3,10 +3,7 @@
  * aosabi-devtool dotenv: parses the text of a .env file the way the command
  * line reads it.
  *
- * No analogue in the reference. The judging notebook is
- * tests/notebooks/70_scaffold.ipynb, which sends the same request lines to
- * this primitive and to the operation dotenv_parse of the command line
- * sidecar.
+ * No analogue in the reference.
  */
 
 //! The `dotenv` primitive of the seam.
@@ -25,8 +22,8 @@
 //! its last line, which is the order [`aosabi_cli::dotenv::parse`] answers.
 //!
 //! The seam names the command line on a Unix host alone, the hosts of the
-//! runtime the plan gives the command line, so this primitive exists on such
-//! a host alone, and the seam still builds for `wasm32-unknown-unknown`.
+//! runtime meant for the command line, so this primitive exists on such a
+//! host alone, and the seam still builds for `wasm32-unknown-unknown`.
 
 use std::process::ExitCode;
 
@@ -50,7 +47,7 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "dotenv";
 
-/// The milestone the primitive lands at.
+/// The area the primitive lands at.
 pub(crate) const LANDS_AT: &str = "cli";
 
 /// The operations of the batch form.

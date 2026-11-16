@@ -7,14 +7,14 @@
 
 //! [`HttpOptions`] and [`HttpServer`].
 //!
-//! [`HttpServer::new`] reads the options once, the way Yoga's constructor
-//! reads them: the logger, the masking, the endpoint, the options of
-//! `GraphiQL`, the request parsers and the result processors. The option
-//! `batching` has no reading, the named divergence D58 of
-//! `docs/byte-equality.md` section 3, so the function refuses every batch as
-//! Yoga does with batching off. It hands the hook layer of `aosabi-hooks` the
-//! list of hooks Yoga hands envelop, with no plugin of its own list that has
-//! no hook there:
+//! [`HttpServer::new`] reads the options once, the way Yoga's constructor reads them:
+//! the logger, the masking, the endpoint, the request parsers and the result
+//! processors. The options `batching`, `graphiql` and `healthCheckEndpoint` have no
+//! reading, named divergences, so the function refuses every batch as Yoga does with
+//! batching off, answers a request for the page of `GraphiQL` as one for a type it
+//! does not serve and answers no health check. It hands the hook layer of
+//! `aosabi-hooks` the list of hooks Yoga hands envelop, with no plugin of its own list
+//! that has no hook there:
 //!
 //! | Place in Yoga's list | Hook of the hook layer |
 //! | --- | --- |
@@ -27,13 +27,14 @@
 //! | 20 | the masking of an unexpected error, unless the options turn it off |
 //! | 21 | the stamp of a validation error |
 //!
-//! The steps of Yoga's list that hold no hook of the hook layer, the health
-//! check, `GraphiQL`, the five request parsers, the result processors, the
-//! refusal of a batch, the checks of the parameters and of the method and the
-//! unhandled route, are straight code of the function in [`crate::answer()`]
-//! at the same places. The hooks of Yoga and of the server adapter an app's
-//! plugin implements are read off the array the hook layer answers after its
-//! splices, as Yoga reads them.
+//! The places are those of the list of `server.js:110-203`, so every hook of the app's
+//! plugins runs before and after the same steps as in Yoga. The steps of Yoga's list
+//! that hold no hook of the hook layer, the five request parsers, the result
+//! processors, the refusal of a batch, the checks of the parameters and of the method
+//! and the unhandled route, are straight code of the function in [`crate::answer()`]
+//! at the same places. The hooks of Yoga and of the server adapter an app's plugin
+//! implements are read off the array the hook layer answers after its splices, as Yoga
+//! reads them.
 //!
 //! Four options of the reference have no reading here, because the app passes
 //! none of them: `fetchAPI`, `allowedHeaders`, `renderGraphiQL` and a schema
@@ -128,9 +129,8 @@ pub const VERSION: &str = "5.18.0";
 /// The default endpoint, `/graphql`.
 pub const DEFAULT_GRAPHQL_ENDPOINT: &str = "/graphql";
 
-/// Aosabi only: whether a server validates through the single pass when its
-/// options choose neither, on, verbatim "i want to decide between single pass
-/// or conventional in build time but default is single pass".
+/// Aosabi only: whether a server validates through the single pass when its options
+/// choose neither, on by default.
 pub const SINGLE_PASS_DEFAULT: bool = true;
 
 /// The option `logging`.
@@ -179,8 +179,7 @@ pub type AgentHook = Rc<dyn Fn(&aosabi_execute::Agent)>;
 /// Aosabi only. The reference runs every operation on the one event loop of
 /// the process with the resolvers bound in its schema, and here an operation
 /// runs on an agent of its own made with `options` and handed to `setup`,
-/// and the executor takes the resolvers the schema binds (rule 4 of
-/// section YOGA of the old page of the plan).
+/// and the executor takes the resolvers the schema binds.
 #[derive(Clone, Default)]
 pub struct AgentSetup {
     /// The options of the agent.

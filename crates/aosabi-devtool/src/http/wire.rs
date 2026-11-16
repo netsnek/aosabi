@@ -4,10 +4,10 @@
  * an IO in memory, a clock the request line moves and a service that records
  * what it is handed.
  *
- * No analogue in the reference. The request lines are those of family H and
- * of the other families of tests/gen/, and the capture of their bytes from
- * the reference is tests/capture/m5_rows.py, row C48, which sends each case in
- * its writes and pauses and waits 0.4 seconds of quiet after the last.
+ * No analogue in the reference. The request lines are those of family H and of
+ * the other families of tests/gen/, and the capture of their bytes from the
+ * reference sends each case in its writes and pauses and waits 0.4 seconds of
+ * quiet after the last.
  */
 
 //! `answer_all` and the pieces it drives.
@@ -24,18 +24,17 @@
 //!
 //! The recording service stands where the application stands. It reads the
 //! body of a `POST` whose path ends in `/graphql` to its end before it
-//! answers, as Yoga reads it, answers every other request without reading
-//! its body, as the unhandled route of the reference does, and marks the
-//! answer of a method other than `GET` and `HEAD` for the cleanup of its
-//! unread body, as the adapter of `@hono/node-server` does (A10 of the plan's
-//! version 2 draft). Its answer is `200` with a `content-type`, so a notebook
-//! tells an answer of the application from one of Node's own, which carry
-//! none. It answers from a later turn of the driver, one poll of the
-//! connection later at the earliest and one answer a turn, as Node's
-//! recording service of `tests/hardening/upstream/node-recorder.mjs` answers
-//! from the next turn of the event loop through `setImmediate`, so a read is
-//! parsed whole before such an answer, while the connection runs the service
-//! once at each head as Node runs its listener.
+//! answers, as Yoga reads it, answers every other request without reading its
+//! body, as the unhandled route of the reference does, and marks the answer of
+//! a method other than `GET` and `HEAD` for the cleanup of its unread body, as
+//! the adapter of `@hono/node-server` does. Its answer is `200` with a
+//! `content-type`, so a notebook tells an answer of the application from one
+//! of Node's own, which carry none. It answers from a later turn of the
+//! driver, one poll of the connection later at the earliest and one answer a
+//! turn, as Node's recording service answers from the next turn of the event
+//! loop through `setImmediate`, so a read is parsed whole before such an
+//! answer, while the connection runs the service once at each head as Node
+//! runs its listener.
 
 use core::{
     cell::{

@@ -1,15 +1,32 @@
 # SPDX-License-Identifier: MIT
 """tests/gen: the seeded operation generator of the Aosabi harness.
 
-The package reads a schema, enumerates the operation families of
-`docs/harness.md` section 4 over it, writes the behaviour tables the two sides
-run those operations against, and returns both as a [`Corpus`] with the counts
-and the seed a run records. It decides nothing about correctness. The verdict of
-a run is the byte comparison of the node sidecar and the Rust devtool over the
-same corpus.
+The package reads a schema, enumerates the operation families over it, writes
+the behaviour tables the two sides run those operations against, and returns
+both as a [`Corpus`] with the counts and the seed a run records. It decides
+nothing about correctness. The verdict of a run is the byte comparison of the
+node sidecar and the Rust devtool over the same corpus.
 
-The configuration and invalid document families of that section belong to later
-milestones. Both are reached by name.
+The operation families are the selection shapes S1 to S8, the argument
+deviations A, the variable classes V0 to V6, the directives D, the
+introspection documents I, the error classes E01 to E16 and the ordering cases
+O01 to O12. The HTTP families of `tests/gen/http.py` are T for the transport, K
+for the static routes, U for the uploads and R for the routes a fixture
+registers, and the wire family H of `tests/gen/wire.py` holds 101 cases of raw
+bytes. Three modules are reached by name: `streams`, the served cases S01 to
+S31, N01 to N04, P01 to P09, MAP1 to MAP4 and CAD0 to CAD2 of the server sent
+events, `subscriptions`, the family SUB, and `pubsub`, the seeded pub sub,
+repeater and hub scripts. The configuration and invalid document families
+belong to later releases. The plugin corpora of `tests/gen/plugins.py` hold
+2000 order vectors, 300 boot descriptions and 200 error lists, with the served
+cases and the boots of plugins-app, beside the served cases of
+`tests/gen/identity.py` and `tests/gen/sentry.py`. The login takes `login`, the
+runs of zitadel-login-app with its 25 cases, and `zitadel`, the four corpora of
+the provider, 200 claim sets, 60 request shapes, 100 claim values and 40
+parameter sets, with the runs of zitadel-auth-app and its 31 cases. Both are
+reached by name. The corpora of Federation in `tests/gen/federation.py` are the
+client documents over a front schema and the requests of the federation
+sidecar.
 
 One run of the generator prints its counts with
 
@@ -161,8 +178,8 @@ def generate(
     their types.
 
     `bound` is the number of reachable fields up to which the tree enumeration
-    is exhaustive. A schema above it is enumerated as the covering array of
-    `docs/harness.md` section 4.2, where `fanout` decides the fields per level.
+    is exhaustive. A schema above it is enumerated as the covering array,
+    where `fanout` decides the fields per level.
 
     The tables of the result are the base table, one table per error class and
     target, and one table per ordering case. The cases name the table they run
@@ -219,6 +236,9 @@ def generate_named(
     bound: int = EXHAUSTIVE_FIELD_BOUND,
 ) -> Corpus:
     """Returns the corpus of one schema the generator knows by name.
+
+    The names are `rich`, `blog-app` and the three fixture schemas, which
+    [`schema_names`] lists.
     """
     return generate(
         named_sdl(name),

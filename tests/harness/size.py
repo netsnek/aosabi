@@ -2280,8 +2280,8 @@ NAMED_FAMILIES = (
 )
 #: The crates of the symbolizer of std, whose instances of the stable sort the standard library makes.
 SYMBOLIZER = re.compile(r"(^|[<\s(&])(addr2line|gimli|object|miniz_oxide|rustc_demangle)::|backtrace")
-#: The candidates of the owner's note N2 that the host of a Worker holds, each
-#: as a pattern of a demangled name.
+#: The candidates that the host of a Worker holds, each as a pattern of a
+#: demangled name.
 HOST_CANDIDATES = (
     ("the number parse, dec2flt of core and the number readers of the workspace",
      re.compile(r"core::num::dec2flt|<f(32|64) as core::str::traits::FromStr>|aosabi_json::reader::\w*num"

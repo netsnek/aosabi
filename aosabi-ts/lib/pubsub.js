@@ -7,7 +7,8 @@
  *
  * No analogue in the reference, whose createPubSub of
  * @graphql-yoga/subscription 5.0.5 dispatches the events of its topics on an
- * EventTarget of the process.
+ * EventTarget of the process. It is the marker over the port of createPubSub
+ * in aosabi-core.
  */
 
 import { publishTopic, Topic } from "./core.js";

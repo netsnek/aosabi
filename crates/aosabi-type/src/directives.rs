@@ -328,7 +328,7 @@ struct DirectiveRow {
 pub const DEFAULT_DEPRECATION_REASON: &str = "No longer supported";
 
 /// The five specified directives, in the order of `specifiedDirectives`, with
-/// the configs.
+/// the configs of graphql-js.
 static SPECIFIED: [DirectiveRow; 5] = [
     DirectiveRow {
         name: "include",

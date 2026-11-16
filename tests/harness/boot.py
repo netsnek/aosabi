@@ -13,10 +13,10 @@ process, which is how a failing boot ends. It keeps standard output as it stood 
 moment, ends a process still running with `SIGTERM` on both sides alike, and reads what
 came after.
 
-The streams go to files under `target/harness/boot/`, never under the
-temporary directory of the system. The reference half of the boot report comes
-from `tests/sidecar/boot-report.mjs`, which `reference_report` runs, and the
-twin writes its own where `AOSABI_BOOT_REPORT` names a file.
+The streams go to files under `target/harness/boot/`, never under the temporary
+directory of the system. The reference half of the boot report comes from a sidecar,
+which `reference_report` runs, and the twin writes its own where `AOSABI_BOOT_REPORT`
+names a file.
 """
 
 from __future__ import annotations
@@ -229,7 +229,7 @@ def boot_reference(name: str, port: int, variant: str = "default", node_env: str
     `role` is written into `REFERENCE_ROLE`, the variable the reference reads, `None`
     for unset, and the worker entry sets `worker` itself. With `dump` the boot names a fresh dump file in
     `AOSABI_BOOT_DUMP` and waits for it. The port reaches the reference through
-    the overlay, the rule of docs/harness.md section 2.1.
+    the overlay.
     """
     if variant not in variants_of(name):
         raise ValueError("no variant named %s" % variant)
@@ -270,7 +270,7 @@ def boot_twin(name: str, port: int, variant: str = "default", node_env: str | No
 
 def reference_report(name: str, port: int, variant: str = "default", node_env: str | None = "test",
                      role: str | None = None, entry: str = "server", root=None, timeout_s: float = 60.0) -> dict:
-    """The reference half of the boot report, written by tests/sidecar/boot-report.mjs.
+    """The reference half of the boot report, written by the sidecar of the boot report.
 
     The report carries the declared plugins of the configuration, the array
     executeConfig wrote back after both passes and the routes of the booted
@@ -292,11 +292,11 @@ def boot_bun(name: str, glue: Path, port: int, variant: str = "default", node_en
              root=None, timeout_s: float = 40.0) -> Boot:
     """Boots a glue of the reference's build of a fixture on Bun, under a role.
 
-    `glue` is the folder of the glue, the build folder of the staged fixture for the reference's
-    build on Bun, the reference of the host, which tests/ts1/bun.js serves, or
-    `glue/` of the stage of the judge mode for the TypeScript side, which
-    tests/ts1/bun-glue.js runs on the entry aosabi/bun of the staged package with
-    the IR `ir` and the engine `engine` of aosabi/bun, `module` naming the module
+    `glue` is the folder of the glue, the build folder of the staged fixture for the
+    reference's build on Bun, the reference of the host, which the Bun server of the
+    harness serves, or `glue/` of the stage of the judge mode for the TypeScript side,
+    which the Bun glue of the harness runs on the entry aosabi/bun of the staged package
+    with the IR `ir` and the engine `engine` of aosabi/bun, `module` naming the module
     of the stage the side takes. The reference's build on Bun is ready once the port
     accepts a connection, since its serving plugin binds on Node alone and Bun
     writes no listen line, and the side once it wrote the listen line, since

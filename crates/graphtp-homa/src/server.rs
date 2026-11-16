@@ -10,8 +10,8 @@
 //! The sans I/O server of GraphTP/1.
 //!
 //! A caller hands each whole request with its peer and its RPC to
-//! [`Server::request`], which checks the 11 rules of `docs/graphtp.md` section
-//! 5.3 in their order and answers a refusal, a PULL and a CANCEL itself. An
+//! [`Server::request`], which checks the 11 rules of `Documentation/guides/graphtp.md`
+//! in their order and answers a refusal, a PULL and a CANCEL itself. An
 //! OPERATION that passes goes to the caller's handler as an [`Exchange`], which
 //! the handler completes with [`Server::answer`], or with
 //! [`Server::open_stream`] and then [`Server::next`], [`Server::complete`] and
@@ -70,7 +70,7 @@ const CLOSE: usize = 2;
 
 /// The bounds of a server, which a card sets.
 ///
-/// Each bound answers its code of `docs/graphtp.md` sections 2.5 and 5.5 when a
+/// Each bound answers its code when a
 /// request or an answer passes it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Config {
@@ -161,7 +161,7 @@ pub enum Step<P> {
     /// The answer of the RPC, which the server wrote itself.
     ///
     /// The caller sends every message [`Server::poll`] holds before this one,
-    /// which keeps the order of `docs/graphtp.md` section 2.4: the parked PULL
+    /// which keeps the order: the parked PULL
     /// that a CANCEL ends is answered before the CANCEL.
     Reply(RpcId, Message),
     /// A PULL the server parked until an entry of the peer is ready.
@@ -379,7 +379,7 @@ impl<P: Copy + Eq> Server<P> {
 
     /// Takes the whole request `message` of the RPC `id` from `peer`.
     ///
-    /// The request is checked by the 11 rules of `docs/graphtp.md` section 5.3
+    /// The request is checked by the 11 rules of `Documentation/guides/graphtp.md`
     /// in their order, and a request that breaks one is answered with its
     /// code and an empty body. An OPERATION that passes is handed out with its
     /// decoded content, a PULL is answered with a batch or parked, and a

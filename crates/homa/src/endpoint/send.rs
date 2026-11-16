@@ -3,11 +3,8 @@
  * homa endpoint send: packetization, the transmit order and the restarts of a
  * sender.
  *
- * The rules are those of sending and of RPC_UNKNOWN in the Homa design note,
- * first version, homa/design-v1.md section 2.4, lines 504 to 565, with the
- * FIFO share of its section 1.4 and the limits of a restart of its section
- * 1.5, and the report of RPC_UNKNOWN in place of a restart that the track plan
- * adds after docs/graphtp.md section 2.7.
+ * The rules are those of sending and of RPC_UNKNOWN, with the FIFO share, the
+ * limits of a restart and the report of RPC_UNKNOWN in place of a restart.
  */
 
 //! The sending half of the endpoint.

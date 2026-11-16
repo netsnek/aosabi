@@ -16,7 +16,12 @@
 
 // The canary keeps the auth state of a request in the context under the key
 // auth, which a plugin of the app sets and requireAuth and authMiddleware read,
-// the user and its roles among them.
+// the user and its roles among them. Its useAuth sets that state from the
+// introspection of a token at the identity provider through openid-client,
+// which crosses into no engine item before the connection over the OIDC client
+// of the engine, which a later release makes, so each step of that path throws
+// an error that names its waiting, while the route of the logout answers as the
+// canary's.
 import { deleteCookie, getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { ServiceError } from "./errors.js";
@@ -69,16 +74,13 @@ function adapterEnv(c) {
 }
 
 // Returns the middleware that checks the auth state of the context against
-// `checks`, authMiddleware of the canary's dist/index.js:659-690: no state
-// and a state with no user throw an HTTPException of hono of the status 401
-// and the message "Authentication required", and a user whose roles hold
-// none of `checks.roles`, by its name or by the name after the project
-// AUTH_PROJECT_ID of the environment and a colon, throws one of the status
-// 403 over a response "Forbidden" whose fields Missing-Roles and
-// Obtained-Roles list both. The canary checks the roles only where a user is
-// set, so a state with no user passes, and the refusal of a state with no
-// user is divergence D50 of docs/byte-equality.md of the Aosabi repository,
-// which closes flaw P1 of Appendix A of the security review.
+// `checks`, authMiddleware of the canary's dist/index.js:659-690: no state and
+// a state with no user throw an HTTPException of hono of the status 401 and the
+// message "Authentication required", and a user whose roles hold none of
+// `checks.roles`, by its name or by the name after the project AUTH_PROJECT_ID
+// of the environment and a colon, throws one of the status 403 over a response
+// "Forbidden" whose fields Missing-Roles and Obtained-Roles list both. A state
+// with no user is refused here, a named divergence.
 export const authMiddleware = (checks = {}) => {
   const middleware = async (ctx, next) => {
     const AUTH_PROJECT_ID = adapterEnv(ctx).AUTH_PROJECT_ID;

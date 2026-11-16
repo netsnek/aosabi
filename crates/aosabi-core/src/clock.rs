@@ -4,8 +4,8 @@
  * request, and the turns of the loop that runs the clock.
  *
  * No analogue on the reference side, where the timers and the event loop of
- * the runtime are the clock. The capability is one of the five of
- * Documentation/architecture.md section 14.2.
+ * the runtime are the clock. The capability is one of the five a service
+ * asks its context for.
  */
 
 //! `install_clock`, `now_ms`, `delay`, `Delay`, `note_turn` and `turns`.

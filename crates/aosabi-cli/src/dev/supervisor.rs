@@ -38,16 +38,21 @@
 //!    worker role probes nothing and prints
 //!    `[dev] worker started, watching src for changes` once.
 //! 4. Every changed path prints `[dev] <kind> reload`, the character U+2014 and
-//!    the path relative to the root, and the highest kind
-//!    of a burst is kept. After 200 ms with no change, 150 ms in the worker
-//!    role, the supervisor prints `[dev] rebuilding` and builds. A burst of the
-//!    kind `config` reads the project again first, since the manifest or the
-//!    configuration changed. A build that succeeds prints
-//!    `[dev] restarted`, kills the old child with [`Child::kill`], since the
-//!    served binary has no graceful shutdown, starts the new one and probes it.
-//!    A build that fails prints what cargo printed and
-//!    `[dev] build failed, the previous server keeps running`, the rule of
-//!    `docs/cli-and-targets.md` section 4, or
+//!    the path relative to the root, and the highest kind of a burst is kept.
+//!    After 200 ms with no change, 150 ms in the worker role, the supervisor
+//!    prints `[dev] rebuilding` and builds. A burst of the kind `config` reads
+//!    the project again first, since the manifest or the configuration changed,
+//!    with every refusal of the loader, and after a reload that failed every
+//!    later burst reads it again before it builds, until a reload succeeds.
+//!    Every other burst builds with the project of the last load, and the build
+//!    reads the lock of the project and the lock it derives with the pin check
+//!    of the loader, so a crate of Aosabi from a registry that a change the
+//!    watcher did not see brings in is refused with `AO-C0108` before cargo
+//!    compiles. A build that succeeds prints `[dev] restarted`, kills the old
+//!    child with [`Child::kill`], since the served binary has no graceful
+//!    shutdown, starts the new one and probes it. A build that fails prints
+//!    what cargo printed and
+//!    `[dev] build failed, the previous server keeps running`, or
 //!    `[dev] build failed, watching for the next change` while no child runs.
 //!
 //! The builds run one after the other on the thread of the supervisor, so a

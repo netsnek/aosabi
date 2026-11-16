@@ -252,11 +252,15 @@ pub struct KnowledgePage {
 
 /// Writes `chapter` as `md/device.md` into `out`.
 ///
-/// Each part is a heading of level 2, each table of the blueprint and each
-/// knowledge page a heading of level 3, and the headings of a page sit below
-/// that. A part without a row is the sentence `None.`, and a knowledge page
-/// that writes no text adds no block. When `out` already holds text the page
-/// starts after a blank line, and the page ends with one line feed.
+/// The page opens with the title as a heading of level 1 and the image of
+/// the card, whose link leads from `md/` to the root of the tree and to
+/// [`DeviceChapter::card_file`] there, every byte of that path outside the
+/// letters, the digits and `-._~/` percent encoded. Each part is a heading of
+/// level 2, each table of the blueprint and each knowledge page a heading of
+/// level 3, and the headings of a page sit below that. A part without a row
+/// is the sentence `None.`, and a knowledge page that writes no text adds no
+/// block. When `out` already holds text the page starts after a blank line,
+/// and the page ends with one line feed.
 pub fn render_device_markdown(chapter: &DeviceChapter, out: &mut String) {
     if !out.is_empty() {
         // A blank line ends the paragraph or the table the text before ends

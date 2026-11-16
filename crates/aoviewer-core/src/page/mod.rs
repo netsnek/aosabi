@@ -35,12 +35,11 @@
 //! [`Cell::TypeRef`] of one [`TypeRefPart::Name`], so the rule that a name
 //! cell writes and every other name links holds without an exception.
 //!
-//! The order of a page is the one of `docs/documentation-generator.md` section 4.
-//! Fields, arguments and enum values keep the order of the transforms, which
-//! is schema order unless `sort=alpha`, and every other list sorts by the
-//! bytes of its names with an explicit tie break, so the order of the input
-//! never reaches a page. A page lists every member of the model, the ones the
-//! graph hides included.
+//! The order of a page is the one of the documents. Fields, arguments and enum
+//! values keep the order of the transforms, which is schema order unless
+//! `sort=alpha`, and every other list sorts by the bytes of its names with an
+//! explicit tie break, so the order of the input never reaches a page. A page
+//! lists every member of the model, the ones the graph hides included.
 //!
 //! A diagram of a page is the view of its route under the page budget, one
 //! [`Block::Diagram`] per part of a split view or one that says why it is
@@ -903,7 +902,7 @@ fn count32(n: usize) -> u32 {
     u32::try_from(n).unwrap_or(u32::MAX)
 }
 
-/// The two lints of reachability of `docs/aoviewer.md` section 2.3.
+/// The two lints of reachability.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Lint {
     /// Reached only as an implementation.

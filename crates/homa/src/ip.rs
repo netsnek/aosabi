@@ -3,7 +3,9 @@
  * homa ip: the IP driver of Network in user space over raw IP 146, the
  * IPPROTO_HOMA of HomaModule.
  *
- * The constants of Linux below are read at
+ * The driver takes a peer as an address with its Homa port and holds the
+ * claims of ports, the filter and the calls. The constants of Linux below are
+ * read at
  * https://github.com/torvalds/linux/tree/fe2ec83746e501645709761605c2464a44fd2929.
  * Every system call goes through socket2 or the standard library, so the file
  * holds no unsafe.

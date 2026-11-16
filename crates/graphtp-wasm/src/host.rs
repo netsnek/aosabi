@@ -3,10 +3,10 @@
  * graphtp-wasm host: the state of the module and the safe calls behind each
  * export, over plain integers.
  *
- * No analogue in the reference. The calls are those docs/graphtp-fetch.md
- * section 2.2 names, alloc, free, engine_new, link_up, link_down, push_rx,
- * poll_tx, poll_event, operation, pull, cancel, answer, handle_timeout and
- * next_timeout, with engine_free, abort and codec beside them.
+ * No analogue in the reference. The calls are alloc, free, engine_new,
+ * link_up, link_down, push_rx, poll_tx, poll_event, operation, pull, cancel,
+ * answer, handle_timeout and next_timeout, with engine_free, abort and codec
+ * beside them.
  */
 
 //! The state of the module and the calls behind the exports.

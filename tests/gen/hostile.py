@@ -22,14 +22,13 @@ key beside `data` and a reader that refuses at its first unexpected token
 would otherwise never reach the attack. Every string of the corpus is
 invented.
 
-The hostile introspection corpus carries the strings of the row `hostile` of
-the plan through the introspection input, and what the SDL of
-`tests/fixtures/viewer/hostile.graphql` cannot carry: the lone surrogate
-escapes, which the lexer of graphql-js refuses in an SDL string, and the
-description of 1 MiB. It adds the names at the bounds of the name rule and the
-documents whose shape the builder refuses. Its golden rule is assertions only,
-and [`Document.strings`] names what a tree of a `read` document must carry as
-written.
+The hostile introspection corpus carries the strings of the hostile fixture
+through the introspection input, and what the SDL of that fixture cannot carry:
+the lone surrogate escapes, which the lexer of graphql-js refuses in an SDL
+string, and the description of 1 MiB. It adds the names at the bounds of the
+name rule and the documents whose shape the builder refuses. Its golden rule is
+assertions only, and [`Document.strings`] names what a tree of a `read` document
+must carry as written.
 
     python -m tests.gen.hostile
     python -m tests.gen.hostile --out target/viewer/hostile --mutations 10000

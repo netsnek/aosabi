@@ -3,7 +3,8 @@
  * graphtp-wasm buffer: the memory the host shares with the module, buffers
  * the module owns and names by their address.
  *
- * No analogue in the reference.
+ * No analogue in the reference. Memory crosses the boundary through buffers the
+ * crate owns and exposes by address, read back through safe indexing.
  */
 
 //! The memory the host shares with the module.
@@ -131,6 +132,9 @@ impl Buffers {
 /// Returns the address of the bytes of `bytes`, with a provenance that
 /// permits writes exposed to the host that writes there, or 0 where it does
 /// not fit a `u32`.
+///
+/// The address comes from `Vec::as_mut_ptr`, since the provenance of `as_ptr`
+/// permits no write.
 fn address(bytes: &mut Vec<u8>) -> u32 {
     u32::try_from(bytes.as_mut_ptr().expose_provenance()).unwrap_or(0)
 }

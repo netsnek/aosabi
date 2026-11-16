@@ -18,7 +18,7 @@
 //! parse and a repeated document skips the validation. It acts on the parse and
 //! the validation the hook layer of `aosabi-hooks` runs, so it is a plugin of
 //! that layer, which the function places after the plugins of the app as Yoga's
-//! list places it, and which the probes of `60_request_cache` place in their own
+//! list places it, and which the probes of the request cache place in their own
 //! rigs. Both live in one table of `aosabi-cache`, under the four keys of Yoga:
 //!
 //! | Part | How it enters |

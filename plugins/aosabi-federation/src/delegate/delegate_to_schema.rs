@@ -14,15 +14,13 @@
 //! answers the local executor of that schema, and its root fields delegate
 //! again to the subschema configuration of the remote, whose executor is the
 //! HTTP executor. The two layers stay two, and every error passes the two
-//! checks of the result it passes in the reference (the plan, section
-//! DELEGATE, rule 6).
+//! checks of the result it passes in the reference.
 //!
 //! The executor answers its result or a promise of it on the agent of the
 //! request, and the result goes through the transformer in the one
 //! continuation of `handleMaybePromise`, so a refusal of a transform settles
 //! synchronously and a result that waits on the network settles when it
-//! arrives, at the promise jobs of the reference (the plan, section
-//! DELEGATE, rule 7).
+//! arrives, at the promise jobs of the reference.
 //!
 //! The branch of `delegateRequest` for an executor that answers an async
 //! iterable, a subscription or an incremental result, is left out with

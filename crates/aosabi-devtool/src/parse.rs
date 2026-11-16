@@ -3,9 +3,7 @@
  * aosabi-devtool parse: parses a GraphQL document and reports what graphql-js
  * reports, as a tree or as printed text.
  *
- * No analogue in the reference. The crate under test is aosabi-lang, and the
- * judging notebook is tests/notebooks/02_language.ipynb, which compares the
- * bytes against a node sidecar running the pinned graphql-js.
+ * No analogue in the reference. The crate under test is aosabi-lang.
  */
 
 //! The `parse` and `print` primitives of the seam.

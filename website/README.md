@@ -25,8 +25,8 @@ come.
 ## The docs section
 
 Every Markdown file of `Documentation/` becomes one page under `/docs/`, at the address its path
-gives it. The file `Documentation/graphtp.md` is the page `/docs/graphtp/`, a file in a folder keeps
-the folder, as in `/docs/decisions/ADR-0027-graphtp/`, and the `README.md` of a folder is the page
+gives it. The file `Documentation/principles.md` is the page `/docs/principles/`, a file in a
+folder keeps the folder, as in `/docs/guides/graphtp/`, and the `README.md` of a folder is the page
 of that folder. The page `/docs/` is the index: the `README.md` of `Documentation/` when there is
 one, then every page, grouped by its folder, with its file and its first sentence.
 

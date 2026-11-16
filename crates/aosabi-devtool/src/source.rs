@@ -5,8 +5,7 @@
  *
  * No analogue in the reference. The crate under test is aosabi-build with its
  * feature source, the reader of the source path of aosabi-builder, which
- * stands in for the program the TypeScript checker builds for the
- * builder. The judging notebook is tests/notebooks/12_authoring_parity.ipynb.
+ * stands in for the program the TypeScript checker builds for the builder.
  */
 
 //! The `source` primitive of the seam.
@@ -102,8 +101,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "source";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "APL1";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "authoring";
 
 /// The operations of the batch form.
 const OPERATIONS: &Operations = &[("read", op_read), ("names", op_names), ("build", op_build)];

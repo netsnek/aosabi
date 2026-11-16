@@ -2,22 +2,21 @@
 /*
  * homa wire: a packet as the engine sees it, whatever wire form carries it.
  *
- * The shapes are those of the Homa design note, second version, homa/design.md
- * section 7.5, lines 2540 to 2629, with one packet type for both forms, so the
- * engine is written once and each form only writes and reads its own layout.
+ * The shapes give one packet type for both forms, so the engine is written once
+ * and each form only writes and reads its own layout.
  */
 
 //! The packets of the engine and the two wire forms that carry them.
 //!
 //! [`Packet`] is a packet as the engine sees it, and a [`Form`] writes the
-//! header of one and reads a whole one back. The compact form is version 0 of
-//! the first version of the Homa design note, 6 bytes of common header, 32
-//! bit identifiers and LIMITS, for every carrier but Network. The full form is
-//! `homa_wire.h` of `HomaModule` at the pinned commit, with the ports of both
-//! ends, for Network. Each form refuses the packets it has no layout for with
-//! [`DecodeError::Form`], so the engine never sends a packet the form lacks,
-//! and every length from the wire is checked before a byte past it is read,
-//! so no length from the wire is ever an allocation request.
+//! header of one and reads a whole one back. The compact form is version 0, 6
+//! bytes of common header, 32 bit identifiers and LIMITS, for every carrier but
+//! Network. The full form is `homa_wire.h` of `HomaModule` at the pinned
+//! commit, with the ports of both ends, for Network. Each form refuses the
+//! packets it has no layout for with [`DecodeError::Form`], so the engine never
+//! sends a packet the form lacks, and every length from the wire is checked
+//! before a byte past it is read, so no length from the wire is ever an
+//! allocation request.
 //!
 //! Every multi byte field of both forms is big endian. The full form keeps the
 //! order of `homa_wire.h`, whose every multi byte field is `__be16`, `__be32`

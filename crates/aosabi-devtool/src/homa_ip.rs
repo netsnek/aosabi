@@ -4,9 +4,11 @@
  * of aosabi-carrier-network and a client of the crate homa, driven by a
  * notebook from two network namespaces.
  *
- * No analogue in the reference. The flood of forged and malformed datagrams
- * and the filter of the IP driver serve the hostile rows of the same notebook.
- * Its judging notebook is tests/notebooks/29_homa_raw.ipynb.
+ * No analogue in the reference. Its operations are serve and load over raw IP
+ * 146 with the listener over a Yoga instance, printing latencies, and peers,
+ * which opens one endpoint over a range of client ports to show a server two
+ * peers from one host. The flood of forged and malformed datagrams and the
+ * filter of the IP driver serve the hostile rows of the same notebook.
  */
 
 //! The primitive `homa-ip` of the seam.
@@ -525,8 +527,7 @@ struct Tally {
 /// Returns the fetch of the harness: `subscription{tick}` answers an endless
 /// event stream of one result every `interval`, tagged with the variable
 /// `tag` where the request names one, `mutation{pause}` answers
-/// `{"data":{"pause":true}}`, and every other query `{"data":{"ok":true}}`,
-/// the calls of `docs/graphtp.md` section 6.2.
+/// `{"data":{"pause":true}}`, and every other query `{"data":{"ok":true}}`.
 fn harness_fetch(tally: &Rc<Tally>, interval: Duration) -> Fetch {
     let tally = Rc::clone(tally);
     Rc::new(move |request: Request| -> Reply {
@@ -676,7 +677,7 @@ fn instance_of(fields: &Fields<'_>, name: &str) -> Result<Rc<HttpServer>, JsStri
 }
 
 /// Returns the fetch of the listener over the Yoga instance `yoga`, the POST
-/// of the fixed fields of `docs/graphtp-in-aosabi.md` section 2.1.
+/// of the fixed fields of `Documentation/guides/graphtp.md`.
 fn yoga_fetch(yoga: Rc<HttpServer>) -> Fetch {
     Rc::new(move |request: Request| -> Reply {
         let yoga = Rc::clone(&yoga);

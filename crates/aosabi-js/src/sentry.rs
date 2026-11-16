@@ -353,8 +353,7 @@ pub fn call(request: u32, c: &Context, reader: &mut Reader<'_>) -> Option<Result
 /// object leave the scope as it was, a user that is no object clears the user
 /// and a context that is no object removes the context, where `scope.js`
 /// keeps each as given or spreads it, and a setter the scope of the port
-/// holds no field for changes nothing, each a difference named in section 14
-/// of `docs/ts1-surface.md`.
+/// holds no field for changes nothing.
 fn set(scope: &mut Scope, name: &str, args: &JsValue) {
     let JsValue::Array(args) = args else {
         return;

@@ -66,6 +66,8 @@ export { ServiceError };
 export { deleteCookie, getCookie, getSignedCookie, setCookie, setSignedCookie } from "hono/cookie";
 export { authMiddleware, requireAuth, useAuth } from "./canary.js";
 
+// The federation, createGateway, pass and passthrough of Pylon's root, whose
+// delegations run in the federation of the engine, aosabi-ts/lib/federation.js.
 export { createGateway, pass, passthrough } from "./federation.js";
 
 // Pylon exports createPubSub of graphql-yoga as experimentalCreatePubSub, whose
@@ -793,7 +795,7 @@ export const getLocale = () => getInContext().locale;
 // selected below it, each its name, its nodes and its type, the one object of
 // the call, as the views of lib/nodes.js answer them over what the engine
 // holds, the nodes of the document among them, while the schema does not
-// cross, which docs/ts1-surface.md of the Aosabi repository names.
+// cross.
 export const getResolveInfo = () => {
   const store = context.getStore();
   if (!store?.info) throw new Error("Resolve info is not available");

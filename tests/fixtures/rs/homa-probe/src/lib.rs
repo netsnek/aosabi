@@ -281,8 +281,7 @@ pub fn reply(endpoint: &mut DeviceEndpoint<'_>, id: RpcId, answer: &[u8]) -> Res
 }
 
 /// The card's answer buffer, the longest answer of the ESP32-C3 by the limits
-/// of ADR-0026, which a reservation takes in the pages in its place
-/// (DOCUMENTED, docs/graphtp-in-aosabi.md section 3).
+/// of its device card, which a reservation takes in the pages in its place.
 #[cfg(not(feature = "frame-only"))]
 pub const LONGEST_ANSWER: u32 = 8_192;
 
@@ -486,8 +485,7 @@ pub static KEEP_CLIENT: ClientProbe = ClientProbe {
 };
 
 /// The budget of an hour of air of the band P in microseconds, the ledger's
-/// limit of the HT-CT62 (ASSUMED, the Homa design note, second version,
-/// section 6.3).
+/// limit of the HT-CT62 under the duty cycle of 10 percent of the band P.
 #[cfg(feature = "pacer-budget")]
 const AIR_PER_HOUR_US: u32 = 360_000_000;
 

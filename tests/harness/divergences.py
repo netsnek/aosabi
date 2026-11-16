@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the named divergences of the side under test a comparison reads as the reference's answer.
 
-A named divergence of docs/byte-equality.md section 3 that changes the bytes of an answer of the side under test
-by a fixed rewrite is written here once, so a comparison asserts the side's own form and then reads the answer
-as the reference writes it, every other byte held to the reference.
+A named divergence that changes the bytes of an answer of the side under test by a fixed rewrite is written here
+once, so a comparison asserts the side's own form and then reads the answer as the reference writes it, every other
+byte held to the reference.
 
   - The title and the default query of GraphiQL, `Aosabi Playground` in the three places where the reference's page
     writes its own name, which meets no answer, as the side serves no page of GraphiQL since 0.1.1.
@@ -43,21 +43,24 @@ as the reference writes it, every other byte held to the reference.
     a middleware before it set, where the reference's answers `Vary: Origin` alone, as the cors() of hono 4.13.16
     does on the side ts.
 
-  D56  an answer of Yoga's default plugins outside the GraphQL endpoint, the
-       health check on a URL that ends in /health and the preflight of CORS
-       on another path, which the hono of the app answers on the side ts,
-       named only for a request target that `is_endpoint` rejects
-  D47  the landing page of an unknown route, on the side ts with no
-       `landingPage: true`
-  D48  the viewer of `GET /viewer`, on the side ts with no `viewer: true`
-  HV1  the field `Vary: Accept-Encoding` compress() of hono 4.13.14 sets on
-       every answer of a type it codes, coded or not, where 4.11.9 sets none,
-       which a middleware of an app that reads the fields of an answer after
-       compress() has run sees as well, the memo of transit-app among them
+The side ts runs an app over the real hono 4.13.16, the peer of the package
+aosabi, where Pylon pins hono 4.11.9, and the engine answers the GraphQL
+endpoint alone, so the module names the answers hono gives on that side where
+Pylon's answer came from Yoga outside the endpoint, from the landing page or
+from the viewer, and the changes of hono since 4.11.9:
 
-  D80  the answer of the plugin short of plugins-app, 418 and short, where
-       The reference loses it and answers 500 with {"error":"Internal Server Error"},
-       row QD-003 of the rated table
+  - `yoga-plugins`, an answer of Yoga's default plugins outside the GraphQL endpoint, the health check on a URL
+    that ends in /health and the preflight of CORS on another path, which the hono of the app answers on the side
+    ts, named only for a request target that `is_endpoint` rejects.
+  - `endpoint-ending`, the answer of the GraphQL endpoint to a request whose whole URL ends in the endpoint or in
+    the endpoint and a slash while its path is another, which the hono of the app answers on the side ts.
+  - `endpoint-slash`, the answer of the GraphQL endpoint to a request to the endpoint and a slash, which the hono
+    of the app answers on the side ts.
+  - `landing-plugin`, the landing page of an unknown route, which the side ts serves under no configuration.
+  - `graphiql-viewer`, the viewer of `GET /viewer`, which the side ts serves under no configuration.
+  - The field `Vary: Accept-Encoding` compress() of hono 4.13.16 sets on every answer of a type it codes, coded or
+    not, where 4.11.9 sets none, which a middleware of an app that reads the fields of an answer after compress()
+    has run sees as well, the memo of transit-app among them.
 
   - `kept-plugin-answer`, the answer of the plugin short of plugins-app, 418 and short, where the reference loses
     it and answers 500 with {"error":"Internal Server Error"}.
@@ -597,8 +600,9 @@ def _path_of(target: str) -> str:
 def is_endpoint(target: str) -> bool:
     """Return whether the request target `target` names the GraphQL endpoint, as `isEndpoint` tests its URL.
 
-    A target that ends in /graphql or /graphql/, or whose path is one of the two, which the engine answers on
-    the side ts with every method, while the hono of the app answers every other target.
+    A target whose path is /graphql, which the engine answers on the side ts with every method, while the hono of
+    the app answers every other target. A target whose path is /graphql/ names `endpoint-slash` in
+    `outside_endpoint`, and a target that merely ends in one of the two names `endpoint-ending` there.
     """
     return _path_of(target) == ENDPOINT_PATH
 
@@ -1139,9 +1143,11 @@ def in_process_without_multipart(request_headers: dict, expected: dict) -> dict:
     return expected
 
 
-# A side under test answers only what its configuration turns on, and each row
-# of the rated table that brings one of those defaults is one step below, which
-# rewrites an answer of the reference into the answer of the side under test.
+# The secure defaults.
+#
+# A side under test answers only what its configuration turns on, and each of
+# those defaults is one step below, which rewrites an answer of the reference
+# into the answer of the side under test.
 # `served_defaults`, `golden_defaults` and `in_process_defaults` run the steps
 # in their order over the three forms of an answer the notebooks hold: an answer
 # of `http.py`, a recorded golden `{status, headers, body}` and a recorded answer

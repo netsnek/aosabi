@@ -14,7 +14,7 @@
 //! schema hash of `manifest.json`, `counts`, and the form itself as
 //! `introspection` unless `form` is false. The form is the canonical JSON of
 //! the model: one model writes one text and the reader reads it back to the
-//! same model, so step 3 of `51_viewer_core` compares two models by their
+//! same model, so a check of the viewer core compares two models by their
 //! forms and runs the round trip through a file that holds one. Leaving the
 //! form out keeps the answer to a mutated document of the hostile corpus a few
 //! bytes long whatever the size of the document.

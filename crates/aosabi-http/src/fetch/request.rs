@@ -10,8 +10,7 @@
 //! A request carries its method, its URL, its `Headers` and its body. The body
 //! is read once, and a second read answers the `TypeError` of a body in use. A
 //! request of the Node adapter reads `TRACE` as its method and has no body, as
-//! the adapter makes a `GET` whose method reads `TRACE` (A8 of the plan's
-//! version 2 draft).
+//! the adapter makes a `GET` whose method reads `TRACE`.
 //!
 //! An outbound request may also carry the field lines a client that writes
 //! HTTP/1.1 itself sends in place of its `Headers`, each name as it was spelled

@@ -7,13 +7,14 @@ loopback and nothing else. The issuer is harness code and never a golden source:
 sends and answers.
 
 It is built on `http.server` and `ssl` of the standard library, and no Python package enters tests/pyproject.toml.
-The certificate of 127.0.0.1 and the CA come from tests/harness/tls.py, which the reference trusts through
+The certificate of 127.0.0.1 and the CA come from the harness, which the reference trusts through
 `NODE_EXTRA_CA_CERTS` and the twin through `AOSABI_EXTRA_CA_CERTS`. Each connection runs its TLS session through
-`ssl.SSLObject` over two memory buffers, the way tests/harness/mock_ingest.py runs it, and hands the decrypted
-stream to the request handler of `http.server`, so the issuer sees each record it sends and its hostile mode can cut
-one: under `hostile="answer"` it reads and records the request and sends the first half of the record that carries
-the answer before it closes the socket, and under `hostile="handshake"` it sends the first half of its first flight
-and closes.
+`ssl.SSLObject` over two memory buffers, the way the mock ingest runs it, and hands the decrypted stream to the
+request handler of `http.server`, so the issuer sees each record it sends and its hostile mode can cut one: under
+`hostile="answer"` it reads and records the request and sends the first half of the record that carries the answer
+before it closes the socket, and under `hostile="handshake"` it sends the first half of its first flight and closes.
+Every answer carries `connection: close`, the HTTP/1.0 default of `http.server`, so both sides handshake once per
+call.
 
 The default issuer closes every connection, and the login routes and the provider talk to it. Three more modes stand
 beside it: `connection="keep-alive"` keeps a connection for the next request of its client and writes

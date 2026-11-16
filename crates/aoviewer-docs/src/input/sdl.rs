@@ -144,9 +144,9 @@ use crate::error::{
 /// The tokens the parser reads at most for each type and member the read
 /// limits admit.
 ///
-/// The SDL files of `tests/fixtures/viewer/corpus.toml` and the two synthetic
-/// schemas of `tests/gen/synth_schema.py` spend at most 4.09 tokens per type,
-/// field, argument, input field, enum value and directive of their model,
+/// The SDL files of the viewer corpus and the two synthetic schemas of
+/// `tests/gen/synth_schema.py` spend at most 4.09 tokens per type, field,
+/// argument, input field, enum value and directive of their model,
 /// `synthetic-5000` the most, so the bound leaves about twice that.
 const TOKENS_PER_ELEMENT: u32 = 8;
 

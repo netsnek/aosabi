@@ -37,10 +37,6 @@
 //! because the numeric option of a collator is off unless a caller asks for
 //! it.
 //!
-//! The judging notebook is `tests/notebooks/15_sdl_printer.ipynb`, which
-//! drives `aosabi-devtool collate` against node over the name pairs of
-//! `tests/capture/15_corpus/`.
-//!
 //! [collator]: https://tc39.es/ecma402/#sec-intl.collator
 
 use alloc::string::String;

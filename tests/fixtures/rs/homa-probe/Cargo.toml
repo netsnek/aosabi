@@ -8,7 +8,7 @@
 # application is, and the Aosabi workspace at the repository root does not list
 # it. The one command that builds it, from the repository root:
 #
-#   ~/.cargo/bin/cargo build --release --manifest-path tests/fixtures/rs/homa-probe/Cargo.toml --target riscv32imc-unknown-none-elf
+#   cargo build --release --manifest-path tests/fixtures/rs/homa-probe/Cargo.toml --target riscv32imc-unknown-none-elf
 
 [workspace]
 resolver = "3"
@@ -51,11 +51,9 @@ sx1262 = ["lora", "aosabi-carrier-lora/sx1262", "dep:embedded-hal"]
 
 [dependencies]
 homa = { path = "../../../../crates/homa", default-features = false, features = ["server", "wire-compact", "stream-delimited", "stream-prefixed"] }
-# The carrier LoRa of stage H6, which brings chacha20poly1305 and its
-# companions, the register's rows of docs/dependencies.md section 3.17.
+# The carrier LoRa, which brings chacha20poly1305 and its companions.
 aosabi-carrier-lora = { path = "../../../../crates/aosabi-carrier-lora", optional = true }
-# The traits the HAL of the probe implements for the SX1262, the register's
-# row of docs/dependencies.md section 3.18.
+# The traits the HAL of the probe implements for the SX1262.
 embedded-hal = { version = "1.0.0", optional = true }
 
 [lints.rust]

@@ -11,10 +11,12 @@
 
 //! Layer 0 of Aosabi.
 //!
-//! Documentation/architecture.md section 3.1 gives it three things, the framing, the
-//! publish primitive and the entry traits. The framing is `AoFrame`, which the crate `homa`
-//! holds as `homa::stream`, so one implementation exists, and a build without either
-//! feature has none.
+//! The crate holds three things, the framing, the publish primitive and the
+//! entry traits. The framing is in place under the features `client` and
+//! `homa`, and the empty modules `cbor` and `document_table` stay until a
+//! later release removes them. The framing is `AoFrame`, which the crate
+//! `homa` holds as `homa::stream`, so one implementation exists, and a build
+//! without either feature has none.
 //!
 //! | Module | Holds | State |
 //! | --- | --- | --- |

@@ -216,7 +216,7 @@ impl IntoArgument for Date {
     /// argument, valid or not, as the input object `{}`. A host object carried
     /// through unread is what `ast_from_js_value` of the federation and the
     /// writer of the JSON model write as `{}`, so the outbound variables equal
-    /// the reference's, quirk `Q83_FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT` of
+    /// the reference's, quirk `FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT` of
     /// `aosabi-compat`.
     fn into_argument(&self) -> JsValue {
         JsValue::Opaque(Opaque(host_date(JsDate::from_time_value(self.get_time()))))

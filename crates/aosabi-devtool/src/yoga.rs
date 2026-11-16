@@ -4,7 +4,9 @@
  * to the Yoga of graphql-over-http in process, with no socket and no base
  * pipeline.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the Rust half of the in process capture
+ * rows. The flag --graphtp serves the same instances over GraphTP(Homa) on
+ * Unix Sockets.
  */
 
 //! The primitive `yoga` of the seam.
@@ -138,7 +140,7 @@ use self::instances::{
 /// The name of the primitive.
 const NAME: &str = "yoga";
 
-/// The milestone the primitive lands at.
+/// The area the primitive lands at.
 const LANDS_AT: &str = "http";
 
 /// The origin a URL given as a path is completed with.

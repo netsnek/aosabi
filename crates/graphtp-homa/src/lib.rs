@@ -3,9 +3,8 @@
  * graphtp-homa: the binding of GraphTP to Homa, a sans I/O server and client
  * of GraphTP/1 and the one adapter that calls Homa.
  *
- * No analogue in the reference. The specification is docs/graphtp.md, whose
- * section 10.5 names the modules below and their public items, and whose
- * sections 2.4, 2.7, 4 and 5 give the rules they keep.
+ * No analogue in the reference. The specification is Documentation/guides/graphtp.md, which
+ * this crate follows.
  */
 
 //! The binding of `GraphTP` to Homa: one Homa RPC carries one exchange, a
@@ -24,10 +23,8 @@
 //! over its client role. Both are on by default, and a build with one role
 //! holds the modules of that role alone, so these docs name the modules of a
 //! role without a link. The crate builds with no standard library, needs an
-//! allocator and takes the crates `graphtp` and `homa` and no other. Its judges
-//! are the Jupyter notebooks `tests/notebooks/25_carrier_unix.ipynb` and
-//! `tests/notebooks/38_card_limits.ipynb`, and there is no test in this crate,
-//! which is the rule of CONTRIBUTING.md section 3.
+//! allocator and takes the crates `graphtp` and `homa` and no other. There is
+//! no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 #![forbid(unsafe_code)]

@@ -89,7 +89,7 @@ export class Link {
 
   /**
    * Sends one OPERATION and resolves to its outcome, the event of its answer or the stream it
-   * opened, or rejects with the TypeError of docs/graphtp-fetch.md section 8. An abort of `signal`
+   * opened, or rejects with the TypeError. An abort of `signal`
    * ends the exchange at once, or the stream it opened, and a decoded body longer than `maxBody`
    * rejects with TOO_LARGE. A fault of the module ends the link and rejects with LINK_DOWN. A
    * refused buffer rejects with NO_MEMORY, and a content `put` cannot copy with its TypeError or
@@ -169,8 +169,7 @@ export class Link {
 
   /**
    * Sends the CANCEL of the stream `stream` once, whose entries the link drops until its end
-   * arrives, as Yoga returns its source when the client closes the connection
-   * (docs/graphtp-fetch.md section 7).
+   * arrives, as Yoga returns its source when the client closes the connection.
    */
   cancelStream(stream) {
     if (stream.cancelling || this.streams.get(stream.handle) !== stream) return
@@ -219,8 +218,7 @@ export class Link {
 
   /**
    * Asks the module for the next PULL where the link holds a stream its reader keeps, and every such
-   * stream has room in its queue, so a reader that stalls holds the PULLs back
-   * (docs/graphtp-fetch.md section 7).
+   * stream has room in its queue, so a reader that stalls holds the PULLs back.
    */
   park() {
     let open = 0

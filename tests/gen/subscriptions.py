@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: MIT
-"""tests/gen: the family SUB, the subscription cases of `docs/harness.md` section 4.1.
+"""tests/gen: the family SUB, the subscription cases.
 
 The family runs over every root field of `Subscription` of a schema, in `plain`
-and in `pylon` mode, through the operation `subscribe` of
-`tests/sidecar/execute.mjs` and of `aosabi-devtool execute`.
+and in `pylon` mode, through the operation `subscribe` of the executor sidecar
+and of `aosabi-devtool execute`.
 
 | Case | What it sends |
 | --- | --- |
@@ -29,6 +29,12 @@ Two cases do not run over every field. SUB9 runs on the first field of a schema
 whose type is a leaf, because its table carries 1025 push steps and one table of
 that size per schema and mode reaches the overflow. SUB10 needs a root field of
 `Mutation` to publish from, so a schema without that root has none.
+
+The schemas are `rich`, the schema of `schemas.py` with a `Subscription` root of
+this module's own, because the root of `schemas.py` is also the schema of every
+corpus of the executor and a change to it would drift them, and the built
+schemas of the two stream fixtures, `subscription-app` and `pubsub-app`, read
+from their builds as the other fixture schemas are.
 
 A case id is the SHA-256 of the canonical request with `pull`, `return_after`
 and `interleave` added.
@@ -66,6 +72,8 @@ SUBSCRIPTION_ROOT = """type Subscription {
 }
 """
 
+#: The built schemas of the two stream fixtures, relative to the directory of
+#: the TypeScript fixtures unless the caller names a stage.
 FIXTURE_SCHEMAS = {
     "subscription-app": "subscription-app/.aosabi/schema.graphql",
     "pubsub-app": "pubsub-app/.aosabi/schema.graphql",

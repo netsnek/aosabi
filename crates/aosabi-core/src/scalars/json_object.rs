@@ -2,7 +2,7 @@
 /*
  * aosabi-core scalars json_object: the bound `JSONObject` scalar.
  *
- * Binds `JSONObjectResolver` of graphql-scalars as it stands.
+ * The scalar is `JSONObjectResolver` of graphql-scalars as it stands.
  */
 
 //! The bound `JSONObject` scalar, the `JSONObjectResolver` of graphql-scalars.

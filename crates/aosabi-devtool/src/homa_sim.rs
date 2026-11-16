@@ -3,7 +3,9 @@
  * aosabi-devtool homa_sim: runs a scenario of Homa RPCs over a simulated link
  * and reports the RPCs, the counters and the trace.
  *
- * No analogue in the reference. Its judging notebooks are
+ * No analogue in the reference. The primitive and its operations run over the
+ * loopback, the lossy link, the baseline, the fabric, the sockets, the pty and
+ * the radio of homa::sim. Its judging notebooks are
  * tests/notebooks/21_homa_loopback.ipynb, tests/notebooks/22_homa_lossy.ipynb
  * and tests/notebooks/23_homa_budget.ipynb, whose checks over a trace are
  * tests/harness/homa/trace.py.
@@ -27,7 +29,7 @@
 //!   number of peers, [`scenario::op_table`] says which fields it takes.
 //! - `sizes` answers the bytes of the types of an endpoint on this host and
 //!   the parts of the storage a `config` needs in a card's build, so a
-//!   notebook reads the budget of section 8.3 of the design note from the
+//!   notebook reads the memory budget of a device from the
 //!   crate.
 //! - `build` builds an endpoint of `config` and `profile` over owned storage
 //!   and answers `ok` or `error` with the name of the `ConfigError`.
@@ -391,9 +393,9 @@ fn timers_json(timers: &Timers) -> JsObject {
 
 /// Answers the operation `sizes`.
 ///
-/// The sizes are those of this host, which the budget of the design note
-/// counts on the RV32IMC core of the ESP32-C3 as well, since no type of the
-/// engine holds a pointer.
+/// The sizes are those of this host, which the memory budget counts on the
+/// RV32IMC core of the ESP32-C3 as well, since no type of the engine holds a
+/// pointer.
 ///
 /// The storage is that of a card's build, which leaves out the feature
 /// `prio` and with it the part `peer_prio`, unless the request sets `prio`.

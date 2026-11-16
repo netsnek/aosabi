@@ -23,10 +23,8 @@
 //! carries no float, no hash container, no clock, no thread and no `unsafe`,
 //! and every loop runs under a cap named as a constant.
 //!
-//! The judging notebooks are `tests/notebooks/51_viewer_core.ipynb`,
-//! `tests/notebooks/75_docgen.ipynb` and `tests/notebooks/76_docs_pdf.ipynb`,
-//! which drive `aosabi-devtool viewer`. There is no test in this crate, which
-//! is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md
+//! section 3.
 
 #![no_std]
 

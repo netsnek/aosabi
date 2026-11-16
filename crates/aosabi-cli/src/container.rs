@@ -2,6 +2,8 @@
 /*
  * aosabi-cli: the container files and the image of the docker card.
  *
+ * The image builds in stages and serves port 3000 as a user without privileges,
+ * with container files of its own.
  */
 
 //! The container files and the image.

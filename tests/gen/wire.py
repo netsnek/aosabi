@@ -3,19 +3,17 @@
 
 A case of family H is the bytes a client writes on one connection, the order in
 which they are split into writes and the pause before each write, and whether
-the client shuts its write half after the last write. The cases are the 95 of
-the draft `<v2>`, section The oracle, family H, in the order of its table, and
-the six of the plan, section The oracle, H96 to H101. They are the one source of
-the wire corpus: capture row C48 sends them to the reference, and
-`30_http_tier1` sends them to the twins and to `aosabi-devtool http --requests`.
+the client shuts its write half after the last write. The cases are H1 to H95,
+in the order of the table they were drafted in, and six more, H96 to H101. They
+are the one source of the wire corpus: the capture sends them to the reference,
+and a notebook sends them to the twins and to `aosabi-devtool http --requests`.
 
-The rules each case names are the rules R1 to R21, N9 to N14 and A1 to A10 of
-`<v2>`, and the quirks it pins are those of `docs/byte-equality.md` section
-13.1. The bytes carry no customer value and reach no real host: the `Host` is
-`h`, the probe header is `Origin` with the value `http://o.test`, whose echo
-in the answer of Yoga's CORS shows that a field reached the application (the
-draft, family H), and the document is `{__typename}`, which every fixture
-answers.
+The rules each case names, R1 to R21, N9 to N14 and A1 to A10, are those of the
+table the cases were drafted in, and the quirks it pins are the ones of Node and
+llhttp. The bytes carry no customer value and reach no real host: the `Host` is
+`h`, the probe header is `Origin` with the value `http://o.test`, whose echo in
+the answer of Yoga's CORS shows that a field reached the application, and the
+document is `{__typename}`, which every fixture answers.
 
 The identity of a case is the SHA-256 of the bytes it sends when it sends them
 in one write with no pause and keeps its write half open. Two cases send the
@@ -392,7 +390,7 @@ def connection_cases() -> list[WireCase]:
 
 
 def added_cases() -> list[WireCase]:
-    """The six cases of the plan, H96 to H101."""
+    """The six added cases, H96 to H101."""
     group = "added"
     head = chunked_post()
     extension = b";e=" + b"v" * 9999
@@ -422,7 +420,7 @@ def wire_cases() -> list[WireCase]:
     )
     numbers = [case.number for case in cases]
     if numbers != list(range(1, WIRE_CASE_COUNT + 1)):
-        raise AssertionError("family H is numbered %s, the plan asks 1 to %d" % (numbers, WIRE_CASE_COUNT))
+        raise AssertionError("family H is numbered %s, not 1 to %d" % (numbers, WIRE_CASE_COUNT))
     ids = [case.id for case in cases]
     if len(set(ids)) != len(ids):
         raise AssertionError("two cases of family H share an id")

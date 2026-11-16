@@ -6,7 +6,7 @@
  *
  * No analogue in the reference. The gadget is the one the card's setup
  * composes in configfs, which the notebook composes in guest A over
- * dummy_hcd. The judging notebook is tests/notebooks/27_carrier_usb.ipynb.
+ * dummy_hcd.
  */
 
 //! USB behind the primitive `carrier`.

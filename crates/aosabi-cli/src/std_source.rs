@@ -112,7 +112,7 @@ pub const WRAPPER_ENV: &str = "RUSTC_WRAPPER";
 /// The file of the wrapper of rustc beside the generated workspace.
 pub const WRAPPER_FILE: &str = "rustc-std-source.sh";
 
-/// The flag the wrapper adds to a crate of the framework.
+/// The flag the wrapper adds to drop a framework crate's Debug text.
 pub const NO_DEBUG_TEXT: &str = "-Zfmt-debug=none";
 
 /// The flag the wrapper adds to a crate of the framework and to `core`, `alloc`

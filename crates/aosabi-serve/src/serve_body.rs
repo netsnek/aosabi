@@ -7,8 +7,7 @@
  * Node socket there, and this file hands the same bytes to hyper as a body of
  * unknown size.
  *
- * It carries the half of the serve layer of the quirk
- * Q51_NODE_ADAPTER_NULL_BODY of docs/byte-equality.md section 13.1.
+ * It carries the half of the serve layer of the quirk NODE_ADAPTER_NULL_BODY.
  */
 
 //! `ServeBody`.
@@ -18,9 +17,9 @@
 //! the record wrote it, adds no `content-length` of its own, and frames a null
 //! body chunked where Node frames it, with `0\r\n\r\n` at the end. A chunk
 //! that fails ends the body with [`ChunkError`], on which the Node connection
-//! writes no further byte (quirk `Q46`). An answer of HTTP/2 with no body ends
-//! its stream with its `HEADERS` frame, which [`ServeBody::for_http2`] asks
-//! for.
+//! writes no further byte (quirk `NODE_STREAM_ERROR_ENDS`). An answer of
+//! HTTP/2 with no body ends its stream with its `HEADERS` frame, which
+//! [`ServeBody::for_http2`] asks for.
 //!
 //! A stream body keeps no handle of its driver, which runs as a task of its
 //! own from the moment the handler spawned it. The drop of a [`ServeBody`]

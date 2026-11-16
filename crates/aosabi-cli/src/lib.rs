@@ -6,7 +6,9 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/index.ts, Apache-2.0. Changed by the Aosabi authors.
  *
- * This file holds the module list and the entry of both programs.
+ * The file .env is read before any command, and every failure ends in one
+ * report and the exit code 1. This file holds the module list and the entry of
+ * both programs.
  */
 
 //! The command line of Aosabi.

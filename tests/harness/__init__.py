@@ -25,7 +25,32 @@ runner the loop above finds the package on the first try.
 The seven helpers of the documentation notebooks are modules of their own,
 reached as `from harness import docs, svg, pdf, wasm, arch, estate, fetch`.
 
-A notebook imports the last two by name.
+Three modules a served notebook imports by name are `harness.http`, the raw
+HTTP/1.1 client over TCP and a Unix socket, `harness.fixtures`, the staging,
+building and serving of both sides of a fixture, and `harness.masks`, the named
+masks. `harness.size` reads an ELF file and a wasm module in Python and
+attributes their bytes to crates and to the families of generic code, with a
+demangler of Rust names and a decoder of the aarch64 instructions it follows, so
+no LLVM tool runs. The names below are the ones every notebook needs.
+
+Two more modules serve the streams: `harness.sse`, the reader of a server sent
+event stream with the case id of a served case, and `harness.push_model`, the
+rules of the kernel's publish module as code a notebook runs beside
+`aosabi-devtool push`.
+
+Three more modules boot and drive a fixture: `harness.boot`, which boots one
+side of a fixture and keeps its standard output, its standard error and its
+status until the listen line, a dump file or its end, `harness.callers`, the
+callers a served identity fixture is driven as, and `harness.tls`, the test CA
+and the certificate of 127.0.0.1 it writes through the openssl command line. A
+notebook imports `harness.tls` by name.
+
+The OIDC cases take `harness.mock_issuer`, the mocked OIDC issuer over HTTPS
+with its scenarios, its control endpoint, its check of the client assertion and
+of PKCE and its hostile modes, which `MockIssuer` names here, the client key of
+the run in `harness.tls`, the four masks `OIDC_MASKS` of `harness.masks`, and
+the issuer lines of `harness.fixtures`, which write the environment and the key
+files of a variant of `zitadel-login-app` and `zitadel-auth-app`.
 
 `harness.probelock` holds the lock of a scratch workspace that a notebook
 writes with `cargo generate-lockfile --offline` to the versions of the locks

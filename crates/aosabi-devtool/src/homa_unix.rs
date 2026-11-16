@@ -3,9 +3,12 @@
  * aosabi-devtool homa_unix: a Homa server or client of the crate homa over a
  * real Unix Socket, driven against a peer in another process.
  *
- * No analogue in the reference. With the field homa false, serve answers whole
- * messages in AoFrame alone, the baseline of ADR-0023. Its judging notebooks
- * are tests/notebooks/21_homa_loopback.ipynb and
+ * No analogue in the reference. Its operation serve answers the Homa requests of
+ * the Python client engine tests/harness/homa/client.py through a responder of
+ * bytes, and client drives a Python server of that engine with the Rust client
+ * engine, both over the transports of homa::unix. With the field homa false,
+ * serve answers whole messages in AoFrame alone, the baseline Homa is measured
+ * against. Its judging notebooks are tests/notebooks/21_homa_loopback.ipynb and
  * tests/notebooks/22_homa_lossy.ipynb.
  */
 
@@ -19,7 +22,11 @@
 //! - `ping` sends the bytes of `hex` from a client endpoint to a server
 //!   endpoint over a pair of sockets in this process and answers the `hex`
 //!   the server echoed, the smallest call of the primitive.
-//! - It ends once every connection it accepted has closed, or at
+//! - `serve` binds a listener at `path`, accepts `connections` connections, runs
+//!   one endpoint of the server role a connection, and answers every request
+//!   through its `responder`, `echo`, `reverse` or `sized <n>`, the answers of
+//!   the RPCs `reserve` names through `reply_reserve` and the others through
+//!   `reply`. It ends once every connection it accepted has closed, or at
 //!   `max_time_ms`, and answers what each connection counted. `rebuild_after`
 //!   rebuilds the engine of a connection over its open socket with the first
 //!   identifier `rebuild_first_id` when that many requests of it have arrived,

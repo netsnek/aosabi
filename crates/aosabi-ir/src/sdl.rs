@@ -32,10 +32,6 @@
 //!   arises in it. The one position of this crate is
 //!   [`CollateError::offset`], a UTF-16 code unit offset.
 //!
-//! The judging notebook is `tests/notebooks/15_sdl_printer.ipynb`, which
-//! drives `aosabi-devtool print-sdl` against the reference over the cases of
-//! `tests/capture/15_corpus/`.
-//!
 //! [enumerable]: https://tc39.es/ecma262/#sec-enumerableownproperties
 //! [to-boolean]: https://tc39.es/ecma262/#sec-toboolean
 //! [coalesce]: https://tc39.es/ecma262/#sec-binary-logical-operators

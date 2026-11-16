@@ -3,11 +3,11 @@
  * graphtp deflate encode: the DEFLATE encoder, LZ77 over hash chains with one
  * step of lazy matching, in memory the caller owns.
  *
- * No analogue in the reference. The encoder follows RFC 1951, its hash chains
- * and its one step of lazy matching are those of the plan, and the memory it
- * holds is that of the specification. The buffer of plain bytes with its
- * lookahead of 262 bytes and the rule that a block is stored only while its
- * plain bytes stand in that buffer are those of zlib-ng.
+ * No analogue in the reference. The encoder follows RFC 1951 with hash chains
+ * and one step of lazy matching, and the memory it holds is that of the
+ * specification. The buffer of plain bytes with its lookahead of 262 bytes and
+ * the rule that a block is stored only while its plain bytes stand in that
+ * buffer are those of zlib-ng.
  */
 
 //! The DEFLATE encoder, which writes each block stored, fixed or dynamic,

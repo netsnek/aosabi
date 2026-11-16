@@ -2,7 +2,12 @@
 """The harness guests: boots them under KVM from `target/guests/`, shares the
 tree, runs commands and collects their output.
 
-The host has neither `tc` nor `dummy_hcd`, which is why they run in a guest.
+The guests are three: guest A from the Fedora 43 cloud image for the emulated
+carriers, the namespaces with their queuing discipline, the helper and the
+crate's kernel module, guest B from the same image for the user space engine,
+and guest C on the koji kernel 6.17.8-300.fc43 with HomaModule at 50d65305 as
+the reference, each with 2 GiB and 2 cores, and at most three at once. The
+host has neither `tc` nor `dummy_hcd`, which is why they run in a guest.
 
 Every file a guest boots from or installs is pinned in
 `tests/guests/guests.lock` by its URL, its SHA-256 and its size, fetched into
@@ -36,8 +41,8 @@ Commands run through the QEMU guest agent over a Unix socket under
 with a writable exchange directory at `/mnt/xfer`, so no guest takes a port
 of the host. The first network interface is QEMU's user mode network, which
 reaches the Fedora repositories, and a `Hub` joins guests on a private
-Ethernet segment over Unix datagram sockets, the bridge the interop halves of
-`29_homa_raw` and `29_homa_kmod` run on.
+Ethernet segment over Unix datagram sockets, the bridge of the interop runs
+between guests.
 
 The host tools are the host's own where it has them, and otherwise the pinned
 packages of the lock unpacked into `target/guests/tools/`, so nothing is
@@ -92,15 +97,19 @@ MEMORY_MIB = 2048
 CPUS = 2
 MAX_RUNNING = 3
 
-# 0 runs QEMU in the cgroup of its caller.
+# The CPU weight of the scope of the user's systemd that QEMU runs in, against
+# the weight 100 of every other unit of the session, so the work of other
+# checkouts on a shared machine takes less of the time of the guest's two
+# cores, which a guest whose numbers are times needs. 0 runs QEMU in the
+# cgroup of its caller.
 CPU_WEIGHT = 10000
 
 # Whether QEMU runs on the cores of the highest capacity alone where the
 # machine has cores of two kinds, as the performance and efficiency cores of
 # Apple silicon, whose capacities the kernel reads as 1024 and 485 on the
 # development machine. A guest core that the host moves to an efficiency core
-# runs at about half its speed, which moves the share of a load point of
-# 29_homa_raw.
+# runs at about half its speed, which moves the share of a load point of the
+# runs over raw IP.
 FAST_CORES_ONLY = True
 
 # The label of the read only disk that carries a guest's pinned artifacts and
@@ -124,6 +133,8 @@ CHUNK = 1 << 20
 # `peer_roots`. False makes a worktree fetch and provision on its own.
 SHARE_PEERS = True
 
+# The ioctl that makes a file share the extents of another on Linux,
+# _IOW(0x94, 9, int).
 FICLONE = 0x40049409
 
 

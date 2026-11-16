@@ -15,9 +15,8 @@
 //! named exception to the lint, because a symbol name is an unsafe attribute
 //! in edition 2024 and the workspace forbids `unsafe_code`.
 //!
-//! The judging notebooks are `tests/notebooks/51_viewer_core.ipynb` and
-//! `tests/notebooks/75_docgen.ipynb`. There is no test in this crate, which
-//! is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md
+//! section 3, and no notebook judges the module yet.
 
 mod abi;
 mod host;

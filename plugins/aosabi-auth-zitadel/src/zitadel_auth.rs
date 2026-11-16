@@ -21,11 +21,11 @@
 //! every request with a token asks the issuer twice. Every failure is thrown,
 //! and the identity middleware answers it with 500.
 //!
-//! The token is the second word of an `Authorization` header split at every
-//! space when the first word is `Bearer`, else the query `token`, else the
-//! cookie `aosabi-auth`. On a service served on `GraphTP` the listener
-//! presents the credential as `authorization` with no query and no cookie, so
-//! there the provider reads the `Bearer` token alone.
+//! The token is the second word of an `Authorization` header split at every space when the first
+//! word is `Bearer`, else the query `token`, else the session cookie, `aosabi-auth` or the name
+//! the option `cookie_name` gives it. On a service served on `GraphTP` the listener presents the
+//! credential as `authorization` with no query and no cookie, so there the provider reads the
+//! `Bearer` token alone.
 //!
 //! The provider implements the seam with its own marker, so `use_identity`
 //! infers it, and an application that keeps the answers by token writes its

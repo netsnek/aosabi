@@ -49,8 +49,7 @@
 //! async runtime and no `unsafe`, so it builds for `wasm32-unknown-unknown`.
 //! One agent serves one request on one thread, and every value of a request
 //! is `Rc` based. There is no test in this crate, which is the rule of
-//! CONTRIBUTING.md section 3, and the judging notebook is
-//! `tests/notebooks/20_execute.ipynb`.
+//! CONTRIBUTING.md section 3.
 //!
 //! The modules of the async iterator protocol, of the timers, of the repeater
 //! and of the subscription entry name `core` and `alloc` and no item of

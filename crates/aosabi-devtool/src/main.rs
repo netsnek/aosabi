@@ -39,7 +39,11 @@
  * agent that a host owns answers through host-queue, which a build with the
  * feature host-queue alone holds, so the default build and every primitive in it
  * run the agent without that queue. The single pass of aosabi-validate answers
- * through pass, its check, its static table and the dump of its table.
+ * through pass, its check, its static table and the dump of its table. The
+ * reader of the plain source of a crate, the first part of the source path,
+ * answers through source, its entry, its registrations, its reach and the names
+ * of the source path, and the build of its schema from the source, on every
+ * target but wasm32.
  */
 
 //! The Python seam of Aosabi.
@@ -157,9 +161,7 @@ use crate::{
 /// The command line of the seam, one sub command per primitive.
 ///
 /// The about line of a command is the line the help of the program lists it
-/// with, and `tests/notebooks/00_environment.ipynb` reads the roster of the
-/// seam from that list, so it is part of the command line contract the
-/// notebooks see.
+/// with, so it is part of the command line contract.
 static PROGRAM: Program = Program {
     name: "aosabi-devtool",
     about: "The Python seam. One byte level primitive per sub command.",
@@ -442,9 +444,9 @@ fn main() -> ExitCode {
     if let Some(code) = aosabi_carrier_usb::relay_from_env() {
         return code;
     }
-    // The devtool is a tool of the build host and part of no served binary, so
-    // the thread rule of Documentation/architecture.md section 14 does not reach it, and it
-    // needs a stack of STACK_SIZE for the deep documents of the corpus.
+    // The devtool is a tool of the build host and part of no served binary,
+    // outside the thread rule, and it needs a stack of STACK_SIZE for the deep
+    // documents of the corpus.
     #[expect(
         clippy::disallowed_methods,
         reason = "a tool of the build host that needs a 256 MiB stack for deep documents"

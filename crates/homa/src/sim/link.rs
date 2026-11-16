@@ -3,10 +3,8 @@
  * homa sim link: the loopback, the lossy link and the baseline of AoFrame
  * alone.
  *
- * The three links are those of the Homa design note, first version,
- * homa/design-v1.md section 2.5, lines 566 to 1088, with the baseline its
- * section 6.6, lines 1983 to 2004, sets AoEnvelope(Homa) against, which the
- * track plan reads as GraphTP(Homa).
+ * The three links are the loopback, the lossy link and the baseline that
+ * GraphTP(Homa) is set against.
  */
 
 //! The simulated links between two ends.
@@ -518,7 +516,7 @@ struct Carried {
 }
 
 /// Whole messages in one `AoFrame` each, first in first out, with no Homa,
-/// the baseline of ADR-0023.
+/// the baseline Homa is measured against.
 ///
 /// Each message is framed whole in the form `mode` and put on a byte stream
 /// behind the frames before it, which moves at `bytes_per_s` of the model,

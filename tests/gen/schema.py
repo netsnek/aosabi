@@ -160,8 +160,8 @@ class Schema:
 
         A field of an object type that also implements an interface is
         selectable in both positions and counts once, because the bound of
-        `docs/harness.md` section 4.2 is a bound on the fields of the schema
-        and not on the positions a document can spell them in.
+        the generator is a bound on the fields of the schema and not on the
+        positions a document can spell them in.
         """
         seen: set[tuple[str, str]] = set()
         steps: list[Step] = []
@@ -179,8 +179,7 @@ class Schema:
 
         At or below `bound` reachable fields every composite level carries
         every field it declares. Above it the enumeration draws a fan out per
-        level with the seed, which is the covering array of `docs/harness.md`
-        section 4.2.
+        level with the seed, which is the covering array.
         """
         return len(self.reachable_fields()) <= bound
 

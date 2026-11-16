@@ -12,10 +12,9 @@
 //!
 //! The combinator `except(paths, mw)` runs `mw` unless the path of the request
 //! matches one of `paths`, in which case the continuation runs directly. The
-//! paths are matched by the trie router under the method `ALL`, so `/__aosabi/*`
-//! matches the path and every path below it. Aosabi wraps its request logger in
-//! `except(['/__aosabi/*'], ...)`,
-//! divergence D54 of `docs/byte-equality.md` section 3.
+//! paths are matched by the trie router under the method `ALL`, so
+//! `/__aosabi/*` matches the path and every path below it. Aosabi wraps its
+//! request logger in `except(['/__aosabi/*'], ...)`, a named divergence.
 
 use std::rc::Rc;
 

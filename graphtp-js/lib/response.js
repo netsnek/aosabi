@@ -3,7 +3,7 @@
  * graphtp lib/response: the Response the function builds from an answer of GraphTP, the event
  * stream of a 200.3, and its own answers 405, 406 and 415.
  *
- * The rules are those of docs/graphtp-fetch.md section 6: the status is HTTP's, the statusText the
+ * The rules are: the status is HTTP's, the statusText the
  * name the registry gives the code, the header graphtp-status carries status.substatus, 200.0 too,
  * and an answer with a body carries the answer type of GraphTP with the length of the plain body,
  * while an answer with an empty body carries graphtp-status alone and no content-type, whatever its
@@ -35,7 +35,7 @@ export function answerResponse(answer) {
 /**
  * Returns the Response of a stream, 200 with the name of 200.3 as its statusText and the event
  * stream `readable` as its body under text/event-stream, with cache-control no-cache and
- * graphtp-status 200.3 (docs/graphtp-fetch.md sections 6 and 7).
+ * graphtp-status 200.3.
  */
 export function streamResponse(readable, statusText) {
   const headers = new Headers()

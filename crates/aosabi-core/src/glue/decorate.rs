@@ -6,6 +6,9 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/create-decorator.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * Awaits the callback with the arguments and then calls the original, over
+ * the promise model of aosabi-execute.
  */
 
 //! `decorated` and the cell of the decorators of a site.

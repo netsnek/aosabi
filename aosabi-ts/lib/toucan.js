@@ -101,9 +101,8 @@ export function initOptions() {
 // name and the message of an Error, No error message for an empty one, as
 // exceptionFromError of Toucan reads them, and the text of any other value
 // under the type Error. Toucan writes a plain object as "Non-Error exception
-// captured with keys" with the extra __serialized__ on its scope and any
-// other value that is no Error as the value itself (dist/index.cjs.js:86-124
-// there), a difference section 14 of docs/ts1-surface.md names.
+// captured with keys" with the extra __serialized__ on its scope and any other
+// value that is no Error as the value itself (dist/index.cjs.js:86-124 there).
 function exceptionOf(exception) {
   const isError = exception instanceof Error;
   const type = isError ? String(exception.name) : "Error";

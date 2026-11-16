@@ -13,7 +13,7 @@
 //! A request the adapter cannot build is answered with 400 and a fetch that
 //! rejects with 500, or 504 for a `TimeoutError`, each with a null body, which
 //! the listener writes on its object path with the default `content-type`
-//! and chunked framing on HTTP/1.1 (A3 and A6 of the plan's version 2 draft).
+//! and chunked framing on HTTP/1.1.
 //! A record that Node's `writeHead` refuses is answered as
 //! `handleResponseError` answers: the error on standard error, the status 500
 //! with the reason the failed call left, `Content-Type: text/plain`, the body

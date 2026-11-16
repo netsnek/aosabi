@@ -32,10 +32,9 @@
 //!
 //! A throw of the request parse, of the parameters or of the run is handled
 //! into a result that is processed in turn, so a 415 and a 406 are the only
-//! answers that pass the processors by (rule 3 of section YOGA of the old page
-//! of the plan). A hook `onRequest` of the app may answer the request, replace
-//! it or replace the request handler, [`HttpServer::handle`] by default, as
-//! the server adapter allows.
+//! answers that pass the processors by. A hook `onRequest` of the app may
+//! answer the request, replace it or replace the request handler,
+//! [`HttpServer::handle`] by default, as the server adapter allows.
 
 use std::rc::Rc;
 
@@ -168,12 +167,12 @@ pub fn answer(
 
 /// Returns the answer of the steps of Yoga's list before the hooks `onRequest` of the app, or none.
 ///
-/// The health check answers every method whose whole URL ends in its endpoint
-/// with 200 and `x-yoga-id`, an `OPTIONS` request gets the empty 404 of the
-/// unhandled route, which the mount hands on to the web server or the host,
-/// where Yoga's CORS answers every one with 204 and `Content-Length: 0`, the
-/// named divergence D46, and `GraphiQL` answers a GET at the endpoint that
-/// accepts HTML with its page unless the option is `false`.
+/// The function answers no health check, so a request for `/health` takes the
+/// steps of any other path, where Yoga's health check answers every method
+/// whose whole URL ends in its endpoint with 200 and `x-yoga-id`, a named
+/// divergence. An `OPTIONS` request gets the empty 404 of the unhandled route,
+/// which the mount hands on to the web server or the host, where Yoga's CORS
+/// answers every one with 204 and `Content-Length: 0`, a named divergence.
 ///
 /// # Errors
 ///

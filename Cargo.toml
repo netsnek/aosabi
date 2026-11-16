@@ -108,8 +108,11 @@ inherits = "release"
 opt-level = "z"
 strip = "symbols"
 
+# The module core.wasm of the TypeScript option for the Node host, the profile
+# wasm at opt-level 3 in place of z. This second module is built wherever
+# opt-level 3 gains more than 15 percent under Node, which the gate measured.
 # The Worker keeps the module of the profile wasm, whose settings are those of
-# the profile worker-stripped of tests/budget.
+# the stripped profile of the size gate.
 [profile.wasm-node]
 inherits = "wasm"
 opt-level = 3

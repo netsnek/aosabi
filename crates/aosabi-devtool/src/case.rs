@@ -5,9 +5,7 @@
  *
  * No analogue in the reference. The crate under test is aosabi-json, whose
  * module case reduces String.prototype.toLowerCase and toUpperCase to the
- * characters whose mapping holds an ASCII character, and the judging notebook
- * is tests/notebooks/02_language.ipynb, section 9, which maps every Unicode
- * scalar value through node and through this primitive.
+ * characters whose mapping holds an ASCII character.
  */
 
 //! The `case` primitive of the seam.
@@ -51,8 +49,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "case";
 
-/// The plan whose notebook judges the primitive.
-const LANDS_AT: &str = "SIZE1";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "size";
 
 /// The operations of the batch form.
 const OPERATIONS: &Operations = &[("lower", op_lower), ("upper", op_upper)];

@@ -9,12 +9,14 @@
 //!
 //! The standard library has no stable way to read the credential of a peer at
 //! the pinned toolchain, since `UnixStream::peer_cred` stays behind the
-//! unstable feature `peer_credentials_unix_socket`, which the compile cell
-//! `c6-unix-peer-cred` of `12_authoring_parity` records as refused with E0658.
-//! So the Linux cards read `SO_PEERCRED` through the safe
-//! `rustix::net::sockopt::socket_peercred` where the process runs in the
-//! initial PID namespace and the initial user namespace, which on a kernel
-//! built without such namespaces, as that of the player, is every process.
+//! unstable feature `peer_credentials_unix_socket`, which a compile check of
+//! the authoring parity records as refused with E0658. So the Linux cards read
+//! `SO_PEERCRED` through the safe `rustix::net::sockopt::socket_peercred` where
+//! the process runs in the initial PID namespace and the initial user
+//! namespace, which on a kernel built without such namespaces, as that of the
+//! player, is every process. A process in a PID namespace of its own or in a
+//! user namespace of its own, a process whose `/proc` hides the links of its
+//! namespaces, and every other build answer `None`.
 
 use std::io;
 #[cfg(all(feature = "linux", target_os = "linux"))]
@@ -59,13 +61,16 @@ impl UnixStream {
     /// links and every build without `linux`, so the file modes of the socket
     /// are the boundary there.
     ///
-    /// Every process is visible in each ancestor PID namespace up to the
-    /// initial one, so the kernel names the pid of every peer there. In a user
-    /// namespace of its own the kernel gives every peer the namespace does not
-    /// map, root of the host among them, the overflow uid, which the owner of
-    /// the socket file takes as well where the namespace maps no uid, so a uid
-    /// read there cannot tell root from the owner. The links are read once per
-    /// process, at the first call.
+    /// The answer is `None` in a PID namespace of its own. Every process is
+    /// visible in each ancestor PID namespace up to the initial one, so the
+    /// kernel names the pid of every peer there. In a user namespace of its own
+    /// the kernel gives every peer the namespace does not map, root of the host
+    /// among them, the overflow uid, which the owner of the socket file takes
+    /// as well where the namespace maps no uid, so a uid read there cannot tell
+    /// root from the owner. The answer is `None` in every user namespace of its
+    /// own, one that maps the owner among them. A `/proc` that hides the links,
+    /// `/proc/self/ns/mnt` among them, answers `None` as well. The links are
+    /// read once per process, at the first call.
     ///
     /// # Errors
     ///
@@ -91,7 +96,10 @@ impl UnixStream {
 ///
 /// The first call reads `/proc/self/ns/pid` through [`names_initial`], and
 /// `/proc/self/ns/user` where that read answers the initial PID namespace, a
-/// kernel without PID namespaces included.
+/// kernel without PID namespaces included. The answer is kept for the life of
+/// the process, since a process never leaves its PID namespace and the
+/// workspace calls neither `unshare(2)` nor `setns(2)`, the calls that would
+/// move it into another user namespace.
 // An `unsafe` `getsockopt` would skip both reads of the namespaces.
 #[cfg(all(feature = "linux", target_os = "linux"))]
 fn in_initial_namespaces() -> bool {
@@ -109,7 +117,9 @@ fn in_initial_namespaces() -> bool {
 /// as a kernel built without that kind of namespace, whose processes all run in
 /// the initial one, where the link `/proc/self/ns/mnt` reads, since the kernel
 /// lists that link whatever its configuration and the links `pid` and `user`
-/// only under `CONFIG_PID_NS` and `CONFIG_USER_NS`.
+/// only under `CONFIG_PID_NS` and `CONFIG_USER_NS`. Every other failure answers
+/// `false`, since the process then cannot show that the kernel names every
+/// peer, and so does a `/proc` that hides both links.
 #[cfg(all(feature = "linux", target_os = "linux"))]
 fn names_initial(path: &str, initial: &str) -> bool {
     match fs::read_link(path) {

@@ -3,9 +3,7 @@
  * aosabi-devtool validate: validates a document against a schema and reports
  * the errors graphql-js reports.
  *
- * No analogue in the reference. The crate under test is aosabi-validate, and
- * the judging notebook is tests/notebooks/02_language.ipynb, which compares
- * the bytes against a node sidecar running the pinned graphql-js.
+ * No analogue in the reference. The crate under test is aosabi-validate.
  */
 
 //! The `validate` primitive of the seam.
@@ -265,8 +263,8 @@ struct Call<'r> {
 
 /// Validates the document of `call` against the schema of its SDL.
 ///
-/// The steps and the refusals are those of `opValidate` in
-/// tests/sidecar/graphql-js.mjs.
+/// The steps and the refusals are those of `opValidate` of the graphql-js
+/// sidecar.
 ///
 /// # Errors
 ///

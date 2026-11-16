@@ -3,9 +3,8 @@
  * aosabi-core: the facts of a decorator and of a guard call that the
  * authoring check reads.
  *
- * No analogue on the reference side. The facts stand in for the decorator
- * nodes and the leading guard calls the sidecar reads off the TypeScript
- * source for check C3 of tests/notebooks/12_authoring_parity.ipynb.
+ * No analogue on the reference side. The facts stand in for the decorator nodes and the
+ * leading guard calls the sidecar reads off the TypeScript source.
  */
 
 //! `DecoratorFact`, `GuardFact`, `GuardCall` and `GuardKind`.

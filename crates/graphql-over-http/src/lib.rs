@@ -42,13 +42,10 @@
 //! | `host_env` | no file, the feature `host-env` | the variables of the process and the writer of the console a host of the TypeScript option hands in |
 //!
 //! Every message of the parsers, the checks, the processors and the errors is
-//! copied from the pinned file its module names, and the row
-//! `graphql_yoga_message_corpus` of `tools/provenance/provenance.toml` records
-//! the port.
+//! copied from the pinned file its module names, and the port is recorded.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/30_http_tier1.ipynb`,
-//! and `tests/notebooks/40_sse.ipynb` for the streams of a subscription.
+//! section 3.
 
 pub mod answer;
 pub mod checks;

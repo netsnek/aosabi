@@ -53,7 +53,9 @@
 //! `proxy-connection` name no option `close` as llhttp reads them, whose body
 //! the end of the connection does not frame and after which the connection
 //! holds no byte, as undici keeps the socket of an answer that llhttp lets it
-//! keep and destroys one that holds the bytes of no request. It reads the
+//! keep and destroys one that holds the bytes of no request. An answer of
+//! HTTP/1.0 is the one exception: llhttp lets undici keep one whose
+//! `connection` names `keep-alive`, and the client keeps none. It reads the
 //! timeout the field `Keep-Alive` names as undici reads it, the digits after
 //! the first `timeout=` of the values of every such field joined with nothing
 //! between them.

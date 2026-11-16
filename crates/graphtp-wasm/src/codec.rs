@@ -4,9 +4,9 @@
  * through the crate graphtp, as records of plain bytes the glue reads.
  *
  * No analogue in the reference. The messages, the refusals and the malformed
- * answers are those of docs/graphtp.md sections 2.4, 5.3 and 5.4, and each
- * operation answers what the operation of the same name of the primitive
- * graphtp of aosabi-devtool answers, in bytes in place of JSON.
+ * answers are those of GraphTP, and each operation answers what the operation
+ * of the same name of the primitive graphtp of aosabi-devtool answers, in bytes
+ * in place of JSON.
  */
 
 //! Every message of GraphTP/1 written and read whole.
@@ -196,8 +196,8 @@ fn written(
     write(out).is_ok()
 }
 
-/// Reads the request `message` by the 11 rules of `docs/graphtp.md` section
-/// 5.3 under the bounds `max_credential` and `max_content`.
+/// Reads the request `message` by the 11 rules of `Documentation/guides/graphtp.md`
+/// under the bounds `max_credential` and `max_content`.
 ///
 /// The payload of a request that passes is its kind, then for an OPERATION the
 /// coding of its content, 0 plain and 1 zlib, a byte that tells whether it
@@ -346,7 +346,7 @@ fn name(status: u32, substatus: u32, out: &mut Vec<u8>) {
 }
 
 /// Returns the text of `statusText` for the status `status` and the substatus
-/// `substatus`, by `docs/graphtp-fetch.md` section 6.
+/// `substatus`.
 #[must_use]
 pub fn text_of(status: u32, substatus: u32) -> Option<&'static str> {
     let status = u16::try_from(status).ok().and_then(Status::from_u16)?;

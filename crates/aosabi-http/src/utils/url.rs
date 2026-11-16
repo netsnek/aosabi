@@ -383,9 +383,11 @@ fn decode_query(value: &str) -> String {
 
 /// Returns the first value of the query parameter `key` of `url`.
 ///
-/// A key with no `%` and no `+` is looked for in the URL string first, as the
-/// reference's fast path does, and the parameters are decoded one by one only
-/// when that finds nothing and the URL holds a `%` or a `+`.
+/// A key with no `%`, no `+`, no `&` and no `=` is looked for in the URL string
+/// first, as the reference's fast path does, and the parameters are decoded one
+/// by one only when that finds nothing and the URL holds a `%` or a `+`. A key
+/// that holds a `&` or a `=` is matched against the name of each parameter
+/// alone, a named divergence.
 #[must_use]
 pub fn get_query_param(url: &str, key: &str) -> Option<String> {
     if !key.is_empty() && !key.contains(['%', '+', '&', '=']) {

@@ -11,8 +11,10 @@
 //! reference keeps it in a weak map keyed by the document, so a plugin that
 //! needs the text of a document finds it without printing it again. A document
 //! here is shared through an `Arc`, so the map keys it by the address of that
-//! `Arc` and keeps a weak handle beside it. The map belongs to the thread, as
-//! the module's map belongs to the process of the reference.
+//! `Arc` and keeps a weak handle beside it. A weak handle keeps the allocation
+//! of its document, so no other document takes that address while the entry
+//! stands. The map belongs to the thread, as the module's map belongs to the
+//! process of the reference.
 //!
 //! The orchestrator sets the text of every document it parses, a hit of the
 //! request cache included, and the parse keeps that text as the body of the

@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: the runtime traits of hyper over the runtime.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The file adapts the sockets, the timer
+ * and the executor of the runtime to hyper's traits of IO, time and spawning.
  */
 
 //! `HyperIo`, `RuntimeTimer`, `RuntimeSleep` and `LocalExec`.

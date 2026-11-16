@@ -1,9 +1,8 @@
 # GraphTP, the Graph Transfer Protocol: the types and the wire codec of
 # GraphTP/1 in the shape of the crate http, and nothing that moves a byte. The
-# manifest is the one docs/graphtp.md section 10.1 gives, with the edition, the
-# lowest Rust version, the licence and the lints taken from the workspace, which
-# says the same. The crate is no_std with alloc, because a microcontroller links
-# it.
+# manifest takes the edition, the lowest Rust version, the licence and the
+# lints from the workspace. The crate is no_std with alloc, because a
+# microcontroller links it.
 [package]
 name = "graphtp"
 version.workspace = true

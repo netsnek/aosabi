@@ -3,9 +3,8 @@
  * aosabi-devtool pubsub script: one script of steps over the pub sub and the
  * repeater, on one agent with virtual timers.
  *
- * Follows `Run`, `executorOf`, `runStep` and `opScript` of
- * tests/sidecar/pubsub.mjs, whose protocol is tests/sidecar/pubsub.md. No
- * analogue in the reference.
+ * Follows `Run`, `executorOf`, `runStep` and `opScript` of the pub sub
+ * sidecar. No analogue in the reference.
  */
 
 //! One script of the pub sub sidecar's protocol.
@@ -528,9 +527,8 @@ fn publish_on_thread(
     args: Vec<SharedPayload>,
 ) -> Result<(), ()> {
     // The devtool is a tool of the build host and part of no served binary,
-    // so the thread rule of Documentation/architecture.md section 14 does not reach it, and
-    // this thread is the one publish from a foreign thread that the pub sub
-    // of a service has to carry.
+    // outside the thread rule, and this thread is the one publish from a
+    // foreign thread that the pub sub of a service has to carry.
     #[allow(
         clippy::disallowed_methods,
         reason = "a tool of the build host that publishes from a second thread on purpose"

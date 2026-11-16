@@ -13,13 +13,15 @@
 
 //! The command `dev`.
 //!
-//! `cargo aosabi dev` is a supervisor over child processes in both roles,
-//! `web` and `worker`, as `docs/cli-and-targets.md` section 4 states:
-//! [`command`] reads the project with the refusals of `build`, takes the
-//! `server` card, computes the port with [`env::port`], snapshots the sources
-//! with [`watch::Watcher`] and hands them to [`supervisor::Supervisor`], which
-//! builds, runs the child and rebuilds on every burst of changes until the
-//! process ends. A refusal of the project prints its report and exits 1.
+//! `pylon dev` runs the app in its own process, compiles the schema there and
+//! swaps it on an edit, and `pylon dev --worker` runs the worker bootstrap as a
+//! child it restarts. `cargo aosabi dev` is a supervisor over child processes
+//! in both roles, `web` and `worker`: [`command`] reads the project with the
+//! refusals of `build`, takes the `server` card, computes the port with
+//! [`env::port`], snapshots the sources with [`watch::Watcher`] and hands them
+//! to [`supervisor::Supervisor`], which builds, runs the child and rebuilds on
+//! every burst of changes until the process ends. A refusal of the project
+//! prints its report and exits 1.
 //!
 //! Every rebuild of a plain crate runs the steps of `build`, so it reads the
 //! crate from its source again and refreshes the generated copy of the crate

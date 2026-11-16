@@ -6,7 +6,10 @@
  * packages/pylon/src/cli/builder/bundler/bundler.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * The abort message is the literal file config_abort_message.rs.
+ * The run is its own: it holds the configuration under a panic hook that
+ * prints the abort message and exits 1 and awaits each build hook in turn,
+ * with the exit code 1 at the first failure. The abort message is the literal
+ * file config_abort_message.rs.
  */
 
 //! `run_build_step`, `run_app_build_step`, `load_app` and the abort message

@@ -104,9 +104,9 @@ const KEYS: [&str; 13] = [
 
 /// The option string after the question mark.
 ///
-/// Every key of `docs/aoviewer.md` section 3.8 is read. The generator uses
-/// all but `theme`, `z` and `lens`, which it carries and writes back
-/// unchanged. [`Options::default`] carries the default of every key.
+/// Every key of the options of a route is read. The generator uses all but
+/// `theme`, `z` and `lens`, which it carries and writes back unchanged.
+/// [`Options::default`] carries the default of every key.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Options {
     /// The six Voyager flags and the layers, `relay`, `deprecated`, `leaf`,

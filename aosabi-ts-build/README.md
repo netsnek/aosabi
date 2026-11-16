@@ -1,11 +1,15 @@
 # aosabi-build
 
-The dev package `aosabi-build` carries the command `aosabi` of the TypeScript option of Aosabi. It
-depends on `typescript` 5.9.3 alone, pinned exact at the version the lock of the reference pins,
-runs on Node at build time on the machine that builds an app, and ships in no build.
+The dev package `aosabi-build` carries the command `aosabi` of the TypeScript option of Aosabi. Its
+step `aosabi migrate` turns a Pylon app into an app of the package `aosabi` by its import specifiers
+and the names its rename rows and variable rows give, and its step `aosabi build`, the author mode,
+builds that app as `pylon build` builds it, with the schema inferred by `infer.wasm` over the live
+checker of `typescript`. It depends on `typescript` 5.9.3 alone, pinned exact at the version the
+lock of the reference pins, runs on Node at build time on the machine that builds an app, and ships
+in no build.
 
-This folder is the source of the package until the owner publishes it, and nothing of it is
-published.
+The two steps follow `Documentation/guides/typescript.md` of the Aosabi repository. This folder is
+the source of the package.
 
 ## A path to show
 
@@ -70,6 +74,9 @@ npx --no aosabi migrate --reverse <dir>
   applies to the entry the app imports. A specifier in a string or a comment is never
   touched, and a rewrite replaces the bytes between the quotes of one literal and keeps its quote
   character and every other byte.
+- The table `migrate-map.json` maps each specifier with an engine item to its entry by the prefix
+  rule, `@getcronit/pylon` to `aosabi` and every other specifier to the same path under `aosabi/`,
+  but `graphql-yoga`, whose names stand at the root.
 - A rename row of the table gives a name of a specifier the name the package exports it under,
   such as `AppConfig`, `AppConfigFactory`, `AppOptions` and `Role` of the root. The step renames the name where a named import or an
   export declaration of the specifier names it, and every identifier the checker resolves to the
@@ -90,12 +97,12 @@ npx --no aosabi migrate --reverse <dir>
   specifier with no row whatever the app names. Any other specifier, such as `node:fs`, a package of
   the app's own or a peer, is kept.
 - A name of a name row of the table, such as `getSignedCookie` of the root, stops the run in the same
-  way, with the milestone that brings it or the record that leaves it aside, wherever the step reads
-  it. That is a named import, of types alone or not, and an export clause that names the module,
-  each at the line of the statement, and a read off a namespace of the specifier, at the line of the
-  name. A namespace is the binding of `import * as ns`, the expression `await import()` of the
-  specifier, the first parameter of a function that `import().then()` is called with, and every
-  binding whose initializer is a namespace, such as `const ns = await import()` or
+  way, with the later release that brings it or the record that leaves it aside, wherever the step
+  reads it. That is a named import, of types alone or not, and an export clause that names the
+  module, each at the line of the statement, and a read off a namespace of the specifier, at the
+  line of the name. A namespace is the binding of `import * as ns`, the expression `await import()`
+  of the specifier, the first parameter of a function that `import().then()` is called with, and
+  every binding whose initializer is a namespace, such as `const ns = await import()` or
   `const alias = ns`. A read is a member `ns.name` or `ns['name']`, a qualified name `ns.Name` in a
   type, in `typeof ns.name` or in `import alias = ns.Name`, and a key of an object binding pattern
   whose initializer is a namespace or which is that first parameter, such as `const {name} = ns`.
@@ -176,7 +183,11 @@ npx --no aosabi migrate --reverse <dir>
   before and after, the SHA-256 of each changed file before and after and every renamed file. The
   step `--reverse` restores every file the log names byte for byte and under its old name and
   removes the log.
-- The flag `--mark-unsupported` belongs to the harness. Every other specifier with no entry, such as
+- The flag `--mark-unsupported` belongs to the harness. It rewrites a specifier of the seven
+  subpaths of Pylon whose values `lib/unsupported.js` of the package `aosabi` carries, `db`,
+  `db/plugin`, `queues`, `pages`, `pages/plugin`, `query` and `ir`, which wait for a later
+  release, to `aosabi/unsupported/<subpath>` and logs it, so that a fixture which imports such a
+  name without calling it still loads. Every other specifier with no entry, such as
   `@getcronit/pylon/queues/plugin`, and every name with no engine item stay a stop with the flag.
 
 The exit code is 0 when the step ran, 1 when it stopped or refused and 2 for a call the command does
@@ -196,11 +207,16 @@ the glue, and loads the configuration of the app:
   forced, or the defaults of the step where none reads, and the default export of `src/index.ts` as
   the app, whose property `graphql` holds the three roots. A missing entry or default export fails
   the step with a message that names it.
-- The inference. The module prints the schema text, writes the IR as `JSON.stringify` writes it,
-  writes `resolvers.js` and validates the schema with the writers of `aosabi-build`, the crate of
-  the Rust option. A call of the checker that throws, a trap of the module, inside the answer of an
-  import as well, or an answer that does not read fails the step, and a trapped instance is called
-  no more. Each warning of the inference is written to stderr.
+- The inference. `infer.wasm`, the crate `aosabi-infer-wasm` of the Aosabi repository, runs the
+  inference of the crate `aosabi-infer` over a type source whose 39 methods are imports
+  `lib/checker.js` answers lazily from the live `ts.TypeChecker`, through three handle tables, one
+  for types, one for symbols and one for call signatures, each handing one handle per object, so two
+  handles are equal where the objects are. The inference keys its maps by that identity. The module
+  prints the schema text, writes the IR as `JSON.stringify` writes it, writes `resolvers.js` and
+  validates the schema with the writers of `aosabi-build`, the crate of the Rust option. A call of
+  the checker that throws, a trap of the module, inside the answer of an import as well, or an
+  answer that does not read fails the step, and a trapped instance is called no more. Each warning
+  of the inference is written to stderr.
 - The transpile. Each `.ts`, `.tsx`, `.mts` and `.cts` file of `src/` and the configuration
   `aosabi.config.ts`, `.mts`, `.js` or `.mjs` take their file under `.aosabi/` at the path they hold
   in the app, transpiled by `ts.transpileModule` to an ES module at the target of the app, or at
@@ -224,12 +240,23 @@ the glue, and loads the configuration of the app:
   engine. `worker.mjs` is the entry of a Cloudflare Worker: it imports `aosabi/worker` first, so the
   app takes `core.wasm` before the glue runs, then the glue, and exports the fetch handler of
   `aosabi/worker`.
+- The schema of the app. After the glue the step writes the schema to `schema.graphql` in the
+  working directory as well, beside `package.json`, with the bytes of `.aosabi/schema.graphql` and
+  only where its text changed, the current schema an app commits, a named divergence. A build that
+  fails writes none.
 
-The declarations of the package `aosabi` keep the bare specifiers of `hono`,
-`graphql` and `graphql-yoga`, which an app installs none of, so the checker reads those types as
-unresolved where a type of the app names them, and the class `Repeater` of the root comes from the
-declaration of `@repeaterjs/repeater` the package carries, the test the inference makes of a
-stream.
+What `pylon build` does beside this is left out, each named in `Documentation/guides/typescript.md`
+of the Aosabi repository: the hook `build` of a plugin, which belongs to `usePages`, which the
+package carries no entry of, the typed client of the subpath `query` waits for a later release with
+that subpath, the contribution of the object relational mapper waits for it with `db`, the worker
+entry of the role `worker`, Pylon's own `worker.mjs`, waits with the queues of that release, whose
+name the Worker entry of this step takes, and the flag `--standalone` is no flag of the step. The
+declarations of the package `aosabi` keep the bare specifiers of `hono`, `graphql` and
+`graphql-yoga`, which an app installs none of, so the checker reads those types as unresolved where
+a type of the app names them, and the class `Repeater` of the root comes from the declaration of
+`@repeaterjs/repeater` the package carries, the test the inference makes of a stream. Over the 24
+fixtures of its gate, `aosabi build` in an install with no package of the reference writes the three
+files byte equal to the answer of the reference build of each fixture, 24 of 24.
 
 The exit code is 0 when the step built the app, 1 when it failed, with the message on stderr, and 2
 for a call it does not know.

@@ -6,8 +6,7 @@
  * No translation. The mappings it keeps are those of
  * String.prototype.toLowerCase and String.prototype.toUpperCase, ECMA-262
  * sections 22.1.3.28 and 22.1.3.30, whose result holds an ASCII character, as
- * the pinned node 24.13.0 answers them for every Unicode scalar value, which
- * tests/notebooks/02_language.ipynb derives and holds this module to.
+ * the pinned node 24.13.0 answers them for every Unicode scalar value.
  */
 
 //! The case conversions of JavaScript, reduced to the mappings that reach ASCII.

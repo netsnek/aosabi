@@ -3,9 +3,7 @@
  * aosabi-devtool app-model: forms the canonical application model of a raw
  * model and writes it the way aosabi inspect --json prints it.
  *
- * No analogue in the reference. The judging notebook is
- * tests/notebooks/70_cli.ipynb, which hands this primitive the raw model the
- * operation inspect_raw of the IR sidecar answers.
+ * No analogue in the reference.
  */
 
 //! The `app-model` primitive of the seam.
@@ -64,8 +62,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "app-model";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M8";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "cli";
 
 /// The gap of `aosabi inspect --json`, two spaces.
 const GAP: &str = "  ";

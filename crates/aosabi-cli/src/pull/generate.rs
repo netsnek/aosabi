@@ -46,15 +46,15 @@
 //! `needs` selects. The cases of `blog-app` and of the corpus of the command
 //! `pull` pin it.
 //!
-//! `ID`, `Int`, `Float`, `Date` and `File` are the markers of the facade,
-//! and the seven other known scalars are the aliases the file opens with.
-//! Inside a root module and inside `args`, a type of
-//! the remote is written `super::<Name>`, so a field named like a type does
-//! not shadow it. A name that is a Rust keyword is written raw, and `self`,
-//! `super`, `crate`, `Self` and `_`, which cannot be raw, take a trailing
-//! underscore, while `arguments` and the enum values keep the GraphQL name.
-//! The `use` line names exactly what the file uses, in the vertical layout of
-//! `Documentation/coding-style.md` section 2.1, so an unused import never warns.
+//! `ID`, `Int`, `Float`, `Date` and `File` are the markers of the facade, and
+//! the seven other known scalars are the aliases the file opens with. Inside
+//! a root module and inside `args`, a type of the remote is written
+//! `super::<Name>`, so a field named like a type does not shadow it. A name
+//! that is a Rust keyword is written raw, and `self`, `super`, `crate`,
+//! `Self` and `_`, which cannot be raw, take a trailing underscore, while
+//! `arguments` and the enum values keep the GraphQL name. The `use` line
+//! names exactly what the file uses, in the vertical layout, so an unused
+//! import never warns.
 //!
 //! The file allows four lints of the compiler and the eight of clippy that
 //! the names and the shapes of a remote raise under `clippy::all` and
@@ -821,8 +821,7 @@ fn indent_lines(item: &str) -> String {
 /// Returns the constant `name` of the registry with the keys `keys` in the
 /// layout rustfmt gives it: on one line when that fits [`MAX_WIDTH`], else on
 /// the next line when the keys fit [`ARRAY_WIDTH`], else several to a row
-/// when no key is wider than [`SHORT_KEY`], else one key per line (,
-/// rustfmt of 1.95.0 over random lists of keys).
+/// when no key is wider than [`SHORT_KEY`], else one key per line.
 fn keys(name: &str, keys: &[String]) -> String {
     let head = format!("{INDENT}const {name}: &'static [&'static str] =");
     let quoted: Vec<String> = keys.iter().map(|key| format!("\"{key}\"")).collect();

@@ -4,15 +4,14 @@
  * wire form.
  *
  * No analogue in the reference. The messages, the order of refusal and the
- * malformed answer are those of the specification, and the sender rule is that
- * of section 3.3.
+ * malformed answer are those of the specification.
  */
 
 //! The wire form of GraphTP/1: the decoders of a request, its content and an
 //! answer, and the writers of every message.
 //!
 //! A server calls [`decode_request`], which checks rules 1 to 9 of
-//! `docs/graphtp.md` section 5.3 in their order, and then [`decode_content`]
+//! `Documentation/guides/graphtp.md` in their order, and then [`decode_content`]
 //! on the content of an OPERATION, which checks rules 10 and 11 as it decodes,
 //! so the two calls answer the 11 rules in their order, each with its [`Code`].
 //! A client calls [`decode_answer`] with the kind it sent, and [`decode_body`]
@@ -21,8 +20,7 @@
 //!
 //! The writers put a message into a [`Sink`] and code exactly the contents and
 //! bodies of more than [`THRESHOLD`] bytes, >128 B, through the caller's
-//! [`zlib::Scratch`], with no size check, which is the sender rule of section
-//! 3.3.
+//! [`zlib::Scratch`], with no size check, which is the sender rule.
 
 use core::{
     error,
@@ -53,8 +51,8 @@ use crate::{
 
 /// Why a client cannot read an answer, which fails the exchange.
 ///
-/// Each reason but [`WireError::Bound`] is a malformed answer of
-/// `docs/graphtp.md` section 5.4, and [`WireError::Bound`] is the client's own
+/// Each reason but [`WireError::Bound`] is a malformed answer,
+/// and [`WireError::Bound`] is the client's own
 /// bound on a body.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum WireError {
@@ -75,7 +73,7 @@ pub enum WireError {
     Decode,
     /// The body, decoded, passes the bound the client gave it.
     Bound,
-    /// The head of a stream or a batch is no stream body of section 2.4, or the
+    /// The head of a stream or a batch is no stream body, or the
     /// head of a stream carries no handle.
     Stream,
 }
@@ -134,8 +132,8 @@ impl<'a> Body<'a> {
     }
 }
 
-/// A request a server accepts by rules 1 to 9 of `docs/graphtp.md` section
-/// 5.3, borrowed from its message.
+/// A request a server accepts by rules 1 to 9 of `Documentation/guides/graphtp.md`,
+/// borrowed from its message.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Request<'a> {
     /// An OPERATION with its credential, `None` for none, and its content.
@@ -165,22 +163,22 @@ pub enum Answer<'a> {
     Opened {
         /// The code 200.3.
         code: Code,
-        /// The head of the stream, a stream body of section 2.4.
+        /// The head of the stream, a stream body.
         head: Body<'a>,
     },
     /// The answer 200.0 to a PULL or a CANCEL, a batch of stream entries.
     Batch {
         /// The code 200.0.
         code: Code,
-        /// The batch, a stream body of section 2.4.
+        /// The batch, a stream body.
         body: Body<'a>,
     },
     /// An answer with an empty body, a refusal whatever its code.
     Refused(Code),
 }
 
-/// Reads the request `message` by rules 1 to 9 of `docs/graphtp.md` section
-/// 5.3, in their order, with the server's bound `max_credential` on the
+/// Reads the request `message` by rules 1 to 9 of `Documentation/guides/graphtp.md`,
+/// in their order, with the server's bound `max_credential` on the
 /// credential.
 ///
 /// Rule 9 reads a coded content's header in three steps: at least 2 bytes, then
@@ -237,7 +235,7 @@ pub fn decode_request(message: &[u8], max_credential: u16) -> Result<Request<'_>
 /// Decodes the content `content` into `sink` under the server's decoded bound
 /// `bound` and returns the count of its plain bytes.
 ///
-/// This is rules 10 and 11 of `docs/graphtp.md` section 5.3. A plain content is
+/// This is rules 10 and 11 of `Documentation/guides/graphtp.md`. A plain content is
 /// put into `sink` as it is, and a coded one is decoded through a window of
 /// 4,096 bytes the function holds on its stack, so the plain bytes leave
 /// through `sink` as they come.

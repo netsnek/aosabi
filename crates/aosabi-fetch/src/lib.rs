@@ -32,9 +32,7 @@
 //! | `error` | no analogue | the mapping of every failure onto `FetchError` |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/62_sentry.ipynb`,
-//! and `61_oidc_login.ipynb`, `63_zitadel_auth.ipynb` and
-//! `61_oidc_budget.ipynb` for the calls of the issuer.
+//! section 3.
 
 pub mod body;
 pub mod client;

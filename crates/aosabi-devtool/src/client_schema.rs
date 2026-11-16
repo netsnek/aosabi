@@ -3,9 +3,7 @@
  * aosabi-devtool client-schema: builds the client schema of an introspection
  * result and prints it, and writes the introspection query that pull posts.
  *
- * No analogue in the reference. The judging notebook is
- * tests/notebooks/02_language.ipynb, which sends the same request lines to
- * this primitive and to tests/sidecar/graphql-js.mjs.
+ * No analogue in the reference.
  */
 
 //! The `client-schema` primitive of the seam.
@@ -68,8 +66,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "client-schema";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M8";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "cli";
 
 /// The operations of the batch form.
 const OPERATIONS: &Operations = &[

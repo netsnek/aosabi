@@ -14,12 +14,20 @@
 //!
 //! [`create_wrapping_schema`] maps the client schema `build_client_schema`
 //! makes of a remote's introspection into the schema the delegation runs
-//! over, `mapSchema` of `createWrappingSchema`. A specified scalar, a
-//! specified directive and an introspection type stay the instance they are,
-//! as `mapSchema` keeps them. The resolvers are values of the executor,
-//! which this crate carries in a [󰀋](crate::ResolverHandle) without reading,
-//! so the caller hands them in as the bindings of the root fields and the
-//! one merged resolver.
+//! over, `mapSchema` of `createWrappingSchema`. The mapping is the bindings
+//! laid over a copy of every named type: a root field takes the proxying
+//! resolver the caller binds to it, every other field of an object type
+//! takes the merged resolver and loses its `subscribe`, an object type loses
+//! its `isTypeOf`, an interface and a union lose their `resolveType`, an
+//! enum value loses its internal value, which makes it its name again, and a
+//! custom scalar loses its three hooks, so a remote `Number`, `Date` or
+//! `JSON` passes through as the JSON value the remote wrote. A specified
+//! scalar, a specified directive and an introspection type stay the instance
+//! they are, as `mapSchema` keeps them. The resolvers are values of the
+//! executor, which this crate carries in a
+//! [`ResolverHandle`](crate::ResolverHandle) without reading, so the caller
+//! hands them in as the bindings of the root fields and the one merged
+//! resolver.
 //!
 //! A clearing binding is spelled out here, since the bindings of
 //! [`schema_bindings`](crate::schema_bindings) lay a present member over the

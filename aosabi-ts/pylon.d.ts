@@ -6,12 +6,19 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett, its source, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * Every declaration is Pylon's. This file re-exports the names lib/pylon.js exports and the types of
- * their shapes, and no other name, so a name whose engine item is missing stays undeclared here:
- * asyncContext, renderLine, jobLogLevel and IN_CONTEXT_SDL. The cookie helpers are hono's own, the
- * signed forms among them, which Pylon's root re-exports from hono/cookie. The declaration of
- * experimentalCreatePubSub is the one of Pylon's root, createPubSub of graphql-yoga, whose topics
- * the engine keeps in its own pub sub.
+ * Every declaration is Pylon's. The folder types/pylon/ holds the declaration files of Pylon's root as
+ * the declaration build of its package emits them at 2653a81, as Pylon's vendored literals, Apache-2.0,
+ * with the class Pylon named App and the configuration and its kin under Aosabi's own names, AppConfig
+ * among them. This file re-exports the names lib/pylon.js exports and the types of their shapes, and no
+ * other name, so a name whose engine item is missing stays undeclared here: asyncContext, renderLine,
+ * jobLogLevel and IN_CONTEXT_SDL. The cookie helpers are hono's own, the signed forms among them, which
+ * Pylon's root re-exports from hono/cookie. The gateway, createGateway, pass and passthrough with the
+ * types FieldPolicy and PatchPolicy, is declared with the declarations of types/pylon/core/gateway.d.ts,
+ * since its markers run over the federation of the engine. The declaration of experimentalCreatePubSub is
+ * the one of Pylon's root, createPubSub of graphql-yoga, whose topics the engine keeps in its own pub
+ * sub. The declarations import hono, graphql, graphql-yoga and the other packages Pylon depends on by
+ * their bare specifiers, as Pylon's declarations do: hono is the peer of the package, and the package
+ * names none of the others as a dependency, so the author mode judges how its checker reads them.
  *
  * The three names requireAuth, authMiddleware and useAuth of the root of Pylon's canary
  * 3.0.0-canary-20260206115650, which lib/canary.js exports for an app that build makes, are

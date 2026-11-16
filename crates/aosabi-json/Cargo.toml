@@ -1,7 +1,7 @@
-# The JSON writer. Documentation/architecture.md section 3 names it the only crate that turns
-# a number, a string or an object into bytes, and docs/byte-equality.md section
-# 6 is the contract it satisfies. The crate is no_std with alloc, because the
-# kernel and the player link it.
+# The JSON writer. Documentation/architecture.md section 3 names it the only
+# crate that turns a number, a string or an object into bytes, and it
+# satisfies the contract of the JSON writer. The crate is no_std with alloc,
+# because the kernel and the player link it.
 [package]
 name = "aosabi-json"
 version.workspace = true
@@ -27,8 +27,7 @@ default = []
 std = []
 # The group of four control bytes on every target, which a target of 32 bits
 # such as the ESP32-C3 probes with anyway (src/map/table.rs). It changes the
-# speed of a lookup and no answer, and tests/notebooks/01_json_writer.ipynb
-# turns it on to replay the map through that group on the host.
+# speed of a lookup and no answer.
 narrow-group = []
 
 [dependencies]
@@ -39,7 +38,7 @@ narrow-group = []
 # The insertion ordered map needs no outside crate either. The map of
 # src/map.rs is written with no unsafe and no atomic operation, its index
 # table translates the generic group of hashbrown, and NOTICE carries the
-# notice of hashbrown (docs/dependencies.md section 3.1).
+# notice of hashbrown.
 #
 # Where the standard library does not key the map, it hashes with the
 # SipHash-1-3 of the crate homa of this workspace, the one SipHash the

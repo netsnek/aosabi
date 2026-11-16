@@ -7,8 +7,9 @@
  * https://www.unicode.org/reports/tr46/, and Punycode, RFC 3492, as ada 3.3.0, the URL parser of
  * Node 24.13.0, runs it.
  *
- * It carries the half of fetch/url.rs of the quirk Q54_NODE_ADAPTER_URL of
- * docs/byte-equality.md section 13.1.
+ * Derived from ada 3.3.0, src/ada_idna.cpp, MIT.
+ *
+ * It carries the half of fetch/url.rs of the quirk NODE_ADAPTER_URL.
  */
 
 //! The URL of a request and the parser of `application/x-www-form-urlencoded`.
@@ -498,10 +499,10 @@ pub fn parse_url(input: &str, base: Option<&str>) -> Result<Url, UrlError> {
 /// Returns the origin of `input`, `new URL(input).origin`, read as [`parse_url`] reads `input`
 /// with no base.
 ///
-/// Without the feature `node-server` the split of a serialized URL reads it, so the module of a
-/// Worker that checks the origin of a request holds no symbol of [`parse_url`], the name that
-/// `tests/notebooks/08_card_builds.ipynb` refuses in a Worker, since behind `node-server` it is
-/// the parser with domain to ASCII.
+/// Without the feature `node-server` the split of a serialized URL reads it, so
+/// the module of a Worker that checks the origin of a request holds no symbol
+/// of [`parse_url`], since behind `node-server` it is the parser with domain to
+/// ASCII.
 ///
 /// # Errors
 ///
@@ -1594,8 +1595,8 @@ mod idna {
 
     /// Returns the Punycode decoding of `input`, RFC 3492 section 6.2.
     ///
-    /// A code point that is no scalar value is refused here, where ada keeps it and its mapping
-    /// refuses it as disallowed.
+    /// A code point that is no scalar value is refused here, where ada keeps it
+    /// and its mapping refuses it as disallowed.
     ///
     /// Derived from ada 3.3.0, MIT.
     // The names of the bindings are the ones of RFC 3492 section 6.
@@ -1682,16 +1683,18 @@ mod idna {
 
     /// Returns whether a label passes the validity criteria as ada checks them.
     ///
-    /// A label must not start with a mark. The first joiner decides the label: after a virama
-    /// the label is valid, a zero width joiner elsewhere refuses it, and a zero width non-joiner
-    /// inside the label passes when a code point of joining type L or D stands anywhere before
-    /// it and one of type R or D anywhere after it. A label of nonspacing marks alone is
-    /// refused. The rules of RFC 5893 section 2 run on a label that holds a code point of the
-    /// classes R, AL or AN, and on no other label of the domain. A label that starts with L is
-    /// read as a left to right label whose code points before the last one that is no NSM are of
-    /// the classes L, EN, ES, CS, ET, ON, BN or NSM. Any other is read as a right to left label
-    /// with the classes R, AL, AN, EN, ES, CS, ET, ON, BN or NSM up to that code point, which is
-    /// R, AL, EN or AN, and not both EN and AN.
+    /// A label must not start with a mark. The first joiner decides the label:
+    /// after a virama the label is valid, a zero width joiner elsewhere refuses
+    /// it, and a zero width non-joiner inside the label passes when a code
+    /// point of joining type L or D stands anywhere before it and one of type R
+    /// or D anywhere after it. A label of nonspacing marks alone is refused.
+    /// The rules of RFC 5893 section 2 run on a label that holds a code point
+    /// of the classes R, AL or AN, and on no other label of the domain. A label
+    /// that starts with L is read as a left to right label whose code points
+    /// before the last one that is no NSM are of the classes L, EN, ES, CS, ET,
+    /// ON, BN or NSM. Any other is read as a right to left label with the
+    /// classes R, AL, AN, EN, ES, CS, ET, ON, BN or NSM up to that code point,
+    /// which is R, AL, EN or AN, and not both EN and AN.
     ///
     /// Derived from ada 3.3.0, MIT.
     fn valid_label(label: &[char]) -> bool {
@@ -1750,7 +1753,8 @@ mod idna {
 
     /// Returns `domain` in ASCII, domain to ASCII of the URL Standard with `beStrict` false.
     ///
-    /// The result is refused when it is empty or holds a forbidden domain code point.
+    /// The result is refused when it is empty or holds a forbidden domain code
+    /// point.
     ///
     /// Derived from ada 3.3.0, MIT.
     pub(super) fn domain_to_ascii(domain: &str) -> Result<String, UrlError> {
@@ -1773,10 +1777,11 @@ mod idna {
 
     /// Returns `ToASCII` of UTS 46 of `domain` as ada runs it, `None` on an error.
     ///
-    /// An ASCII domain is lower cased and a label that starts with `xn--` is checked by its
-    /// decoding. Any other domain is mapped as a whole, where a disallowed code point refuses
-    /// it, and normalized to form C, and then each label that starts with `xn--` is checked by
-    /// its decoding, an ASCII label is kept, and any other is checked and encoded in Punycode.
+    /// An ASCII domain is lower cased and a label that starts with `xn--` is
+    /// checked by its decoding. Any other domain is mapped as a whole, where a
+    /// disallowed code point refuses it, and normalized to form C, and then
+    /// each label that starts with `xn--` is checked by its decoding, an ASCII
+    /// label is kept, and any other is checked and encoded in Punycode.
     ///
     /// Derived from ada 3.3.0, MIT.
     fn to_ascii(domain: &str) -> Option<String> {

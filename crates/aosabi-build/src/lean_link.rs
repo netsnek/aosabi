@@ -44,21 +44,12 @@
 //! until it has read its counters under both links.
 //!
 //! The switch reaches `aarch64-unknown-linux-gnu` alone, the target whose folds
-//! section Folds lists and whose cards `20_exec_cost` and `20_exec_asm` read.
-//! The lean link of `x86_64-unknown-linux-gnu` links with the linker the
-//! compiler driver finds whatever the switch says, since no listing reads the
-//! folds of that target, and the cross compiler driver of the project's machine
-//! runs GNU ld for `-fuse-ld=lld`, which knows no `--icf=all`. The part `x86`
-//! of `tests/notebooks/17_framework_size.ipynb` prints the arguments of that
-//! lean link with the switch at `lld`.
-//!
-//! The judging notebooks are `tests/notebooks/17_framework_size.ipynb`, which
-//! builds every aarch64 row of its sections 1 and 2 in the plain and in the
-//! lean link, the rows of `x86_64` in its part `x86`, and prints per card the
-//! bytes the switch holds back, `tests/notebooks/18_size_oracles.ipynb`, whose
-//! section Folds lists and classifies every section the fold removes, and
-//! `tests/notebooks/31_http_errors.ipynb`, which answers its corpus through the
-//! lean link of the twins.
+//! a listing reads and whose cards the measures of the cost and of the machine
+//! code of the executor read. The lean link of `x86_64-unknown-linux-gnu` links
+//! with the linker the compiler driver finds whatever the switch says, since no
+//! listing reads the folds of that target, and the cross compiler driver of the
+//! project's machine runs GNU ld for `-fuse-ld=lld`, which knows no
+//! `--icf=all`.
 
 use std::{
     env,

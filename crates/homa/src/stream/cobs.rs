@@ -2,7 +2,10 @@
 /*
  * homa stream cobs: consistent overhead byte stuffing of the delimited form.
  *
- * The delimited form of AoFrame takes it.
+ * COBS is Cheshire and Baker's byte stuffing, first shown at SIGCOMM 1997,
+ * which removes every zero byte from its input at a cost of at most one byte
+ * in 254, so a zero byte can end a frame and a receiver finds the next frame
+ * after any error. The delimited form of AoFrame takes it.
  */
 
 //! COBS, which removes every zero byte from a frame.

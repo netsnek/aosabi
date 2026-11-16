@@ -32,11 +32,7 @@
 //! The crate builds with no standard library and needs an allocator, and it
 //! holds no atomic type, so a build for `riscv32imc-unknown-none-elf`, whose
 //! core has no atomic instruction, links it. There is no test in this crate,
-//! which is the rule of CONTRIBUTING.md section 3. The judging notebooks are
-//! `tests/notebooks/60_request_cache.ipynb`, whose section 4 holds the table
-//! against a model of it in Python and whose sections 3 and 5 hold the
-//! estimate and the bounds, and `tests/notebooks/08_card_builds.ipynb`, which
-//! builds the crate for both targets of the ESP32-C3.
+//! which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 #![forbid(unsafe_code)]
@@ -111,9 +107,7 @@ pub const MAX_ENTRIES: usize = 1 << 20;
 /// Over 14 hostile shapes and the seven documents of the corpus the heap of a
 /// parsed document less twice its text is at most 330.7 bytes per token on
 /// aarch64 for every shape past 100 tokens, and a document of 3 tokens takes
-/// 2,556 bytes, so the base and the charge per token lie above both.
-/// `tests/notebooks/60_request_cache.ipynb` holds the estimate against the
-/// bytes DHAT counts for every document and shape of its section 3. A blamed
+/// 2,556 bytes, so the base and the charge per token lie above both. A blamed
 /// node holds the string values of its subtree, which no charge per token
 /// bounds, so it takes 3 bytes for each UTF-16 code unit it spans, the most
 /// bytes of UTF-8 one code unit stands for, and its copy stays within its
@@ -129,10 +123,7 @@ pub const ESTIMATE_64: Estimate = Estimate {
 ///
 /// On wasm32 the heap of a parsed document less twice its text is at most
 /// 186.3 bytes per token for every shape past 100 tokens, and a document of 3
-/// tokens takes 1,448 bytes. `tests/notebooks/60_request_cache.ipynb` holds
-/// the estimate against the growth of linear memory per copy of every
-/// document and shape of its section 3, which carries the overhead of the
-/// allocator.
+/// tokens takes 1,448 bytes.
 pub const ESTIMATE_32: Estimate = Estimate {
     base: 1_536,
     per_token: 208,

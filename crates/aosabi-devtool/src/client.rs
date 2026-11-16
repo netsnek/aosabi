@@ -3,9 +3,7 @@
  * aosabi-devtool client: writes the three files of the TypeScript client a
  * build emits for an SDL text.
  *
- * No analogue in the reference. The judging notebook is
- * tests/notebooks/70_client.ipynb, which sends the same request lines to this
- * primitive and to the operation client of the command line sidecar.
+ * No analogue in the reference.
  */
 
 //! The `client` primitive of the seam.
@@ -63,8 +61,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "client";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M8";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "cli";
 
 /// The operations of the batch form.
 const OPERATIONS: &Operations = &[("client", op_client)];

@@ -11,9 +11,14 @@
 //!
 //! The plugin is named `node-server`, runs in the pass of the strategy `last`
 //! and in the role `web` alone, and binds the port in its setup, so the port
-//! binds only after every route is mounted. A native build of Aosabi is always
-//! the Node case of `isNodeRuntime`, since a Worker build links no serving
-//! crate at all.
+//! binds only after every route is mounted. Its setup returns under
+//! `NODE_ENV=development`, where `pylon dev` owns the serving, and otherwise
+//! binds the port [`port_rule`] answers on every address, prints
+//! `Aosabi running at http://localhost:<port>` through the console once the
+//! bind succeeded, where the reference prints `Pylon running at`, and attaches
+//! the listener to the app, which the boot runs over the booted app. A native
+//! build of Aosabi is always the Node case of `isNodeRuntime`, since a Worker
+//! build links no serving crate at all.
 //!
 //! The listener serves TLS when the boot read a certificate from
 //! `AOSABI_TLS_CERT` and `AOSABI_TLS_KEY`, and the line then names `https`,

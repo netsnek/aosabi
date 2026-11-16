@@ -9,12 +9,15 @@
 //!
 //! [`process_request`] parses, validates, builds the context and executes one
 //! operation through the enveloped functions, and answers the validation
-//! errors as the result when there are any. A subscription operation runs
-//! `subscribe` and any other `execute`, the operation chosen by
-//! `getOperationAST` with the operation name of the parameters, and the stream
-//! a subscription answers keeps that agent, which the driver of its readable
-//! stream runs. The processing of the result, `process-request.js:7-37`, is a
-//! step of the function, [`crate::server::HttpServer::process_result`].
+//! errors as the result when there are any. The operation runs on an agent of
+//! its own, made with the options of the server and handed to its setup hook,
+//! so every resolver of the operation runs with the measured job order. A
+//! subscription operation runs `subscribe` and any other `execute`, the
+//! operation chosen by `getOperationAST` with the operation name of the
+//! parameters, and the stream a subscription answers keeps that agent, which
+//! the driver of its readable stream runs. The processing of the result,
+//! `process-request.js:7-37`, is a step of the function,
+//! [`crate::server::HttpServer::process_result`].
 
 use std::rc::Rc;
 

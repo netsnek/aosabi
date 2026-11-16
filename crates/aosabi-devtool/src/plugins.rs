@@ -3,7 +3,8 @@
  * aosabi-devtool plugins: the primitive through which a notebook sorts
  * plugins, gates them by role, boots them and remaps refusals in process.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the Rust half of the plugins sidecar on Node, whose
+ * four operations call the reference's own topoSortPlugins, executeConfig and useIdentity.
  */
 
 //! The primitive `plugins` of the seam.

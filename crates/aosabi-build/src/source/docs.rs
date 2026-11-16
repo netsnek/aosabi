@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-build: the documentation of an item of a plain crate, read from its
- * doc attributes by the rule of docs/authoring.md section 29.5.
+ * doc attributes.
  */
 
 //! The documentation of an item of a plain crate.

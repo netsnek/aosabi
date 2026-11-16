@@ -108,8 +108,7 @@ pub const SINGLE_BOXES: usize = 40;
 /// The types above which the index and the search file split by first letter.
 pub const LETTER_TYPES: u32 = 2000;
 
-/// The clusters a cluster map holds at most, as `docs/aoviewer.md` section 5.5
-/// derives it from the size cap.
+/// The clusters a cluster map holds at most, which the size cap derives.
 const MAP_BOXES: usize = 120;
 
 /// The fewest digits of the number of a cluster chapter.
@@ -734,7 +733,7 @@ impl<'a> Site<'a> {
         let clusters = self.clustering.clusters.len();
         if clusters > MAP_BOXES {
             self.notes.push(format!(
-                "The cluster map holds {clusters} clusters, more than the {MAP_BOXES} boxes docs/aoviewer.md section 5.5 bounds it to."
+                "The cluster map holds {clusters} clusters, more than its bound of {MAP_BOXES} boxes."
             ));
         }
     }

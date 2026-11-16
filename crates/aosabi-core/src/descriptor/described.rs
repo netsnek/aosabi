@@ -3,9 +3,8 @@
  * aosabi-core: the traits a described type implements.
  *
  * No analogue on the reference side. The implementations for the types of
- * `core` and `alloc` state which TypeScript type each Rust type is the twin
- * of, which is the left column of the rule table of
- * docs/schema-inference.md section 4.
+ * `core` and `alloc` state which TypeScript type each Rust type is the
+ * twin of.
  */
 
 //! The traits a described type implements.
@@ -39,8 +38,7 @@ use super::{
 /// types of an application, and this module implements it for the types of
 /// `core` and `alloc` that have a TypeScript twin. A type with no
 /// implementation cannot stand in a field, a parameter or a return, and the
-/// compiler says so with the message below, which is the compile time refusal
-/// of `docs/schema-inference.md` section 13.
+/// compiler says so with the message below, which is the compile time refusal.
 ///
 /// # Examples
 ///

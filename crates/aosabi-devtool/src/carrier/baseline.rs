@@ -3,9 +3,8 @@
  * aosabi-devtool carrier baseline: AoFrame alone on the link of a carrier,
  * whole messages each in one frame, first in first out, with no Homa.
  *
- * No analogue in the reference. The baseline is the comparison ADR-0023 asks
- * the plan that owns the carriers for on each carrier, which lives in the
- * devtool and ships in no artifact.
+ * No analogue in the reference. The baseline, which lives in the devtool and
+ * ships in no artifact, is what Homa is measured against on each carrier.
  */
 
 //! The baseline of `AoFrame` alone.

@@ -5,8 +5,8 @@
  * build throws.
  *
  * The constant text of the message is the extracted literal
- * crates/aosabi-build/src/schema_invalid_message.rs, which tools/provenance
- * writes and this file only reads.
+ * crates/aosabi-build/src/schema_invalid_message.rs, whose bytes are pinned
+ * and which this file only reads.
  */
 
 //! The `validate-schema` primitive of the seam.

@@ -5,7 +5,16 @@
  * of the engine through bun:ffi or core.wasm.
  *
  * Bun serves the app as the default export of the glue of a build, while the
- * serving plugin useNodeServer binds on Node alone.
+ * serving plugin useNodeServer binds on Node alone. This entry loads the
+ * library of the platform package of the process through dlopen of bun:ffi,
+ * falls back to core.wasm when none is present, reads an environment variable
+ * that forces core.wasm for the comparison, hands every app of the process
+ * that engine when it loads, so the logger of an app writes before its first
+ * request, serves an app over Bun.serve with serve(app, options) and serves an
+ * app whose configuration names useNodeServer over Bun.serve as that plugin
+ * serves it on Node, with no HTTP code and no deflate code of its own:
+ * compress() of hono in Pylon's base pipeline codes a body through the
+ * CompressionStream of Bun, lib/pylon.js.
  */
 
 // The library is the crate aosabi-js built as a cdylib from the code of
@@ -460,8 +469,8 @@ function listen(app, options) {
 // node:http: on the port of `options`, of the variable PORT where Number reads
 // a port of it, or 3000, as the rule of the plugin reads them, and once the
 // server listens it writes the line
-// `Aosabi running at http://localhost:<port>` through the console,
-// divergence D53 of docs/byte-equality.md section 3. The pass of executeConfig calls it in the role web alone and
+// `Aosabi running at http://localhost:<port>` through the console, a named
+// divergence. The pass of executeConfig calls it in the role web alone and
 // never under NODE_ENV=development, lib/index.js. The server binds every
 // address of IPv6 and of IPv4 where the system gives IPv6, the default of
 // Bun.serve, as node:http binds.

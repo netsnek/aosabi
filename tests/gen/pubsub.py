@@ -4,7 +4,7 @@
 Three kinds of script, each drawn from a stream of its own of `rng.py`, so a
 kind added later leaves the draws of the others where they are.
 
-- **Pub sub scripts**, in the language of `tests/sidecar/pubsub.md`, which
+- **Pub sub scripts**, in the language of the pub sub sidecar, which
   `aosabi-devtool pubsub` reads as well: the topic rule and the payload rule of
   `publish` with the nullish payload quirk, the listener a subscription adds
   only once it is pulled, the order per subscriber, `return` removing the

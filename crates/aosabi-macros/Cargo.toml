@@ -30,10 +30,8 @@ mirror = []
 # The three crates the Linux kernel carries under rust/, each at exactly the
 # version the README of its directory there names, because the kernel vets a
 # version and not a crate name. Cargo.lock pins each version with its
-# checksum, which is a normal dependency, pinned, in
-# docs/decisions/ADR-0024-dependencies.md. A version moves in a change of its
-# own, and only to the version the kernel carries, as section 4 of
-# docs/dependencies.md says.
+# checksum, which is a normal dependency, pinned. A version moves in a change
+# of its own, and only to the version the kernel carries.
 #
 # The parser of the annotated items. The `full` feature carries the `impl`
 # block and the method signatures `#[aosabi::resolvers]` reads, which the

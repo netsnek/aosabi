@@ -20,6 +20,6 @@
 //! GraphTP(Homa) on Unix Socket.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/30_http_tier1.ipynb`.
+//! section 3.
 
 pub mod http;

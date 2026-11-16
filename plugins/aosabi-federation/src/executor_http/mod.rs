@@ -9,12 +9,16 @@
 //! The HTTP executor, `build_http_executor` and the requests in flight it
 //! shares.
 //!
-//! The explicit headers are `accept`, then the headers the headers function
-//! answers in their order, then `content-type` for a text body that no
-//! header of that name set, and the body is the JSON text of [`serialize`]
-//! or the form of [`form_data`]. The headers function takes the request, so
-//! the introspection, whose request carries no context, hands the
-//! federation's function none (quirk Q77). The headers leave as the lines
+//! The executor sends each request as a `POST` through
+//! [`aosabi_core::net::fetch`], the network capability, so the native driver
+//! of `aosabi-fetch` carries it on a served card and the platform's fetch on
+//! a Worker, with no change to this crate. The explicit headers are `accept`,
+//! then the headers the headers function answers in their order, then
+//! `content-type` for a text body that no header of that name set, and the
+//! body is the JSON text of [`serialize`] or the form of [`form_data`]. The
+//! headers function takes the request, so the introspection, whose request
+//! carries no context, hands the federation's function none (quirk
+//! `FEDERATION_INTROSPECTION_HEADERS`). The headers leave as the lines
 //! node:http writes for that object, and the fetch follows the redirects the
 //! fetch of the reference follows, both in [`transport`].
 //!

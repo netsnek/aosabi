@@ -10,10 +10,10 @@
 //! The report pages.
 //!
 //! - The unreachable page holds the types no root reaches under the walk of
-//!   aoviewer and the two lints of `docs/aoviewer.md` section 2.3, so it
-//!   doubles as a lint report. The rule of each lint is the one of the home
-//!   page counts. Each list is a name grid in name order, written even when it
-//!   is empty, so the report has one shape.
+//!   aoviewer and the two lints of reachability, so it doubles as a lint
+//!   report. The rule of each lint is the one of the home page counts. Each
+//!   list is a name grid in name order, written even when it is empty, so the
+//!   report has one shape.
 //! - The deprecated page lists every deprecated member with its reason, the
 //!   types in name order and the members of a type in the order of the
 //!   transforms, each field before its arguments and the values last. A member

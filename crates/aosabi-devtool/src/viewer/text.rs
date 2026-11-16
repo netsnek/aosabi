@@ -6,7 +6,8 @@
  *
  * Every file comes from render_job of the core, so the operation answers the
  * bytes the tree holds at that path. The device chapter is the hand written
- * fixture of 75_docgen step 15, read in the field names of DeviceChapter.
+ * fixture of the checks of the documentation generator, read in the field
+ * names of DeviceChapter.
  */
 
 //! The `md` and `typ` operations.

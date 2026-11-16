@@ -24,13 +24,12 @@ The module writes what the federation notebooks send to both sides:
   stub with the canned answers of the stub, `dg-order-01` and a delegation from
   outside a resolver among them.
 
-Every request is a line of the protocol of tests/sidecar/federation.mjs,
-`tests/sidecar/federation.md`, without its `id`, which a case carries beside it.
-A case id is a hash of the request, and every family draws on until it holds its
-count of distinct ids, so an id is a key of the goldens and of the remote stub.
-The module decides nothing about correctness. The verdict of a run is the byte
-comparison of the sidecar and `aosabi-devtool federation` over the same
-requests. Every value is a neutral test string.
+Every request is a line of the protocol of the federation sidecar without its `id`,
+which a case carries beside it. A case id is a hash of the request, and every family
+draws on until it holds its count of distinct ids, so an id is a key of the goldens
+and of the remote stub. The module decides nothing about correctness. The verdict of a
+run is the byte comparison of the sidecar and `aosabi-devtool federation` over the
+same requests. Every value is a neutral test string.
 
 The manifest of the families that need no pair prints with the command below,
 and two runs print the same bytes. The package imports this module, so the

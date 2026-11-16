@@ -3,13 +3,11 @@
  * aosabi-devtool provenance: recomputes every hash of the provenance lock over
  * the extracted files.
  *
- * No analogue in the reference. tools/provenance/extract.py is the only writer
- * of the extracted literals and records each one in
- * tools/provenance/provenance.lock with its mode, its SHA-256 and its byte
- * length. This primitive reads the lock back and hashes the files on disk, so
- * a hand edit of a vendored literal, a missing extraction and a stale lock are
- * three distinguishable states rather than one silent pass. The seven literals
- * and why each mode is what it is are docs/harness.md section 10.
+ * No analogue in the reference. The only writer of the extracted literals
+ * records each one in a lock with its mode, its SHA-256 and its byte length.
+ * This primitive reads the lock back and hashes the files on disk, so a hand
+ * edit of a vendored literal, a missing extraction and a stale lock are three
+ * distinguishable states rather than one silent pass.
  */
 
 //! The `provenance` primitive of the seam.

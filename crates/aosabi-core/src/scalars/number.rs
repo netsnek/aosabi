@@ -7,7 +7,7 @@
  * Changed by the Aosabi authors.
  *
  * The two message prefixes are the extracted literal
- * ../number_scalar_messages.rs, which tools/provenance writes.
+ * ../number_scalar_messages.rs. They are pinned byte for byte.
  */
 
 //! The bound `Number` scalar.

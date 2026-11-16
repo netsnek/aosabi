@@ -5,7 +5,6 @@
  * The function matches_endpoint holds the test of the path of the endpoint.
  *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/use-unhandled-route.js, MIT.
- * Derived from graphql-yoga 5.18.0, cjs/plugins/use-health-check.js, MIT.
  */
 
 //! The paths of the function.

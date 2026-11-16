@@ -4,9 +4,7 @@
  * range of a wait, serving one connection.
  *
  * No analogue on the reference side. The program is the probe of the timeout
- * of the epoll reactor, which tests/notebooks/08_card_builds.ipynb builds for
- * the host with each backend of rustix and for the player's own target and
- * runs in each. It ships in no artifact.
+ * of the epoll reactor. It ships in no artifact.
  */
 
 //! A runtime that accepts one connection while a far timer waits.

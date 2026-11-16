@@ -3,7 +3,8 @@
  * aosabi-serve: the epoll reactor of the feature linux, and the reactor of a
  * build.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The reactor waits in epoll through the safe
+ * API of rustix on a Linux card.
  */
 
 //! `EpollReactor` and `platform_reactor`.

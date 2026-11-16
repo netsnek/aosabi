@@ -4,8 +4,7 @@
  * table describes, over the promise type of aosabi-execute.
  *
  * No analogue in the reference. The node side makes the same values with real
- * promises, and the rules both sides follow are those of
- * tests/sidecar/execute.md.
+ * promises, and both sides follow the same rules.
  */
 
 //! The interpreter of a behaviour table.

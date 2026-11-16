@@ -5,7 +5,9 @@
  * No analogue on the reference side, where the WebCrypto of Node signs with
  * RSASSA-PKCS1-v1_5 and SHA-256 and digests with SHA-256. The feature
  * host-crypto takes both from the host the crate runs in, the crypto of Bun or
- * of Cloudflare, through the functions the host installs, on any target.
+ * of Cloudflare, through the functions the host installs, on any target. Else
+ * on a target of cfg(unix) with the feature ring, a default, both run over
+ * ring, and elsewhere a call answers a thrown TypeError.
  */
 
 //! `sign_rs256`, `sha256`, `import_private_key`, the hidden `verify_rs256`,
@@ -369,9 +371,9 @@ pub(crate) fn sign_rs256(key: &PrivateKey, _data: &[u8]) -> Result<Vec<u8>, Oaut
 /// Verifies the RSASSA-PKCS1-v1_5 signature with SHA-256 `signature` of `data` with the public half
 /// of the PEM private key `pem`.
 ///
-/// It is hidden, for the devtool, whose primitive `zitadel` verifies the
-/// client assertion it signed before it masks it, as
-/// `tests/sidecar/zitadel.mjs` verifies the assertion of the reference.
+/// It is hidden, for the devtool, whose primitive `zitadel` verifies the client
+/// assertion it signed before it masks it, as the sidecar of Zitadel verifies
+/// the assertion of the reference.
 ///
 /// # Errors
 ///

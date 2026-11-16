@@ -646,7 +646,7 @@ function fromWtf8(bytes) {
 
 // Whether a record defers its short strings to the send, where the module
 // strings.wasm writes each into the memory of the engine through the JS String
-// Builtins, which the first engine with that module sets (round JSSTRING).
+// Builtins, which the first engine with that module sets.
 let deferStrings = false;
 
 // The longest string, in code units or bytes, that crosses through strings.wasm.
@@ -819,8 +819,8 @@ class Out {
 // the record stays at the address `base` of that memory while it is read, the
 // record of an import, which a vector of the frame that called the import
 // holds, a text is read there through the module strings.wasm of the memory,
-// and through the strict TextDecoder where that module answers none (round
-// JSSTRING).
+// over the JS String Builtins, and through the strict TextDecoder where that
+// module answers none.
 class In {
   constructor(bytes, memory = undefined, base = -1, at = 0, view = undefined) {
     this.bytes = bytes;
@@ -1814,8 +1814,9 @@ export function wasmEngine(module) {
 }
 
 // The member of the compiled module core.wasm under which a host hands the
-// compiled module strings.wasm beside it, round JSSTRING: aosabi/worker sets
-// it where Wrangler uploads that module, and no other host sets it.
+// compiled module strings.wasm beside it, which hands strings over through the
+// JS String Builtins: aosabi/worker sets it where Wrangler uploads that
+// module, and no other host sets it.
 export const STRINGS = Symbol.for("aosabi.strings");
 
 // Returns the exports encode and decode of an instance of the compiled module
@@ -2659,17 +2660,27 @@ function open(engine) {
   // Writes the value record of `value`, whose handles go to the table of
   // `request`. The checks run in the order of the resolver wrapper: a primitive,
   // a Date, a thenable, an array and a function, and any other object stays here
-  // behind a handle. An array is mapped as step 4 maps it, through mapList, and
-  // crosses as the mapped array, or as the promise of all its items that the
-  // wrapper owns when one of them is a thenable, and an array mapList has mapped
-  // crosses as its mapping, its then read no more. A walk that throws, by a
-  // getter of then, a then, a revoked Proxy or a value nested deeper than DEPTH
-  // levels, a cyclic array among them, throws to the import that called it. A
-  // value the walk takes as it is, a thrown value, which wrapResolver never
-  // walks, among them, is written with `raw` true, so the walk reads and calls
-  // no then of it and maps no array of it, and a value whose then the walk has
-  // read already and found no function with `checked` true. An error crosses as
-  // its handle alone, which the module reads through the import js_error.
+  // behind a handle. A bigint and a symbol, which step 1 passes on as they are,
+  // cross as the tag FOREIGN with their kind and the string String answers for
+  // them, which the engine reads by the place the value stands at in the schema:
+  // that string at a leaf of the scalars ID and GID, whose serialize answers
+  // String(value), and elsewhere a function whose every call answers another such
+  // function, which the scalars of a leaf answer as those of graphql-js answer
+  // the primitive and the writer of JSON of the engine leaves out of an object
+  // and writes as null in a list, as JSON.stringify treats a symbol, while a
+  // bigint that reaches that writer, where JSON.stringify throws, and a symbol as
+  // the whole value of the scalar JSON stay open. An array is mapped as step 4
+  // maps it, through mapList, and crosses as the mapped array, or as the promise
+  // of all its items that the wrapper owns when one of them is a thenable, and an
+  // array mapList has mapped crosses as its mapping, its then read no more. A
+  // walk that throws, by a getter of then, a then, a revoked Proxy or a value
+  // nested deeper than DEPTH levels, a cyclic array among them, throws to the
+  // import that called it. A value the walk takes as it is, a thrown value, which
+  // wrapResolver never walks, among them, is written with `raw` true, so the walk
+  // reads and calls no then of it and maps no array of it, and a value whose then
+  // the walk has read already and found no function with `checked` true. An error
+  // crosses as its handle alone, which the module reads through the import
+  // js_error.
   const writeValue = (out, value, request, depth, raw = false, checked = false) => {
     if (depth > DEPTH) throw new RangeError("a value of the app nests deeper than " + DEPTH + " levels");
     switch (typeof value) {
@@ -2814,10 +2825,10 @@ function open(engine) {
   // its then once to check it, as the walk has, and once more to call it. A
   // promise of the realm of the host, whose then is the then of Promise,
   // takes the two callbacks of the host in place of the one callback of the
-  // wrapper, the form of the plan, which settle the value that callback receives
-  // in the job it runs in. Any other thenable takes the call of the wrapper with one
-  // callback through callThen, and what its then answers is the value of the
-  // field, as the call of wrapResolver answers it there.
+  // wrapper, which settle the value that callback receives in the job it runs
+  // in. Any other thenable takes the call of the wrapper with one callback
+  // through callThen, and what its then answers is the value of the field, as
+  // the call of wrapResolver answers it there.
   const writeThen = (out, value, request, depth) => {
     const then = value.then;
     if (then === promiseThen) {
@@ -4696,8 +4707,7 @@ export function createCore({
 
     // Whether the live instance hands the strings of its records through
     // strings.wasm, which a host hands beside core.wasm and the builtins
-    // js-string of V8 link (round JSSTRING), or takes TextEncoder and
-    // TextDecoder.
+    // js-string of V8 link, or takes TextEncoder and TextDecoder.
     get codec() {
       return Boolean(live.memory?.codec);
     },

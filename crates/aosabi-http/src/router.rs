@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 /*
- * aosabi-http: the trie router with the method rule of the smart router.
+ * aosabi-http: the trie router the app matches its routes with.
  *
  * Derived from hono 4.11.9, dist/router/trie-router/router.js, MIT.
  * Derived from hono 4.11.9, dist/router/trie-router/node.js, MIT.
@@ -12,13 +12,13 @@
 //! The reference builds a `SmartRouter` over a `RegExpRouter` and a
 //! `TrieRouter` and keeps the first that accepts every route, and the two
 //! answer the same matches by contract. The port carries the trie router: a
-//! static label, `:name`, `:name?`, `*` and a trailing `/*`, every route of
-//! the method and of `ALL` that matches in registration order, and a
-//! middleware under `use` matching its path and everything below it. A label
-//! with a constraint `:name{...}` is stored with its key, and its constraint
-//! matches any label, because a constraint is a regular expression the
-//! workspace has no engine for, and no route of an app or of a fixture names
-//! one.
+//! static label, `:name`, `:name?`, `*` and a trailing `/*`, every route of the
+//! method and of `ALL` that matches in registration order, and a middleware
+//! under `use` matching its path and everything below it. A route whose label
+//! carries a constraint `:name{...}` is refused at its registration, a named
+//! divergence, because a constraint is a regular expression the workspace has
+//! no engine for, and no route of an app or of a fixture names one. An app
+//! writes the parameter as `:name` and checks its value in the handler.
 
 use crate::utils::url::{
     Pattern,

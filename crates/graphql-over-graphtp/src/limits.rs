@@ -2,10 +2,8 @@
 /*
  * graphql-over-graphtp limits: the bounds a card sets on its GraphTP listener.
  *
- * No analogue in the reference. The buffers are those of
- * docs/decisions/ADR-0026-runtime-graphql-over-aoenvelope.md, section Limits
- * answer outside the API, and docs/graphtp-in-aosabi.md sections 3 and 8, and
- * each bound answers its code of docs/graphtp.md section 5.5.
+ * No analogue in the reference. The buffers are limits that answer outside the
+ * API, and each bound answers its code.
  */
 
 //! The bounds of a card's listener.
@@ -94,7 +92,8 @@ pub const TEST_GRAPHTP: CardLimits = CardLimits {
 };
 
 /// The player, 8,192 bytes of request buffer and 131,072 of answer buffer, one
-/// stream a peer, and the encoder's default sizes.
+/// stream a peer, and the encoder's default sizes. The credential, the queue
+/// and the peers are assumed until they are measured.
 pub const PLAYER: CardLimits = CardLimits {
     card: "player",
     max_credential: 2048,
@@ -109,7 +108,8 @@ pub const PLAYER: CardLimits = CardLimits {
 /// The ESP32-C3 and the HT-CT62, 4,096 bytes of request buffer and 8,192 of
 /// answer buffer, and the encoder with 1,024 hash heads, blocks of 2,048
 /// tokens and a buffer of plain bytes of the window and its lookahead, 4,358
-/// bytes.
+/// bytes. The credential, the streams, the queue and the peers are assumed
+/// until they are measured.
 pub const ESP32C3: CardLimits = CardLimits {
     card: "esp32c3-devkitm1",
     max_credential: 2048,

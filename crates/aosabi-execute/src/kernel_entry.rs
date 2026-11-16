@@ -13,7 +13,7 @@
 //! [`normalized_executor`] on a fresh agent and drives the agent until the
 //! result has settled. A syntax error and a validation error answer as a
 //! result with errors and no `data` key, which is the body Yoga answers them
-//! with (docs/byte-equality.md section 8.2).
+//! with.
 //!
 //! The pipeline splits where the agent is driven. [`prepare_request`] runs
 //! everything before that point and answers a [`Prepared`], and

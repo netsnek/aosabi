@@ -5,7 +5,7 @@
  * build.
  *
  * No analogue in the reference. The listener is the one of
- * docs/graphtp-in-aosabi.md section 3, which the crate graphql-over-graphtp
+ * Documentation/guides/graphtp.md, which the crate graphql-over-graphtp
  * holds.
  */
 

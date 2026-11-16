@@ -102,8 +102,8 @@ pub trait BuildFn: 'static {
     ) -> LocalBoxFuture<'a, Result<Box<dyn BuildController>>>;
 }
 
-/// What a setup body may give: `()` for `return;` as `docs/authoring.md`
-/// section 7 writes it, or `Result<()>`.
+/// What a setup body may give: `()` for `return;`,
+/// or `Result<()>`.
 pub trait IntoSetupResult {
     /// Returns the result of the setup.
     ///

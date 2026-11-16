@@ -13,11 +13,11 @@
 //! The constructor reverses the transforms of the delegation, so the request
 //! runs through them from the last of the array to the first, between the
 //! preparation and the finalization of the document, and the result runs
-//! through them from the first to the last, before the result is checked.
-//! The gateway hands the four transforms `InjectNeeds`, `InlineArgs`,
-//! `ForceArgs` and `Patch` in that array order, so the request path is
-//! `Patch`, `ForceArgs`, `InlineArgs`, `InjectNeeds`, and no transform is
-//! reordered, which quirk `Q10-5` pins.
+//! through them from the first to the last, before the result is checked. The
+//! gateway hands the four transforms `InjectNeeds`, `InlineArgs`, `ForceArgs`
+//! and `Patch` in that array order, so the request path is `Patch`,
+//! `ForceArgs`, `InlineArgs`, `InjectNeeds`, and no transform is reordered,
+//! which the quirk `FEDERATION_FORCE_BEFORE_NEEDS` pins.
 //!
 //! The transformation context, an empty object per transform, has no reader
 //! in the four transforms and no member here.

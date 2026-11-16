@@ -1,8 +1,7 @@
 # The module infer.wasm of the npm package aosabi-build, the author mode of the
-# TypeScript option of docs/decisions/ADR-0028-typescript-authoring.md: the
-# schema inference of aosabi-infer, the intermediate representation of
-# aosabi-ir and the writers of aosabi-build, as one cdylib for
-# wasm32-unknown-unknown whose second type source asks the live checker of
+# TypeScript option: the schema inference of aosabi-infer, the intermediate
+# representation of aosabi-ir and the writers of aosabi-build, as one cdylib
+# for wasm32-unknown-unknown whose second type source asks the live checker of
 # typescript through one import block. The command aosabi build of the folder
 # aosabi-ts-build drives it on Node at build time. The crate is never published
 # and ships in no build, since the dev package carries its module as a build

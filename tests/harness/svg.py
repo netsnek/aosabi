@@ -5,7 +5,9 @@ xml.etree.ElementTree.
 A drawing has no box overlap, no run whose text length exceeds its box, no edge
 through a foreign box and unique ids in the grammar of the parity table.
 
-The checks read geometry and never pixels.
+The checks read geometry and never pixels. A drawing is read in the shape
+below, the stable id on every box and edge group of the SVG writer, with the
+nesting of the elements assumed until that writer lands:
 
 - The root is `<svg>` with `width`, `height`, `role="img"` and a `<title>`.
 - A box is an element whose `id` is a type or a cluster id in the grammar

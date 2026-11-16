@@ -152,7 +152,7 @@ KEY_FILES = ("key.json", "a.json", "b.json")
 REFERENCE_OUT = ".pylon"
 REFERENCE_CONFIG = "pylon.config.ts"
 
-#: The TypeScript fixtures of tests/fixtures/ts/, the rest are the reference's own.
+#: The TypeScript fixtures of the repository, the rest are the reference's own.
 OWN_FIXTURES = (
     "async-order-app", "docs-app", "errors-app", "federation-boundary-app", "federation-catalogue-app",
     "identity-app", "numbers-app", "plugins-app", "pubsub-app", "roots-app", "sentry-app",
@@ -216,7 +216,7 @@ def variants_of(name: str) -> tuple:
 
 def fixture_source(name: str, root=None) -> Path:
     """The source directory of a TypeScript fixture, the repository's own or the reference's, or of an app of the
-    TypeScript option under tests/ts1/apps that no fixture holds, such as zitadel-providers-app."""
+    TypeScript option that no fixture holds, such as zitadel-providers-app."""
     base = paths(root).root
     own = base / "tests" / "fixtures" / "ts" / name
     if own.is_dir():
@@ -367,7 +367,7 @@ def issuer_environment(name: str, variant: str, side: str, issuer: str, tls_file
 
 
 def graphql_ready(port: int) -> bool:
-    """The readiness probe of docs/harness.md section 2.1, over the raw client."""
+    """The readiness probe, over the raw client."""
     from .http import send, tcp
 
     answer, _ = send(tcp(port), b'POST /graphql HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\n'
@@ -398,7 +398,7 @@ def serve_reference(name: str, port: int, variant: str = "default", node_env: st
 
 def serve_development(name: str, port: int, variant: str = "default", env: dict | None = None, root=None,
                       timeout_s: float = 40.0, port_offset: int = 0) -> Server:
-    """Serves the development variant of a fixture through tests/sidecar/serve-dev.mjs.
+    """Serves the development variant of a fixture through the sidecar of the development server.
 
     A variant and `env` reach the front as they reach `serve_reference`: the
     overlay's variant or a fixture's own in `AOSABI_CONFIG`, then `env`, then

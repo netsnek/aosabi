@@ -28,6 +28,9 @@ use aosabi_json::case::lower_ascii_exact;
 use crate::utils::header::with_header;
 
 /// Returns whether `c` is matched by `\s` of a JavaScript regular expression.
+///
+/// The class `\s` matches the white space and the line terminators, which hold
+/// U+FEFF and leave out U+0085.
 fn is_js_space(c: char) -> bool {
     matches!(
         c,

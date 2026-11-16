@@ -2,7 +2,7 @@
 /*
  * graphtp lib/sse: the stream of server sent events a 200.3 becomes, frame for frame the event
  * stream GraphQL Yoga writes over HTTP, and the reader of such a stream that subscriptionClient
- * runs (docs/graphtp-fetch.md sections 7 and 12.4).
+ * runs.
  *
  * A stream opens with the comment `:\n\n`, writes `event: next\ndata: ` with the value of each
  * `next` entry and `\n\n`, and ends with `event: complete\ndata:\n\n`, as Yoga 5.18.0 writes them.
@@ -62,7 +62,7 @@ export function nextFrame(value) {
 
 /**
  * Tells whether the `accept` of a request admits the stream: text/event-stream, text/* or * / *, or
- * no accept at all, as Yoga reads a missing accept (docs/graphtp-fetch.md section 7).
+ * no accept at all, as Yoga reads a missing accept.
  */
 export function admitsStream(accept) {
   if (accept === null || accept.trim() === '') return true

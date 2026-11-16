@@ -24,9 +24,8 @@ from .paths import find_root
 
 SCHEMA_FILE = "schema.graphql"
 
-# The pins of docs/harness.md section 8, which sit in the parameters cell of
-# each of the three notebooks and are repeated here as the defaults a helper
-# checks against.
+# The pins, which sit in the parameters cell of each of the three notebooks and
+# are repeated here as the defaults a helper checks against.
 EXPECTED_SCHEMAS = 10
 EXPECTED_EGO_VIEWS = 361
 EXPECTED_LARGEST_BOXES = 127

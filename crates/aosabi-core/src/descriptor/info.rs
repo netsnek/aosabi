@@ -71,9 +71,8 @@ pub struct DocTag {
 /// Where a described item stands in its source and the documentation block it
 /// carries there, as written.
 ///
-/// The build writes these facts into `authoring.json`, which check C2 of
-/// `tests/notebooks/12_authoring_parity.ipynb` compares with the declarations
-/// of the TypeScript twin. The inference reads none of them.
+/// The build writes these facts into `authoring.json`. The inference reads none
+/// of them.
 #[derive(Clone, Copy, Debug)]
 pub struct Site {
     /// The value of `file!()` at the macro that describes the item.

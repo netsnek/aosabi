@@ -1,14 +1,13 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the test CA and the certificate of 127.0.0.1, through the openssl command line.
 
-The HTTPS port of tests/harness/mock_ingest.py serves the certificate this
-module writes, and both sides trust it through the CA file alone: the reference
-through `NODE_EXTRA_CA_CERTS`, which Node reads at its start and adds to its
-bundled roots, and the twin through `AOSABI_EXTRA_CA_CERTS`, the name
-`aosabi-fetch` reads. No Python package makes a key or a certificate here,
-because tests/pyproject.toml gains none, so every file comes from the `openssl`
-of the machine, which risk 23 of the plan asks 00_environment to find present
-in round 2.
+The HTTPS port of the mock ingest serves the certificate this module writes,
+and both sides trust it through the CA file alone: the reference through
+`NODE_EXTRA_CA_CERTS`, which Node reads at its start and adds to its bundled
+roots, and the twin through `AOSABI_EXTRA_CA_CERTS`, the name `aosabi-fetch`
+reads. No Python package makes a key or a certificate here, because
+tests/pyproject.toml gains none, so every file comes from the `openssl` of the
+machine, whose version the notebook of the environment prints.
 
 `generate` writes a fresh set on every call, under target/harness/tls/ unless
 the caller names a directory:

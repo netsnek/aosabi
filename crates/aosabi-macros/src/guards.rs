@@ -11,9 +11,10 @@
 //! body.
 //!
 //! A TypeScript resolver states its permission in its first statements,
-//! `requireRole('editor', 'admin')` or `authorize(p => ...)`, and check C3 of
-//! `tests/notebooks/12_authoring_parity.ipynb` compares those calls of a pair
-//! per path of the intermediate representation.
+//! `requireRole('editor', 'admin')` or `authorize(p => ...)`. [`facts`] scans
+//! a body of an inline entry, a method, a static or a free resolver by the
+//! rules that the operation `authoring_map` of the IR sidecar applies to the
+//! TypeScript twin.
 //!
 //! 1. The leading run is the statements from the start of the body while each
 //!    is an expression statement whose expression is a call of a path whose

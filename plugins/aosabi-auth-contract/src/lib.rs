@@ -25,9 +25,7 @@
 //! through no atomic operation, because the core of the ESP32-C3 has none.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/30_http_tier1.ipynb`
-//! and `12_authoring_parity.ipynb`, whose compile cells `c6-identity-*` hold
-//! the provider seam.
+//! section 3.
 
 #![no_std]
 

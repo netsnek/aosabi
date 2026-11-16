@@ -4,7 +4,8 @@
  * serves the Yoga instances of the in process capture through the GraphTP
  * listener of aosabi-core over real Unix Sockets.
  *
- * No analogue in the reference.
+ * No analogue in the reference. Each listener serves its instance over the
+ * fetch of a booted app, as an app is served.
  */
 
 //! The flag `--graphtp DIR` of the primitive `yoga`.

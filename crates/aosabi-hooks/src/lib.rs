@@ -34,9 +34,7 @@
 //! | `document_string_map` | `document-string-map.js` | the source text of a parsed document |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/30_http_tier1.ipynb`
-//! for the hooks of a request and `tests/notebooks/40_sse.ipynb` for the
-//! stream of a subscription.
+//! section 3.
 
 pub mod context;
 pub mod create;

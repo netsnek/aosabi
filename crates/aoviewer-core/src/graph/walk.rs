@@ -64,8 +64,8 @@ use crate::model::{
     RootKind, //
 };
 
-/// The three walks of `docs/aoviewer.md` section 2.3, each a bit set over the
-/// nodes, computed once.
+/// The three walks of reachability, each a bit set over the nodes, computed
+/// once.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Walks {
     /// The walk of aoviewer, the definition of reachable.

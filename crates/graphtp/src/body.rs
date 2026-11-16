@@ -5,7 +5,7 @@
  *
  * No analogue in the reference. The threshold and the rule are those of the
  * specification, and the zlib header they read is that of RFC 1950 section 2.2
- * under the profile of section 3.2.
+ * under the profile.
  */
 
 //! The threshold, >128 B, and the coding of a body by its first byte.
@@ -25,7 +25,7 @@ pub const THRESHOLD: usize = 128;
 pub enum Coding {
     /// The bytes as the service or the client wrote them.
     Plain,
-    /// One zlib stream of the profile of `docs/graphtp.md` section 3.2.
+    /// One zlib stream of the profile of `Documentation/guides/graphtp.md`.
     Zlib,
 }
 
@@ -54,7 +54,7 @@ pub fn coding_of(body: &[u8]) -> Result<Option<Coding>, WireError> {
 }
 
 /// Tells whether `cmf` and `flg` are a zlib header of the profile of
-/// `docs/graphtp.md` section 3.2.
+/// `Documentation/guides/graphtp.md`.
 ///
 /// CM is the low four bits of `cmf` and must be 8, CINFO its high four bits
 /// and at most 4, FCHECK makes `cmf * 256 + flg` a multiple of 31, and FDICT,

@@ -313,9 +313,8 @@ fn push_values(schema: &Schema, ty: TypeId, blocks: &mut Vec<Block>) {
 
 /// Appends the input fields table of the input `ty` and the details it cut.
 ///
-/// The table has the columns of `docs/documentation-generator.md` section 4,
-/// with no deprecation, and the deprecated group lists a deprecated input
-/// field.
+/// The table has the columns of the documents, with no deprecation, and the
+/// deprecated group lists a deprecated input field.
 fn push_input_fields(schema: &Schema, ty: TypeId, blocks: &mut Vec<Block>) {
     let (model, tr) = (&schema.model, &schema.transformed);
     let mut details = Vec::new();

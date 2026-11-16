@@ -22,10 +22,10 @@
 //! the diagrams of a route and the viewer for one route. The parts of the last
 //! call turn into JSON after its clock stops, so `ns` times no JSON. `routes`
 //! is a list of hashes or the word `types`, the route of every node of the
-//! graph in schema order under the option string `options`, which step 14 of
-//! `51_viewer_core` times. The routes run grouped by their transforms, so the
-//! schema of each set is built once, and answer in the order of the request. A
-//! refused input answers its refusal beside `load_ns`.
+//! graph in schema order under the option string `options`, which the measure
+//! of the viewer core times. The routes run grouped by their transforms, so
+//! the schema of each set is built once, and answer in the order of the
+//! request. A refused input answers its refusal beside `load_ns`.
 //!
 //! `peak_rss_kib` is the peak resident set of the process in KiB, the line
 //! `VmHWM` of `/proc/self/status`, read after the last call, or null where

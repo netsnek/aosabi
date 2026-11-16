@@ -13,8 +13,7 @@
 //! the facade, so a crate of the native layer opens each file with one line,
 //! and an explicit import of any name stays as good. Clippy's lint
 //! `wildcard_imports`, which the group `pedantic` holds, exempts a glob of a
-//! module named `prelude`, which the compile cell `c6-prelude-pedantic` of
-//! `tests/fixtures/rs/c6/cells.toml` records.
+//! module named `prelude`.
 //!
 //! | Name | Holds |
 //! | --- | --- |

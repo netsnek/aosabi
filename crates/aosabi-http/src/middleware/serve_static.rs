@@ -43,17 +43,16 @@
 //!
 //! The answer carries no `Last-Modified` and no `ETag`.
 //!
-//! Four readings of the adapter are kept where HTTP or a reader expects
-//! otherwise, each a quirk proposed to the register of `docs/byte-equality.md`
-//! section 13. The `Date` of a range answer is the birth time of the file,
-//! where HTTP gives `Date` the time the message originated. The `Range` is read
-//! by `parseInt` with no check, so a suffix range `bytes=-N` reads from 0, a
-//! range that starts inside the file and ends past it while it is no longer
-//! than the file declares more bytes than it sends, and a start past the end or
-//! below 0 fails the check of `fs.createReadStream`, whose `RangeError` the
-//! error handler answers, where HTTP answers 416. An `OPTIONS` declares the
-//! length of the file and sends no body. A file whose extension names a
-//! property of `Object.prototype` fails in `getMimeType` with a `TypeError`.
+//! Three readings of the adapter are kept where HTTP or a reader expects
+//! otherwise, each a named quirk. The `Date` of a range answer is the birth
+//! time of the file, where HTTP gives `Date` the time the message originated.
+//! The `Range` is read by `parseInt` with no check, so a suffix range
+//! `bytes=-N` reads from 0, a range that starts inside the file and ends past
+//! it while it is no longer than the file declares more bytes than it sends,
+//! and a start past the end or below 0 fails the check of
+//! `fs.createReadStream`, whose `RangeError` the error handler answers, where
+//! HTTP answers 416. A file whose extension names a property of
+//! `Object.prototype` fails in `getMimeType` with a `TypeError`.
 
 use std::{
     rc::Rc,

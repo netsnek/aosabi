@@ -34,20 +34,26 @@
 //! result that is an error is thrown, what is left goes to `T::from_delegated`,
 //! and the guard then answers `None` for the typed value it rejects, so the
 //! guard reads the record `T` reads and not the raw object the reference hands
-//! its guard.
+//! its guard. The read of a pulled record is lenient: a member the value does
+//! not carry, a member that holds an error and a member the field type cannot
+//! read each read as the value an absent member reads as, its `Default`, and
+//! only a value that is no object is refused, so the guard meets every object
+//! the reference's guard meets.
 //!
 //! The cache holds one slot per URL and headers function, the introspection in
 //! flight with the tasks that wait on it and then the wrapping schema beside
 //! the subschema configuration its resolvers reach, whose executor sends with
 //! that headers function. The map of the reference is keyed by the URL alone,
 //! so every later federation of a URL sends through the executor and the
-//! headers of the first, the credentials of the first among them, which the
-//! owner answered with "A2 Fix it", so a federation with another headers
+//! headers of the first, the credentials of the first among them. This cache is
+//! keyed by the headers function as well, so a federation with another headers
 //! function introspects the URL once more and sends through an executor of its
 //! own, the entry of the cache in `NOT_PORTED`. The patches, the policies and
 //! `strict` are read from the delegating federation at each delegation and
 //! never from the slot, so the headers function is the one part of a
-//! configuration the slot keeps.
+//! configuration the slot keeps. A failed introspection leaves the cache only
+//! when the slot is still the one its attempt installed, an identity guard, so
+//! the next delegation introspects again.
 
 use std::{
     cell::RefCell,
@@ -819,11 +825,11 @@ thread_local! {
     /// The map is per runtime thread, which is per process for a served
     /// card with its one runtime thread, so two federations over one URL
     /// with one headers function share a slot as the module wide map of the
-    /// reference does (the plan, section FEDERATION, rule 6), and a
-    /// federation with another headers function takes a slot of its own,
-    /// where the reference shares the first (the entry of `NOT_PORTED`).
-    /// A URL holds one slot for each headers function its federations
-    /// name, so the slots of one URL are few and found by a scan.
+    /// reference does, and a federation with another headers function takes
+    /// a slot of its own, where the reference shares the first (the entry
+    /// of `NOT_PORTED`). A URL holds one slot for each headers function its
+    /// federations name, so the slots of one URL are few and found by a
+    /// scan.
     static SCHEMA_CACHE: RefCell<IndexMap<String, Vec<Rc<Slot>>, KeyHasherBuilder>> =
         RefCell::new(IndexMap::default());
 }

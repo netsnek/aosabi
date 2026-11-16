@@ -21,7 +21,7 @@
 //! section 7).
 //!
 //! The codes `AO-C` are the command line's own. `AO-R0105` is the design code
-//! of `docs/device-cards.md` section 6 for a host tool the card needs, which
+//! for a host tool the card needs, which
 //! the command line uses for a missing standard library of the card's target.
 //!
 //! A code that no refusal issues any more leaves [`CODES`] and stands in
@@ -105,13 +105,14 @@ pub const AO_C0405: &str = "AO-C0405";
 pub const AO_C0501: &str = "AO-C0501";
 /// A remote type name that collides with an item the registry writes.
 pub const AO_C0502: &str = "AO-C0502";
-/// A command that lands with a later milestone.
+/// A command that lands with a later release.
 pub const AO_C0601: &str = "AO-C0601";
 /// The container engine failed.
 pub const AO_C0701: &str = "AO-C0701";
 
-/// Every code of the command line in the order of the plan's table, with
-/// `AO-C0105`, `AO-C0106` and `AO-C0107` after the codes of the project.
+/// Every code of the command line, the codes of the project first,
+/// `AO-C0105`, `AO-C0106`, `AO-C0107` and `AO-C0108` after them, and
+/// `AO-C0405` after the codes of `new`.
 pub const CODES: [Code; 21] = [
     Code {
         id: AO_C0101,

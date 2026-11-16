@@ -67,7 +67,7 @@ def identity_cases() -> list:
     add("id-26", "default", get("/admin/secure/data", U1_PLAIN + [("x-perm", "admin:secure")]),
         "a middleware of a child app that passes")
     add("id-27", "default", get("/early/whoami", U1),
-        "{\"id\":null} on the reference, the principal's id on the twin, divergence D75")
+        "{\"id\":null} on the reference, the principal's id on the twin, a named divergence")
     add("id-28", "default", post("{whoami}", [("x-user-id", "")]), "an empty header is anonymous")
     add("id-29", "default", get(get_target("{adminOnly}")), "the mapping over GET")
     add("id-30", "default", get("/admin/export", role("viewer")), "the branch of the route example, 403")

@@ -3,7 +3,12 @@
  * aosabi-devtool homa_sim scenario: the scenario a homa-sim request names,
  * read from its JSON, and the run of it over a simulated link.
  *
- * No analogue in the reference.
+ * No analogue in the reference. A run drives two endpoints of the crate homa
+ * over one link of homa::sim, and a fabric run drives one endpoint on each
+ * host of the switch of homa::sim. Either takes the transmit decisions of each
+ * end from Endpoint::transmittable and Endpoint::last_data and the decisions
+ * of its grant scheduler from Endpoint::grant_decisions, which the crate
+ * exposes for this seam under its feature sim.
  */
 
 //! The scenarios of the `homa-sim` primitive.

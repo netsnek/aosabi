@@ -21,7 +21,7 @@
 //!   line `build.rs` of its declaration list. A facade named under
 //!   `[build-dependencies]` alone is no normal dependency.
 //! - `AO-C0102` for a package of the derive path whose library target does
-//!   not stand at `src/index.rs`, the entry of `docs/authoring.md` section 2.
+//!   not stand at `src/index.rs`.
 //! - `AO-C0103` for a package that names `aosabi` from two sources or at two
 //!   requirements, or whose workspace lists members beside it. The facade
 //!   named in `[dependencies]` and again in `[target.'cfg(unix)'.dependencies]`
@@ -778,7 +778,7 @@ fn is_library_kind(kind: &JsValue) -> bool {
 }
 
 /// Returns whether the facade the metadata resolved declares the feature
-/// `mirror`, which every facade on declares.
+/// `mirror`, which every newer facade declares.
 fn declares_mirror(metadata: &JsValue) -> bool {
     cargo::items(metadata, "packages")
         .iter()

@@ -1,6 +1,7 @@
-# The authorization contract of layer 4. It builds with no standard library
-# and needs an allocator, and it names aosabi-json alone, so every target
-# links it, riscv32imc-unknown-none-elf among them.
+# The authorization contract of layer 4. It holds ForbiddenError, the
+# principal, its checks and the identity provider seam. It builds
+# with no standard library and needs an allocator, and it names aosabi-json
+# alone, so every target links it, riscv32imc-unknown-none-elf among them.
 [package]
 name = "aosabi-auth-contract"
 version.workspace = true

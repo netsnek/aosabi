@@ -14,10 +14,12 @@
 //!
 //! Hono's `compress()` codes an answer as `gzip`, the format of RFC 1952, or as
 //! `deflate`, which HTTP names for the zlib format of RFC 1950, since it pipes the
-//! body through `CompressionStream` with that name. The wrapper frames the raw
-//! DEFLATE data of RFC 1951 that [`graphtp::deflate::Encoder`] writes, the one
-//! DEFLATE encoder of the workspace, so the module adds the header and the trailer
-//! of zlib and nothing else.
+//! body through `CompressionStream` with that name. Aosabi codes `deflate` alone,
+//! so an answer Pylon codes as `gzip` is `deflate` or identity here and equal to
+//! Pylon's after decoding. The wrapper frames the raw DEFLATE data of RFC 1951
+//! that [`graphtp::deflate::Encoder`] writes, the one DEFLATE encoder of the
+//! workspace, so the module adds the header and the trailer of zlib and nothing
+//! else.
 //!
 //! - [`zlib::Encoder`] writes one zlib stream at the window of its scratch.
 //!
@@ -31,9 +33,7 @@
 //! changes the ratio and never the validity.
 //!
 //! Byte equality is judged after decoding, so a coded answer is valid when it
-//! decodes to the plain bytes. The judging notebook is
-//! `tests/notebooks/37_content_coding.ipynb`, whose rows of the HTTP wrapper
-//! decode every stream with Python's `zlib`.
+//! decodes to the plain bytes.
 
 use graphtp::{
     deflate::{

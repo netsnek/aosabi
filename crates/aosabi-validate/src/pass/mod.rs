@@ -89,18 +89,17 @@
 //! its callers call unconditionally.
 //!
 //! An optimizing build inlines the stubs, so the served twin of
-//! `in-context-app`, the Worker module of `tests/budget/worker`, the RV32 probe
-//! of `tests/notebooks/09_single_pass_budget.ipynb` and the host probe
-//! `tests/budget/pass`, built at the conventional validation in their profiles
-//! `release`, `worker`, `z` and `release`, hold no symbol of the module. The
-//! host probe built so in the profile `dev` keeps out of line the stubs it
-//! calls and the functions of the other types of the module it names, the
-//! verdict, the options and the kind of a token among them, and no function of
-//! the walk, of the checks after it, of the builder of a table, of the feed of
-//! the lexer or of the buffers of the walk.
+//! `in-context-app`, the Worker module, the RV32 probe and the host probe,
+//! built at the conventional validation in their profiles `release`, `worker`,
+//! `z` and `release`, hold no symbol of the module. The host probe built so in
+//! the profile `dev` keeps out of line the stubs it calls and the functions of
+//! the other types of the module it names, the verdict, the options and the
+//! kind of a token among them, and no function of the walk, of the checks after
+//! it, of the builder of a table, of the feed of the lexer or of the buffers of
+//! the walk.
 //!
 //! There is no test in this module, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/09_single_pass.ipynb`.
+//! section 3.
 
 #![deny(
     clippy::indexing_slicing,
@@ -150,9 +149,10 @@ pub const MAX_DEPTH: u32 = 64;
 ///
 /// The setting reads `single-pass`, which an unset setting means, or
 /// `conventional`, and any other value fails the build with the message of the
-/// assertion below. A build of the conventional validation holds the types and
-/// the check of [󰀂](Setting) under the names of the module, and every
-/// validation of it runs the rules.
+/// assertion below. The choice is a setting of the build, with the single pass
+/// as its default. A build of the conventional validation holds the types and
+/// the check of [`Setting<false>`](Setting) under the names of the module, and
+/// every validation of it runs the rules.
 pub const CARRIED: bool = matches!(SETTING, None | Some(b"single-pass"));
 
 /// The build setting `AOSABI_VALIDATION` as its bytes, `None` where the build

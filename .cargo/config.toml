@@ -3,8 +3,10 @@
 #
 # One alias, so the one tool that writes the committed viewer products runs as
 # cargo xtask viewer-assets from the repository root. The wasm files and
-# assets.lock have that writer and no other. The alias carries --locked,
-# because every build of the harness and of continuous integration passes it.
+# assets.lock have that writer and no other. A later release adds the two font
+# files to it under --fonts, so until then no tool writes them. The alias
+# carries --locked, because every build of the harness and of continuous
+# integration passes it.
 
 [alias]
 xtask = "run --locked --package xtask --"

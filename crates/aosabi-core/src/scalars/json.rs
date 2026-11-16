@@ -2,7 +2,8 @@
 /*
  * aosabi-core scalars json: the bound `JSON` scalar.
  *
- * Binds `JSONResolver` of graphql-scalars as it stands.
+ * The scalar is `JSONResolver` of graphql-scalars as
+ * it stands.
  */
 
 //! The bound `JSON` scalar, the `JSONResolver` of graphql-scalars.

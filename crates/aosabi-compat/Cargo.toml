@@ -1,7 +1,6 @@
-# The compatibility register. Documentation/architecture.md section 11 names it the one
-# place a Pylon defect that Aosabi reproduces on purpose is written down, so a
-# failing comparison cites an identifier rather than a guess. It carries no
-# dependency and no code beyond the register itself.
+# The compatibility register. It is the one place a Pylon defect that Aosabi reproduces on
+# purpose is written down, so a failing comparison cites an identifier rather than a guess.
+# It carries no dependency and no code beyond the register itself.
 [package]
 name = "aosabi-compat"
 version.workspace = true

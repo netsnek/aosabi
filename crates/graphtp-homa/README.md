@@ -13,13 +13,13 @@ the engine they have. The module `rpcs` is the one adapter that calls Homa.
 | Property | Value |
 | --- | --- |
 | Standard library | None, `#![no_std]` with `alloc`, so it builds for `riscv32imc-unknown-none-elf` and `wasm32-unknown-unknown` |
-| Dependencies | `graphtp` and `homa`, the owner's crates, and no other |
+| Dependencies | `graphtp` and `homa`, both of this workspace, and no other |
 | Features | `server` over the server role of `homa`, `client` over its client role, both by default |
 | `unsafe` | None, `#![forbid(unsafe_code)]` |
 | Edition and lowest Rust | Those of the workspace, edition 2024 and Rust 1.95.0 |
 | Tests | None in Rust. The judge in this repository is the Jupyter notebook `tests/notebooks/25_carrier_unix.ipynb`, and a notebook of the project that runs outside it holds the limits (section What the judges measured) |
 | Licence | MIT |
-| Publishing | `publish = false`, since publishing is the owner's step, once `homa` has a release |
+| Publishing | `publish = false`, so nothing in this workspace publishes the crate |
 
 ## The modules
 
@@ -32,8 +32,8 @@ the engine they have. The module `rpcs` is the one adapter that calls Homa.
 
 ## A server
 
-`Server::request` takes each whole request with its peer and its RPC. It checks the 11 rules of
-section 5.3 in their order through `graphtp::wire`, answers a refusal with its 2 bytes, answers a
+`Server::request` takes each whole request with its peer and its RPC. It checks the 11 rules
+in their order through `graphtp::wire`, answers a refusal with its 2 bytes, answers a
 PULL with the batch of the peer's ready entries or parks it, refuses a second PULL beside a parked
 one with 409.1 and a PULL of a peer with no stream with 404.1, and answers a CANCEL with one
 `cancelled` entry per stream it ends. A CANCEL that ends the peer's last stream first answers the
@@ -102,14 +102,14 @@ rpcs::drive(&mut rpcs, peer, &mut client, &mut out)?;
 The server of the crate runs under the GraphTP listener of `aosabi-core` as the card `test-graphtp`
 over a real Unix Socket, on a `SOCK_SEQPACKET` socket and on the stream socket of the prefixed
 framing, with `tests/harness/homa/graphtp.py` over the Python Homa engine as its client. The server
-rows of `25_carrier_unix` hold on both forms: the sizes of the exchanges of `docs/graphtp.md`
-section 6.2, one parked PULL serving ten streams, 409.1 on a second PULL, the stream answers applied
-by `seq` in 200 orders with 0 lost events, CANCEL of the peer's only handle, of its last handle and
-of handle 0 answering the parked PULL with 404.1 first while CANCEL of one handle of two leaves it
-parked, a restarted client taking its count from CANCEL of handle 0, the restart cases of section
-2.7 with 0 double runs of an unmarked OPERATION and every unknown outcome reported, 429.1 at the
-bound, back pressure with its queue and a link down ending every stream of the peer and, on one
-listener whose link goes down and up again, setting the peer's count back to 0. A notebook of the
-project that runs outside this repository holds the bounds of `Config` at their value and one past
-it, 413.0, 431.0, 429.1 and 500.1, and 2,000 hostile messages a card with 0 panics. The client rows of `25_carrier_unix`
-join with `aosabi-link`, the client the bridge runs over.
+rows of `25_carrier_unix` hold on both forms: the sizes of the exchanges, one parked PULL serving
+ten streams, 409.1 on a second PULL, the stream answers applied by `seq` in 200 orders with 0 lost
+events, CANCEL of the peer's only handle, of its last handle and of handle 0 answering the parked
+PULL with 404.1 first while CANCEL of one handle of two leaves it parked, a restarted client taking
+its count from CANCEL of handle 0, the restart cases with 0 double runs of an unmarked OPERATION and
+every unknown outcome reported, 429.1 at the bound, back pressure with its queue and a link down
+ending every stream of the peer and, on one listener whose link goes down and up again, setting the
+peer's count back to 0. A notebook of the project that runs outside this repository holds the bounds
+of `Config` at their value and one past it, 413.0, 431.0, 429.1 and 500.1, and 2,000 hostile
+messages a card with 0 panics. The client rows of `25_carrier_unix` join with `aosabi-link`, the
+client the bridge runs over.

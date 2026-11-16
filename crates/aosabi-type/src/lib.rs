@@ -61,8 +61,7 @@
 //! The crate builds with no standard library and needs an allocator, because
 //! the bare metal build of a microcontroller card links it. The `std` feature
 //! is the configuration symbol of a host build and gates nothing today. There
-//! is no test in this crate, which is the rule of CONTRIBUTING.md section 3,
-//! and the judging notebook is `tests/notebooks/02_language.ipynb`.
+//! is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 

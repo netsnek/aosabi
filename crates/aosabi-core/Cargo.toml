@@ -40,13 +40,11 @@ runtime = [
 # the feature std of aosabi-json, which keys the hasher of every map where the
 # target's standard library draws its keys from the operating system. A build
 # with runtime and without std keeps the fixed hasher, which is what a build
-# with no standard library needs
-# (docs/decisions/ADR-0026-runtime-graphql-over-aoenvelope.md).
+# with no standard library needs.
 std = ["aosabi-json?/std"]
-# The GraphTP listener of docs/graphtp-in-aosabi.md section 3, the module
-# graphtp. It takes the crate graphql-over-graphtp, the listener with no
-# standard library, and nothing of the feature runtime, so a card with no
-# standard library builds it.
+# The GraphTP listener, the module graphtp. It takes the crate
+# graphql-over-graphtp, the listener with no standard library, and nothing of
+# the feature runtime, so a card with no standard library builds it.
 homa = ["dep:graphql-over-graphtp"]
 # The watcher of the console, which an SDK installs to read the lines the
 # logger and the serving plugin write through the console, as the console

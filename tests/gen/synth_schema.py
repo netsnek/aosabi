@@ -22,13 +22,13 @@ and the neighbours of all types together grow with the type count alone, which
 is the shape the linear pass is judged on.
 
 The output is an introspection result in the shape the operation introspect of
-`tests/sidecar/graphql-js.mjs` answers, `{"data":{"__schema":..}}`, with the
-keys in the order of `getIntrospectionQuery` of graphql-js 16.12.0 under its
-four options and written the way `JSON.stringify` writes it. It carries the
-declared types alone, in the order a schema of the compatibility layer prints them, so the eight
-introspection types and the five specified directives a server adds are left
-out, and the five specified scalars carry no description. The transforms of the
-core fold the introspection types and the twelve branded scalars, the five
+the graphql-js sidecar answers, `{"data":{"__schema":..}}`, with the keys in the
+order of `getIntrospectionQuery` of graphql-js 16.12.0 under its four options
+and written the way `JSON.stringify` writes it. It carries the declared types
+alone, in the order a schema of the compatibility layer prints them, so the
+eight introspection types and the five specified directives a server adds are
+left out, and the five specified scalars carry no description. The transforms of
+the core fold the introspection types and the twelve branded scalars, the five
 specified ones among them, into the field `builtin` of `Transformed`. The
 specified directives are no types and never enter that field. All three parts
 are left out to keep text that graphql-js wrote out of this repository.
@@ -238,7 +238,7 @@ P_VALUE_DEPRECATED = 300
 MAX_ATTEMPTS = 64
 
 #: The composite kinds, object, interface and union, whose types the walks of
-#: `docs/aoviewer.md` section 2.3 count.
+#: aoviewer count.
 COMPOSITE_KINDS = ("OBJECT", "INTERFACE", "UNION")
 
 

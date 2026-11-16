@@ -6,6 +6,8 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * The workspace is the boot entry of an app, which the author never edits.
  */
 
 //! The generated workspace.

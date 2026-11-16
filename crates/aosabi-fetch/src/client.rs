@@ -2,7 +2,10 @@
 /*
  * aosabi-fetch: the outbound client and its idle connections.
  *
- * No analogue file on the reference side.
+ * No analogue file on the reference side. The behaviour is that of the Fetch
+ * standard as far as a server's outbound call uses it,
+ * https://fetch.spec.whatwg.org/#fetch-method, over the connections the Client
+ * of undici 7.22.0 keeps.
  */
 
 //! `NativeFetch`, the driver of the network capability over TCP and TLS.

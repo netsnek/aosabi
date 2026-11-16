@@ -8,8 +8,8 @@
  * Changed by the Aosabi authors.
  *
  * The constant text of the message is the extracted literal
- * schema_invalid_message.rs beside this file, which tools/provenance writes
- * and this file only reads.
+ * schema_invalid_message.rs beside this file, whose bytes are pinned and which
+ * this file only reads.
  */
 
 //! The validation that runs before a build writes a byte.

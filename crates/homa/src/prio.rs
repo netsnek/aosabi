@@ -3,9 +3,7 @@
  * homa prio: the priority levels, the unscheduled cutoffs and the scheduled
  * levels.
  *
- * The shapes are those of the Homa design note, second version,
- * homa/design.md sections 3.5 and 7.6, lines 583 to 606 and 2630 to 2690, and
- * the rules are HomaModule's at commit 50d65305: its default levels and
+ * The rules are HomaModule's at commit 50d65305: its default levels and
  * cutoffs, homa_utils.c lines 66 to 84, the level of an unscheduled message,
  * homa_peer.c lines 700 to 710, and the level of a grant, homa_grant_priority
  * of homa_grant.c lines 282 to 303, at

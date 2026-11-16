@@ -18,10 +18,10 @@ workspace = true
 [features]
 # The primitive host-queue, which runs the scenarios of the queue of an agent
 # that a host owns on aosabi-execute with its feature host-queue. Only the
-# notebook 13_ts1_boundary builds the seam with it, in a target directory of
-# its own, so the default build and every primitive in it run the agent
-# without that queue, as every card but the module of the npm package aosabi
-# runs it.
+# checks of the boundary of the TypeScript option build the seam with it, in
+# a target directory of their own, so the default build and every primitive
+# in it run the agent without that queue, as every card but the module of the
+# npm package aosabi runs it.
 host-queue = ["aosabi-execute/host-queue"]
 
 [dependencies]
@@ -85,8 +85,8 @@ aosabi-hooks = { path = "../aosabi-hooks" }
 graphql-over-http = { path = "../graphql-over-http" }
 # The crate behind the operation cache of the graphtp primitive, whose table and
 # estimate answer what the request cache of a card keeps of a document under its
-# budget, the answer section 8 of 38_card_limits holds against the budget of the
-# card.
+# budget, the answer the checks of the card limits hold against the budget of
+# the card.
 aosabi-cache = { path = "../aosabi-cache" }
 # The crate behind the http primitive, whose --tables prints the tables of Node
 # that the node feature holds, behind the operation http-coding of the graphtp
@@ -101,6 +101,9 @@ aosabi-http = { path = "../aosabi-http", default-features = false, features = ["
 # is read through, so the seam and the command share one reader.
 aoviewer-core = { path = "../aoviewer-core" }
 aoviewer-docs = { path = "../aoviewer-docs" }
+# The crate behind the federation primitive, the transforms, the documents, the
+# patch transform, the merge and the body of a delegation of Federation, which a
+# notebook holds to the federation sidecar.
 aosabi-federation = { path = "../../plugins/aosabi-federation" }
 # The crate behind the graphtp primitive, the types and the wire codec of
 # GraphTP/1 with its DEFLATE core, which the notebooks reach through this seam
@@ -123,7 +126,7 @@ aosabi-carrier-lora = { path = "../aosabi-carrier-lora", features = ["model"] }
 # The reader of the plain source of a crate behind the source primitive, the
 # feature source of aosabi-build, which brings syn on the build host. The table
 # names it for every target but wasm32, so the build of this binary for
-# wasm32-unknown-unknown that 02_language makes leaves syn out.
+# wasm32-unknown-unknown that the checks of the language make leaves syn out.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 aosabi-build = { path = "../aosabi-build", features = ["source"] }
 
@@ -138,27 +141,26 @@ aosabi-build = { path = "../aosabi-build", features = ["source"] }
 aosabi-cli = { path = "../aosabi-cli" }
 
 # The Unix Socket transports of homa, which homa-unix and the socket links of
-# homa-sim run over real sockets. They build on Linux alone, and
-# tests/notebooks/02_language.ipynb builds this binary for
-# wasm32-unknown-unknown as well, so the feature unix joins sim on Linux.
+# homa-sim run over real sockets. They build on Linux alone, and this binary
+# builds for wasm32-unknown-unknown as well, so the feature unix joins sim on
+# Linux.
 [target.'cfg(target_os = "linux")'.dependencies]
 homa = { path = "../homa", features = ["sim", "unix"] }
-# The device carriers of stage H3 of the Homa track, Serial Line, USB and
-# Bluetooth, with their drivers of Linux user space, which the carrier primitive
-# runs over the runtime of aosabi-serve, the poll reactor of a build without its
-# feature linux. The drivers build on Linux alone. The feature trace of the
-# Bluetooth carrier keeps the time and the compact header of every packet of its
-# GATT data path, which the operation serve answers where a notebook turns it
-# on. The devtool alone names it, as it alone names the feature sim of homa, so
-# no card keeps a trace.
+# The device carriers of Homa, Serial Line, USB and Bluetooth, with their
+# drivers of Linux user space, which the carrier primitive runs over the runtime
+# of aosabi-serve, the poll reactor of a build without its feature linux. The
+# drivers build on Linux alone. The feature trace of the Bluetooth carrier keeps
+# the time and the compact header of every packet of its GATT data path, which
+# the operation serve answers where a notebook turns it on. The devtool alone
+# names it, as it alone names the feature sim of homa, so no card keeps a trace.
 aosabi-carrier-bluetooth = { path = "../aosabi-carrier-bluetooth", features = ["linux", "channel", "trace"] }
 aosabi-carrier-serial = { path = "../aosabi-carrier-serial", features = ["linux"] }
 aosabi-carrier-usb = { path = "../aosabi-carrier-usb", features = ["linux", "bulk", "serial"] }
 aosabi-serve = { path = "../aosabi-serve" }
-# The carrier Network of stage H4 with its IP driver over raw IP 146, which the
-# homa-ip primitive serves on the runtime of aosabi-serve and in a loop of its
-# own, beside a client of the crate homa over the same raw socket. The driver
-# builds on Linux alone.
+# The carrier Network with its IP driver over raw IP 146, which the homa-ip
+# primitive serves on the runtime of aosabi-serve and in a loop of its own,
+# beside a client of the crate homa over the same raw socket. The driver builds
+# on Linux alone.
 aosabi-carrier-network = { path = "../aosabi-carrier-network", features = ["homa-ip"] }
 # The outbound client of the Linux cards behind the operation delegate of the
 # federation primitive, whose front reaches the remote stub over the loopback

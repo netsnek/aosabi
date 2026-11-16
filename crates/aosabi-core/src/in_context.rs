@@ -17,10 +17,10 @@
 //! [`get_locale`] and [`get_in_context`].
 //!
 //! The SDL of the directive is the extracted literal `in_context.graphql`
-//! beside this file, which `tools/provenance` writes. The plugin
-//! `use_in_context` of `plugins::in_context` reads the directive in its hook
-//! `onExecute` over HTTP, and the service below HTTP calls
-//! [`apply_in_context`] where that hook would run, over the same reading.
+//! beside this file, pinned byte for byte. The plugin `use_in_context` of
+//! `plugins::in_context` reads the directive in its hook `onExecute` over
+//! HTTP, and the service below HTTP calls [`apply_in_context`] where that hook
+//! would run, over the same reading.
 
 use aosabi_execute::kernel_entry::Request;
 use aosabi_json::{

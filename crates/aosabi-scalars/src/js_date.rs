@@ -23,6 +23,8 @@ use alloc::{string::String, vec::Vec};
 use crate::error::RangeError;
 
 /// The message of the `RangeError` that `toISOString` throws.
+///
+/// The text is V8's.
 pub const INVALID_TIME_VALUE: &str = "Invalid time value";
 
 /// `msPerDay` of <https://tc39.es/ecma262/#sec-day-number-and-time-within-day>.

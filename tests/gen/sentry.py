@@ -14,12 +14,12 @@ and no request. Every case runs on both sides under `NODE_ENV` `test` and
 `development`, and is sent as it stands and again with
 `Accept-Encoding: identity`.
 
-Round 2 serves the variants `default`, `skip`, `env_dsn` and `initialized` with
-`SENTRY_DSN` naming the mock ingest of tests/harness/mock_ingest.py, and each of
-its cases names the port of the ingest its DSN reaches: `http` for `st-05`,
-`st-06`, `st-07`, `st-10` and `st-11`, `https` for `st-12`, and the HTTPS port
-in its hostile mode for `st-14`. Cases `st-05` and `st-06` send the bytes of
-their round 1 requests, so their answers are held to the goldens of round 1.
+The cases with a DSN, those of [`sentry_cases_round_2`], serve the variants
+`default`, `skip`, `env_dsn` and `initialized` with `SENTRY_DSN` naming the mock
+ingest, and each names the port of the ingest its DSN reaches: `http` for
+`st-05`, `st-06`, `st-07`, `st-10` and `st-11`, `https` for `st-12`, and the
+HTTPS port in its hostile mode for `st-14`. Cases `st-05` and `st-06` send the
+same requests as without a DSN, so their answers are held to the same goldens.
 Case `st-13` runs on the twin alone and compares no byte, so it has no request
 here. A case names the count of envelopes it expects of the reference, or None
 where a capture row decides it, `st-11` for CP10 and `st-14` for the hostile
@@ -49,8 +49,8 @@ def sentry_cases() -> list:
     add("st-04", "null_key", post("{boom}"), "no event id")
     add("st-05", "skip", post("query Skipped {boom}", operationName="Skipped"), "no event id for a skipped operation")
     add("st-06", "default", get("/route-boom"), "500 unchanged by the capture of the error of the context")
-    add("st-09-now-later", "default", post("{now later}"), "the settle order under the plugin, unchanged from M4")
-    add("st-09-later-now", "default", post("{later now}"), "the settle order under the plugin, unchanged from M4")
+    add("st-09-now-later", "default", post("{now later}"), "the settle order under the plugin, the same as without it")
+    add("st-09-later-now", "default", post("{later now}"), "the settle order under the plugin, the same as without it")
     return cases
 
 

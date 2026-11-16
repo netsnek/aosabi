@@ -96,7 +96,8 @@ from dataclasses import dataclass
 
 from .http import HttpCase, canonical, json_body
 
-FAMILY = "M7b"
+#: The family the served cases of the login name in their `x-request-id`.
+FAMILY = "auth"
 #: The host every case sends, so the `redirect_uri` is one string on both sides.
 APP_HOST = "app.example.invalid"
 #: The node environments every run serves under.

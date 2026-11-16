@@ -2,10 +2,10 @@
 /*
  * graphtp: the types of GraphTP and the codec of the GraphTP/1 wire form.
  *
- * No analogue in the reference. The specification is docs/graphtp.md, whose
- * section 10.3 names the modules below and section 10.4 their public items.
- * The crate is a protocol crate in the shape of the crate http 1.5.0, so it
- * holds no I/O, no transport, no executor and no server.
+ * No analogue in the reference. The specification is
+ * Documentation/guides/graphtp.md, which this crate follows. The crate is a
+ * protocol crate in the shape of the crate http 1.5.0, so it holds no I/O, no
+ * transport, no executor and no server.
  */
 
 //! The types of `GraphTP`, the Graph Transfer Protocol, and the codec of its
@@ -29,10 +29,8 @@
 //! content or a body at >128 B, and [`stream`] the handles, the batch number
 //! and the writers and the reader of the stream bodies. The modules
 //! [`request`] and [`response`] hold the owned request of an OPERATION and the
-//! owned answer, generic over the body. The judges of the crate are the
-//! notebooks `tests/notebooks/24_graphtp.ipynb` and
-//! `tests/notebooks/37_content_coding.ipynb`, with the primitive `graphtp` of
-//! `aosabi-devtool` as their door to the crate.
+//! owned answer, generic over the body. The primitive `graphtp` of
+//! `aosabi-devtool` is the door of the notebooks to the crate.
 //!
 //! The crate builds with no standard library and needs an allocator, takes no
 //! outside crate and has no feature. There is no test in this crate, which is

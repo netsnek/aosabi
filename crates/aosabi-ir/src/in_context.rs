@@ -7,9 +7,9 @@
  * packages/pylon/src/core/in-context.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * The text itself is the extracted literal
- * crates/aosabi-core/src/in_context.graphql, which tools/provenance writes and
- * nothing else does.
+ * The text itself is the extracted literal in_context_sdl, the file
+ * crates/aosabi-core/src/in_context.graphql, pinned byte for byte, which
+ * NOTICE lists under Apache-2.0.
  */
 
 //! The directive tail of an emitted schema.

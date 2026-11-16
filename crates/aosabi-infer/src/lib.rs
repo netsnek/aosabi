@@ -50,8 +50,7 @@
 //! text and are entries of [`Built::warnings`].
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3, and the judging notebook is
-//! `tests/notebooks/10_schema_tier1.ipynb`.
+//! section 3.
 
 pub mod builder;
 pub mod descriptor_source;

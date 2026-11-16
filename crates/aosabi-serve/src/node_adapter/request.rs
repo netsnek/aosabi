@@ -190,7 +190,7 @@ impl Stream for IncomingStream {
 /// A `GET` and a `HEAD` get no body whatever the wire carried, `TRACE` reads as
 /// its method with no body, as the adapter makes a `GET` whose method reads
 /// `TRACE`, and every other method reads the body as a stream, quirk
-/// `Q56_NODE_ADAPTER_BODY_METHODS`.
+/// `NODE_ADAPTER_BODY_METHODS`.
 ///
 /// # Errors
 ///

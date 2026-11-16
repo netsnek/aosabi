@@ -49,8 +49,8 @@
 //! 9. For `docker`, the container files and the image of [`container`],
 //!    after the derived lock the context carries is read with the pin check
 //!    and the check once more, since every run on the project shares it.
-//! 10. `target/aosabi/build.json`, the build record, and the build log of
-//!     `docs/cli-and-targets.md` section 5.0 on standard error.
+//! 10. `target/aosabi/build.json`, the build record, and the build log
+//!     on standard error.
 //!
 //! A build that writes the schema, of the server package or of a plain
 //! crate for any card, leaves it in the folder of the project as well, as
@@ -251,7 +251,7 @@ pub const DIST_DIR: &str = "dist";
 const OBJCOPY: &str = "rust-objcopy";
 
 /// The variable the loader of Linux reads the directories of shared libraries
-/// from before the run path of a program (, the manual page ld.so(8)).
+/// from before the run path of a program.
 const LIBRARY_PATH_ENV: &str = "LD_LIBRARY_PATH";
 
 /// The directory of the artifacts of `verify` inside its generated
@@ -1265,7 +1265,7 @@ fn lean_build(
 ///
 /// A build for `--target` runs the script of a package once for the host and
 /// once for the target when both compile it, and the count names the package
-/// once, as the build line of `docs/cli-and-targets.md` section 5.0 names
+/// once, as the build line names
 /// every dependency build script by package and version.
 fn dependency_scripts(compiled: &CargoRun, own: &[&str]) -> usize {
     let mut packages: Vec<&str> = compiled
@@ -1591,6 +1591,10 @@ impl Strip {
         })
     }
 
+    /// Returns the bytes of `binary` after `--strip-all`, which drops every
+    /// symbol and every section that is neither allocated nor inside a segment,
+    /// the symbol table among them, but the names of the sections.
+    ///
     /// # Errors
     ///
     /// Returns a failure when the program does not start or does not
@@ -1621,6 +1625,11 @@ impl Strip {
 
 /// Returns the value of `LD_LIBRARY_PATH` with `first` before the directories
 /// of the value the command line inherited.
+///
+/// The loader splits the value at every colon and at every semicolon and reads
+/// an empty entry as the working directory, so the inherited value is split at
+/// both, every entry they leave empty is left out, and a directory whose path
+/// holds either separator is refused.
 #[cfg(unix)]
 fn library_path(first: &Path) -> Result<OsString, CliError> {
     use std::os::unix::ffi::{

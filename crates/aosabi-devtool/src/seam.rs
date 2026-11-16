@@ -51,8 +51,8 @@ use crate::{
     stub, //
 };
 
-/// The milestone the primitives of this seam land at.
-pub const LANDS_AT: &str = "M2";
+/// The area the primitives of this seam land at.
+pub const LANDS_AT: &str = "language";
 
 /// The exit code of an error array written in place of a payload.
 const EXIT_REFUSED: u8 = 1;
@@ -138,10 +138,10 @@ pub fn smoke(name: &str) -> ExitCode {
 }
 
 /// Prints the interface line of the implemented primitive `name`, which lands
-/// at the milestone `lands_at`.
+/// in the area `lands_at`.
 ///
-/// This is [`smoke`] for a primitive of a later milestone than [`LANDS_AT`],
-/// so the line names the milestone whose notebooks judge it.
+/// This is [`smoke`] for a primitive of another area than [`LANDS_AT`], so
+/// the line names the area whose notebooks judge it.
 pub fn smoke_at(name: &str, lands_at: &str) -> ExitCode {
     println!("{}", stub::interface_line(name, true, lands_at));
     ExitCode::SUCCESS
@@ -167,7 +167,7 @@ impl BatchArgs {
     }
 }
 
-/// Runs the primitive `name` of the milestone `lands_at` over `operations` in the batch form.
+/// Runs the primitive `name` of the area `lands_at` over `operations` in the batch form.
 ///
 /// Under `--smoke` it prints the interface line, and otherwise it answers
 /// every request line of the file `--requests` names through [`batch::run`]
@@ -285,8 +285,7 @@ pub fn graphql_error_json(error: &GraphQLError) -> JsValue {
 /// Returns a thrown value of the type layer the way the oracle serializes it.
 ///
 /// A `GraphQLError` renders through its own `toJSON`. A plain `Error` has no
-/// `toJSON`, so it renders as `message` alone, which is the second arm of
-/// `serializeError` in tests/sidecar/graphql-js.mjs.
+/// `toJSON`, so it renders as `message` alone.
 pub fn definition_error_json(error: &DefinitionError) -> JsValue {
     match error {
         DefinitionError::GraphQL(error) => graphql_error_json(error),

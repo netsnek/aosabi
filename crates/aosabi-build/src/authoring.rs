@@ -2,9 +2,8 @@
 /*
  * aosabi-build: the text of authoring.json, the authoring map of a build.
  *
- * The file is the Rust half of checks C2, C3 and C4 of
- * tests/notebooks/12_authoring_parity.ipynb, whose TypeScript half is the
- * operation authoring_map of the TypeScript sidecar.
+ * The file is the Rust half of the checks of the authoring parity, whose
+ * TypeScript half is the operation authoring_map of the TypeScript sidecar.
  */
 
 //! The text of `authoring.json`.

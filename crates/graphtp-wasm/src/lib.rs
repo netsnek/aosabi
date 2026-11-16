@@ -4,9 +4,8 @@
  * GraphTP/1 and the client role of graphtp-homa and homa behind a raw binary
  * interface of plain integers that imports nothing.
  *
- * No analogue in the reference. The module is the one of
- * docs/graphtp-fetch.md section 2.2, which the glue of the package loads and
- * drives: the glue hands it the bytes a link received and the time, and takes
+ * No analogue in the reference. The glue of the package loads and drives the
+ * module: the glue hands it the bytes a link received and the time, and takes
  * the bytes it sends and the events of each exchange.
  */
 
@@ -20,7 +19,11 @@
 //! The module [`buffer`] holds the memory the host shares with the module,
 //! [`link`] the engine of one link, [`codec`] the messages written and read
 //! whole, and [`host`] the state of the module and the calls behind the
-//! exports. Every other module opens with `#![forbid(unsafe_code)]`.
+//! exports. The exports themselves are the module `exports`, since a symbol
+//! name is an unsafe attribute in edition 2024 and the workspace denies
+//! `unsafe_code` in this crate: each export line carries its own
+//! `#[expect(unsafe_code)]` with its reason and no unsafe block. Every other
+//! module opens with `#![forbid(unsafe_code)]`.
 //!
 //! The module `exports` builds for `wasm32-unknown-unknown` alone, under
 //! `cfg(all(target_arch = "wasm32", target_os = "unknown"))`. The wider
@@ -30,9 +33,8 @@
 //!
 //! The module links the standard library, whose allocator serves `alloc` on
 //! `wasm32-unknown-unknown`, since an allocator of the crate's own would need
-//! `unsafe`. The judging notebooks are `tests/notebooks/32_graphtp_fetch.ipynb`
-//! and the package half of `tests/notebooks/24_graphtp.ipynb`. There is no
-//! test in this crate, which is the rule of CONTRIBUTING.md section 3.
+//! `unsafe`. There is no test in this crate, which is the rule of
+//! CONTRIBUTING.md section 3.
 
 pub mod buffer;
 pub mod codec;

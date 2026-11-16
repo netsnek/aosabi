@@ -5,8 +5,7 @@
  *
  * Derived from node v24.13.0, lib/_http_outgoing.js, MIT.
  *
- * It carries the quirk Q59_NODE_RECORD_CHECK_500 of docs/byte-equality.md
- * section 13.1.
+ * It carries the quirk NODE_RECORD_CHECK_500.
  */
 
 //! `check_record` and `RecordError`.
@@ -14,12 +13,12 @@
 //! The call `writeHead` checks every name of its record against the token of
 //! RFC 9110 and every value against tab, 0x20 to 0x7E and 0x80 to 0xFF, and
 //! throws `ERR_INVALID_HTTP_TOKEN` or `ERR_INVALID_CHAR` before the head is
-//! stored and after the reason is set (N14 of the plan's version 2 draft).
+//! stored and after the reason is set.
 //! In a TypeScript app a record has passed a Fetch `Headers` first, which refuses a
 //! name that is no token and a value with a NUL, a CR, an LF or a character
 //! above U+00FF, so the check refuses a value with another control byte, 0x01
 //! to 0x08, 0x0B, 0x0C, 0x0E to 0x1F or 0x7F. The adapter then answers what
-//! `handleResponseError` answers, quirk `Q59_NODE_RECORD_CHECK_500`.
+//! `handleResponseError` answers, quirk `NODE_RECORD_CHECK_500`.
 
 use alloc::{
     format,

@@ -4,9 +4,9 @@
  * writable stream of bytes that connect takes, with delimited AoFrame.
  *
  * A caller who holds a byte stream of its own, a serial port it opened itself among them, hands it
- * to connect, which names the link by a local name (docs/graphtp-fetch.md section 3). The stream may
- * lose bytes, so its frames are delimited, and the server may not see the end of an earlier run, so
- * the link keeps the start rule.
+ * to connect, which names the link by a local name. The stream may lose bytes, so its frames are
+ * delimited, and the server may not see the end of an earlier run, so the link keeps the start
+ * rule.
  */
 
 import {linkError} from '../engine.js'
@@ -33,7 +33,7 @@ function bytesOf(value) {
 /**
  * Returns the carrier over the streams `readable` and `writable` of the caller, or throws NO_LINK
  * where either is locked, held by a reader or a writer of the caller or by the carrier that closed
- * them, so a link whose stream closed answers NO_LINK (docs/graphtp-fetch.md section 8).
+ * them, so a link whose stream closed answers NO_LINK.
  */
 export function open({readable, writable}) {
   if (readable.locked || writable.locked) throw linkError('NO_LINK', 'the byte stream of the caller is closed or held')

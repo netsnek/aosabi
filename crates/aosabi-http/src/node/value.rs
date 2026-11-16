@@ -4,8 +4,7 @@
  *
  * Derived from node v24.13.0, lib/_http_outgoing.js, MIT.
  *
- * It carries the quirk Q58_NODE_ENCODING_FIRST_WRITE of docs/byte-equality.md
- * section 13.1.
+ * It carries the quirk NODE_ENCODING_FIRST_WRITE.
  */
 
 //! `value_bytes`.
@@ -13,11 +12,11 @@
 //! Node holds the head of an answer as a string and sends it with the first
 //! write after `writeHead`. A string write whose encoding is `utf8`, `latin1`
 //! or none joins the head to it and sends both in that encoding, none being
-//! UTF-8, and a write of bytes queues the head alone as `latin1` (N13 of the
-//! plan's version 2 draft). A value character from U+0080 to U+00FF, which is
-//! how a request byte from 0x80 up reaches the application, therefore goes out
-//! as one byte under Latin-1 and as two under UTF-8, quirk
-//! `Q58_NODE_ENCODING_FIRST_WRITE`. Names, the status line and every other line
+//! UTF-8, and a write of bytes queues the head alone as `latin1`. A value
+//! character from U+0080 to U+00FF, which is how a request byte from 0x80 up
+//! reaches the application, therefore goes out as one byte under Latin-1 and
+//! as two under UTF-8, quirk
+//! `NODE_ENCODING_FIRST_WRITE`. Names, the status line and every other line
 //! are ASCII and the same under both.
 
 use alloc::{

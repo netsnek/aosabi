@@ -2,11 +2,12 @@
 /*
  * aosabi-http: the web app, its routes, its dispatch and its handlers.
  *
+ * Where hono picks its smart router, the app takes the trie router of crate::router.
+ *
  * Derived from hono 4.11.9, dist/hono-base.js, MIT.
  * Derived from hono 4.11.9, dist/hono.js, MIT.
  *
- * It carries the quirk Q57_HONO_HEAD_FROM_GET of docs/byte-equality.md section
- * 13.1.
+ * It carries the quirk HONO_HEAD_FROM_GET.
  */
 
 //! The web app, the translation of the app of hono.
@@ -22,8 +23,8 @@
 //! head of the `GET` answer, `new Response(null, getResponse)`, so the answer
 //! keeps the status and the headers of the `GET` answer and loses the length
 //! the adapter adds below them, and the answer of `c.text` with nothing
-//! prepared, which has no init, fails, the 500 of the adapter (A9 of the
-//! plan's version 2 draft, quirk `Q57_HONO_HEAD_FROM_GET`).
+//! prepared, which has no init, fails, the 500 of the adapter (quirk
+//! `HONO_HEAD_FROM_GET`).
 //!
 //! A closure passed to a route method is bound by `Fn` directly, so rustc gives the closure its
 //! parameter types, and [`HandlerFn`] and [`MiddlewareFn`] are the forms the app stores it in.
@@ -497,11 +498,11 @@ impl<E: RouteError> WebApp<E> {
     /// of registration.
     ///
     /// The router matches in the order routes enter it, so it is built again with the first
-    /// `count` routes at its end. The base pipeline of a Rust service calls it once, at the boot,
-    /// with the routes the app registered before the boot, so they run behind the pipeline,
-    /// divergence D75 of `docs/byte-equality.md`. Under the feature `host-platform` the order
-    /// stays as registered, since the TypeScript option keeps the order of a TypeScript app, whose routes registered
-    /// before the boot run before its pipeline.
+    /// `count` routes at its end. The base pipeline of a Rust service calls it once, at the
+    /// boot, with the routes the app registered before the boot, so they run behind the
+    /// pipeline, a named divergence. Under the feature `host-platform` the order stays as
+    /// registered, since the TypeScript option keeps the order of a TypeScript app, whose
+    /// routes registered before the boot run before its pipeline.
     pub fn put_behind(&mut self, count: usize) {
         if cfg!(feature = "host-platform") {
             return;

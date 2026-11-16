@@ -25,7 +25,7 @@
 //! | `serve` | `driver` and `HomaListen`, the driver `serve_with` starts |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/29_homa_raw.ipynb`.
+//! section 3.
 
 #![no_std]
 #![forbid(unsafe_code)]

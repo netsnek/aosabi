@@ -43,12 +43,7 @@
 //! could take the place of. Every module but this root and `abi` forbids
 //! `unsafe_code`, and no unsafe block exists. The root holds no code but the
 //! declarations of its modules, and a forbid there would bind `abi` as well.
-//! The judging notebooks are `tests/notebooks/10_schema_tier1.ipynb`, whose
-//! side `ts` holds the three files of `aosabi build` to the sidecar for every
-//! fixture G8 counts, `tests/notebooks/39_ts1_parity.ipynb` in the author
-//! mode, and `tests/notebooks/08_card_builds.ipynb` and
-//! `tests/notebooks/32_graphtp_fetch.ipynb`, which count the boundary, and
-//! there is no test in this crate, the rule of `CONTRIBUTING.md` section 3.
+//! There is no test in this crate, the rule of `CONTRIBUTING.md` section 3.
 #![cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 
 mod abi;

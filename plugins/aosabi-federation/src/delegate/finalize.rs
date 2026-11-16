@@ -38,9 +38,10 @@
 //! list. The federation finalizes its outer request against the wrapping
 //! schema and runs it with the local executor, whose proxying root resolver
 //! delegates again, so a need on a field whose remote type is a union answers
-//! that `TypeError` as the error of the field and sends no data request. No
-//! target schema of the three pairs declares a union, so only that case
-//! reaches the branch.
+//! that `TypeError` as the error of the field and sends no data request. The
+//! port runs the fragments and sends them on, a named divergence. No target
+//! schema of the three pairs declares a union, so only that case reaches the
+//! branch.
 //!
 //! The type information of a selection set is made fresh per call, where the
 //! reference keeps one per schema and type in `getTypeInfoWithType`. A visit

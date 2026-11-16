@@ -4,7 +4,8 @@
  * time on air of the carrier LoRa, and the radios the radio model of homa-sim
  * runs the carrier over.
  *
- * No analogue in the reference. Its judging notebooks are
+ * No analogue in the reference. Its operations are toa, seal, open and
+ * ledger, with the radio model of homa-sim. Its judging notebooks are
  * tests/notebooks/06_lora_frame.ipynb and
  * tests/notebooks/29_carrier_lora.ipynb, whose references are
  * tests/harness/homa/lora.py and tests/harness/homa/chacha.py.

@@ -10,16 +10,16 @@
  * Derived from @repeaterjs/repeater 3.0.6, cjs/repeater.js, MIT.
  */
 
-// A Repeater of an app is an object of the host, which the engine pulls
-// through the method Symbol.asyncIterator and the members next, return and
-// throw, each a read and a call of the import block of the engine, as an
-// executor pulls the Repeater of graphql-yoga. The class keeps every
-// step of the reference, each promise made where the reference makes it and
-// each then called where it calls one, so an iteration settles in the
-// microtask an iteration of the reference settles in, which 40_pubsub judges
-// over the repeater scripts of its corpus. The static combinators race,
-// merge, zip and latest of the reference are refusals that name the waiting,
-// since no fixture and no example of the reference calls one.
+// A Repeater of an app is an object of the host, which the engine pulls through
+// the method Symbol.asyncIterator and the members next, return and throw, each
+// a read and a call of the import block of the engine, as an executor pulls the
+// Repeater of graphql-yoga. The class keeps every step of the reference, each
+// promise made where the reference makes it and each then called where it calls
+// one, so an iteration settles in the microtask an iteration of the reference
+// settles in, which a run over the repeater scripts of the pub sub corpus
+// judges. The static combinators race, merge, zip and latest of the reference
+// are refusals that name the waiting, since no fixture and no example of the
+// reference calls one.
 
 // The bound of the queues of pushes and of nexts of one repeater.
 export const MAX_QUEUE_LENGTH = 1024;

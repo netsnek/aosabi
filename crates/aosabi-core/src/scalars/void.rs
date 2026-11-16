@@ -2,7 +2,8 @@
 /*
  * aosabi-core scalars void: the bound `Void` scalar.
  *
- * Binds `GraphQLVoid` of graphql-scalars as it stands.
+ * The scalar is `GraphQLVoid` of graphql-scalars as
+ * it stands.
  */
 
 //! The bound `Void` scalar, the `GraphQLVoid` of graphql-scalars.

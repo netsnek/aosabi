@@ -101,10 +101,9 @@ use crate::{
 ///
 /// The members of its own come in the order of their declaration at
 /// `core/index.ts:93-122`, then the hooks of envelop, of the server adapter
-/// and of Yoga in the order of `docs/plugins.md` sections 3.1 to 3.3, which is
-/// the order the reference half of the boot report lists them in. The boot
-/// writes a strategy onto every plugin, so `strategy` is no member and the
-/// boot report carries it as a field of its own.
+/// and of Yoga in the order the reference half of the boot report lists them
+/// in. The boot writes a strategy onto every plugin, so `strategy` is no
+/// member and the boot report carries it as a field of its own.
 pub const MEMBER_ORDER: [&str; 24] = [
     "name",
     "roles",

@@ -1,8 +1,8 @@
 # The binding of GraphTP to Homa, beside the crate graphtp as hyper stands
-# beside http. The manifest is the one docs/graphtp.md section 10.5 gives, with
-# the edition, the lowest Rust version, the licence and the lints taken from
-# the workspace, as the manifest of graphtp takes them. The crate is no_std
-# with alloc, because the listener of a microcontroller links it.
+# beside http. The manifest takes the edition, the lowest Rust version, the
+# licence and the lints from the workspace, as the manifest of graphtp does.
+# The crate is no_std with alloc, because the listener of a microcontroller
+# links it.
 [package]
 name = "graphtp-homa"
 version.workspace = true
@@ -24,8 +24,8 @@ default = ["client", "server"]
 client = ["homa/client"]
 server = ["homa/server"]
 
-# The owner's two crates and nothing else, so the binding takes 0 outside
-# crates. A version joins the line of homa once homa has a release.
+# Two crates of this workspace and nothing else, so the binding takes 0 outside
+# crates.
 [dependencies]
 graphtp = { path = "../graphtp" }
 homa = { path = "../homa", default-features = false }

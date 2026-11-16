@@ -75,9 +75,9 @@ def find_root(start=None) -> Path:
 def paths(start=None, goldens_dir=None) -> Paths:
     """Resolve the repository root and the directories the harness uses.
 
-    `goldens_dir` is the papermill parameter of docs/harness.md section 8 and
-    defaults to tests/goldens. A relative value is read against the root, so a
-    notebook passes the parameter through verbatim.
+    `goldens_dir` is the papermill parameter and defaults to the goldens folder
+    of the tests. A relative value is read against the root, so a notebook
+    passes the parameter through verbatim.
     """
     root = find_root(start)
     tests = root / "tests"

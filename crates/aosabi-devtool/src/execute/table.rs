@@ -3,9 +3,8 @@
  * aosabi-devtool execute table: the behaviour table, which is a schema text
  * and what every resolver of it does, read out of its JSON form.
  *
- * No analogue in the reference. The grammar is the one of
- * tests/sidecar/execute.md, which the node side interprets with real promises
- * over the same JSON text.
+ * No analogue in the reference. The node side of the comparison interprets
+ * the same grammar with real promises over the same JSON text.
  */
 
 //! The behaviour table.

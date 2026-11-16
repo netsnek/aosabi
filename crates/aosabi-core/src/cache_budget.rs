@@ -41,10 +41,7 @@
 //! `target_arch = "mips"`, of the Worker on `target_family = "wasm"` and of the
 //! server on every other target. The cards `server`, `server-legacy`, `docker`
 //! and the player name the same features of the facade, so no feature tells them
-//! apart. `tests/notebooks/38_card_limits.ipynb` prints every budget of [`CARDS`]
-//! with the entries it admits for each document of the corpus, and
-//! `tests/notebooks/08_card_builds.ipynb` builds the player with the plugin and
-//! its budget.
+//! apart.
 
 use graphql_over_http::{
     CacheBudget,

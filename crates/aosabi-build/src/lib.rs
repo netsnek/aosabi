@@ -37,8 +37,8 @@
 //! | `source` | `cli/builder/schema/builder.ts:233-394`, behind the feature `source` | the reader of the plain source of a crate, its entry, its reach, `source::names::graphql_name`, `source::SourceTypes`, the third type source, `source::glue`, the generated module of its glue, and `source::write_copy`, the generated copy of the crate |
 //!
 //! The file `schema_invalid_message.rs` beside these modules is no module. It
-//! is the constant text of the invalid schema message, written by
-//! `tools/provenance` and read with `include_str!`.
+//! is the constant text of the invalid schema message, pinned byte for byte
+//! and read with `include_str!`.
 //!
 //! # The protocol
 //!
@@ -122,10 +122,7 @@
 //! Rust server links its application and imports nothing at run time.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3, and the judging notebook is
-//! `tests/notebooks/10_schema_tier1.ipynb`, with
-//! `tests/notebooks/17_framework_size.ipynb` and
-//! `tests/notebooks/31_http_errors.ipynb` for the lean link.
+//! section 3.
 
 pub mod artifact_dirs;
 pub mod assert_schema_is_valid;

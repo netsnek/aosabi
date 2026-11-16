@@ -5,9 +5,12 @@
  * transpiles its sources and writes the glue into .aosabi/ and the current schema into the folder of
  * the app.
  *
- * It fails on an app with no entry or no default export, on a refusal of the inference, on a source
- * with a syntax error, on a configuration that throws when it loads and on a schema that is no valid
- * GraphQL schema. The inference runs as the crate aosabi-infer inside infer.wasm, whose every question lib/checker.js answers from the checker of that program.
+ * The step runs the inference, the transpile and the glue in that order, and the validation of the
+ * schema in the glue fails the build before it writes a byte of the glue. It fails on an app with no
+ * entry or no default export, on a refusal of the inference, on a source with a syntax error, on a
+ * configuration that throws when it loads and on a schema that is no valid GraphQL schema. The
+ * inference runs as the crate aosabi-infer inside infer.wasm, whose every question lib/checker.js
+ * answers from the checker of that program.
  */
 
 import fs from 'node:fs'

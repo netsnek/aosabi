@@ -5,9 +5,8 @@
  * the bytes and the time the glue hands it.
  *
  * No analogue in the reference. The exchanges, the repeat mark, the start
- * rule and the order of seq are those of docs/graphtp.md sections 2.4 and
- * 2.7, and the outcomes the glue turns into a Response or a rejection those
- * of docs/graphtp-fetch.md sections 6 and 8.
+ * rule and the order of seq are those of GraphTP, and the glue turns the
+ * outcomes into a Response or a rejection.
  */
 
 //! The engine of one link.

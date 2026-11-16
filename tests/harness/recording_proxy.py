@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the recording proxy in front of one remote of a federation.
 
-A served pair of `tests/notebooks/90_federation.ipynb` puts one proxy in front
-of every remote on each side, and the front reaches its remote through it. The
-proxy records every request with its method, its target, its headers in wire
-order and its body, forwards it to the remote, records the remote's answer and
-answers the front. The outbound request of a federation is what row C87 records
-and what the notebook compares, so the proxy is the place both sides are seen
-from.
+A served pair puts one proxy in front of every remote on each side, and the
+front reaches its remote through it. The proxy records every request with its
+method, its target, its headers in wire order and its body, forwards it to the
+remote, records the remote's answer and answers the front. The outbound request
+of a federation is what the capture records and what the notebook compares, so
+the proxy is the place both sides are seen from.
 
 Two delegations a front sends at once reach the proxy over two connections, and
 either one can arrive first. The second of the two delegations of one document

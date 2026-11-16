@@ -3,10 +3,7 @@
  * aosabi-devtool infer: infers the intermediate representation from a
  * descriptor dump.
  *
- * No analogue in the reference. The judging notebooks are
- * tests/notebooks/10_schema_tier1.ipynb and
- * tests/notebooks/11_schema_builder_corpus.ipynb, the second of which is the
- * inference corpus.
+ * No analogue in the reference.
  */
 
 //! The `infer` primitive of the seam.

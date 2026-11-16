@@ -31,10 +31,9 @@
 //! | `#/search/<text>` | [`Route::Search`] |
 //! | `#/unreachable`, `#/deprecated`, `#/scalars`, `#/relay` | the four report pages |
 //!
-//! Every form but `#/scalars` and `#/relay` is a route of `docs/aoviewer.md`
-//! sections 3.8 and 3.11. The report pages of the scalars and of the Relay
-//! wrappers are pages of the documents, and their hashes follow the two report
-//! pages of the viewer.
+//! Every form but `#/scalars` and `#/relay` is a route of the viewer. The
+//! report pages of the scalars and of the Relay wrappers are pages of the
+//! documents, and their hashes follow the two report pages of the viewer.
 //!
 //! A part of a path is percent decoded as the URL standard decodes, a `%`
 //! without two hex digits after it kept as it is, and read as UTF-8 with a
@@ -94,8 +93,7 @@ pub const MAX_ROUTE_BYTES: usize = 2 * MAX_HIDE_GLOBS * (MAX_GLOB_BYTES + 1);
 /// the argument of `#/type/<type>/<field>/<arg>`.
 pub const MAX_PARTS: usize = 3;
 
-/// One route of `docs/aoviewer.md` section 3.8, one grammar in the URL, the
-/// documents and `--view`.
+/// One route, one grammar in the URL, the documents and `--view`.
 ///
 /// A name of a type, a field or an argument is the name as the schema writes
 /// it, and the route holds it whether or not a schema declares it.

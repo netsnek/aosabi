@@ -12,13 +12,11 @@
 //! A Rust programmer writes a field, a method and a parameter in snake case
 //! and a variant in upper camel case, and a GraphQL schema spells them in
 //! lower camel case and in screaming snake case, so the builder renames them
-//! by the rule of point 8 of
-//! `docs/decisions/ADR-0029-application-programming-layers.md`. It is the
-//! rule async-graphql and juniper apply by default, under which every field
-//! name, argument name and enum value of the goldens comes back unchanged.
-//! Strawberry and Graphene apply its half for fields alone by default, snake
-//! case into lower camel case. [`graphql_name`] is that rule, and every part
-//! of the source path names a member through it.
+//! by one rule. It is the rule async-graphql and juniper apply by default,
+//! under which every field name, argument name and enum value of the goldens
+//! comes back unchanged. Strawberry and Graphene apply its half for fields
+//! alone by default, snake case into lower camel case. [`graphql_name`] is
+//! that rule, and every part of the source path names a member through it.
 //!
 //! | Rust name | GraphQL name |
 //! | --- | --- |
@@ -43,9 +41,12 @@
 //! `mirror` and of the registries `aosabi pull` writes keeps every name
 //! verbatim, so no twin and no registry changes by it.
 //!
-//! The judging notebook is `tests/notebooks/12_authoring_parity.ipynb`, whose
-//! names cells take every field name, argument name and enum value of the
-//! goldens through the rule and back.
+//! The words of a name follow the split that measured the round trip of the
+//! goldens: a word of snake case ends at each underscore, and a word of upper
+//! camel case starts at an upper case letter that follows a lower case letter
+//! or a digit, or that is followed by a lower case letter after another upper
+//! case letter, the end of an acronym, while a digit stays with the word
+//! before it.
 
 /// The kind of a name, which decides the rule it takes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -79,9 +80,6 @@ pub enum NameKind {
 /// graphql_name(NameKind::Variant, "InProgress")   IN_PROGRESS
 /// graphql_name(NameKind::Field, "firstName")      firstName
 /// ```
-///
-/// The builder cells of check C6 of `tests/notebooks/12_authoring_parity.ipynb`
-/// hold each of these answers.
 #[must_use]
 pub fn graphql_name(kind: NameKind, rust: &str) -> String {
     let name = rust.strip_prefix("r#").unwrap_or(rust);

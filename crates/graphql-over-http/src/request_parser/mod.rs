@@ -14,7 +14,8 @@
 //! [`Parsers::choose`] answers the parser of a request before the hooks
 //! `onRequestParse` of the app, which may replace it. Yoga sets the parser of
 //! each of its five parsers whose matcher accepts the request, so the last one
-//! that matches is the one that runs.
+//! that matches is the one that runs. The five match disjoint requests, which
+//! makes their order the order of the first match as well.
 
 use std::rc::Rc;
 

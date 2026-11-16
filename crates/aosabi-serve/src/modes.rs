@@ -2,33 +2,42 @@
 /*
  * aosabi-serve: the harness modes of a served binary.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The modes print the schema, answer request
+ * lines, write the boot report and serve the development variant, which the
+ * notebooks read, with the fields of the passes in the boot report.
  */
 
 //! The harness modes.
 //!
-//! The variable `AOSABI_BOOT_REPORT` names a file the boot writes one JSON
-//! document into after its last pass: the plugins of the configuration in their
-//! order, each with the text and the line of its element of `plugins!` or the
-//! file and the line of the call of `.plugin(..)` of the builder of an app that
-//! registered it, its name, its strategy and its roles, and every route with
-//! its method, its path, its base path and the line of its registration, which
-//! check C4 of `12_authoring_parity` and the family R read.
+//! The flag `--print-schema` prints the schema the build wrote, which the
+//! checks of the schema read in place of a call with no argument. The flag
+//! `--requests PATH` answers the request lines of the harness through a service
+//! over the roots of the entry, which keeps the in process halves of the checks
+//! of the executor and of the HTTP errors. The variable `AOSABI_BOOT_REPORT`
+//! names a file the boot writes one JSON document into after its last pass: the
+//! plugins of the configuration in their order, each with the text and the line
+//! of its element of `plugins!` or the file and the line of the call of
+//! `.plugin(..)` of the builder of an app that registered it, its name, its
+//! strategy and its roles, and every route with its method, its path, its base
+//! path and the line of its registration, which a check of the authoring parity
+//! and the family R read. Under `NODE_ENV=development` with `AOSABI_DEV` at `1`
+//! the boot binds the port itself after the last pass and prints nothing, the
+//! seam that `cargo aosabi dev` fills.
 //!
 //! The report also carries what the passes of the boot did, in the fields the
-//! reference half `tests/sidecar/boot-report.mjs` writes and those its
-//! operation `boot` answers: `entry`, `server` or `worker`, and `role`, the run
-//! role of the passes, `config_plugins`, the plugins of the configuration as
-//! declared, `config_plugins_after_boot`, the array the last pass wrote back,
-//! which holds the always on plugins twice by quirk
-//! `Q01_DUPLICATE_PLUGIN_WRITEBACK`, `passes`, one entry per pass with its
-//! strategy, its role, its array with the strategy written back and its sorted,
-//! loaded and middleware plugins, `middleware`, the names of the plugins whose
-//! middleware the loader pushed in that order, and `gates`, the app and the
-//! line of every `.gate(...)` of the tree. A plugin is labelled by its
-//! identity, its index in the configuration as the boot found it or, for an
-//! always on plugin, `{"builtin": <role>, "pass": <n>}`, because names collide
-//! and the last one wins, and its members are those of `Plugin::members`.
+//! reference half of the report writes and those its operation `boot` answers:
+//! `entry`, `server` or `worker`, and `role`, the run role of the passes,
+//! `config_plugins`, the plugins of the configuration as declared,
+//! `config_plugins_after_boot`, the array the last pass wrote back, which holds
+//! the always on plugins twice by quirk `DUPLICATE_PLUGIN_WRITEBACK`, `passes`,
+//! one entry per pass with its strategy, its role, its array with the strategy
+//! written back and its sorted, loaded and middleware plugins, `middleware`,
+//! the names of the plugins whose middleware the loader pushed in that order,
+//! and `gates`, the app and the line of every `.gate(...)` of the tree. A
+//! plugin is labelled by its identity, its index in the configuration as the
+//! boot found it or, for an always on plugin,
+//! `{"builtin": <role>, "pass": <n>}`, because names collide and the last one
+//! wins, and its members are those of `Plugin::members`.
 
 use std::{
     ffi::OsStr,

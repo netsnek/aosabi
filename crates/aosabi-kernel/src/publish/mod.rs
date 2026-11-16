@@ -34,11 +34,11 @@
 //!    and it reaches no frame of HTTP(TCP) and no event of GraphTP(Homa), which
 //!    carry only what the payload carries. In the lean
 //!    frame of `GraphTP` an entry `next` holds the bytes after `data: ` of one
-//!    `next` event of the service's stream verbatim, and a stream entry carries
-//!    a handle and a batch count `seq` and no revision. The revision is the
-//!    hub's, so a service has one counter per pub sub, and a service with one
-//!    pub sub, which every example and the wasabi service write, has the
-//!    one global counter of ADR-0017, Rules kept from the prototype.
+//!    `next` event of the service's stream verbatim, and a stream entry
+//!    carries a handle and a batch count `seq` and no revision. The revision
+//!    is the hub's, so a service has one counter per pub sub, and a service
+//!    with one pub sub, which every example writes, counts all its topics on
+//!    one counter.
 
 pub mod allow;
 #[cfg(feature = "alloc")]

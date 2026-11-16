@@ -33,20 +33,22 @@
 //! | [`executor_http`] | `@graphql-tools/executor-http` `dist/index.cjs` and `@graphql-tools/executor-common` | `build_http_executor`, the multipart body, the errors of a fetch and the serialization of a request |
 //! | [`utils`] | `@graphql-tools/utils` `cjs/errors.js` and five helpers | `create_graphql_error`, `relocated_error` and the helpers |
 //!
-//! The graphql-tools half holds its items: the delegation in [`delegate`], the
-//! interface of a transform in [`transforms`], the helpers in [`utils`], and
-//! the serialization, the multipart body and the errors of a request in
-//! [`executor_http`]. The gateway half holds [`headers`](mod@headers), [`ast_from_js`],
-//! [`policy`](mod@policy), the selection of [`needs`](mod@needs) and the four transforms
-//! with the patch table they run over. [`gateway`], [`patches`](mod@patches) and the
-//! typed builder of [`needs`](mod@needs) read the registry of a pulled remote. The
-//! literals [`needs!`] and [`patches!`] are a closure over the typed builder
-//! and a block per entry with a key type of its own, the forms the probe cells
-//! of W00 decide. The judging notebooks are
-//! `tests/notebooks/90_federation.ipynb`,
-//! `tests/notebooks/90_federation_transforms.ipynb` and
-//! `tests/notebooks/90_federation_budget.ipynb`. There is no test in this
+//! The graphql-tools half holds its items: the delegation in [`delegate`], the interface
+//! of a transform in [`transforms`], the helpers in [`utils`], and the serialization,
+//! the multipart body and the errors of a request in [`executor_http`]. The gateway half
+//! holds [`headers`](mod@headers), [`ast_from_js`], [`policy`](mod@policy), the
+//! selection of [`needs`](mod@needs) and the four transforms with the patch table they
+//! run over. [`gateway`], [`patches`](mod@patches) and the typed builder of
+//! [`needs`](mod@needs) read the registry of a pulled remote. The literals [`needs!`]
+//! and [`patches!`] are a closure over the typed builder and a block per entry with a
+//! key type of its own, the forms probe cells chose for them. There is no test in this
 //! crate, which is the rule of CONTRIBUTING.md section 3.
+//!
+//! [`gateway`] joins the two layers: a delegation reads the wrapping schema of [`wrap`],
+//! built over the introspection that the executor of [`executor_http`] sends through the
+//! network capability, from the cache of the thread, and runs
+//! [`delegate_to_schema`](fn@delegate::delegate_to_schema) over it with the four
+//! transforms.
 
 #![forbid(unsafe_code)]
 

@@ -2109,7 +2109,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
     ///
     /// A labeled tuple rest parameter gives one argument per element. A rest
     /// parameter with no labels is skipped with a warning, quirk
-    /// `Q16_UNLABELED_REST_DROPPED`.
+    /// `UNLABELED_REST_DROPPED`.
     fn rec_loop_parameter(
         &mut self,
         reference_schema: &mut ReferenceSchemaOf<S>,

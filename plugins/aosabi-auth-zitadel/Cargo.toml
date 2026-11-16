@@ -35,11 +35,10 @@ aosabi-auth-contract = { path = "../aosabi-auth-contract" }
 # The identity seam over the request context, which the provider half plugs
 # into.
 aosabi-auth = { path = "../aosabi-auth" }
-# The string operations of the language layer, to_string_lossy, the one
-# reader of a string as text, with U+FFFD for each lone surrogate where the
-# reference meets the text of the string. Every twin links the crate, so the
-# edge brings no package into the root lock or into the locks of
-# tests/fixtures/rs/c6, zitadel-auth-app and zitadel-login-app.
+# The string operations of the language layer, to_string_lossy, the one reader
+# of a string as text, with U+FFFD for each lone surrogate where the reference
+# meets the text of the string. Every twin links the crate, so the edge brings
+# no package into the root lock or into the locks of the fixtures.
 aosabi-lang = { path = "../../crates/aosabi-lang" }
 
 [features]
@@ -47,7 +46,7 @@ aosabi-lang = { path = "../../crates/aosabi-lang" }
 # reader of a key file, by the backend the build names and never by the target
 # alone. The cards of pure Rust take the default ring, which signs and digests
 # over ring on a target of cfg(unix), so a build for wasm32 links neither
-# crate and the signer answers the thrown TypeError of rule 9 of section LOGIN
+# crate and the signer answers a thrown TypeError that crypto is not available
 # there. The module core.wasm and the native library of the TypeScript option
 # take host-crypto with no default, so they link no ring and no
 # rustls-pki-types and take the three from the functions of their host, the
@@ -57,8 +56,9 @@ default = ["ring"]
 ring = ["dep:ring", "dep:rustls-pki-types"]
 host-crypto = []
 
-# Both sit under cfg(unix), so the feature ring of a build for wasm32 names
-# neither.
+# ring is the provider by default, and the requirements name the versions the
+# register reviewed as their floors. Both sit under cfg(unix), so the feature
+# ring of a build for wasm32 names neither.
 [target.'cfg(unix)'.dependencies]
 # RsaKeyPair for RSASSA-PKCS1-v1_5 with SHA-256, and SHA-256 itself. The
 # module rsa sits behind alloc, and std adds the Error impls of KeyRejected

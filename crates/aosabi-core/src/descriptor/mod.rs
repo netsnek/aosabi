@@ -41,8 +41,8 @@
 //! # What has no description
 //!
 //! A tuple, a `HashMap`, a `BTreeMap`, a closure and a trait object implement
-//! [`Described`] nowhere, which is the compile time refusal of
-//! `docs/schema-inference.md` section 13. [`TypeExpr`] is `non_exhaustive`,
+//! [`Described`] nowhere, which is the compile time refusal.
+//! [`TypeExpr`] is `non_exhaustive`,
 //! because the scalar markers, the JSON markers, the repeater newtype and the
 //! insertion ordered map join it with the inference corpus.
 

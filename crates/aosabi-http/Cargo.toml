@@ -27,7 +27,7 @@ workspace = true
 [features]
 default = ["deflate", "messages", "node"]
 # The zlib wrapper of HTTP, the content coding deflate, around graphtp::deflate,
-# which brings the crate graphtp.
+# which brings the crate graphtp. Aosabi codes no gzip.
 deflate = ["dep:graphtp"]
 # The neutral messages the Node adapter of aosabi-serve and the serve layer
 # exchange.
@@ -63,7 +63,7 @@ platform-coding = ["web"]
 # it on, so a build of the Rust option keeps its bytes.
 host-platform = ["web"]
 
-# The crate graphtp is the owner's protocol crate outside the layers, whose
+# The crate graphtp is the workspace's protocol crate outside the layers, whose
 # DEFLATE encoder the wrapper of the feature deflate frames, so the workspace
 # holds one DEFLATE encoder. It takes no outside crate, so a build with deflate
 # adds none, and a build without deflate uses core and alloc alone.

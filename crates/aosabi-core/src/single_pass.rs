@@ -55,17 +55,15 @@
 //! | `test-graphtp` | the bound of `server`, the card it stands in for |
 //! | `esp32c3-devkitm1` | none, the card links no facade |
 //!
-//! The stack the pass takes grows with the bound, and a card that raises it is
-//! judged at its new bound.
+//! Every bound is an assumed depth to which the single pass is equal to the
+//! rules. The stack the pass takes grows with the bound, and a card that
+//! raises it is judged at its new bound.
 //!
-//! The served path learns its card by its target, as the budget of the
-//! request cache does ([`crate::cache_budget`]): [`CARD`] is the bound of
-//! the player on `target_arch = "mips"`, of the Worker on `target_family =
-//! "wasm"` and of the server on every other target, until the generated
-//! package of a card passes its own. The judging notebook is
-//! `tests/notebooks/09_single_pass.ipynb`, which holds every bound of
-//! [`CARDS`] at the bound and one level past it, and builds a twin with
-//! each setting.
+//! The served path learns its card by its target, as the budget of the request
+//! cache does ([`crate::cache_budget`]): [`CARD`] is the bound of the player
+//! on `target_arch = "mips"`, of the Worker on `target_family = "wasm"` and of
+//! the server on every other target, until the generated package of a card
+//! passes its own.
 
 /// The card `worker`: 64 levels.
 pub const WORKER: u32 = 64;
@@ -104,7 +102,12 @@ pub const CARD: u32 = if cfg!(target_arch = "mips") {
 ///
 /// The stack the pass takes at its bound grows with the bound, 27,628 bytes at
 /// 64 levels on ARM64 at opt-level z. At 1,024 levels that is about 442 KB on
-/// ARM64. Raising the bound changes no answer, as the module documentation
+/// ARM64. The WebAssembly module of a Worker build starts its stack pointer at
+/// 1 MiB, and the stack of the Worker is taken to hold a walk at 1,024 levels,
+/// since no walk that deep was run there and the stack in its linear memory
+/// holds only the part of each frame that the compiler spills there, while the
+/// engine keeps the rest on a stack of its own, so a frame of ARM64 measures
+/// neither. Raising the bound changes no answer, as the module documentation
 /// says.
 pub const MOST_LEVELS: u32 = 1024;
 

@@ -76,8 +76,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "print-sdl";
 
-/// The milestone the primitives of the schema layer land at.
-pub const LANDS_AT: &str = "M3a";
+/// The area the primitives of the schema layer land at.
+pub const LANDS_AT: &str = "sdl";
 
 /// The operations of the protocol that reach aosabi-ir.
 pub const OPERATIONS: &Operations = &[

@@ -27,7 +27,7 @@
 //! options, `init` with its options, the client of a request and the scope.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/62_sentry.ipynb`.
+//! section 3.
 
 pub mod dsn;
 pub mod envelope;

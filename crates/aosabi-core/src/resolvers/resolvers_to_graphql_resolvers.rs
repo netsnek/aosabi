@@ -155,6 +155,9 @@ struct RootCall {
 /// source lines 426, 440 and 453.
 struct RootMember {
     /// The factory the member comes from.
+    ///
+    /// A weak handle keeps the allocation of its factory, so no other factory
+    /// takes the address the member is found by while the entry stands.
     factory: Weak<dyn Fn() -> Value + Send + Sync>,
     /// The member.
     value: Value,
@@ -188,12 +191,11 @@ pub struct RootMemberCounts {
 
 /// Returns the counts of the entries of the table of root members of the calling thread.
 ///
-/// The devtool answers them, so section 8 of `tests/notebooks/20_execute.ipynb`
-/// reads that a fill leaves no entry of a factory that is gone, over a root the
-/// devtool holds outside every schema. A service built from SDL keeps its
-/// factories alive after it is dropped, since its schema holds its types in a
-/// reference cycle with the scope of its build, which holds the bindings, so
-/// the entries of its roots stay live entries.
+/// The devtool answers them, over a root it holds outside every schema. A
+/// service built from SDL keeps its factories alive after it is dropped,
+/// since its schema holds its types in a reference cycle with the scope of
+/// its build, which holds the bindings, so the entries of its roots stay live
+/// entries.
 #[must_use]
 pub fn root_member_counts() -> RootMemberCounts {
     ROOT_MEMBERS.with_borrow(|members| {
@@ -222,8 +224,7 @@ fn member_key(root: &RootFactory, key: &str) -> Box<[u8]> {
 ///
 /// The read is the one of [`root_graphql_resolver`], with the key of the
 /// table made per call. The devtool reads a root through it outside every
-/// schema, so `tests/notebooks/20_execute.ipynb` drops a factory the table
-/// holds entries of, which no service built from SDL drops.
+/// schema.
 #[must_use]
 pub fn read_root_member(root: &RootFactory, key: &str) -> Value {
     root_member(root, &member_key(root, key), key)

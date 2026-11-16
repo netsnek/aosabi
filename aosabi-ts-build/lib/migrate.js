@@ -7,28 +7,32 @@
  * table, logs every rewritten line and every renamed file in .aosabi/migrate.json and restores
  * every file byte for byte and under its name from that log.
  *
- * The parser of typescript 5.9.3 finds the four forms the step rewrites, the import declaration, the
- * export declaration that names a module, the call of import() with a literal and the name of a
- * declare module block, in .ts, .mts, .js and .mjs files, so a specifier inside a string or a comment
- * is never touched. A rewrite replaces the bytes between the quotes of one literal and keeps the
- * quote character and every other byte of the file. The checker of a program of the one file tells
- * which declaration an identifier refers to, so a name of the table stops the run where the source
- * reads it off a namespace of its specifier, and a binding that shadows the namespace reads none. A
- * member of a plugin named as a hook of Envelop or of Yoga that the engine runs no item of stops the
- * run at its line as well, the plan's rule for the plugins of an app (section Routes, middleware and
- * plugins of the plan), where a plugin is an object literal that holds a key of a plugin or that
- * the source places among the plugins of a configuration, and a member of that name of any other
- * object literal is kept and listed. A specifier of a package of the list kept of the table, hono,
- * the peer of the package aosabi, and @hono/node-server, which an app on Node installs itself, is
- * kept as the app wrote it.
+ * The rules are those of Documentation/guides/typescript.md of the Aosabi repository. The parser of
+ * typescript 5.9.3 finds the four forms the step rewrites, the import declaration, the export
+ * declaration that names a module, the call of import() with a literal and the name of a declare module
+ * block, in .ts, .mts, .js and .mjs files, so a specifier inside a string or a comment is never
+ * touched. A rewrite replaces the bytes between the quotes of one literal and keeps the quote character
+ * and every other byte of the file. The checker of a program of the one file tells which declaration an
+ * identifier refers to, so a name of the table stops the run where the source reads it off a namespace
+ * of its specifier, and a binding that shadows the namespace reads none. A member of a plugin named as
+ * a hook of Envelop or of Yoga that the engine runs no item of stops the run at its line as well, where
+ * a plugin is an object literal that holds a key of a plugin or that the source places among the
+ * plugins of a configuration, and a member of that name of any other object literal is kept and listed.
+ * A specifier of a package Pylon pulls in by default that has no row stops the run, unless the
+ * package.json of the app names that package as a dependency of its own and the table maps no specifier
+ * of it, since a package outside Pylon stays the app's own dependency, and then it is kept and listed.
+ * A specifier of a package of the list kept of the table, hono, the peer of the package aosabi, and
+ * @hono/node-server, which an app on Node installs itself, is kept as the app wrote it.
  *
- * The step renames that name where a named import or an export declaration of the specifier names it,
- * and every identifier of the file that the checker resolves to the binding of such an import, each
- * one more edit of the log, which the reverse undoes as it undoes a specifier. An import under an
- * alias of its own, `Name as Alias`, renames the imported name alone. A variable row gives a
- * variable of the environment the app reads the name the engine reads it under, such as
- * AOSABI_ROLE, and the step renames a read or a write of it on an object env,
- * `process.env.NAME` or `process.env['NAME']`, as the worker entry of a build sets the role.
+ * A rename row of the table gives a name of a specifier the name the package aosabi exports it under,
+ * PylonConfig of @getcronit/pylon as AppConfig among them and the class Pylon as App. The step renames
+ * that name where a named import or an export declaration of the specifier names it, and every
+ * identifier of the file that the checker resolves to the binding of such an import, each one more edit
+ * of the log, which the reverse undoes as it undoes a specifier. An import under an alias of its own,
+ * `Name as Alias`, renames the imported name alone. A variable row gives a variable of the environment
+ * the app reads the name the engine reads it under, such as AOSABI_ROLE, and the step renames a read or
+ * a write of it on an object env, `process.env.NAME` or `process.env['NAME']`, as the worker entry of a
+ * build sets the role.
  */
 
 import {createHash} from 'node:crypto'
@@ -368,13 +372,12 @@ function packageOf(specifier) {
 /**
  * Returns what the step does with `specifier`: rewrite it to an entry, stop on it, or keep it. A
  * specifier of the package the step swaps, or of a package it pulls in by default, with no row of
- * the table stops as well, unless the app depends on that package itself, `own` naming the packages its package.json
- * names, and the table maps no specifier of the package, whose engine item then stands in its
- * place: then it is the app's own dependency, kept and listed in the form `own`. A specifier of a
- * package of the list kept of the table is kept, hono, the peer of the package aosabi, and
- * @hono/node-server, which an app on Node installs itself. Any other specifier, a Node built in, a
- * package of the app's own, a peer or a relative path, is kept, as the plan keeps `node:fs`
- * (owner question 9 of the plan).
+ * the table stops as well, unless the app depends on that package itself, `own` naming the packages
+ * its package.json names, and the table maps no specifier of the package, whose engine item then
+ * stands in its place: then it is the app's own dependency, kept and listed in the form `own`. A
+ * specifier of a package of the list kept of the table is kept, hono, the peer of the package
+ * aosabi, and @hono/node-server, which an app on Node installs itself. Any other specifier, a Node
+ * built in such as `node:fs`, a package of the app's own, a peer or a relative path, is kept.
  */
 function classify(specifier, own = new Set()) {
   const {entries, stops, pulled, mapped, kept, origin} = loadTable()
@@ -814,8 +817,8 @@ function names(file, source, lineAt, uses) {
  * With `mark` a stop row whose names lib/unsupported.js of the package aosabi carries becomes a
  * rewrite to aosabi/unsupported/<subpath>. A name with no engine item stays a stop with the flag or
  * without it, in the forms `names` gives. A stop of a specifier or of a name in an import or an
- * export names the line of the statement, as G8 of 36_ts1_gate counts it, and a stop of a name read
- * off a namespace names the line of the name.
+ * export names the line of the statement, as the count of the stops over the fixtures counts it,
+ * and a stop of a name read off a namespace names the line of the name.
  */
 function scan(dir, file, mark, own) {
   const bytes = fs.readFileSync(path.join(dir, file))

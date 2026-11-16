@@ -2,6 +2,9 @@
 /*
  * aosabi-devtool viewer walks: the operation walks, the counts and the orphans
  * of the three walks of an input.
+ *
+ * The walks are the walk of aoviewer, Voyager's walk from every root and the
+ * strict walk.
  */
 
 //! The `walks` operation.

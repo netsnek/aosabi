@@ -20,7 +20,7 @@ measured.
 | Edition and lowest Rust | Edition 2024, Rust 1.95.0 |
 | Tests | No test in Rust. Two notebooks of the project judge the codec and its content coding, and they run outside this repository |
 | Licence | MIT |
-| Publishing | `publish = false`, since publishing is the owner's step |
+| Publishing | `publish = false`, so nothing in this workspace publishes the crate |
 
 ## The wire form in brief
 
@@ -136,8 +136,8 @@ Python's `zlib` and never from the crate.
 | Registered codes of the classes 2 to 5 that round trip | 59 of 59 | codec |
 | Requests and answers written by the crate and read by `graphtp.py`, and the other way, the Japanese contents and bodies of capture row C62 among them | 108 requests and 946 answers each way, 0 differences | codec |
 | Requests and answers built through `Request::builder()` and `Response::builder()`, each refusal with the code of `graphtp.py` | 32 requests, 12 refused with 400.7 and 4 with 431.0, and 1,112 answers, 750 refused with 500.2, 0 differences | codec |
-| Refusal rules of section 5.3 raised with their code | 11 of 11, and the 62,801 zlib headers that break both FCHECK and the profile answer 400.8 | codec |
-| Test vectors of section 9.2 |  | codec |
+| Refusal rules raised with their code | 11 of 11, and the 62,801 zlib headers that break both FCHECK and the profile answer 400.8 | codec |
+| Test vectors | 22 of 22 accepted, and the crate writes the coded answer of 137 bytes byte equal to the section's, where an encoder that hashes 4 bytes writes 137 other bytes that decode to the same body | codec |
 | Hostile messages to each decoder, `read-request`, `read-answer` and `entries` | 1,000,000 each, 0 panics | codec |
 | Contents and bodies coded exactly when they hold >128 B | 1,612 of 1,612, 838 of them coded | codec |
 | A content and a body of 128 bytes plain and of 129 bytes coded, each written by one side and read by the other | 4 of 4 | codec |

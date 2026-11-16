@@ -7,7 +7,7 @@
  * packages/pylon/src/core/mutation.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side for the descriptors.
  */
 
 //! The descriptors of the entries of `graphql!`.

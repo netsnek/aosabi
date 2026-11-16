@@ -13,12 +13,11 @@
 //! the base image of a container card carries, and the certificates of the
 //! extra CA file `AOSABI_EXTRA_CA_CERTS` names, with `NODE_EXTRA_CA_CERTS` as
 //! its Node name. The two names follow the rule of the alias table of
-//! `docs/cli-and-targets.md` section 6.2, the Aosabi name winning and a note
-//! when both are set and disagree, and are read here and not through the
-//! table of `aosabi-core`, so a served app that links no client keeps the
-//! table it had. A file is read as PEM through the reader of
-//! `rustls-pki-types`, and a certificate rustls cannot parse is skipped, as a
-//! bundle of a distribution may hold one.
+//! `aosabi-core`, the Aosabi name winning and a note when both are set and
+//! disagree, and are read here and not through that table, so a served app
+//! that links no client keeps the table it had. A file is read as PEM through
+//! the reader of `rustls-pki-types`, and a certificate rustls cannot parse is
+//! skipped, as a bundle of a distribution may hold one.
 //!
 //! An extra CA file that cannot be read or holds no certificate is ignored
 //! with the warning Node writes for it,
@@ -130,7 +129,8 @@ impl RootSources {
 /// Returns the extra CA file the environment names.
 ///
 /// The Aosabi name wins when it is set, and when both names are set and
-/// disagree a note goes to standard error, as the alias table asks.
+/// disagree a note goes to standard error, as the alias table of
+/// `aosabi-core` asks.
 fn extra_file() -> Option<PathBuf> {
     let set = |name| env::var_os(name).filter(|value: &OsString| !value.is_empty());
     match (set(EXTRA_ENV), set(EXTRA_ENV_NODE)) {

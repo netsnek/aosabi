@@ -110,7 +110,7 @@ const BYTES_PER_NODE: usize = 4;
 pub const KEPT_BYTES: usize = 256 * 1024;
 
 /// The most bytes the vectors a thread keeps between executions hold in all, 1
-/// MiB natively, the default of.
+/// MiB natively.
 #[cfg(not(target_family = "wasm"))]
 pub const KEPT_BYTES: usize = 1024 * 1024;
 

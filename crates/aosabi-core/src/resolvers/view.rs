@@ -6,6 +6,9 @@
  * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/define-pylon.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * It is read through the ECMA-262 operations Get, Set and the key list of
+ * Object.keys that crates/aosabi-execute/src/value/object.rs translates.
  */
 
 //! The projection as a view.

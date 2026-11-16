@@ -63,11 +63,10 @@
 //! The crate builds with no standard library and needs an allocator, because
 //! every node owns its children. The `std` feature is the configuration symbol
 //! of a host build and gates nothing today. The dev feature
-//! `exec-walk-location` keeps `location::get_location_by_walk`, the walk of
-//! the body from its start, as the second judge of the table of line starts,
-//! and only `aosabi-devtool` names it, so no card ships the walk. There is no test in this crate,
-//! which is the rule of CONTRIBUTING.md section 3, and the judging notebook is
-//! `tests/notebooks/02_language.ipynb`.
+//! `exec-walk-location` keeps `location::get_location_by_walk`, the walk of the
+//! body from its start, as the second judge of the table of line starts, and
+//! only `aosabi-devtool` names it, so no card ships the walk. There is no test
+//! in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 

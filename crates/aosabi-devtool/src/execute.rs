@@ -4,10 +4,7 @@
  * whose resolvers a behaviour table describes.
  *
  * No analogue in the reference. The crates under test are aosabi-execute and
- * the resolver wrapping of aosabi-core, and the judging notebook is
- * tests/notebooks/20_execute.ipynb, which compares the bytes against the node
- * sidecar tests/sidecar/execute.mjs running the executor Yoga runs over the
- * same table.
+ * the resolver wrapping of aosabi-core.
  */
 
 //! The `execute` primitive of the seam.
@@ -41,6 +38,13 @@
 //! served answer takes, and `--result tree` writes it from the tree its data
 //! builds on its first read instead, the data a hook reads, so a notebook
 //! holds both readings to the bytes of the reference.
+//!
+//! The resolver wrapping of a table in `pylon` mode projects an object into a
+//! view of its selection, the projection every card builds, and
+//! `--projection object` projects it into the object the reference builds
+//! instead, a plain object with a copy of each key, through the dev feature
+//! `exec-eager-projection` of aosabi-core that this seam alone turns on, so a
+//! notebook holds the view to that object.
 //!
 //! One request runs on one fresh agent with virtual timers, so the clock of
 //! every request starts at 0. An event of the trace carries `time`, `label`
@@ -248,7 +252,7 @@ use crate::{
 /// The name of the primitive, which opens every refusal it writes.
 const NAME: &str = "execute";
 
-/// The milestone the primitive lands at.
+/// The area the primitive lands at.
 const LANDS_AT: &str = "execute";
 
 /// The operations of the protocol that reach aosabi-execute.

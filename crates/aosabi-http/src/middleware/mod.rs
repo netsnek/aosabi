@@ -8,10 +8,9 @@
  * the file of hono it translates.
  */
 
-//! The middleware of hono, `serve_static` and `cors`,
-//! which a service registers itself, and `csrf` and `body_limit`, which the
-//! base pipeline of a Rust service installs, the
-//! divergences D70 and D76 of `docs/byte-equality.md`.
+//! The middleware of hono, `serve_static` and `cors`, which a service
+//! registers itself, and `csrf` and `body_limit`, which the base pipeline
+//! of a Rust service installs, named divergences.
 
 pub mod body_limit;
 pub mod combine;

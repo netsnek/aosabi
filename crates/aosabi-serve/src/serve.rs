@@ -28,8 +28,11 @@
 //! configuration that throws at load. Under [`serve_with`] the configuration of
 //! the function is the one the boot runs, and a configuration the app carries
 //! beside it is left out, so a project that keeps `aosabi.config.rs` boots as it
-//! booted before the builder. Both run the seven steps of the old page of the
-//! plan, with the same exit codes:
+//! booted before the builder. That file and `aosabi::serve` of the facade are
+//! retired for `aosabi::serve_app`, and the hidden feature `mirror` of the
+//! facade keeps them for the twins that wait for the TypeScript judge alone, so
+//! [`serve_with`] boots those twins. Both run these seven steps, with the same
+//! exit codes:
 //!
 //! 1. **The arguments.** No argument serves, `--print-schema` and
 //!    `--requests PATH` are the harness modes of [`modes`], and
@@ -69,7 +72,14 @@
 //!    keeps its loop alive, and there is no graceful shutdown, since the
 //!    reference has none.
 //!
-//! Its plugins are gated by the role of the process, so `use_node_server` binds
+//! Under the run role `worker` the binary is the twin of the worker entry
+//! `.pylon/worker.mjs`, the same build in a different process: it runs both
+//! passes with no GraphQL handler mounted between them, starts no driver and
+//! binds no port, writes the boot report, and holds the runtime open with a
+//! timer of `1 << 30` milliseconds that it sets again whenever it fires, the
+//! twin of the referenced interval `setInterval(() => {}, 1 << 30)`, so the
+//! process ends on a signal alone, by the default action of the signal. Its
+//! plugins are gated by the role of the process, so `use_node_server` binds
 //! nothing there, and a listener a plugin of the role binds in its setup runs as
 //! in the server entry.
 //!

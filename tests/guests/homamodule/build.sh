@@ -1,12 +1,15 @@
 # SPDX-License-Identifier: MIT
+#
 # Builds HomaModule at 50d65305 in guest C, the second phase, on the kernel
 # 6.17.8-300.fc43 the first phase installed: the module with its own
 # Makefile against the kernel's build tree and the tools of util/, as the
 # module's INSTALL.md describes, then loads the module, reads its protocol
 # from /proc/net/protocols and unloads it again.
 #
-# A module that does not build or load fails the phase, and util tools that do
-# not build leave the guest with the module alone.
+# Where a part fails on aarch64, the script prints it with the fallback, which
+# runs the interop halves on an x86-64 host. A module that does not build or
+# load fails the phase, and util tools that do not build leave the guest with
+# the module alone.
 
 set -eu
 
@@ -22,7 +25,7 @@ cd "$src/HomaModule"
 
 fallback() {
     echo "homamodule: $1 on aarch64 under $kernel"
-    echo "homamodule: fallback of risk 3, the interop halves of 29_homa_raw and 29_homa_kmod run on an x86-64 host the owner names"
+    echo "homamodule: fallback, the interop halves of the checks of Homa over raw IP and over its kernel module run on an x86-64 host"
 }
 
 if ! make all KDIR="/usr/src/kernels/$kernel" > /var/log/homamodule-build.log 2>&1; then
