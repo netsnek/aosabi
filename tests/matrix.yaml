@@ -56,6 +56,8 @@
 # cold build timeout. The seed and the corpus counts are the run's choice.
 - notebook: tests/notebooks/03_homa_packets.ipynb
   id: 03_homa_packets
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -66,6 +68,8 @@
 
 - notebook: tests/notebooks/04_aoframe.ipynb
   id: 04_aoframe
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -82,6 +86,8 @@
 # gates it rests on first, so it carries the cold build timeout.
 - notebook: tests/notebooks/05_homa_wire_full.ipynb
   id: 05_homa_wire_full-synthetic
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -97,6 +103,8 @@
 # for the device among them, so it carries the cold build timeout.
 - notebook: tests/notebooks/06_lora_frame.ipynb
   id: 06_lora_frame
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -115,6 +123,8 @@
 # their own.
 - notebook: tests/notebooks/21_homa_loopback.ipynb
   id: 21_homa_loopback-compact
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -128,6 +138,8 @@
 # peers.
 - notebook: tests/notebooks/21_homa_loopback.ipynb
   id: 21_homa_loopback-network
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -146,6 +158,8 @@
 # 23_homa_budget for its bytes added.
 - notebook: tests/notebooks/21_homa_loopback.ipynb
   id: 21_homa_loopback-socket
+  group: model
+  needs: []
   cell_timeout: 900
   # Exclusive, timing: the table of the socket half prints the latency, the
   # throughput and the resident memory over real Unix Sockets.
@@ -159,6 +173,8 @@
 
 - notebook: tests/notebooks/22_homa_lossy.ipynb
   id: 22_homa_lossy-engine
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -172,6 +188,8 @@
 # socket, a silent client, and a pty pair of pty.py through homa-sim.
 - notebook: tests/notebooks/22_homa_lossy.ipynb
   id: 22_homa_lossy-socket
+  group: model
+  needs: []
   cell_timeout: 900
   # Exclusive, real timers: the server and the client run a RESEND after 20 ms
   # and a dead peer after 200 ms on real Unix Sockets, and the silent client is
@@ -185,6 +203,8 @@
 
 - notebook: tests/notebooks/23_homa_budget.ipynb
   id: 23_homa_budget-simulation
+  group: bounds
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -197,6 +217,8 @@
 # progress holds through reply_reserve against reply with a buffer.
 - notebook: tests/notebooks/23_homa_budget.ipynb
   id: 23_homa_budget-client
+  group: bounds
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -211,6 +233,8 @@
 # entries above.
 - notebook: tests/notebooks/23_homa_budget.ipynb
   id: 23_homa_budget-graphtp
+  group: bounds
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -223,6 +247,8 @@
 # and the time on air, the carrier, and the driver of the SX1262.
 - notebook: tests/notebooks/23_homa_budget.ipynb
   id: 23_homa_budget-lora
+  group: bounds
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -241,6 +267,8 @@
 # row prints OPEN with it beside its measure and the bound it crosses.
 - notebook: tests/notebooks/23_homa_budget.ipynb
   id: 23_homa_budget-raw-server
+  group: bounds
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -256,6 +284,8 @@
 # first, the release build among them, so it carries the cold build timeout.
 - notebook: tests/notebooks/29_homa_fabric.ipynb
   id: 29_homa_fabric
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -275,6 +305,8 @@
 # The bench half arrives with device cards.
 - notebook: tests/notebooks/29_carrier_lora.ipynb
   id: 29_carrier_lora-model
+  group: model
+  needs: []
   cell_timeout: 900
   parameters:
     aosabi_root: .
@@ -293,6 +325,8 @@
 # alone, so the cell timeout matches the cold build entries above.
 - notebook: tests/notebooks/25_carrier_unix.ipynb
   id: 25_carrier_unix
+  group: model
+  needs: []
   cell_timeout: 900
   # Exclusive, real timers: both ends run a RESEND after 20 ms and a dead peer
   # after 200 ms of silence on real Unix Sockets.
@@ -313,6 +347,8 @@
 # it.
 - notebook: tests/notebooks/28_carrier_bluetooth.ipynb
   id: 28_carrier_bluetooth-emulated
+  group: model
+  needs: [qemu, kvm, network]
   cell_timeout: 900
   # Exclusive, a guest: it boots guest A under KVM, whose agent socket, pid file
   # and hub sockets under target/guests/ every guest entry shares, runs BlueZ
