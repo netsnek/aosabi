@@ -181,6 +181,20 @@ note: .gitignore names /key.json, so the key stays out of git
 note: the service reads the key once, so a key added or changed later takes a restart
 ";
 
+/// The guide a service follows before it goes to production, which the
+/// manifest and `AGENTS.md` of a scaffold point at, as the public tree of the
+/// repository names it.
+pub const HARDENING_GUIDE: &str = "Documentation/guides/hardening.md";
+
+/// The file `AGENTS.md` of a scaffold, which tells an agent that works on the
+/// service to read the hardening guide before it prepares the service for
+/// production.
+pub const AGENTS_MD: &str =
+    "This project is a service built on Aosabi, whose defaults are open for development.
+Before you prepare it for production, read the hardening guide Documentation/guides/hardening.md of
+the Aosabi repository and apply it.
+";
+
 /// The ignore file of the `native` runtime, which keeps the build directory,
 /// the variables of `.env` and the key file `key.json` the auth plugins read
 /// by default out of git. It names no `schema.graphql`, so the current schema
@@ -205,7 +219,8 @@ pub const GITIGNORE_WORKERS: &str = "/target
 /// `unix`, with the checkout `excluded` of Aosabi left out of its workspace
 /// where the checkout lies below the target.
 ///
-/// The manifest names no `[lib]` table, so the crate root is cargo's default
+/// Its first line points at the hardening guide, [`HARDENING_GUIDE`]. The
+/// manifest names no `[lib]` table, so the crate root is cargo's default
 /// `src/lib.rs`, and it names no build dependency and no lint table. The
 /// second table of the facade stays, since the lock of the project pins the
 /// packages the engine takes from a registry only through it: a scaffold
@@ -231,7 +246,8 @@ exclude = [{}]
         )
     });
     format!(
-        "[package]
+        "# Before production, read {HARDENING_GUIDE} of the Aosabi repository.
+[package]
 name = {name}
 version = \"{PACKAGE_VERSION}\"
 edition = \"2024\"

@@ -29,20 +29,26 @@
 //! The hints of the last three name the checkout the command was given.
 //!
 //! The scaffold is a cargo workspace of its own with the one dependency on the
-//! facade, its index `src/lib.rs`, the crate root by cargo's default, and
-//! `.gitignore`, with the publish workflow on `native`, `wrangler.toml` on
-//! `workers`, and under `--features pages` the page `public/index.html`. The
-//! features are calls of the chain of the entry, [`templates::lib_rs`]: under
-//! `--features auth` on either runtime the chain registers the identity over
-//! `zitadel_auth` and the login routes of `zitadel_login`, and the manifest
-//! names the facade with its feature `auth-zitadel`, which carries both, and
-//! under `--features pages` the chain registers the file server of `public/`
-//! on the cards that serve sockets. The manifest names the facade a second
-//! time for a Unix target with the features of the cards that serve on Linux,
-//! `serve` among them for the file server, so its lock pins the packages of
-//! the engine that the check of the derived lock asks for, and a Worker build
-//! links no engine. The dependency names the version of the command line, and
-//! `--aosabi-path <dir>` names `<dir>/crates/aosabi` by path in its place,
+//! facade, its index `src/lib.rs`, the crate root by cargo's default,
+//! [`templates::AGENTS_MD`] as `AGENTS.md` and `.gitignore`, with the publish
+//! workflow on `native`, `wrangler.toml` on `workers`, and under
+//! `--features pages` the page `public/index.html`. The first line of the
+//! manifest and `AGENTS.md` point at the hardening guide,
+//! [`templates::HARDENING_GUIDE`], which a service follows before it goes to
+//! production. The index is the native index, a plain crate whose entry answers
+//! `App::new().query(Query)`, so the scaffold holds no build script, no
+//! `aosabi.config.rs`, no `src/bindings.rs`, no `[lib]` path and no allowance
+//! of a lint. The features are calls of the chain of the entry,
+//! [`templates::lib_rs`]: under `--features auth` on either runtime the chain
+//! registers the identity over `zitadel_auth` and the login routes of
+//! `zitadel_login`, and the manifest names the facade with its feature
+//! `auth-zitadel`, which carries both, and under `--features pages` the chain
+//! registers the file server of `public/` on the cards that serve sockets. The
+//! manifest names the facade a second time for a Unix target with the features
+//! of the cards that serve on Linux, `serve` among them for the file server, so
+//! its lock pins the packages of the engine that the check of the derived lock
+//! asks for, and a Worker build links no engine. The dependency names the
+//! facade `<dir>/crates/aosabi` of the checkout `--aosabi-path <dir>` by path,
 //! written relative to the target, so a scaffold inside a checkout builds
 //! against it there and in the context of an image, and the publish workflow
 //! checks out the submodules of the repository and installs the command line
@@ -349,6 +355,7 @@ fn files(
             templates::cargo_toml(name, &facade, &unix, excluded.as_deref()),
         ),
         ("src/lib.rs", templates::lib_rs(auth, pages).to_owned()),
+        ("AGENTS.md", templates::AGENTS_MD.to_owned()),
     ];
     match args.runtime {
         Runtime::Native => {
