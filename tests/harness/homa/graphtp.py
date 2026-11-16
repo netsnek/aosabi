@@ -54,6 +54,12 @@ MAX_CREDENTIAL = 65535
 # of 4,096 bytes.
 WBITS = 12
 
+# The longest name of a socket `aosabi-devtool yoga --graphtp` binds,
+# `secondNoIntrospection.stream`. The devtool binds a socket for every instance
+# and stops at the first path past the bound of `sun_path`, so a folder of its
+# sockets leaves room for this name and not only for the instances a cell calls.
+YOGA_SOCKET_ROOM = len("secondNoIntrospection.stream")
+
 # The IANA registry of HTTP status codes, the rows of the classes 2 to 5 that are
 # assigned, with the description column verbatim. The file read is
 # https://www.iana.org/assignments/http-status-codes/http-status-codes-1.csv,
