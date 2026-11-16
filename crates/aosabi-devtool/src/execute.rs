@@ -85,12 +85,41 @@
 //! [`project`] describes, so a notebook holds the keys of the view to those
 //! of the object of the reference, which no answer of the reference reads.
 //!
+//! The operation `embed` hands `body`, the JSON body of a GraphQL request
+//! over HTTP, to the service of a loaded service table through
+//! `aosabi_core::embed::answer`, the entry of a host that links the engine
+//! into its own program, with the mask off and introspection on, as for an
+//! app that sets neither the key `maskedErrors` nor the key `introspection`,
+//! and answers `{"body":"<text>"}` with the response body it
+//! returns. `body` travels as a string, as `result` does, so a
+//! notebook holds the bytes of the answer to the result text of an `execute`
+//! of the same document.
+//!
 //! The operation `persisted` hands the id `number` of a persisted document to
 //! the `Execute` of a loaded table, the general executor of a table of the
 //! mode `plain` or the service of a service table, and answers
 //! `{"result":"<text>"}` with the result text of the one result its stream
 //! yields, so a notebook holds the answer of both executors to an operation
 //! that names a persisted document, which no request of the protocol carries.
+//!
+//! The operation `keys` calls one entry of the engine with the service of a
+//! loaded service table on two threads of its own, one after the other, as a
+//! host calls it from threads that never reached the engine before, and
+//! answers `{"keyed":{..},"answer":"<text>"}`. The field `entry` names the
+//! entry: `execute` and `subscribe` hand `document` to `Service::execute` and
+//! to `Service::subscribe` with the policy of Network, `trait` hands it to the
+//! `Execute` of `Service` with the same policy, `requests` hands the lines of
+//! `requests` to `aosabi_core::request_stream::answer_requests`, `embed`
+//! hands `body` to `aosabi_core::embed::answer`, and `fetch` hands a GET of
+//! `url` to `BootedApp::fetch` of an app with no routes. The object `keyed`
+//! tells whether either thread held the key of its maps before the call
+//! (`before`), whether both held one after it (`after`), whether each hashes
+//! a constant text after the call other than under the fixed key it held
+//! before (`moved`), whether the two threads hold different keys
+//! (`distinct`) and whether both answered the same text (`agree`), and
+//! `answer` is the text of the first. So a notebook holds each entry to
+//! keying the thread that calls it with a key of its own, which no answer
+//! shows, and a seed of zeros or of any other constant fails `distinct`.
 //!
 //! The operation `revisions` subscribes to a topic of the pub sub of the
 //! request on one road of a loaded service table, through
@@ -113,23 +142,45 @@ use std::{
     cell::RefCell,
     path::PathBuf,
     process::ExitCode,
-    rc::Rc, //
+    rc::Rc,
+    task::{
+        self,
+        Poll,
+        Waker, //
+    },
+    thread, //
 };
 
-use aosabi_core::resolvers::{
-    resolvers_to_graphql_resolvers::root_member_counts,
-    wrap_resolver::set_eager_projection, //
+use aosabi_core::{
+    App,
+    BootedApp,
+    Service,
+    ServiceStream,
+    carrier::CarrierPolicy,
+    embed,
+    kernel::execute_closed::{
+        Execute,
+        Operation, //
+    },
+    plugin::config::MaskedErrors,
+    request_stream,
+    resolvers::{
+        resolvers_to_graphql_resolvers::root_member_counts,
+        wrap_resolver::set_eager_projection, //
+    }, //
 };
 use aosabi_execute::{
     errors::copy_graphql_error,
     kernel_entry::{
         Executed,
         Request,
-        RunFailure, //
+        RunFailure,
+        Subscribed, //
     },
     normalized_executor::get_operation_ast,
     promise::{
         AgentOptions,
+        TimerMode,
         TraceEvent, //
     },
     result::ExecutionResult,
@@ -142,10 +193,17 @@ use aosabi_execute::{
         get_variable_values, //
     }, //
 };
+use aosabi_http::{
+    Body,
+    Env,
+    Headers,
+    Request as HttpRequest, //
+};
 use aosabi_json::{
     JsObject,
     JsString,
-    JsValue, //
+    JsValue,
+    value::KeyState, //
 };
 use aosabi_lang::{
     ParseOptions,
@@ -203,6 +261,8 @@ const OPERATIONS: &Operations = &[
     ("roots", op_roots),
     ("coerce", op_coerce),
     ("project", project::op_project),
+    ("embed", op_embed),
+    ("keys", op_keys),
     ("persisted", op_persisted),
     ("revisions", revisions::op_revisions),
 ];
@@ -595,6 +655,33 @@ fn op_execute(request: &JsObject) -> Result<JsObject, JsString> {
     payload(executed, call.trace)
 }
 
+/// Answers the operation `embed`, which hands the request body `body` to the
+/// service of a loaded table the way an embedding host hands it, through
+/// `aosabi_core::embed::answer`.
+///
+/// A table the run does not hold and a table of the mode `plain`, which has
+/// no service, are mistakes of the harness and answer `fatal`.
+fn op_embed(request: &JsObject) -> Result<JsObject, JsString> {
+    let name = batch::require_string(request, "table")?;
+    let body = batch::require_string(request, "body")?;
+    begin_request();
+    let bytes = SESSION.with_borrow(|session| {
+        let service = session.service(name).ok_or_else(|| {
+            if session.schema(name).is_some() {
+                format!("embed: the table {name} is of the mode plain")
+            } else {
+                format!("embed: {}", no_table(name))
+            }
+        })?;
+        Ok::<_, String>(
+            in_window(|| embed::answer(service, body.as_bytes(), &MaskedErrors::Off, true)).0,
+        )
+    })?;
+    let mut payload = JsObject::new();
+    payload.insert("body", String::from_utf8_lossy(&bytes).into_owned());
+    Ok(payload)
+}
+
 /// Answers the operation `persisted`, which hands the id `number` of a
 /// persisted document to the `Execute` of a loaded table and answers the
 /// result text of the one result its stream yields.
@@ -621,6 +708,193 @@ fn op_persisted(request: &JsObject) -> Result<JsObject, JsString> {
     Ok(payload)
 }
 
+/// Answers the operation `keys`, which calls one entry of the engine on a
+/// thread of its own and answers whether that thread held the key of its
+/// maps before the call and after it, see the module doc.
+///
+/// A table the run does not hold, a table of the mode `plain`, an `entry`
+/// of no such name and an entry without the field it reads are mistakes of
+/// the harness and answer `fatal`, and so is a call whose thread does not
+/// start or panics.
+fn op_keys(request: &JsObject) -> Result<JsObject, JsString> {
+    let name = batch::require_string(request, "table")?;
+    let entry = batch::require_string(request, "entry")?;
+    let field = match entry {
+        "execute" | "subscribe" | "trait" => "document",
+        "requests" => "requests",
+        "embed" => "body",
+        "fetch" => "url",
+        other => return Err(JsString::from(format!("keys: no entry named {other}"))),
+    };
+    let input = batch::require_string(request, field)?;
+    begin_request();
+    let (first, second) = SESSION.with_borrow(|session| {
+        let service = session.service(name).ok_or_else(|| {
+            if session.schema(name).is_some() {
+                format!("keys: the table {name} is of the mode plain")
+            } else {
+                format!("keys: {}", no_table(name))
+            }
+        })?;
+        let first = on_a_fresh_thread(service, entry, input)?;
+        let second = on_a_fresh_thread(service, entry, input)?;
+        Ok::<_, String>((first, second))
+    })?;
+    let mut keyed = JsObject::new();
+    keyed.insert("before", first.before || second.before);
+    keyed.insert("after", first.after && second.after);
+    keyed.insert(
+        "moved",
+        first.hash_after != first.hash_before && second.hash_after != second.hash_before,
+    );
+    keyed.insert("distinct", first.hash_after != second.hash_after);
+    keyed.insert("agree", first.answer == second.answer);
+    let mut payload = JsObject::new();
+    payload.insert("keyed", JsValue::Object(keyed));
+    payload.insert("answer", first.answer);
+    Ok(payload)
+}
+
+/// The text whose hash under the key of a thread tells two keys apart.
+const KEY_PROBE: &[u8] = b"the text the operation keys hashes";
+
+/// The polls a fetch of an app with no routes may take before it settles.
+const FETCH_POLLS: usize = 16;
+
+/// What one call of an entry did to the key of the thread that made it.
+struct KeyedCall {
+    /// Whether the thread held a key before the call.
+    before: bool,
+    /// Whether the thread held a key after the call.
+    after: bool,
+    /// The hash of [`KEY_PROBE`] under the key the thread held before the call.
+    hash_before: u64,
+    /// The hash of [`KEY_PROBE`] under the key the thread held after the call.
+    hash_after: u64,
+    /// The text of the answer.
+    answer: String,
+}
+
+/// Calls the entry `entry` of `service` with `input` on a thread of its own.
+fn on_a_fresh_thread(service: &Service, entry: &str, input: &str) -> Result<KeyedCall, String> {
+    // The devtool is a tool of the build host and part of no served binary,
+    // outside the thread rule, and this thread is the fresh thread of a host
+    // that the entry has to key.
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "a tool of the build host that calls an entry from a fresh thread on purpose"
+    )]
+    let joined = thread::scope(|scope| {
+        thread::Builder::new()
+            .name(String::from("aosabi-devtool keys"))
+            .spawn_scoped(scope, || keyed_call(service, entry, input))
+            .map(thread::ScopedJoinHandle::join)
+    });
+    match joined {
+        Ok(Ok(called)) => called,
+        Ok(Err(_)) => Err(String::from("keys: the thread of the call panicked")),
+        Err(error) => Err(format!(
+            "keys: the thread of the call did not start: {error}"
+        )),
+    }
+}
+
+/// Calls the entry `entry` of `service` with `input` on the calling thread.
+///
+/// Returns whether the thread held the key of its maps before the call and
+/// after it, the hash of [`KEY_PROBE`] under each of the two keys, and the
+/// text of the answer: the result text of a result, `thrown: ` and the
+/// message of what the entry threw, the refusal of a stall, `a stream` for a
+/// subscription that answers one, the bytes an entry of a host writes, and
+/// the status of a fetch. Each call runs on a fresh agent with virtual
+/// timers, the agent of a host that never drives them.
+fn keyed_call(service: &Service, entry: &str, input: &str) -> Result<KeyedCall, String> {
+    let before = KeyState::seeded().is_some();
+    let hash_before = KeyState::default().hash_bytes(KEY_PROBE);
+    let request = Request {
+        document: input,
+        variables: None,
+        operation_name: None,
+        validate: true,
+    };
+    let options = AgentOptions {
+        timers: TimerMode::Virtual,
+        trace: false,
+    };
+    let answer = match entry {
+        "execute" => outcome_text(service.execute(&request, options).outcome),
+        "subscribe" => match service.subscribe(&request, options, CarrierPolicy::NETWORK) {
+            Ok(Subscribed::One(result)) => result_text(&result),
+            Ok(Subscribed::Stream(_)) => String::from("a stream"),
+            Err(failure) => outcome_text(Err(failure)),
+        },
+        "trait" => stream_text(Execute::execute(
+            service,
+            Operation::Document {
+                text: input,
+                operation_name: None,
+            },
+            &JsValue::Undefined,
+            &CarrierPolicy::NETWORK,
+        )),
+        "requests" => bytes_text(request_stream::answer_requests(service, input.as_bytes())),
+        "fetch" => fetch_status(input)?,
+        _ => bytes_text(embed::answer(
+            service,
+            input.as_bytes(),
+            &MaskedErrors::Off,
+            true,
+        )),
+    };
+    Ok(KeyedCall {
+        before,
+        after: KeyState::seeded().is_some(),
+        hash_before,
+        hash_after: KeyState::default().hash_bytes(KEY_PROBE),
+        answer,
+    })
+}
+
+/// Returns the text of what the `Execute` of a service answered: the result
+/// text of its one result, `no result` for a stream that ended with none,
+/// and `a stream` for the events of a subscription.
+fn stream_text(stream: ServiceStream) -> String {
+    match stream {
+        ServiceStream::One(Some(result)) => result_text(&result),
+        ServiceStream::One(None) => String::from("no result"),
+        ServiceStream::Events { .. } => String::from("a stream"),
+    }
+}
+
+/// Returns the status that an app with no routes, booted on the calling
+/// thread, answers a GET of `url` with, or `thrown` for a rejection.
+///
+/// No route waits on anything, so the fetch settles on its first polls, and
+/// a fetch still pending after [`FETCH_POLLS`] polls is a mistake of the
+/// probe.
+fn fetch_status(url: &str) -> Result<String, String> {
+    let (app, _) = BootedApp::new(App::default());
+    let request = Rc::new(HttpRequest::new(
+        "GET",
+        url,
+        Headers::default(),
+        Body::Empty,
+    ));
+    let mut fetched = app.fetch(request, Env::Process, None);
+    for _ in 0..FETCH_POLLS {
+        if let Poll::Ready(answered) = fetched
+            .as_mut()
+            .poll(&mut task::Context::from_waker(Waker::noop()))
+        {
+            return Ok(answered.map_or_else(
+                |_| String::from("thrown"),
+                |response| response.status().to_string(),
+            ));
+        }
+    }
+    Err(String::from("keys: the fetch of the app did not settle"))
+}
+
 /// Returns the text of the outcome of one run: the result text, `thrown: `
 /// and the message of the thrown value, or the refusal of a stall.
 fn outcome_text(outcome: Result<ExecutionResult, RunFailure>) -> String {
@@ -631,6 +905,12 @@ fn outcome_text(outcome: Result<ExecutionResult, RunFailure>) -> String {
         }
         Err(RunFailure::Stalled) => String::from(STALLED),
     }
+}
+
+/// Returns the bytes an entry of a host wrote as a string.
+fn bytes_text(bytes: Vec<u8>) -> String {
+    String::from_utf8(bytes)
+        .unwrap_or_else(|error| String::from_utf8_lossy(error.as_bytes()).into_owned())
 }
 
 /// Answers the operation `root`, which holds the factory of one root of a table with no schema.

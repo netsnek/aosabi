@@ -113,6 +113,23 @@
     restarts: 100
     timeout_s: 600
 
+# The notebook of the embedding entry judges aosabi_core::embed through the
+# operation embed of aosabi-devtool execute against the executor over the
+# capture corpus, and the facade aosabi::embed through the host of
+# tests/fixtures/rs/embed-host against the served binary of its app and
+# through the host of tests/fixtures/rs/embed-wasm on wasm32-unknown-unknown,
+# before and after it installs a provider of random bytes. It runs the gates
+# it rests on first and builds the app and both hosts, so it carries the cold
+# build timeout.
+- notebook: tests/notebooks/80_embed.ipynb
+  id: 80_embed
+  group: bounds
+  needs: []
+  cell_timeout: 900
+  parameters:
+    aosabi_root: .
+    timeout_s: 600
+
 # The engine notebooks of Homa run the crate homa over the simulated links of
 # homa::sim through aosabi-devtool homa-sim, each half its own entry sized to
 # finish within the per call bound of the development machine. 21_homa_loopback

@@ -108,6 +108,19 @@ jobs:
           tests/.venv/bin/python -m ipykernel install --sys-prefix --name aosabi \
             --display-name aosabi
 
+      # The file .node-version pins the release of Node that npm and the sidecar run on, and the
+      # action installs that release.
+      - name: Set up Node
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version-file: .node-version
+
+      # The sidecar of graphql-js, which 80_embed asks for the error of a document past the token
+      # cap, imports the library from the package beside it. npm takes graphql 16.12.0 from the lock
+      # of that folder, checks the integrity the lock records and runs no script of the package.
+      - name: Install the package of the graphql-js sidecar
+        run: npm --prefix tests/sidecar ci --ignore-scripts --no-audit --no-fund
+
       # The runner of the matrix keeps the locks of its job slots under XDG_RUNTIME_DIR, and so
       # does the harness with a socket whose path would be too long, so the step names the
       # temporary directory of the job, which every hosted runner has.

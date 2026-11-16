@@ -20,9 +20,26 @@
 //! its host. Node always has `crypto`, so the reference never takes its own fallback to
 //! `Math.random`.
 //!
-//! `DevUrandom` opens the device at its first fill and keeps it open for the process,
-//! so a fill is one read and no open and close, which every request that mints its
-//! request id pays.
+//! The function [`seed_keys`] keys the hashes of the maps of the calling thread
+//! from the same provider on the first call of each thread. The entries that
+//! answer a request call it before they read one: `Service::execute`,
+//! `Service::subscribe`, the `Execute` of `Service`,
+//! `request_stream::answer_requests`, `embed::answer`, `BootedApp::fetch`, the
+//! middleware of `app::handler` and the fetch of `graphtp::served`. On a thread
+//! it leaves without a key, each of them answers [`NO_RANDOMNESS`] in place of
+//! the request and reads no part of it. The first five answer it as an error in
+//! the form of their protocol, and the last three answer `refused`, the status
+//! 503 with that text and no header field, which `GraphTP` carries as 503.0
+//! with an empty body. The module of the TypeScript option installs the
+//! randomness of its host at its boot and keys the thread from it before a
+//! request reaches them. A request to its GraphQL endpoint, which reaches none
+//! of them, calls [`seed_keys`] as well and answers that refusal on a thread it
+//! leaves without a key, so on a host that hands random bytes its requests
+//! pass.
+//!
+//! `DevUrandom` opens the device at its first fill and keeps it open for the
+//! process, so a fill is one read and no open and close, which every request
+//! that mints its request id pays.
 
 use core::fmt;
 #[cfg(unix)]

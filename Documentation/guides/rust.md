@@ -313,3 +313,11 @@ the glue as well.
 
 The types of a remote schema, which a delegation to another GraphQL service reads, are code a
 command writes: `aosabi pull <url>` writes them as a registry of the remote API.
+
+## 14. Embedding the engine in a program
+
+A host that links the app into its own program, such as a module of WebAssembly that a Web Worker of
+a page runs, boots the roots of the app with `aosabi::embed::Embedded::boot` and hands each request
+to `answer` as the JSON body a GraphQL request over HTTP carries, with no socket, no clock and no
+thread. [embedding.md](embedding.md) shows the build of such a host, what takes part in a request
+and a complete host.
