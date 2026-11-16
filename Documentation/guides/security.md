@@ -59,7 +59,10 @@ app.use('*', cors({origin: SITES, credentials: true}))
 app.use('*', csrf({origin: SITES}))
 ```
 
-- Without `cors()` a browser on another site gets no CORS header, so it cannot read an answer.
+- Without `cors()` a browser on another site gets no CORS header, so it cannot read an answer. A
+  project that `aosabi new` writes registers `cors()` for `https://aosabi.org` on `/graphql`, so the
+  explorer that the site of Aosabi hosts reads it, and a service removes or narrows those lines
+  before production, as [hardening.md](hardening.md) section 4 says.
 - The base pipeline of a Rust service runs `csrf()` with its defaults on every request that carries
   a `Cookie` field, so a form that another site posts with the cookies of a session answers 403
   `Forbidden` there. A `csrf(options)` of the service takes its place where it stands ahead of the

@@ -14,12 +14,17 @@
 //! holds the one import of the prelude, the root `Query` with an inherent
 //! block whose method `hello` answers `Hello, world!`, and the entry `app`,
 //! which the builder finds by its return type and which answers
-//! `App::new().query(Query)`. An empty `Mutation` would register nothing,
-//! since an empty root prints no type and leaves no trace in the schema, so
-//! the index names none. The scaffold needs no build script, no `aosabi.config.rs`, no
-//! `src/bindings.rs`, no `[lib]` path and no allowance of the naming lints,
-//! since the builder reads the plain source and names every member by the
-//! rule of GraphQL.
+//! `App::new().query(Query)`, with the middleware `cors` of the facade for
+//! the one origin `https://aosabi.org` on `/graphql` as lines of the entry,
+//! so the explorer the site of Aosabi hosts reads the service, where the
+//! engine answers no CORS by itself. The comment above the lines points at
+//! the hardening guide, which says what to do with them before production,
+//! and every index of [`lib_rs`] writes them. An empty `Mutation` would
+//! register nothing, since an empty root prints no type and leaves no trace
+//! in the schema, so the index names none. The scaffold needs no build
+//! script, no `aosabi.config.rs`, no `src/bindings.rs`, no `[lib]` path and
+//! no allowance of the naming lints, since the builder reads the plain source
+//! and names every member by the rule of GraphQL.
 //!
 //! The configuration stands in the chain of the entry, which
 //! `aosabi::serve_app` serves. The chain of a scaffold with no feature
@@ -51,7 +56,12 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
-    App::new().query(Query)
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
+    App::new().query(Query).middleware(\"/graphql\", explorer)
 }
 ";
 
@@ -71,8 +81,14 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
     App::new()
         .query(Query)
+        .middleware(\"/graphql\", explorer)
         .plugin(use_identity(zitadel_auth(ZitadelAuthOptions {
             issuer: String::from(\"https://issuer.example.com\"),
             ..ZitadelAuthOptions::default()
@@ -97,7 +113,12 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
-    let app = App::new().query(Query);
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
+    let app = App::new().query(Query).middleware(\"/graphql\", explorer);
     // The file server reads the files of the process, which only the cards
     // that serve sockets have, so the build for the Worker leaves it out.
     #[cfg(unix)]
@@ -127,8 +148,14 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
     let app = App::new()
         .query(Query)
+        .middleware(\"/graphql\", explorer)
         .plugin(use_identity(zitadel_auth(ZitadelAuthOptions {
             issuer: String::from(\"https://issuer.example.com\"),
             ..ZitadelAuthOptions::default()
@@ -292,7 +319,7 @@ pub fn public_index_html(name: &str) -> String {
 
 /// Returns the `wrangler.toml` of the `workers` runtime of the service
 /// `name`, with no compatibility flag, and the path of `main` reserved for
-/// the Workers entry.
+/// the Workers entry of a later release.
 #[must_use]
 pub fn wrangler_toml(name: &str) -> String {
     let name = toml_string(name);
