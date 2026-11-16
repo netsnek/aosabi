@@ -1,6 +1,6 @@
 # Roadmap
 
-This folder is the public roadmap of Aosabi. It lists the work that comes after the release 0.1.0,
+This folder is the public roadmap of Aosabi. It lists the work that comes after the release 0.1.1,
 one file per area, and it holds the work alone: what is done stands in the
 [CHANGELOG](../CHANGELOG.md) and in the [documentation](../Documentation/README.md).
 
