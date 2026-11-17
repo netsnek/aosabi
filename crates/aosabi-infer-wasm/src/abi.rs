@@ -5,9 +5,7 @@
  *
  * No analogue in the reference. The export lines take the pattern of
  * crates/aosabi-js/src/abi.rs and the import block the form of the same file,
- * the two exceptions of docs/decisions/ADR-0028-typescript-authoring.md,
- * section Two exceptions to the lint of unsafe, under the conditions of its
- * amendment.
+ * the two exceptions to the lint of unsafe.
  */
 
 //! The exports the command `aosabi build` calls and the questions of the

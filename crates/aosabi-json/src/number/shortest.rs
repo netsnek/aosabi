@@ -2,11 +2,15 @@
 /*
  * aosabi-json number shortest: the shortest decimal digits of a double that round trip.
  *
+ * Derived from ryu-js 1.0.3, Apache-2.0 OR BSL-1.0.
+ *
  * The three out values of mul_shift_all_64 are three calls here, and the
  * scale of a binary exponent is one function that the build checks for every
  * exponent a double has.
  *
- * Derived from ryu-js 1.0.3, ., Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/d2s.rs, Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/d2s_intrinsics.rs, Apache-2.0 OR BSL-1.0.
+ * Derived from ryu-js 1.0.3, src/common.rs, Apache-2.0 OR BSL-1.0.
  */
 
 //! The shortest decimal digits of a double, after Ryu.

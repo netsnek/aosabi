@@ -22,11 +22,11 @@
 //!
 //! Yoga offers the processor of `multipart/mixed` between the two, to every
 //! request but the request of a subscription, which it marks in the hook
-//! `onSubscribe`. The function holds no such processor, the named divergence
-//! D59 of `docs/byte-equality.md` section 3, so every request is offered the
-//! list of a subscription, a client that accepts `multipart/mixed` alone gets
-//! the 406 of a type the function does not serve, and the `accept` header of
-//! every 406 lists no `multipart/mixed`.
+//! `onSubscribe`. The function holds no such processor, a named divergence,
+//! so every request is offered the list of a subscription, a client that
+//! accepts `multipart/mixed` alone gets the 406 of a type the function does
+//! not serve, and the `accept` header of every 406 lists no
+//! `multipart/mixed`.
 
 use std::{
     borrow::Cow,

@@ -19,13 +19,14 @@
 //! to the exposed fields where there are any, on the response `c.res` holds. A
 //! request of the method `OPTIONS` is a preflight, which the middleware
 //! answers itself with the status 204 and the fields of that response,
-//! `Vary: Origin` set where the option `origin` is no `*`,
 //! `Access-Control-Max-Age`, the allowed methods and the allowed fields, the
 //! fields the request asks for in `Access-Control-Request-Headers` where the
 //! option names none, and then `Vary: Access-Control-Request-Headers`
-//! appended, with no `Content-Length` and no `Content-Type`. Every other
-//! request runs the rest of the chain, and where the option `origin` is no `*`
-//! the middleware appends `Vary: Origin` to the answer.
+//! appended, with no `Content-Length` and no `Content-Type`. Where the option
+//! `origin` is no `*`, the preflight first appends `Origin` to the field
+//! `Vary`, after the names a middleware before it set, a named divergence.
+//! Every other request runs the rest of the chain, and where the option
+//! `origin` is no `*` the middleware appends `Vary: Origin` to the answer.
 //!
 //! The function an origin or the allowed methods take is a function of the
 //! service, which a host may answer through a call of its own, so it takes the
@@ -52,10 +53,7 @@ use crate::{
             ResponseInit, //
         },
     },
-    web_app::{
-        MiddlewareFn,
-        RouteError, //
-    },
+    web_app::RouteError,
 };
 
 /// The methods a preflight allows by default.
@@ -126,8 +124,14 @@ impl<E> Default for CorsOptions<E> {
 }
 
 /// Returns the middleware `cors(options)`.
-#[must_use]
-pub fn cors<E: RouteError>(options: CorsOptions<E>) -> impl MiddlewareFn<E> {
+///
+/// The closure is a [`MiddlewareFn`] and also what `.middleware(path, f)` of
+/// the app of the facade takes, as the closure of `body_limit` is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
+pub fn cors<E: RouteError>(
+    options: CorsOptions<E>,
+) -> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     let options = Rc::new(options);
     move |c: Context, next: Next<E>| -> LocalBoxFuture<'static, Result<Response, E>> {
         let options = Rc::clone(&options);
@@ -166,7 +170,9 @@ async fn preflight<E: RouteError>(
     c: &Context,
 ) -> Result<Response, E> {
     if !matches!(options.origin, CorsOrigin::Any) {
-        set(c, "Vary", "Origin")?;
+        c.res()
+            .append_header("Vary", "Origin")
+            .map_err(|error| E::refusal(&error))?;
     }
     if let Some(max_age) = &options.max_age {
         set(c, "Access-Control-Max-Age", max_age)?;

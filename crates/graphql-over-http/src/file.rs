@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: a file of a form data body.
  *
- * Derived from node v24.13.0, deps/undici/src/lib/web/fetch/formdata-parser.js, MIT.
+ * The multipart parser of form_data.rs fills them.
+ *
+ * Derived from undici 7.18.2, lib/web/fetch/formdata-parser.js, MIT.
  */
 
 //! `FileBody`, a file of a form data body.

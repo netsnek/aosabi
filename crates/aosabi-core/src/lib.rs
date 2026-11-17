@@ -3,14 +3,16 @@
  * aosabi-core: the crate of Aosabi an application links.
  *
  * This file holds the module list. The two extracted literals beside it,
- * in_context.graphql and number_scalar_messages.rs, are written by
- * tools/provenance and are no modules of this crate.
+ * in_context.graphql and number_scalar_messages.rs, are pinned byte for byte
+ * and are no modules of this crate.
  */
 
 //! The core of Aosabi.
 //!
-//! The crate is the home of everything an application links at run time, which is
-//! the application, its plugin contract and its context.
+//! The crate is the home of everything an application links at run time, which
+//! is the application, its plugin contract and its context. The application is
+//! a web app of `aosabi-http`, whose GraphQL handler runs over Yoga of
+//! `graphql-over-http`, and the serving of it lands with `aosabi-serve`.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |
@@ -22,6 +24,7 @@
 //! | [`create_schema`](mod@create_schema) | the GraphQL handler, `addResolversToSchema.js` | the resolver map and the schema build |
 //! | [`scalars`] | the GraphQL handler | the seven bound scalars |
 //! | [`service`] | no analogue | the service an application builds and a request or a subscription runs through |
+//! | [`embed`] | no analogue | the GraphQL request of a host that holds the engine in its own process |
 //! | [`request_stream`] | no analogue | the request lines a twin answers without a socket |
 //! | [`glue`] | no analogue | the traits the generated code calls |
 //! | [`app`] | `app/index.ts`, the GraphQL handler, `app/plugin-order.ts` | the application, its boot and its GraphQL handler |
@@ -62,14 +65,7 @@
 //! `graphql-over-graphtp`, which uses `core` and `alloc` alone, so a card with
 //! no standard library links the listener beside the descriptors.
 //!
-//! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/10_schema_tier1.ipynb`
-//! for the descriptors, `tests/notebooks/20_execute.ipynb` and
-//! `tests/notebooks/31_http_errors.ipynb` for the run time,
-//! `tests/notebooks/40_sse.ipynb` and `tests/notebooks/40_pubsub.ipynb` for
-//! the repeater, the pub sub and the subscriptions, and
-//! `tests/notebooks/25_carrier_unix.ipynb` and
-//! `tests/notebooks/38_card_limits.ipynb` for the listener.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![cfg_attr(not(feature = "runtime"), no_std)]
 
@@ -96,6 +92,8 @@ pub mod create_schema;
 #[cfg(feature = "runtime")]
 pub mod decorator;
 pub mod descriptor;
+#[cfg(feature = "runtime")]
+pub mod embed;
 #[cfg(feature = "runtime")]
 pub mod file;
 #[cfg(feature = "runtime")]

@@ -2,9 +2,11 @@
 /*
  * aosabi-scalars: the JSONObject scalar.
  *
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
  * Aosabi binds the scalar object itself under the name JSONObject.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/scalars/json/JSONObject.js, MIT.
  */
 
 //! The `JSONObject` scalar.

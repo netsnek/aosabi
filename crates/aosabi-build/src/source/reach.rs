@@ -2,6 +2,9 @@
 /*
  * aosabi-build: the types the roots of a crate reach through its plain
  * source, and what the reader cannot resolve.
+ *
+ * The walk goes from the roots through the properties, the parameters and the
+ * return types, here over the source alone.
  */
 
 //! The reach of the roots of a crate.
@@ -35,7 +38,8 @@
 //! reader does not read, a generic it cannot substitute, an inherent block
 //! whose uses it cannot tell among them, a trait object, an associated type, a
 //! macro expansion, a type alias chain it stops following, a type with no
-//! GraphQL form, or a name no item declares.
+//! GraphQL form, or a name no item declares. These are the open points of a
+//! plain source, which need type information only the compiler has.
 //!
 //! Beside the walk the reach names every member it meets by the rule of
 //! [`graphql_name`](super::names::graphql_name), keeps its doc text and its

@@ -3,9 +3,7 @@
  * aosabi-devtool json: writes a value as bytes the way node writes it.
  *
  * No analogue in the reference. The primitive behind it is aosabi-json, the
- * only crate that turns a number, a string or an object into bytes, and the
- * judging notebook is tests/notebooks/01_json_writer.ipynb, which drives this
- * sub command against node JSON.stringify over the same inputs.
+ * only crate that turns a number, a string or an object into bytes.
  */
 
 //! The `json` primitive of the seam.
@@ -261,7 +259,7 @@ impl fmt::Display for Failure {
 /// Any other call writes the bytes of the one input it names.
 pub fn run(args: &JsonArgs) -> ExitCode {
     if args.smoke {
-        println!("{}", stub::interface_line("json", true, "M1"));
+        println!("{}", stub::interface_line("json", true, "json"));
         return ExitCode::SUCCESS;
     }
     let outcome = gap(args.space.as_deref()).and_then(|gap| {

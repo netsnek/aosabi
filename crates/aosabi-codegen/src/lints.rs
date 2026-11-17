@@ -2,8 +2,7 @@
 /*
  * aosabi-codegen: the lint allowances every emitted item carries.
  *
- * No analogue on the reference side. The allowances and their reason are
- * docs/authoring.md section 29.5.
+ * No analogue on the reference side.
  */
 
 //! The lint allowances of the emitted items.
@@ -19,7 +18,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 /// The reason every allowance states.
-const REASON: &str = "the names are the GraphQL names of the reference verbatim, and a described comment is API text with no Errors section (docs/authoring.md section 29.5)";
+const REASON: &str = "the names are the GraphQL names of the reference verbatim, and a described comment is API text with no Errors section";
 
 /// Returns the attribute of the four allowances.
 #[must_use]

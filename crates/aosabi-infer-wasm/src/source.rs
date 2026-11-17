@@ -3,7 +3,11 @@
  * aosabi-infer-wasm source: the second type source of aosabi-infer, whose
  * every method the host answers from the live checker of typescript.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. Each method stands in for the
+ * call of the checker that the method doc of
+ * crates/aosabi-infer/src/type_source.rs names, and the host makes that call
+ * on the program of the app, as aosabi-ts-build/lib/checker.js writes each
+ * one down.
  */
 
 //! The type source of the host.

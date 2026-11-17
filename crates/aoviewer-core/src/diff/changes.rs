@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
  * aoviewer-core diff changes: the page model of the changes chapter.
+ *
+ * The chapter is tables and no diagram, and its diagrams come in a later
+ * release.
  */
 
 //! The changes chapter.

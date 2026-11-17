@@ -20,8 +20,7 @@
 //! change detection and not for authentication, every byte it hashes is a byte
 //! of the tree, and no secret enters the hash, so a hash that is constant in
 //! time buys nothing here and the function is the plain algorithm of the
-//! standard in safe code. Step 9 of `tests/notebooks/51_viewer_core.ipynb`
-//! holds it to `hashlib` of Python.
+//! standard in safe code.
 //!
 //! Every loop runs over the blocks of 64 bytes of the message, over the at
 //! most two blocks of its padding, over the 64 rounds and the 64 words of the

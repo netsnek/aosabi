@@ -1,23 +1,22 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the boot of one side of a fixture, captured until readiness, a dump file or exit.
 
-A boot log is standard output and the status, so a boot is a process of its own
-whose output is kept from its first byte. The helper starts the reference through
-the built `server.mjs` or `worker.mjs` of the build folder of a stage of
-`tests/harness/fixtures.py`, and the twin through its server binary, and waits for
-the first of three things: the listen line on standard output,
-the listen line of the reference and
-`Aosabi running at http://localhost:<port>` of the side under test, divergence D53
-of docs/byte-equality.md section 3, the dump file `AOSABI_BOOT_DUMP` names, which
-the fixture's plugin of the last pass writes and which is the readiness of a worker
-boot that binds no port, or the end of the process, which is how a failing boot
-ends. It keeps standard output as it stood at that moment, ends a process still
-running with `SIGTERM` on both sides alike, and reads what came after.
+A boot log is standard output and the status, so a boot is a process of its own whose
+output is kept from its first byte. The helper starts the reference through the built
+`server.mjs` or `worker.mjs` of the build folder of a stage of
+`tests/harness/fixtures.py`, and the twin through its server binary, and waits for the
+first of three things: the listen line on standard output, the listen line of the
+reference and `Aosabi running at http://localhost:<port>` of the side under test, the
+dump file `AOSABI_BOOT_DUMP` names, which the fixture's plugin of the last pass writes
+and which is the readiness of a worker boot that binds no port, or the end of the
+process, which is how a failing boot ends. It keeps standard output as it stood at that
+moment, ends a process still running with `SIGTERM` on both sides alike, and reads what
+came after.
 
-The streams go to files under `target/harness/boot/`, never under the
-temporary directory of the system. The reference half of the boot report comes
-from `tests/sidecar/boot-report.mjs`, which `reference_report` runs, and the
-twin writes its own where `AOSABI_BOOT_REPORT` names a file.
+The streams go to files under `target/harness/boot/`, never under the temporary
+directory of the system. The reference half of the boot report comes from a sidecar,
+which `reference_report` runs, and the twin writes its own where `AOSABI_BOOT_REPORT`
+names a file.
 """
 
 from __future__ import annotations
@@ -37,12 +36,12 @@ from .masks import apply as apply_masks
 from .paths import paths
 from .procs import _environment, run
 
-#: The listen line of the serving plugin, whose port the mask `boot-port` replaces,
-#: with the name of the reference or of Aosabi, divergence D53 of
-#: docs/byte-equality.md section 3.
+#: The listen line of the serving plugin, whose port the mask `boot-port` replaces, with
+#: the name of the reference or of Aosabi, a named divergence.
 LISTEN = re.compile(rb"(?:Pylon|Aosabi) running at http://localhost:([0-9]+)")
 
-#: The listen line of the reference and the one of the side under test, divergence D53.
+#: The listen line of the reference and the one of the side under test, a named
+#: divergence.
 LISTEN_REFERENCE = b"Pylon running at "
 LISTEN_AOSABI = b"Aosabi running at "
 
@@ -54,7 +53,7 @@ REFERENCE_ROLE = "PYLON_ROLE"
 BOOT_MASKS = ("time", "boot-port")
 
 #: The masks a boot log of the side under test is compared after, whose listen line
-#: names Aosabi, divergence D53 of docs/byte-equality.md section 3.
+#: names Aosabi, a named divergence.
 SIDE_MASKS = BOOT_MASKS + ("boot-port-aosabi",)
 
 #: The prefixes of the two lines of standard error a failing boot is compared on.
@@ -90,12 +89,11 @@ class Boot:
         return apply_masks(self.stdout, masks)
 
     def masked_as_reference(self, masks=None) -> bytes:
-        """Standard output masked as `masked_stdout` gives it, the listen line of D53 written as the reference writes it.
+        """Standard output masked as `masked_stdout` gives it, the listen line written as the reference writes it.
 
-        A side under test writes `Aosabi running at` where the reference writes
-        its own name, divergence D53 of docs/byte-equality.md section 3,
-        so a comparison of its boot log with the reference's names that one
-        line and holds every other byte to the reference.
+        A side under test writes `Aosabi running at` where the reference writes its own
+        name, a named divergence, so a comparison of its boot log with the reference's
+        names that one line and holds every other byte to the reference.
         """
         return self.masked_stdout(masks).replace(LISTEN_AOSABI, LISTEN_REFERENCE)
 
@@ -231,7 +229,7 @@ def boot_reference(name: str, port: int, variant: str = "default", node_env: str
     `role` is written into `REFERENCE_ROLE`, the variable the reference reads, `None`
     for unset, and the worker entry sets `worker` itself. With `dump` the boot names a fresh dump file in
     `AOSABI_BOOT_DUMP` and waits for it. The port reaches the reference through
-    the overlay, the rule of docs/harness.md section 2.1.
+    the overlay.
     """
     if variant not in variants_of(name):
         raise ValueError("no variant named %s" % variant)
@@ -252,6 +250,11 @@ def boot_twin(name: str, port: int, variant: str = "default", node_env: str | No
               role: str | None = None, dump: bool = False, report: Path | None = None, env: dict | None = None,
               release: bool = True, root=None, timeout_s: float = 40.0) -> Boot:
     """Boots the built twin of a fixture under a role, the twin of both entries of the reference.
+
+    The worker entry of the reference is the twin's binary under `AOSABI_ROLE=worker`,
+    the name the twin reads alone, and `report` names the file the twin writes its boot
+    report into, which the boot waits for before it ends the process, since the twin
+    writes it after the moment of readiness.
     """
     label = "twin-%s-%s-%s-%s" % (name, variant, role or "unset", node_env or "unset")
     dump_path = (paths(root).target / "harness" / "boot" / (label + ".dump.json")) if dump else None
@@ -267,7 +270,7 @@ def boot_twin(name: str, port: int, variant: str = "default", node_env: str | No
 
 def reference_report(name: str, port: int, variant: str = "default", node_env: str | None = "test",
                      role: str | None = None, entry: str = "server", root=None, timeout_s: float = 60.0) -> dict:
-    """The reference half of the boot report, written by tests/sidecar/boot-report.mjs.
+    """The reference half of the boot report, written by the sidecar of the boot report.
 
     The report carries the declared plugins of the configuration, the array
     executeConfig wrote back after both passes and the routes of the booted
@@ -289,11 +292,11 @@ def boot_bun(name: str, glue: Path, port: int, variant: str = "default", node_en
              root=None, timeout_s: float = 40.0) -> Boot:
     """Boots a glue of the reference's build of a fixture on Bun, under a role.
 
-    `glue` is the folder of the glue, the build folder of the staged fixture for the reference's
-    build on Bun, the reference of the host, which tests/ts1/bun.js serves, or
-    `glue/` of the stage of the judge mode for the TypeScript side, which
-    tests/ts1/bun-glue.js runs on the entry aosabi/bun of the staged package with
-    the IR `ir` and the engine `engine` of aosabi/bun, `module` naming the module
+    `glue` is the folder of the glue, the build folder of the staged fixture for the
+    reference's build on Bun, the reference of the host, which the Bun server of the
+    harness serves, or `glue/` of the stage of the judge mode for the TypeScript side,
+    which the Bun glue of the harness runs on the entry aosabi/bun of the staged package
+    with the IR `ir` and the engine `engine` of aosabi/bun, `module` naming the module
     of the stage the side takes. The reference's build on Bun is ready once the port
     accepts a connection, since its serving plugin binds on Node alone and Bun
     writes no listen line, and the side once it wrote the listen line, since

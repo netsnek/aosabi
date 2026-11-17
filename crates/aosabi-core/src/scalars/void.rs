@@ -1,12 +1,9 @@
-// SPDX-License-Identifier: MIT AND Apache-2.0
+// SPDX-License-Identifier: MIT
 /*
  * aosabi-core scalars void: the bound `Void` scalar.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
- * Changed by the Aosabi authors.
- *
- * Binds `GraphQLVoid` of graphql-scalars as it stands.
+ * The scalar is `GraphQLVoid` of graphql-scalars as
+ * it stands.
  */
 
 //! The bound `Void` scalar, the `GraphQLVoid` of graphql-scalars.

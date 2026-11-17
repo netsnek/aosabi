@@ -137,8 +137,8 @@ impl Hasher for KeyHasher {
 /// seven bits of the hash, so keys chosen to agree in the tag as well add on top
 /// of that a comparison of the key for each of them on every probe that passes
 /// them. A cap on the count of keys of one object in the JSON reader would bound
-/// both costs. A key the client does not know leaves it no way to choose such
-/// keys.
+/// both costs. The reader caps no key count. A key the client does not know
+/// leaves it no way to choose such keys.
 #[derive(Clone, Copy)]
 pub struct KeyState {
     /// The two words of the key, read little endian from its sixteen bytes.
@@ -170,6 +170,29 @@ impl BuildHasher for KeyState {
 }
 
 impl KeyState {
+    /// Returns the state of the key `seed` stored for this thread, or `None`
+    /// while it stores none.
+    ///
+    /// A build without the standard library has no `seed` and answers `None`. A
+    /// table that hashes under one state for its whole life keeps this one once
+    /// it answers, and before then hashes with [`KeyState::default`] and keeps
+    /// nothing, so a platform that keys its thread on a later request than the
+    /// first keys the table as well. The module of `aosabi-js` and its native
+    /// library for Bun key their thread at their boot, or at the first call of
+    /// the host that hands them bytes.
+    #[inline]
+    #[must_use]
+    pub fn seeded() -> Option<Self> {
+        #[cfg(feature = "std")]
+        {
+            SEEDED_KEY.with(Cell::get).map(|key| Self { key })
+        }
+        #[cfg(not(feature = "std"))]
+        {
+            None
+        }
+    }
+
     /// Returns the `SipHash-1-3` of `bytes` under the key of this state.
     ///
     /// The key is the one the state took when it was made, the key of `seed` or
@@ -204,22 +227,39 @@ impl fmt::Debug for KeyState {
 /// sixteen bytes of its randomness. The boot of a Linux card calls it with
 /// sixteen bytes of the randomness it installs, before its first pass makes the
 /// cache of parsed documents, whose hash of a text is a [`KeyState`] on every
-/// target. Until a platform calls it, every map of a build whose builder is
-/// [`KeyState`] hashes with the fixed key. Where [`KeyHasherBuilder`] is the
-/// `RandomState` of the standard library, the key reaches only the maps that
-/// name [`KeyState`], since the standard library keys the others.
+/// target. The entries that answer a request, which the module doc of
+/// `aosabi_core::random` names, call its `seed_keys` too before they read one,
+/// so the threads of a host that embeds the engine or calls a service from
+/// threads of its own are keyed on their first request, from the provider the
+/// host installed, and with none, from a `RandomState` where the standard
+/// library draws its keys from the operating system, and on the three targets
+/// where [`KeyHasherBuilder`] is [`KeyState`] for want of such a source each of
+/// those entries refuses a request until the host installs a provider. A Worker
+/// builds this crate with the feature `std` through the default features of
+/// `aosabi-core`, and the module of `aosabi-js` and its native library for Bun
+/// call it with sixteen bytes of `crypto.getRandomValues` of the host at the end
+/// of their boot, and where the host refuses them there, as workerd does in its
+/// global scope, at the first call of an export that decodes a record. Until a
+/// platform calls it, every map of a build whose builder is [`KeyState`] hashes
+/// with the fixed key, the maps the boot of that module makes among them. Where
+/// [`KeyHasherBuilder`] is the `RandomState` of the standard library, the key
+/// reaches only the maps that name [`KeyState`], since the standard library keys
+/// the others.
 ///
 /// The key is kept for the thread that calls it, as the standard library keeps
-/// the keys of `RandomState`, so a map another thread makes keeps the fixed key.
-/// No served crate starts a thread, so the thread that calls it at start makes
-/// every map.
+/// the keys of `RandomState`, so a map another thread makes keeps the fixed key
+/// until that thread is keyed too. No served crate starts a thread, so in a
+/// served binary the thread that calls it at start makes every map, and the
+/// threads of a host are keyed by the entries of the engine.
 ///
 /// Only a build with the feature `std` has it. A function that stores a key
 /// every later map reads needs a static it writes, and without the standard
 /// library safe Rust offers that as an atomic type alone, since every other type
 /// of `core` with interior mutability is not `Sync`. This crate ships on the
 /// ESP32-C3, and a crate that ships there uses no atomic type, not even a load
-/// or a store.
+/// or a store. So a build without the standard library hashes with the fixed key
+/// until a later release, which builds the runtime of that card, decides how the
+/// randomness of the card keys its maps.
 ///
 /// # Errors
 ///
@@ -265,7 +305,11 @@ pub type KeyHasherBuilder = std::hash::RandomState;
 /// where it is off. That is the case with no standard library, where the feature
 /// `std` is off, and on `wasm32-unknown-unknown` and the operating systems
 /// `xous` and `vexos`, whose standard library takes the key of `RandomState`
-/// from the addresses of two allocations for want of a source.
+/// from the addresses of two allocations for want of a source. The builds of the
+/// cards `worker` and `esp32c3-devkitm1` are such builds, so they hash with the
+/// fixed key, with no cap on the count of keys of an object, the Worker until
+/// its first request calls `seed` and the ESP32-C3 until a later release keys
+/// it, which the doc of [`KeyState`] weighs.
 #[cfg(not(all(
     feature = "std",
     not(any(

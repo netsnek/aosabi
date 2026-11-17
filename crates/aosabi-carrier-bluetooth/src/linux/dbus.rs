@@ -4,7 +4,11 @@
  * written in the project, the wire format of the messages BlueZ exchanges
  * over UnixStream.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The client follows the D-Bus
+ * specification, https://dbus.freedesktop.org/doc/dbus-specification.html,
+ * sections Type System, Marshaling (Wire Format), Message Protocol,
+ * Authentication Protocol and Message Bus Specification, read, in place of
+ * zbus.
  */
 
 //! A client of the system bus.

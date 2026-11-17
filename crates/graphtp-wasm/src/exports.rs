@@ -3,7 +3,10 @@
  * graphtp-wasm exports: the exports of the module, each a line over the safe
  * call of the same name in host.rs.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The names are those
+ * Documentation/guides/graphtp.md gives, with engine_free, abort and codec
+ * beside them, and each export carries its own expectation of the lint
+ * unsafe_code and no unsafe block.
  */
 
 //! The exports of the module.
@@ -19,7 +22,7 @@ use crate::host;
 /// Returns the address of a new buffer of `len` bytes, 0 where none is made.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn alloc(len: u32) -> u32 {
@@ -29,7 +32,7 @@ pub extern "C" fn alloc(len: u32) -> u32 {
 /// Drops the buffer at `addr`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn free(addr: u32) {
@@ -39,7 +42,7 @@ pub extern "C" fn free(addr: u32) {
 /// Returns the address of the answer buffer.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn answer() -> u32 {
@@ -49,7 +52,7 @@ pub extern "C" fn answer() -> u32 {
 /// Builds a link and returns its number, 0 where it cannot be built.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn engine_new(
@@ -67,7 +70,7 @@ pub extern "C" fn engine_new(
 /// Drops the link `engine`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn engine_free(engine: u32) {
@@ -77,7 +80,7 @@ pub extern "C" fn engine_free(engine: u32) {
 /// Brings the link `engine` up.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn link_up(engine: u32) -> i32 {
@@ -87,7 +90,7 @@ pub extern "C" fn link_up(engine: u32) -> i32 {
 /// Takes the link `engine` down.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn link_down(engine: u32) -> i32 {
@@ -97,7 +100,7 @@ pub extern "C" fn link_down(engine: u32) -> i32 {
 /// Hands the link `engine` the bytes its carrier received at `now`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn push_rx(engine: u32, addr: u32, len: u32, now: u64) -> i32 {
@@ -107,7 +110,7 @@ pub extern "C" fn push_rx(engine: u32, addr: u32, len: u32, now: u64) -> i32 {
 /// Answers the bytes the carrier of the link `engine` sends at `now`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn poll_tx(engine: u32, now: u64) -> i32 {
@@ -117,7 +120,7 @@ pub extern "C" fn poll_tx(engine: u32, now: u64) -> i32 {
 /// Answers the next event record of the link `engine`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn poll_event(engine: u32) -> i32 {
@@ -127,7 +130,7 @@ pub extern "C" fn poll_event(engine: u32) -> i32 {
 /// Asks the link `engine` for an OPERATION and answers its token.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn operation(
@@ -151,7 +154,7 @@ pub extern "C" fn operation(
 /// Asks the link `engine` for one PULL.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn pull(engine: u32) -> i32 {
@@ -161,7 +164,7 @@ pub extern "C" fn pull(engine: u32) -> i32 {
 /// Sends a CANCEL of the stream `handle` on the link `engine`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn cancel(engine: u32, handle: u32) -> i32 {
@@ -171,7 +174,7 @@ pub extern "C" fn cancel(engine: u32, handle: u32) -> i32 {
 /// Ends the exchange of the token `token` on the link `engine`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn abort(engine: u32, token: u32) -> i32 {
@@ -181,7 +184,7 @@ pub extern "C" fn abort(engine: u32, token: u32) -> i32 {
 /// Runs the timers of the link `engine` at `now`.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn handle_timeout(engine: u32, now: u64) -> i32 {
@@ -191,7 +194,7 @@ pub extern "C" fn handle_timeout(engine: u32, now: u64) -> i32 {
 /// Answers when the link `engine` next needs its timers run.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn next_timeout(engine: u32) -> i64 {
@@ -201,7 +204,7 @@ pub extern "C" fn next_timeout(engine: u32) -> i64 {
 /// Runs an operation of the codec and answers the length of its record.
 #[expect(
     unsafe_code,
-    reason = "a wasm export needs its symbol name, owner question 15 of ADR-0027"
+    reason = "a wasm export needs its symbol name, an unsafe attribute in edition 2024"
 )]
 #[unsafe(no_mangle)]
 pub extern "C" fn codec(op: u32, a: u32, a_len: u32, b: u32, b_len: u32, x: u32, y: u32) -> i32 {

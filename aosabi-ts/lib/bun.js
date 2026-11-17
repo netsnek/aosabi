@@ -5,7 +5,16 @@
  * of the engine through bun:ffi or core.wasm.
  *
  * Bun serves the app as the default export of the glue of a build, while the
- * serving plugin useNodeServer binds on Node alone.
+ * serving plugin useNodeServer binds on Node alone. This entry loads the
+ * library of the platform package of the process through dlopen of bun:ffi,
+ * falls back to core.wasm when none is present, reads an environment variable
+ * that forces core.wasm for the comparison, hands every app of the process
+ * that engine when it loads, so the logger of an app writes before its first
+ * request, serves an app over Bun.serve with serve(app, options) and serves an
+ * app whose configuration names useNodeServer over Bun.serve as that plugin
+ * serves it on Node, with no HTTP code and no deflate code of its own:
+ * compress() of hono in Pylon's base pipeline codes a body through the
+ * CompressionStream of Bun, lib/pylon.js.
  */
 
 // The library is the crate aosabi-js built as a cdylib from the code of
@@ -28,7 +37,8 @@
 // thread takes core.wasm. The JSCallbacks stay alive as long as the thread,
 // since the library may call them at any later call.
 import { dlopen, JSCallback, read, toArrayBuffer } from "bun:ffi";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
+import { basename, dirname, isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { wasmEngine } from "./core.js";
 import { App } from "./pylon.js";
@@ -44,6 +54,12 @@ export const LIBRARY = "libaosabi.so";
 
 // The architectures of Bun with a platform package, by process.arch.
 const ARCHES = new Set(["x64", "arm64"]);
+
+// The folder of a checkout of Aosabi that holds the platform packages. They
+// are released through the repository of Aosabi alone, so the package aosabi
+// names none of them and an app installs the package of its machine by the
+// path of its folder there, once its library is built and copied into it.
+const NATIVE_FOLDER = "aosabi-ts-native";
 
 // The symbols of the library and their types, the export lines of
 // crates/aosabi-js/src/abi.rs: an address is a pointer, null where the
@@ -118,17 +134,115 @@ export function platformPackage() {
   return { name: "aosabi-linux-" + process.arch + "-" + libc(), reason: null };
 }
 
-// Returns the path of the library of the platform package of this process as
-// the package aosabi resolves it, or null with the reason where it is not
-// installed.
+// Returns the root of the app of the process from the entry Bun runs,
+// Bun.main, where it is the absolute path of an existing regular file: the
+// folder that holds the folder .aosabi of the entry, as the glue of a build
+// takes its root from its own place, and the folder of the entry where it
+// lies in no folder .aosabi. Bun names an entry it runs with no file, such as
+// the code of bun -e, by a path in the working directory, so for such an
+// entry the answer is null and no folder of the app is read.
+function appRoot() {
+  const main = Bun.main;
+  if (!isAbsolute(main) || !isFile(main)) return null;
+  const entry = dirname(main);
+  return basename(entry) === ".aosabi" ? dirname(entry) : entry;
+}
+
+// Returns the folders an install of the platform package `name` puts it in,
+// and no other: the folder node_modules that holds this package aosabi, where
+// the tarball of aosabi is installed and the platform package beside it, and
+// the folder node_modules of `root`, the root of the app that appRoot
+// answers, where the app installs the platform package while aosabi is a
+// link whose real path, the path Bun resolves this file by, lies in a
+// checkout or in the store of a package manager such as pnpm. No folder above
+// either is read, so a package of that name elsewhere on the machine is never
+// loaded.
+function platformFolders(name, root) {
+  const holder = dirname(fileURLToPath(new URL("..", import.meta.url)));
+  const folders = basename(holder) === "node_modules" ? [join(holder, name)] : [];
+  if (root === null) return folders;
+  const app = join(root, "node_modules", name);
+  return folders.includes(app) ? folders : [...folders, app];
+}
+
+// Returns whether `path` names an existing regular file.
+function isFile(path) {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
+// Returns the version the package.json at `file` names, or null where the
+// file cannot be read or names none.
+function versionOf(file) {
+  try {
+    const { version } = JSON.parse(readFileSync(file, "utf8"));
+    return typeof version === "string" ? version : null;
+  } catch {
+    return null;
+  }
+}
+
+// Names the version `version` of versionOf in a reason.
+function named(version) {
+  return version === null ? "no version" : "the version " + version;
+}
+
+// Returns the path of the library of the platform package of this process in
+// the first folder of platformFolders that holds the file, or null with the
+// reason where none does. The library is opened only where the package.json
+// of the platform package names the version of this package aosabi. That
+// comparison holds the two packages to one version and catches a platform
+// package installed as the tarball of another version, and it sees no stale
+// library: a folder installed by its path moves with its checkout, so there
+// only the build and copy of the library after every update keeps it
+// current. The reason names both versions where they differ, a folder that
+// holds the package.json of the platform package and no library, and
+// otherwise the folders it read and the folder of a checkout to install the
+// package from.
 export function nativeLibrary() {
   const { name, reason } = platformPackage();
   if (name === null) return { path: null, reason };
-  try {
-    return { path: fileURLToPath(import.meta.resolve(name + "/" + LIBRARY)), reason: null };
-  } catch {
-    return { path: null, reason: "the platform package " + name + " is not installed" };
+  const own = versionOf(fileURLToPath(new URL("../package.json", import.meta.url)));
+  const root = appRoot();
+  const folders = platformFolders(name, root);
+  let bare = null;
+  for (const folder of folders) {
+    const path = join(folder, LIBRARY);
+    const manifest = join(folder, "package.json");
+    if (!isFile(path)) {
+      bare ??= isFile(manifest) ? folder : null;
+      continue;
+    }
+    const version = versionOf(manifest);
+    if (version === null || version !== own) {
+      return {
+        path: null,
+        reason: "the platform package " + name + " at " + folder + " carries " + named(version) +
+          " and aosabi " + named(own) + ", so its library " + LIBRARY + " is not opened, and an " +
+          "app installs aosabi and the platform package from the same checkout again",
+      };
+    }
+    return { path, reason: null };
   }
+  if (bare !== null) {
+    return {
+      path: null,
+      reason: "the platform package " + name + " at " + bare + " holds no library " + LIBRARY +
+        ", which a checkout builds and copies into the folder " + NATIVE_FOLDER + "/" + name +
+        " before npm pack packs it",
+    };
+  }
+  return {
+    path: null,
+    reason: "the platform package " + name + " is not installed" +
+      (folders.length === 0 ? "" : " at " + folders.join(" or ")) + ", which an app installs by " +
+      "path from the folder " + NATIVE_FOLDER + "/" + name + " of a checkout of Aosabi once its " +
+      "library " + LIBRARY + " is built and copied into it" +
+      (root === null ? ", and the entry Bun runs is no file, so no folder of the app is read" : ""),
+  };
 }
 
 // Wraps the function `fn` of the host as the body of a JSCallback, which
@@ -355,8 +469,8 @@ function listen(app, options) {
 // node:http: on the port of `options`, of the variable PORT where Number reads
 // a port of it, or 3000, as the rule of the plugin reads them, and once the
 // server listens it writes the line
-// `Aosabi running at http://localhost:<port>` through the console,
-// divergence D53 of docs/byte-equality.md section 3. The pass of executeConfig calls it in the role web alone and
+// `Aosabi running at http://localhost:<port>` through the console, a named
+// divergence. The pass of executeConfig calls it in the role web alone and
 // never under NODE_ENV=development, lib/index.js. The server binds every
 // address of IPv6 and of IPv4 where the system gives IPv6, the default of
 // Bun.serve, as node:http binds.

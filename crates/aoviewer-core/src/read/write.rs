@@ -34,24 +34,25 @@ use crate::{
 /// descriptions where the model carries them, so the two round trip.
 ///
 /// The result is `{"data":{"__schema":..}}`, the answer to
-/// [󰀁](super::INTROSPECTION_QUERY) with every key in the order of the
-/// selections of the query, no whitespace, and every string in the escapes of
-/// `JSON.stringify`, which is how graphql-js answers the same query. A named
-/// type nine wrappers deep stands without `ofType`, as the query selects it
-/// there. A deeper reference, which graphql-js cuts off, is written in full,
-/// so it round trips. The types and the directives stand in schema order. A
-/// key a kind does not carry is `null`, the possible types of an interface
-/// are the objects that implement it, and every directive argument is written
-/// as not deprecated, because the model holds no deprecation for one. The
-/// output is appended to `out`.
+/// [`INTROSPECTION_QUERY`](super::INTROSPECTION_QUERY) with every key in the
+/// order of the selections of the query, no whitespace, and every string in
+/// the escapes of `JSON.stringify`, which is how graphql-js answers the same
+/// query. A named type nine wrappers deep stands without `ofType`, as the
+/// query selects it there. A deeper reference, which graphql-js cuts off, is
+/// written in full, so it round trips. The types and the directives stand in
+/// schema order. A key a kind does not carry is `null`, the possible types of
+/// an interface are the objects that implement it, and every directive
+/// argument is written as not deprecated, because the model holds no
+/// deprecation for one. The output is appended to `out`.
 ///
 /// For a schema graphql-js builds from SDL, with nine wrappers or fewer on
 /// every type reference and no deprecated directive argument, the model that
-/// [󰀀](super::from_introspection) reads from graphql-js's answer is written
-/// byte equal to that answer. A deprecated directive argument is outside it,
-/// because graphql-js answers it as deprecated. A schema built otherwise is
-/// outside it, because its text may hold a lone surrogate, which the JSON
-/// reader replaces by U+FFFD and which SDL cannot carry.
+/// [`from_introspection`](super::from_introspection) reads from graphql-js's
+/// answer is written byte equal to that answer. A deprecated directive
+/// argument is outside it, because graphql-js answers it as deprecated. A
+/// schema built otherwise is outside it, because its text may hold a lone
+/// surrogate, which the JSON reader replaces by U+FFFD and which SDL cannot
+/// carry.
 ///
 /// [specification]: https://spec.graphql.org/October2021/
 pub fn to_introspection(model: &Model, out: &mut String) {
@@ -280,8 +281,9 @@ fn deprecation(d: Option<&Deprecation>, out: &mut String) {
 }
 
 /// The level of a type reference at which the fragment `TypeRef` of
-/// [󰀁](super::INTROSPECTION_QUERY) selects `kind name` without `ofType`,
-/// counted from 0 at the reference itself, which is the tenth level.
+/// [`INTROSPECTION_QUERY`](super::INTROSPECTION_QUERY) selects `kind name`
+/// without `ofType`, counted from 0 at the reference itself, which is the
+/// tenth level.
 const QUERY_LAST_LEVEL: usize = 9;
 
 /// Writes a list of references to named types.

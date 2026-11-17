@@ -3,7 +3,9 @@
  * aosabi-js request: the pending table of the requests in flight and the two
  * job modes.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The records of a request and of its answer are those of the
+ * probe of the Worker, and the faithful job mode runs the jobs in the app's own microtask
+ * queue, over the queue a host owns of the agent of aosabi-execute.
  */
 
 //! The requests in flight.
@@ -17,7 +19,7 @@
 //! hono of the host has routed it: the byte 0 for the server of the GraphQL
 //! endpoint with no router, the request the handler of the glue hands in,
 //! [`crate::endpoint`], and the byte 1 for the app of the engine, the routes
-//! of the plugins of the engine and its not found handler.
+//! of the plugins of the engine, the login of Zitadel.
 //!
 //! The host runs the routes and the middleware of an app in its own hono and
 //! opens a request here before it hands it to the engine, the op `OPEN` of
@@ -60,28 +62,26 @@
 //! entry with all it holds. The table is a vector, searched by the number of
 //! the request, since a host holds a few requests in flight at once.
 //!
-//! The boot record picks one of two job modes. The first import of a request
-//! that runs on an agent adopts it: the agent tells the host of each job
-//! through the import `host_enqueue`, and the host answers with one microtask
-//! of its own that calls the export `run_job`, so each job of the agent runs as
-//! one microtask in the same queue as the app's own, in the order the agent
-//! enqueued them. The export grants the agent that one job and polls the
-//! request, so the job runs in the drain of the loop of its agent inside that
-//! poll, with the context of the request, the request that runs and the agent
-//! in place, as a job the agent drains itself runs. A settlement of a promise
-//! of the host runs the jobs it enqueues inside its own microtask, where V8
-//! runs the reaction of the `then` of `wrapResolver` on the promise the settled one stands
-//! for. A settlement a callback of the app makes inside an import rides on the
-//! answer of that import and takes effect as the import returns, so in the job
-//! of that call. Its reactions run at once, and the jobs they enqueue, the
-//! reactions of the consumer of the engine, wait for the microtask the host
-//! reserved at that call, where V8 queues the reactions of the promise of the
-//! app, which calls the export `resume`. A settlement through the resolving
-//! functions the host handed a thenable it adopts runs a level of reactions
-//! more at once, inside an import or in the microtask of the export `settle`,
-//! since the async function of a root reacts on such a settlement itself.
-//! In the fast mode a settlement drives the request at once, and the jobs of
-//! the agent run in the same turn.
+//! The boot record picks one of two job modes. In the faithful mode, the default, the host
+//! owns the queue of every agent the code of a request runs on. The first import of a request
+//! that runs on an agent adopts it: the agent tells the host of each job through the import
+//! `host_enqueue`, and the host answers with one microtask of its own that calls the export
+//! `run_job`, so each job of the agent runs as one microtask in the same queue as the app's
+//! own, in the order the agent enqueued them. The export grants the agent that one job and
+//! polls the request, so the job runs in the drain of the loop of its agent inside that poll,
+//! with the context of the request, the request that runs and the agent in place, as a job
+//! the agent drains itself runs. A settlement of a promise of the host runs the jobs it
+//! enqueues inside its own microtask, where V8 runs the reaction of the `then` of
+//! `wrapResolver` on the promise the settled one stands for. A settlement a callback of the
+//! app makes inside an import rides on the answer of that import and takes effect as the
+//! import returns, so in the job of that call. Its reactions run at once, and the jobs they
+//! enqueue, the reactions of the consumer of the engine, wait for the microtask the host
+//! reserved at that call, where V8 queues the reactions of the promise of the app, which
+//! calls the export `resume`. A settlement through the resolving functions the host handed a
+//! thenable it adopts runs a level of reactions more at once, inside an import or in the
+//! microtask of the export `settle`, since the async function of a root reacts on such a
+//! settlement itself. In the fast mode a settlement drives the request at once, and the jobs
+//! of the agent run in the same turn.
 //!
 //! An answer whose body is a stream, the events of a subscription or the parts
 //! of a multipart stream of a result processor of Yoga, or the body of a web
@@ -223,7 +223,7 @@ const SHARE: usize = 4;
 const TO_ENDPOINT: u8 = 0;
 
 /// The byte after the record of a request that hands it to the app of the
-/// engine, the routes of its plugins and its not found handler.
+/// engine, the routes of its plugins.
 const TO_APP: u8 = 1;
 
 /// The mark of an answer the host leaves alone.
@@ -614,9 +614,14 @@ pub fn wait_on(request: u32, handle: u32, promise: Rc<JsPromise>) {
 ///
 /// The last byte of the input names what answers the request,
 /// [`TO_ENDPOINT`] or [`TO_APP`], and the bytes before it are the record of
-/// the request, none for a request the host opened.
+/// the request, none for a request the host opened. The call keys the hashes
+/// of the thread before it makes a map, where no call before keyed them,
+/// [`crate::boot::seed_keys`].
 pub fn fetch(len: u32, request: u32) -> usize {
     let mut record = host::input(len);
+    // The randomness of the host comes through the input buffer, so the
+    // record is read first.
+    crate::boot::seed_keys();
     let to = record.pop();
     if with_entry(request, |entry| entry.opened.is_some()).unwrap_or(false) {
         aosabi_core::clock::note_turn();
@@ -799,9 +804,19 @@ fn execute_request(record: &[u8], request: u32) -> Option<Request> {
 /// `record` of `request`, which the server of the GraphQL endpoint or the app
 /// of the engine answers as `to` names, or the record of the failure the
 /// module answers at once where it is not booted or the record is not valid.
+///
+/// A request to the endpoint on a thread that holds no key keys it through
+/// `aosabi_core::random::seed_keys` first. Where that finds no source, as on
+/// `wasm32-unknown-unknown` while the host hands no random bytes, it answers the refusal at
+/// once, before the engine reads any part of the request: the status 503 with the text of
+/// `NO_RANDOMNESS` and no header field, the answer `BootedApp::fetch` gives a request to the
+/// app of the engine there.
 fn answer_of(record: &Rc<[u8]>, request: u32, to: Option<u8>) -> Result<Answer, Vec<u8>> {
     match (crate::boot::app(), request_of(record, request), to) {
         (None, _, _) => Err(failure(503, b"the module is not booted")),
+        (Some(_), Some(_), Some(TO_ENDPOINT)) if aosabi_core::random::seed_keys().is_err() => {
+            Err(failure(503, aosabi_core::random::NO_RANDOMNESS.as_bytes()))
+        }
         (Some(booted), Some(parsed), Some(TO_ENDPOINT)) => Ok(Box::pin(async move {
             record_of_answer(crate::endpoint::answer(booted, Rc::new(parsed), request).await).await
         })),

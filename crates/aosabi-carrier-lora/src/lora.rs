@@ -3,13 +3,13 @@
  * aosabi-carrier-lora lora: the carrier LoRa, the band, the pairing and the
  * values of a LoRa card.
  *
- * The carrier is that of the Homa design note, second version, homa/design.md
- * sections 6.3 to 6.7 and 7.9, lines 1810 to 2024 and 2816 to 2889: one compact
- * packet per LoRa packet sealed in the frame of section 6.5, no grants, the
- * airtime ledger of section 6.3, channel activity detection before every
- * transmission with a busy channel delaying the packet by a random fraction of
- * one packet's time on air, and bursts of at most 2 s of air, at least one
- * packet, followed by a listening gap of twice a RESEND's time on air.
+ * The carrier sends one compact packet per LoRa packet sealed in the LoRa
+ * frame, with no grants, the airtime ledger, channel activity detection before
+ * every transmission with a busy channel delaying the packet by a random
+ * fraction of one packet's time on air, and bursts of at most 2 s of air, at
+ * least one packet, followed by a listening gap of twice a RESEND's time on
+ * air. A card raises the longest response to 8,192 bytes at SF7 to SF9 in the
+ * 10 percent band.
  */
 
 //! The carrier, the band, the pairing and the values of a card.
@@ -33,13 +33,12 @@
 //! Two rules keep the air of the link for what the pairing does not know.
 //! A LIMITS that names this end's limits of the pairing does not leave, since
 //! both ends hold them from the pairing and no LIMITS crosses the air on a
-//! healthy link, while a LIMITS that names other limits leaves, as the
-//! design note's section 6.4 keeps `NEED_LIMITS` for a pairing that went
-//! stale. And a carrier that has just heard a frame holds its own for two
-//! turnarounds, so the next frame of a sender's burst, which starts one
-//! turnaround after the last, shows in the channel activity detection and
-//! the answer waits for the sender's listening gap in place of colliding
-//! with it.
+//! healthy link, while a LIMITS that names other limits leaves, since
+//! `NEED_LIMITS` stays for a pairing that went stale. And a carrier that has
+//! just heard a frame holds its own for two turnarounds, so the next frame of
+//! a sender's burst, which starts one turnaround after the last, shows in the
+//! channel activity detection and the answer waits for the sender's listening
+//! gap in place of colliding with it.
 
 use core::cell::Cell;
 
@@ -97,11 +96,11 @@ const RESEND_LEN: usize = 14;
 /// The code of a DATA packet, the first byte of its compact header.
 const DATA: u8 = homa::wire::DATA;
 
-/// The longest response the design note gives a `LoRa` link.
+/// The longest response of a `LoRa` link where no card raises it.
 const LONGEST_NOTE: u32 = 2_048;
 
 /// The longest response a card raises its link to at SF7 to SF9 in the 10
-/// percent band, the default of ADR-0026.
+/// percent band for introspection.
 pub const LONGEST_RAISED: u32 = 8_192;
 
 /// The band a link transmits in, which fixes the duty cycle and the longest
@@ -201,9 +200,9 @@ impl core::fmt::Debug for Pairing {
 }
 
 /// Returns the longest response of a link of `modulation` in `band`: 8,192
-/// bytes at SF7 to SF9 in the band P, where a card raises it for introspection
-/// by ADR-0026, and elsewhere the longest message of [`Profile::lora`], at most
-/// 2,048 bytes and a quarter of the hour's air of the band.
+/// bytes at SF7 to SF9 in the band P, where a card raises it for
+/// introspection, and elsewhere the longest message of [`Profile::lora`], at
+/// most 2,048 bytes and a quarter of the hour's air of the band.
 #[must_use]
 pub const fn longest_response(modulation: Modulation, band: Band) -> u32 {
     let sf = modulation.spreading_factor();
@@ -233,13 +232,12 @@ pub const fn limits(modulation: Modulation, band: Band, max_rpcs: u8) -> Limits 
 /// The unanswered RESEND and `NEED_ACK` packets after which a peer of a
 /// `LoRa` link is dead.
 ///
-/// The design note takes 5, the first version's floor, as a value for the model
-/// of `29_carrier_lora` to measure, and the carrier takes 10, since collisions
-/// and a busy channel add to the loss of a shared band. At 10 percent loss an
-/// exchange of a RESEND and its answer fails with the likelihood 1 - 0.9^2,
-/// 0.19, so five failed exchanges in a row end about one recovery in 4,000 and
-/// ten about one in 16 million, before collisions and a busy channel raise the
-/// loss.
+/// The floor is 5, a value for the model of `29_carrier_lora` to measure, and
+/// the carrier takes 10, since collisions and a busy channel add to the loss
+/// of a shared band. At 10 percent loss an exchange of a RESEND and its answer
+/// fails with the likelihood 1 - 0.9^2, 0.19, so five failed exchanges in a
+/// row end about one recovery in 4,000 and ten about one in 16 million, before
+/// collisions and a busy channel raise the loss.
 pub const TIMEOUT_RESENDS: u8 = 10;
 
 /// The bytes of a BUSY of the compact form, the answer a device gives a
@@ -256,7 +254,16 @@ const BUSY_LEN: usize = 6;
 /// RESENDs and of the BUSY each draws, at its duty cycle. A ledger that
 /// recovery has filled holds every packet of a live link until air ages out of
 /// its hour, so a silence of the RESEND intervals alone can end a live link
-/// whose packets wait in its ledger.
+/// whose packets wait in its ledger. At SF12 in the band M ten exchanges of a
+/// RESEND and a BUSY take 34.6 s of the 36 s of air an hour, and the time to
+/// earn that air is 3,457 s, about 58 minutes, against 128 s of ten RESEND
+/// intervals of 12.8 s. At SF7 in the band P it is 14.4 s against 43 s. The 36
+/// s of air an hour, the RESEND interval of 12.8 s and the 3,457 s and 43 s
+/// after which a peer is dead stand in the table of the values of a card in
+/// `29_carrier_lora`. The 34.6 s and 14.4 s are assumed, computed from
+/// [`time_on_air`] of a RESEND and a BUSY with the frame's overhead and the
+/// duty cycle of the band, and so is the 128 s, [`TIMEOUT_RESENDS`] times that
+/// RESEND interval.
 #[must_use]
 pub const fn profile(modulation: Modulation, band: Band) -> Profile {
     let longest = longest_response(modulation, band);

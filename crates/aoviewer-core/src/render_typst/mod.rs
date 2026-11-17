@@ -10,7 +10,7 @@
 //!
 //! [`render_typst_page`] writes one [`PageModel`] as Typst, the page of a
 //! chapter of the document the generator writes, and [`render_typst_scene`]
-//! writes one [󰀃](crate::scene::Scene) as the `#sv-diagram(..)` call of a
+//! writes one [`Scene`](crate::scene::Scene) as the `#sv-diagram(..)` call of a
 //! diagram. The generated files hold data only, and every function they call
 //! lives in the theme, [`SABI_THEME`], so the whole visual language is restyled
 //! by editing that one file.
@@ -38,7 +38,7 @@
 //!   `#sv-anchor(label("..."))`, before the heading or inside the cell of its
 //!   element. A link to an element whose page the tree does not write is no
 //!   link, so every label a page links to is one the document holds, and a dead
-//!   label is a compile error that `76_docs_pdf` counts.
+//!   label is a compile error that the checks of the PDF count.
 //! - The title of a page is a heading of the outline, level 1 for a page that
 //!   opens a chapter and level 2 for a type page and the pages that follow a
 //!   chapter opener, since the type pages of a cluster follow the page of the

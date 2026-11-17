@@ -6,8 +6,7 @@
  *
  * The rule is hono's with the list of codings deflate alone, since Aosabi codes
  * no gzip, and with Accept-Encoding read as a list of codings and their weights
- * in place of hono's substring test, divergence D71 of docs/byte-equality.md
- * section 3.
+ * in place of hono's substring test, a named divergence.
  *
  * Derived from hono 4.11.9, dist/middleware/compress/index.js, MIT.
  * Derived from hono 4.11.9, dist/utils/compress.js, MIT.
@@ -23,19 +22,24 @@
 //! that `Accept-Encoding` accepts, codes the body as a stream, deletes
 //! `Content-Length` and sets `Content-Encoding`. It reads the field as a list
 //! of codings with their weights, [`accepted_coding`], where hono takes the
-//! first coding whose name is a substring of the field, the named divergence
-//! D71 of `docs/byte-equality.md` section 3. The list is `deflate` alone, since
-//! Aosabi codes no gzip, so an answer a TypeScript app codes as `gzip` is
-//! `deflate` or identity here, the named divergence D43 of the same section, with the body
-//! equal after decoding. A coding is never forced, so the option `encoding` of
-//! the reference, which codes one coding whatever the request accepts, is not
-//! ported.
+//! first coding whose name is a substring of the field, a named divergence. The
+//! list is `deflate` alone, since Aosabi codes no gzip, so an answer a
+//! TypeScript app codes as `gzip` is `deflate` or identity here, a named
+//! divergence, with the body equal after decoding. A coding is never forced, so
+//! the option `encoding` of the reference, which codes one coding whatever the
+//! request accepts, is not ported.
+//!
+//! On every answer it does not leave alone, coded or not, `compress()` adds
+//! `Accept-Encoding` to the field `Vary` after the names the field holds,
+//! before it picks the coding, and leaves a `Vary` of `*` or one that names
+//! `Accept-Encoding` already as it is, so a cache keys the plain and the coded
+//! answer of a type it codes by `Accept-Encoding`, a named divergence. The
+//! `compress()` of the hono of the TypeScript option writes the field the same
+//! way on the answers it does not leave alone.
 //!
 //! The base pipeline of a TypeScript app installs `compress()` on every route,
-//! while the base
-//! pipeline of a Rust service of Aosabi codes no answer, so an app writes
-//! `compress()` before the routes it codes, the named divergence D72 of
-//! `docs/byte-equality.md` section 3.
+//! while the base pipeline of a Rust service of Aosabi codes no answer, so an
+//! app writes `compress()` before the routes it codes, a named divergence.
 //!
 //! Under the feature `web-deflate` the body is coded by
 //! `aosabi_http::coding::zlib::Encoder` over a scratch of the card's
@@ -55,8 +59,8 @@
 //!
 //! The coded body is a stream whose first poll is not ready, as the first read
 //! of a `CompressionStream` is not within the two ticks the adapter waits, so
-//! the adapter writes a coded answer chunked as the reference does (A2 and A5
-//! of the plan's version 2 draft, capture row C31).
+//! the adapter writes a coded answer chunked as the reference does (capture
+//! row C31).
 //!
 //! [`HostCoding::Deflate`]: crate::fetch::response::HostCoding::Deflate
 
@@ -67,10 +71,7 @@ use crate::{
         body::LocalBoxFuture,
         response::Response, //
     },
-    web_app::{
-        MiddlewareFn,
-        RouteError, //
-    }, //
+    web_app::RouteError, //
 };
 
 /// The codings `compress()` picks from, in order, `deflate` alone.
@@ -85,7 +86,8 @@ pub const THRESHOLD: u64 = 1024;
 ///
 /// A head holds the newest position of one hash of 4 bytes, so eight times the
 /// 4,096 heads of `aosabi_http::coding::SERVER` leave fewer positions of
-/// another hash on a chain the search follows.
+/// another hash on a chain the search follows. The count is 32,768 heads on
+/// Linux, 64 KiB per coded stream, while the device cards keep 4,096.
 #[cfg(feature = "web-deflate")]
 pub const LINUX_HEADS: usize = 32_768;
 
@@ -115,8 +117,7 @@ impl Default for CompressOptions {
 /// blocks of 8,192 tokens and a buffer of 65,536 plain bytes, with
 /// [`LINUX_HEADS`] hash heads on a Linux target of 64 bits and with the 4,096
 /// heads of `SERVER` on every other target. The player on
-/// `mipsel-unknown-linux-musl` is among those, since the plan adds no memory on
-/// it.
+/// `mipsel-unknown-linux-musl` is among those, since its budget adds no memory.
 #[cfg(feature = "web-deflate")]
 #[must_use]
 pub const fn card_params() -> graphtp::deflate::Params {
@@ -132,14 +133,24 @@ pub const fn card_params() -> graphtp::deflate::Params {
 }
 
 /// Returns the middleware `compress()` with no options.
-#[must_use]
-pub fn compress<E: RouteError>() -> impl MiddlewareFn<E> {
+///
+/// The closure is a [`MiddlewareFn`] and also what `.middleware(path, f)` of
+/// the app of the facade takes, as the closure of `body_limit` is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
+pub fn compress<E: RouteError>()
+-> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     compress_with(CompressOptions::default())
 }
 
 /// Returns the middleware `compress(options)`.
-#[must_use]
-pub fn compress_with<E: RouteError>(options: CompressOptions) -> impl MiddlewareFn<E> {
+///
+/// The closure is a [`MiddlewareFn`], as the one of [`compress`] is.
+///
+/// [`MiddlewareFn`]: crate::web_app::MiddlewareFn
+pub fn compress_with<E: RouteError>(
+    options: CompressOptions,
+) -> impl Fn(Context, Next<E>) -> LocalBoxFuture<'static, Result<Response, E>> + 'static {
     move |c: Context, next: Next<E>| -> LocalBoxFuture<'static, Result<Response, E>> {
         Box::pin(async move {
             next.run(c.clone()).await?;
@@ -147,6 +158,8 @@ pub fn compress_with<E: RouteError>(options: CompressOptions) -> impl Middleware
             if skips(&c, &res, options.threshold) {
                 return Ok(res);
             }
+            vary_accept_encoding(&c, &res);
+            let res = c.res();
             let accepted = c.req().header("Accept-Encoding");
             let Some(encoding) = accepted_coding(accepted.as_deref()) else {
                 return Ok(res);
@@ -185,6 +198,36 @@ fn encode<E: RouteError>(
         .map_err(|error| E::type_error(&error.message))?;
     mark_host_coding(&res);
     Ok(res)
+}
+
+/// Adds `Accept-Encoding` to the field `Vary` of the answer `res` of `c`, after
+/// the names the field holds, and leaves a field of `*` or one that names
+/// `Accept-Encoding` already as it is, a named divergence.
+///
+/// The field is written through `c.header`, which remakes a finalized answer
+/// first, and a name of the field matches in any case of ASCII between optional
+/// white space, as the `compress()` of the hono of the TypeScript option writes
+/// and tests the field, `ctx.header("Vary", ...)` after the test
+/// `/(?:^|,)\s*accept-encoding\s*(?:,|$)/i`. A build with neither `web-deflate`
+/// nor `platform-coding` codes no answer, so it leaves the field as it is.
+fn vary_accept_encoding(c: &Context, res: &Response) {
+    if !cfg!(any(feature = "web-deflate", feature = "platform-coding")) {
+        return;
+    }
+    let value = match res.header("Vary") {
+        Some(held) if held == "*" || names_accept_encoding(&held) => return,
+        Some(held) if !held.is_empty() => format!("{held}, Accept-Encoding"),
+        _ => String::from("Accept-Encoding"),
+    };
+    c.header("Vary", &value);
+}
+
+/// Returns whether the field `Vary` whose value is `vary` names `Accept-Encoding`.
+fn names_accept_encoding(vary: &str) -> bool {
+    vary.split(',').any(|name| {
+        name.trim_matches(is_js_space)
+            .eq_ignore_ascii_case("Accept-Encoding")
+    })
 }
 
 /// Returns whether the answer `res` stays uncoded before the coding is picked.
@@ -232,8 +275,8 @@ fn should_transform(res: &Response) -> bool {
 /// request without the field gets identity, as from hono, where RFC 9110 would
 /// accept any coding. Hono takes the first coding whose name is a substring of
 /// the field, so `deflate;q=0` and `x-deflate` get deflate there and identity
-/// here, and `DEFLATE` and `*` get deflate here and identity there, the named
-/// divergence D71 of `docs/byte-equality.md` section 3.
+/// here, and `DEFLATE` and `*` get deflate here and identity there, a named
+/// divergence.
 #[must_use]
 pub fn accepted_coding(accept_encoding: Option<&str>) -> Option<&'static str> {
     let field = accept_encoding?;

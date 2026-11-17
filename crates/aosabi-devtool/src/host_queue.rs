@@ -5,9 +5,7 @@
  *
  * No analogue in the reference. The crate under test is the agent of
  * aosabi-execute with its feature host-queue, on which the module of the npm
- * package aosabi, crates/aosabi-js, runs its faithful job mode, and the
- * judging notebook is tests/notebooks/13_ts1_boundary.ipynb, which holds each
- * scenario to the order node keeps or to the contract the agent documents.
+ * package aosabi, crates/aosabi-js, runs its faithful job mode.
  */
 
 //! The `host-queue` primitive of the seam.
@@ -94,8 +92,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "host-queue";
 
-/// The batch the primitive lands at.
-const LANDS_AT: &str = "TS1";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "ts";
 
 /// The operations of the protocol.
 const OPERATIONS: &Operations = &[("scenario", op_scenario)];

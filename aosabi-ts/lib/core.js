@@ -350,10 +350,10 @@ const KINDS = [undefined, GRAPHQL, FORBIDDEN, AGGREGATE];
 // fulfilment, crates/aosabi-js/src/value.rs.
 const ADOPTED = 2;
 
-// The forms of the record of js_project: the own enumerable keys, the reads
-// of the members a projection selects, and the names the projection of a
-// build of the canary holds, crates/aosabi-js/src/value.rs.
-const OWN_KEYS = 0;
+// The forms of the record of js_project beside the own enumerable keys, the
+// form 0 that crates/aosabi-js/src/value.rs names OWN_KEYS and that js_project
+// reads for any form but these two: the reads of the members a projection
+// selects, and the names the projection of a build of the canary holds.
 const SELECTED = 1;
 const NAMES = 2;
 
@@ -557,8 +557,8 @@ const MARK_PUSHED = 64;
 // The byte after the record of a request the export fetch takes, which names
 // what answers it, crates/aosabi-js/src/request.rs: the server of the
 // GraphQL endpoint with no router, for the handler of the glue,
-// crates/aosabi-js/src/endpoint.rs, or the app of the engine, the routes of
-// the plugins of the engine and its not found handler.
+// crates/aosabi-js/src/endpoint.rs, or the app of the engine, which answers the
+// routes of the plugins of the engine with no not found handler of its own.
 export const TO = { ENDPOINT: 0, APP: 1 };
 
 // The forms of the record of iter_next, crates/aosabi-js/src/value.rs: the
@@ -646,7 +646,7 @@ function fromWtf8(bytes) {
 
 // Whether a record defers its short strings to the send, where the module
 // strings.wasm writes each into the memory of the engine through the JS String
-// Builtins, which the first engine with that module sets (round JSSTRING).
+// Builtins, which the first engine with that module sets.
 let deferStrings = false;
 
 // The longest string, in code units or bytes, that crosses through strings.wasm.
@@ -819,8 +819,8 @@ class Out {
 // the record stays at the address `base` of that memory while it is read, the
 // record of an import, which a vector of the frame that called the import
 // holds, a text is read there through the module strings.wasm of the memory,
-// and through the strict TextDecoder where that module answers none (round
-// JSSTRING).
+// over the JS String Builtins, and through the strict TextDecoder where that
+// module answers none.
 class In {
   constructor(bytes, memory = undefined, base = -1, at = 0, view = undefined) {
     this.bytes = bytes;
@@ -1425,11 +1425,12 @@ const UNREAD = failureRecord(500, "the host could not read the answer of the mod
 // The answer of a request with a settled value the host could not hand over.
 const UNSETTLED = failureRecord(500, "the host could not settle a promise of the request");
 
-// Returns the byte of the boot record for an option of the configuration
-// that is true, false or left out.
-function flag(value) {
+// Returns the byte of a key the engine reads as a switch, the keys
+// introspection and maskedErrors: 0 where it is not set, 2 for false and 1
+// for any other value.
+function refusal(value) {
   if (value === undefined) return 0;
-  return value ? 1 : 2;
+  return value === false ? 2 : 1;
 }
 
 // Writes `copy`, data of JSON, nested `depth` levels deep: a primitive as
@@ -1681,14 +1682,14 @@ function writePlugins(record, plugins, handle) {
 // its plugins and its type resolvers, crates/aosabi-js/src/boot.rs. Each
 // function of the plan is the handle `handle` answers for it, an index of the
 // table of the boot. The text `ir` may be the schema record of that build in
-// place of the IR.
+// place of the IR. The key maxTokens of the configuration stands last.
 function bootRecord(schema, ir, config, mode, read, env, plan, handle) {
   const record = new Out();
   record.text(schema);
   record.text(ir);
   writeTypeResolvers(record, plan.types ?? []);
-  record.byte(flag(config.graphiql));
-  record.byte(flag(config.landingPage));
+  record.byte(refusal(config.introspection));
+  record.byte(refusal(config.maskedErrors));
   record.byte(MODES[mode]);
   record.byte(READS[read]);
   record.byte(typeof navigator !== "undefined" && navigator.userAgent?.startsWith("Bun") ? 1 : 0);
@@ -1707,7 +1708,26 @@ function bootRecord(schema, ir, config, mode, read, env, plan, handle) {
     writeJson(record, jsonCopy(sentry));
   }
   writePlugins(record, plan.plugins, handle);
+  writeMaxTokens(record, config.maxTokens);
   return record;
+}
+
+// Writes the key maxTokens of the configuration, the cap on the tokens of a
+// request document every parse of a request document of the app takes, a byte 0
+// where the configuration leaves it out, which keeps the cap of 120,008 tokens,
+// or 1 and the cap as a word, crates/aosabi-js/src/boot.rs. The cap is a whole
+// number from 0 to 4294967295, and any other value fails the boot, null among
+// them, since no value lifts the cap, a named divergence.
+function writeMaxTokens(record, cap) {
+  if (cap === undefined) {
+    record.byte(0);
+    return;
+  }
+  if (!Number.isInteger(cap) || cap < 0 || cap > 0xffffffff) {
+    throw new TypeError("the key maxTokens of the configuration takes a whole number from 0 to 4294967295");
+  }
+  record.byte(1);
+  record.word(cap);
 }
 
 // Writes the type resolvers of the form of the canary that typeResolversOf
@@ -1794,8 +1814,9 @@ export function wasmEngine(module) {
 }
 
 // The member of the compiled module core.wasm under which a host hands the
-// compiled module strings.wasm beside it, round JSSTRING: aosabi/worker sets
-// it where Wrangler uploads that module, and no other host sets it.
+// compiled module strings.wasm beside it, which hands strings over through the
+// JS String Builtins: aosabi/worker sets it where Wrangler uploads that
+// module, and no other host sets it.
 export const STRINGS = Symbol.for("aosabi.strings");
 
 // Returns the exports encode and decode of an instance of the compiled module
@@ -2587,13 +2608,14 @@ function open(engine) {
   };
 
   // Returns the promise of the claims of `request` a provider of
-  // aosabi/auth/zitadel answers over the issuer `issuer` and the key path
-  // `keyPath`, crates/aosabi-js/src/zitadel.rs. The promise is made and kept
-  // under a number of its own before the call, since the import js_next may
-  // settle it before the export ctx returns, and the numbers of the
-  // continuations of a chain, which count from 1, never reach it.
+  // aosabi/auth/zitadel answers over the issuer `issuer`, the key path
+  // `keyPath` and the session cookie `cookieName`, each of the last two a
+  // string or undefined, crates/aosabi-js/src/zitadel.rs. The promise is made
+  // and kept under a number of its own before the call, since the import
+  // js_next may settle it before the export ctx returns, and the numbers of
+  // the continuations of a chain, which count from 1, never reach it.
   let claimNumbers = CLAIM_NUMBERS;
-  const claimsOf = (request, issuer, keyPath) => {
+  const claimsOf = (request, issuer, keyPath, cookieName) => {
     if (state.dead) return HostPromise.reject(new Error("the module trapped"));
     const number = claimNumbers;
     claimNumbers = claimNumbers >= 0x7ffffffe ? CLAIM_NUMBERS : claimNumbers + 1;
@@ -2619,6 +2641,12 @@ function open(engine) {
         out.byte(1);
         out.text(String(keyPath));
       }
+      if (cookieName === undefined) {
+        out.byte(0);
+      } else {
+        out.byte(1);
+        out.text(String(cookieName));
+      }
       out.word(number);
       ctxCall(request, out);
     } catch (error) {
@@ -2632,17 +2660,27 @@ function open(engine) {
   // Writes the value record of `value`, whose handles go to the table of
   // `request`. The checks run in the order of the resolver wrapper: a primitive,
   // a Date, a thenable, an array and a function, and any other object stays here
-  // behind a handle. An array is mapped as step 4 maps it, through mapList, and
-  // crosses as the mapped array, or as the promise of all its items that the
-  // wrapper owns when one of them is a thenable, and an array mapList has mapped
-  // crosses as its mapping, its then read no more. A walk that throws, by a
-  // getter of then, a then, a revoked Proxy or a value nested deeper than DEPTH
-  // levels, a cyclic array among them, throws to the import that called it. A
-  // value the walk takes as it is, a thrown value, which wrapResolver never
-  // walks, among them, is written with `raw` true, so the walk reads and calls
-  // no then of it and maps no array of it, and a value whose then the walk has
-  // read already and found no function with `checked` true. An error crosses as
-  // its handle alone, which the module reads through the import js_error.
+  // behind a handle. A bigint and a symbol, which step 1 passes on as they are,
+  // cross as the tag FOREIGN with their kind and the string String answers for
+  // them, which the engine reads by the place the value stands at in the schema:
+  // that string at a leaf of the scalars ID and GID, whose serialize answers
+  // String(value), and elsewhere a function whose every call answers another such
+  // function, which the scalars of a leaf answer as those of graphql-js answer
+  // the primitive and the writer of JSON of the engine leaves out of an object
+  // and writes as null in a list, as JSON.stringify treats a symbol, while a
+  // bigint that reaches that writer, where JSON.stringify throws, and a symbol as
+  // the whole value of the scalar JSON stay open. An array is mapped as step 4
+  // maps it, through mapList, and crosses as the mapped array, or as the promise
+  // of all its items that the wrapper owns when one of them is a thenable, and an
+  // array mapList has mapped crosses as its mapping, its then read no more. A
+  // walk that throws, by a getter of then, a then, a revoked Proxy or a value
+  // nested deeper than DEPTH levels, a cyclic array among them, throws to the
+  // import that called it. A value the walk takes as it is, a thrown value, which
+  // wrapResolver never walks, among them, is written with `raw` true, so the walk
+  // reads and calls no then of it and maps no array of it, and a value whose then
+  // the walk has read already and found no function with `checked` true. An error
+  // crosses as its handle alone, which the module reads through the import
+  // js_error.
   const writeValue = (out, value, request, depth, raw = false, checked = false) => {
     if (depth > DEPTH) throw new RangeError("a value of the app nests deeper than " + DEPTH + " levels");
     switch (typeof value) {
@@ -2787,10 +2825,10 @@ function open(engine) {
   // its then once to check it, as the walk has, and once more to call it. A
   // promise of the realm of the host, whose then is the then of Promise,
   // takes the two callbacks of the host in place of the one callback of the
-  // wrapper, the form of the plan, which settle the value that callback receives
-  // in the job it runs in. Any other thenable takes the call of the wrapper with one
-  // callback through callThen, and what its then answers is the value of the
-  // field, as the call of wrapResolver answers it there.
+  // wrapper, which settle the value that callback receives in the job it runs
+  // in. Any other thenable takes the call of the wrapper with one callback
+  // through callThen, and what its then answers is the value of the field, as
+  // the call of wrapResolver answers it there.
   const writeThen = (out, value, request, depth) => {
     const then = value.then;
     if (then === promiseThen) {
@@ -4452,33 +4490,33 @@ export function coreOf(c) {
 // the variables `env` of the process of the host, and returns the core of the
 // app. The graphql object is read once here, as graphqlOf reads it, and every
 // instance boots over the same copy. The configuration crosses as its options
-// graphiql, landingPage and logger and its plugins, the plan as its plugins,
-// each function a handle of the table of the boot. The job mode `mode` is
-// faithful, one microtask per job of the engine, or fast, and the read mode
-// `read` is get, one import per read, or project, one import per projected
-// object. A request whose instance traps answers with a failure of status
-// 500, a request after a trap runs on a fresh instance, and `instances`
-// counts the instances made. Where primeCore opened an instance of the same
-// engine for the logger of the app before its boot, `primed` is that state,
-// and the app boots over it, so the logger keeps the records and the sinks
-// of the passes of executeConfig. The text `ir` may be the schema record of
-// the build in place of the IR.
+// introspection, maskedErrors, maxTokens and logger and its plugins, the plan
+// as its plugins, each function a handle of the table of the boot.
 //
-// The routes and the middleware of the app run in its hono, lib/pylon.js,
-// and the core answers the requests the hono of the app hands it: the
-// GraphQL endpoint and the routes of the plugins of the engine. A request is
-// the context c of hono it runs in. The step of the request logger of
-// the base pipeline opens it in the engine with the logger of the
-// request, open(c, true), a middleware of a plugin of the engine opens it
-// where it needs it first, and answer(c) hands it to the app of the engine.
-// The step of the logger writes the access line once its chain has run,
-// note(c), and the request ends once the step of the async context bind of
-// that pipeline has released it and the fetch of the app that dispatches it
-// has ended, end(c), so the variables the engine sets for the request, the
-// client of Sentry and the loggers derived while it runs live as long as the
-// request, for a middleware the app registered before the base pipeline as
-// well. A request no step opened, of an app the glue booted with no base
-// pipeline, answers through answer(c) alone.
+// The job mode `mode` is faithful, one microtask per job of the engine, or
+// fast, and the read mode `read` is get, one import per read, or project, one
+// import per projected object. A request whose instance traps answers with a
+// failure of status 500, a request after a trap runs on a fresh instance, and
+// `instances` counts the instances made. Where primeCore opened an instance of
+// the same engine for the logger of the app before its boot, `primed` is that
+// state, and the app boots over it, so the logger keeps the records and the
+// sinks of the passes of executeConfig. The text `ir` may be the schema record
+// of the build in place of the IR.
+//
+// The routes and the middleware of the app run in its hono, lib/pylon.js, and
+// the core answers the requests the hono of the app hands it: the GraphQL
+// endpoint and the routes of the plugins of the engine. A request is the context
+// c of hono it runs in. The step of the request logger of the base pipeline
+// opens it in the engine with the logger of the request, open(c, true), a
+// middleware of a plugin of the engine opens it where it needs it first, and
+// answer(c) hands it to the app of the engine. The step of the logger writes the
+// access line once its chain has run, note(c), and the request ends once the
+// step of the async context bind of that pipeline has released it and the fetch
+// of the app that dispatches it has ended, end(c), so the variables the engine
+// sets for the request, the client of Sentry and the loggers derived while it
+// runs live as long as the request, for a middleware the app registered before
+// the base pipeline as well. A request no step opened, of an app the glue booted
+// with no base pipeline, answers through answer(c) alone.
 export function createCore({
   module, engine, schema, ir, graphql = {}, config = {}, mode = "faithful", read = "get", plan, env, primed,
 }) {
@@ -4669,8 +4707,7 @@ export function createCore({
 
     // Whether the live instance hands the strings of its records through
     // strings.wasm, which a host hands beside core.wasm and the builtins
-    // js-string of V8 link (round JSSTRING), or takes TextEncoder and
-    // TextDecoder.
+    // js-string of V8 link, or takes TextEncoder and TextDecoder.
     get codec() {
       return Boolean(live.memory?.codec);
     },
@@ -4842,14 +4879,14 @@ export function createCore({
     },
 
     // Answers the promise of the claims of the request of the context `c`
-    // that a provider of aosabi/auth/zitadel over the issuer `issuer` and the
-    // key path `keyPath` answers, crates/aosabi-js/src/zitadel.rs, on the
-    // request the core holds for c, or on a request of its own where the
-    // request of c has ended, `alone`.
-    claims(c, issuer, keyPath) {
-      if (!held.has(c)) return alone(c, (state, id) => state.claimsOf(id, issuer, keyPath));
+    // that a provider of aosabi/auth/zitadel over the issuer `issuer`, the
+    // key path `keyPath` and the session cookie `cookieName` answers,
+    // crates/aosabi-js/src/zitadel.rs, on the request the core holds for c,
+    // or on a request of its own where the request of c has ended, `alone`.
+    claims(c, issuer, keyPath, cookieName) {
+      if (!held.has(c)) return alone(c, (state, id) => state.claimsOf(id, issuer, keyPath, cookieName));
       const { state, id } = this.open(c);
-      return state.claimsOf(id, issuer, keyPath);
+      return state.claimsOf(id, issuer, keyPath, cookieName);
     },
   };
   return core;

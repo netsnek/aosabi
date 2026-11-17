@@ -9,8 +9,8 @@
 //! replacing each node a hook answers for.
 //!
 //! [`visit_edit`] walks a document depth first in the order of the
-//! `QueryDocumentKeys` table, as [󰀂](crate::visitor::visit) does, and a hook
-//! of an [`EditVisitor`] answers an [`Edit`]. A hook that answers
+//! `QueryDocumentKeys` table, as [`visit`](crate::visitor::visit) does, and a
+//! hook of an [`EditVisitor`] answers an [`Edit`]. A hook that answers
 //! [`Edit::Remove`] deletes its node from the list that holds it, or clears
 //! the optional property, and one that answers [`Edit::Replace`] puts another
 //! node in its place. A replacement on enter is walked in place of the node,

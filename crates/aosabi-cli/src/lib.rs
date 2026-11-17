@@ -3,10 +3,12 @@
  * aosabi-cli: the command line of Aosabi, behind the two programs cargo-aosabi
  * and aosabi.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts, Apache-2.0. Changed by the Aosabi authors.
  *
- * This file holds the module list and the entry of both programs.
+ * The file .env is read before any command, and every failure ends in one
+ * report and the exit code 1. This file holds the module list and the entry of
+ * both programs.
  */
 
 //! The command line of Aosabi.
@@ -17,14 +19,18 @@
 //!
 //! [`main`] reads the arguments with [`args::parse`], reads `.env` of the
 //! working directory with [`dotenv::load`] before any command runs, and runs
-//! the command. A
-//! command of a later milestone returns its refusal, and [`run`] prints it
-//! once through [`report::report_failure`] and turns it into the exit code.
-//! Every command returns rather than exits, so every teardown has run. The
-//! exit code is 0 on success and 1 on every failure, a usage error, a refusal
-//! and a command of a later milestone among them.
-//! Standard output carries a result and nothing else, the help under `-h` and
-//! the version among them, and every other line goes to standard error.
+//! the command. The seven commands of this build report their own failure and
+//! answer the exit code, as their signatures do, so `build` adds no line to a
+//! failure that cargo or the built binary already printed, `verify` answers 1
+//! for a verdict of `fail` it printed as a result, and `pull` prints its
+//! failure under the head of the reference. A command of a later release
+//! returns its refusal, and [`run`] prints it once through
+//! [`report::report_failure`] and turns it into the exit code. Every command
+//! returns rather than exits, so every teardown has run. The exit code is 0 on
+//! success and 1 on every failure, a usage error, a refusal and a command of a
+//! later release among them. Standard output carries a result and nothing
+//! else, the help under `-h` and the version among them, and every other line
+//! goes to standard error.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
 //! section 3.

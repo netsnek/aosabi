@@ -7,11 +7,11 @@
 # context, the seven bound scalars and the service.
 [package]
 name = "aosabi-core"
-version = "0.0.0"
+version.workspace = true
 description = "The core of Aosabi: the static type descriptors the derive macros emit, and behind the feature runtime the resolver wrapping, the context, the bound scalars and the service."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 
@@ -40,13 +40,11 @@ runtime = [
 # the feature std of aosabi-json, which keys the hasher of every map where the
 # target's standard library draws its keys from the operating system. A build
 # with runtime and without std keeps the fixed hasher, which is what a build
-# with no standard library needs
-# (docs/decisions/ADR-0026-runtime-graphql-over-aoenvelope.md).
+# with no standard library needs.
 std = ["aosabi-json?/std"]
-# The GraphTP listener of docs/graphtp-in-aosabi.md section 3, the module
-# graphtp. It takes the crate graphql-over-graphtp, the listener with no
-# standard library, and nothing of the feature runtime, so a card with no
-# standard library builds it.
+# The GraphTP listener, the module graphtp. It takes the crate
+# graphql-over-graphtp, the listener with no standard library, and nothing of
+# the feature runtime, so a card with no standard library builds it.
 homa = ["dep:graphql-over-graphtp"]
 # The watcher of the console, which an SDK installs to read the lines the
 # logger and the serving plugin write through the console, as the console
@@ -79,12 +77,11 @@ exec-eager-projection = ["runtime"]
 # library, and a Rust service, whose schema its build describes at compile
 # time, gains no byte for it.
 prebuilt = ["canary-types"]
-# The coding of the base pipeline, whose first layer is then
-# compress(), which codes a large answer where the request accepts a coding.
-# aosabi-js turns it on for the module and the native library, which code
-# that way. Without it the base pipeline codes no answer, and a Rust service
-# codes one only where it writes compress(), divergence D72 of
-# docs/byte-equality.md section 3.
+# The coding of the base pipeline, whose first layer is then compress(), which
+# codes a large answer where the request accepts a coding. aosabi-js turns it
+# on for the module and the native library, which code that way. Without it the
+# base pipeline codes no answer, and a Rust service codes one only where it
+# writes compress(), a named divergence.
 base-compress = ["runtime"]
 
 [dependencies]

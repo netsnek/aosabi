@@ -4,7 +4,12 @@
  * encoder builds and the decoder reads.
  *
  * No analogue in the reference. The codes and the tables of lengths and
- * distances follow RFC 1951.
+ * distances follow RFC 1951. The table of the decoder is the one of puff.c by
+ * Mark Adler, the count of codes per length and the symbols in canonical order,
+ * and the lengths of the encoder come from the in place algorithm of Moffat and
+ * Katajainen.
+ *
+ * Derived from zlib 1.3.1, contrib/puff/puff.c, Zlib.
  */
 
 //! The canonical Huffman codes of DEFLATE, shared by the encoder and the

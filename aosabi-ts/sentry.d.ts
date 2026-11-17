@@ -6,7 +6,7 @@
  * The entry exports init alone, the member the apps call, so the declaration is the shape
  * of init of @sentry/node with the keys of its options the engine reads, which every other key of
  * those options may stand beside with no effect, while a key whose value is a function or holds one
- * throws (docs/ts1-surface.md of the Aosabi repository, section 14).
+ * throws.
  */
 
 /** The options of init the client of the engine takes, beside any other key of @sentry/node. */
@@ -22,6 +22,8 @@ export interface NodeOptions {
   release?: string
   /** The share of the errors the client sends, every one where the options name none. */
   sampleRate?: number
+  /** Whether the client sends events, none where it is false, which sets up no client. */
+  enabled?: boolean
   [key: string]: unknown
 }
 

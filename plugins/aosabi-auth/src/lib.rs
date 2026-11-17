@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT AND Apache-2.0
 /*
+ * aosabi-auth: the auth root of Aosabi.
+ *
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ *
  * This file holds the module list and the re-exports of the root, the export
  * list of index.ts:19-36 plus the Rust items its calls and its seam need,
  * PrincipalId, PrincipalRef, IntoIdentity, SyncProvider, AsyncProvider and
- * PRINCIPAL.
- *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * PRINCIPAL. The re-exports below carry the names of that export list and
+ * those Rust items.
  */
 
 //! The auth root of Aosabi.

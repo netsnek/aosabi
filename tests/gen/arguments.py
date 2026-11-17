@@ -1,14 +1,12 @@
 # SPDX-License-Identifier: MIT
 """tests/gen: family A, the valid argument base and one deviation at a time.
 
-The base is the value the generator writes for an argument of a given type, and
-a deviation changes exactly one argument of one field, so a difference a run
-reports names one rule. The deviations are the list of `docs/harness.md`
-section 4.1: missing, null, a wrong type, a wrong enum value, an integer out of
-range, an empty list, an oversized list, an input object without a required
-field and an input object with an unknown field. A deviation the specified
-rules refuse travels twice, once with validation and once without it, so the
-run time coercion of the executor is reached as well.
+The base is the value the generator writes for an argument of a given type, and a deviation
+changes exactly one argument of one field, so a difference a run reports names one rule. The
+deviations are the list: missing, null, a wrong type, a wrong enum value, an integer out of range,
+an empty list, an oversized list, an input object without a required field and an input object
+with an unknown field. A deviation the specified rules refuse travels twice, once with validation
+and once without it, so the run time coercion of the executor is reached as well.
 """
 
 from __future__ import annotations

@@ -2,14 +2,14 @@
 #
 # This file is the one place
 # the settings every crate inherits are written down. Each crate is listed by
-# name as its milestone lands, see the comment above members.
+# name, see the comment above members.
 
 [workspace]
 resolver = "3"
-# Listed one by one rather than globbed. tools/provenance writes extracted
-# literals into the crate directory that NOTICE declares for them, which means a
-# directory under crates/ can hold vendored bytes before the crate that carries
-# them exists. A glob would treat those as members and fail the workspace.
+# Listed one by one rather than globbed. The extracted literals land in the
+# crate directory that NOTICE declares for them, which means a directory under
+# crates/ can hold vendored bytes before the crate that carries them exists. A
+# glob would treat those as members and fail the workspace.
 members = [
     "crates/aosabi",
     "crates/aosabi-build",
@@ -56,9 +56,7 @@ members = [
     "plugins/aosabi-auth-contract",
     "plugins/aosabi-auth-zitadel",
     "plugins/aosabi-federation",
-    "plugins/aosabi-landing",
     "plugins/aosabi-sentry",
-    "plugins/aosabi-viewer",
     "tools/xtask",
 ]
 # The crates vendored the kernel way under third_party/rust/ stay outside the
@@ -68,6 +66,7 @@ members = [
 exclude = ["third_party"]
 
 [workspace.package]
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.95.0"
 license = "MIT"
@@ -109,8 +108,11 @@ inherits = "release"
 opt-level = "z"
 strip = "symbols"
 
+# The module core.wasm of the TypeScript option for the Node host, the profile
+# wasm at opt-level 3 in place of z. This second module is built wherever
+# opt-level 3 gains more than 15 percent under Node, which the gate measured.
 # The Worker keeps the module of the profile wasm, whose settings are those of
-# the profile worker-stripped of tests/budget.
+# the stripped profile of the size gate.
 [profile.wasm-node]
 inherits = "wasm"
 opt-level = 3

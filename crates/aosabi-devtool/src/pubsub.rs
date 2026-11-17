@@ -4,16 +4,15 @@
  * on one fresh agent with virtual timers.
  *
  * No analogue in the reference. The crates under test are the Value level pub
- * sub of aosabi-core and the repeater of aosabi-execute, the scripts are those
- * of the sidecar tests/sidecar/pubsub.mjs, so one file drives both sides, and
- * the judging notebook is tests/notebooks/40_pubsub.ipynb.
+ * sub of aosabi-core and the repeater of aosabi-execute, and the scripts are
+ * those of the pub sub sidecar, so one file drives both sides.
  */
 
 //! The `pubsub` primitive of the seam.
 //!
 //! `--requests PATH` answers a file of request lines, one response line each,
-//! in the batch form of [`crate::batch`], with the two operations of the
-//! sidecar `tests/sidecar/pubsub.mjs`.
+//! in the batch form of [`crate::batch`], with the two operations of the pub
+//! sub sidecar.
 //!
 //! - `versions` answers the versions of the two packages the crates under
 //!   test port, `subscription` for `@graphql-yoga/subscription` and
@@ -59,8 +58,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "pubsub";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M6";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "pubsub";
 
 /// The version of `@graphql-yoga/subscription` the pub sub of aosabi-core ports.
 const SUBSCRIPTION_VERSION: &str = "5.0.5";

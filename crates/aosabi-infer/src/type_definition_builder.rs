@@ -4,7 +4,7 @@
  * list shape and the nullability of a GraphQL type reference, and which owns
  * every naming rule of the inference.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/type-definition-builder.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
@@ -14,9 +14,11 @@
 
 //! The type mapping of the inference.
 //!
-//! [`TypeDefinitionBuilder::get_type_definition`] is `getTypeDefinition` of
-//! the reference, the function behind the thirty rows of the rule table. The
-//! reference writes it as one arrow function of 540 lines.
+//! [`TypeDefinitionBuilder::get_type_definition`] is `getTypeDefinition` of the
+//! reference. The reference writes it as one arrow function of 540 lines. Here
+//! each stretch of it is a private method, and the stretches run in the order
+//! of the reference, because an earlier test shadows a later one and a
+//! recursive call registers names as a side effect.
 //!
 //! # JavaScript semantics the port reproduces
 //!
@@ -844,8 +846,8 @@ impl<'s, S: TypeSource> TypeDefinitionBuilder<'s, S> {
     /// Collects a union of object types, and collapses every other union to
     /// `JSON` or to its first member, `type-definition-builder.ts:510-610`.
     ///
-    /// The collapse is quirk `Q09_INPUT_UNION_FIRST_MEMBER`. `required` of
-    /// `:512` compares the length of a list with itself and is always true.
+    /// The collapse is quirk `INPUT_UNION_FIRST_MEMBER`. `required` of `:512`
+    /// compares the length of a list with itself and is always true.
     fn get_union_type_definition(
         &mut self,
         r#type: S::Type,

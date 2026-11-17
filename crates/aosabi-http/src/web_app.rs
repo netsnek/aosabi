@@ -2,11 +2,12 @@
 /*
  * aosabi-http: the web app, its routes, its dispatch and its handlers.
  *
+ * Where hono picks its smart router, the app takes the trie router of crate::router.
+ *
  * Derived from hono 4.11.9, dist/hono-base.js, MIT.
  * Derived from hono 4.11.9, dist/hono.js, MIT.
  *
- * It carries the quirk Q57_HONO_HEAD_FROM_GET of docs/byte-equality.md section
- * 13.1.
+ * It carries the quirk HONO_HEAD_FROM_GET.
  */
 
 //! The web app, the translation of the app of hono.
@@ -22,16 +23,21 @@
 //! head of the `GET` answer, `new Response(null, getResponse)`, so the answer
 //! keeps the status and the headers of the `GET` answer and loses the length
 //! the adapter adds below them, and the answer of `c.text` with nothing
-//! prepared, which has no init, fails, the 500 of the adapter (A9 of the
-//! plan's version 2 draft, quirk `Q57_HONO_HEAD_FROM_GET`).
+//! prepared, which has no init, fails, the 500 of the adapter (quirk
+//! `HONO_HEAD_FROM_GET`).
 //!
 //! A closure passed to a route method is bound by `Fn` directly, so rustc gives the closure its
 //! parameter types, and [`HandlerFn`] and [`MiddlewareFn`] are the forms the app stores it in.
 //!
-//! A middleware tells through [`MiddlewareFn::is_csrf`] whether it is a
-//! `csrf(options)`, and the dispatch marks a request that one of them matches,
-//! so the default csrf of the base pipeline steps aside for the app's own,
-//! divergence D70 of `docs/byte-equality.md`.
+//! A middleware tells through [`MiddlewareFn::is_csrf`] whether it is a `csrf(options)`,
+//! and the dispatch marks a request where one of them stands ahead of the handlers of the
+//! routes it matches, every handler a route method registered, `get`, `post`, `put`,
+//! `delete`, `patch`, `options`, `all` or `on`, and every middleware that tells through
+//! [`MiddlewareFn::is_handler`] that it answers as one, the endpoint of the engine among
+//! them, in the order the chain runs them, so the default csrf of the base pipeline steps
+//! aside for the app's own there and holds every other request, a named divergence. A
+//! middleware of `use` ahead of the csrf leaves it ahead of the handlers, as in hono's
+//! order of middleware.
 
 use core::{
     cell::RefCell,
@@ -65,7 +71,9 @@ use crate::{
     router::{
         METHOD_NAME_ALL,
         Params,
-        Router, //
+        Router,
+        constrained_parameter,
+        constraint_refusal, //
     },
     utils::url::{
         get_path,
@@ -143,8 +151,16 @@ pub trait MiddlewareFn<E>: 'static {
     fn call(&self, c: Context, next: Next<E>) -> LocalBoxFuture<'static, Result<Response, E>>;
 
     /// Returns whether the middleware is a `csrf(options)`, which takes the
-    /// place of the default csrf on every request it matches.
+    /// place of the default csrf on a request where it stands ahead of the
+    /// handlers of the routes the request matches.
     fn is_csrf(&self) -> bool {
+        false
+    }
+
+    /// Returns whether the middleware answers the requests it takes as a
+    /// handler of a route method does, so the rule of the default csrf counts
+    /// it among the handlers, as the endpoint of the engine that `use` mounts.
+    fn is_handler(&self) -> bool {
         false
     }
 }
@@ -215,6 +231,10 @@ impl<E: RouteError> MiddlewareFn<E> for Caught<E> {
     fn is_csrf(&self) -> bool {
         self.inner.is_csrf()
     }
+
+    fn is_handler(&self) -> bool {
+        self.inner.is_handler()
+    }
 }
 
 /// One registered route, `{ basePath, path, method, handler }` of `app.routes`.
@@ -237,6 +257,9 @@ struct Route<E> {
     handler: Rc<dyn MiddlewareFn<E>>,
     /// Whether the handler is a `csrf(options)`, read once when the route is added.
     csrf: bool,
+    /// Whether the route counts as a handler, where a route method registered it or its
+    /// middleware answers as one, read once when the route is added.
+    answers: bool,
     /// The record.
     record: RouteRecord,
 }
@@ -373,6 +396,7 @@ impl<E: RouteError> WebApp<E> {
             &upper_case(method),
             path,
             Rc::new(Handler(handler)),
+            true,
             location,
         );
         self
@@ -386,7 +410,7 @@ impl<E: RouteError> WebApp<E> {
         Fut: Future<Output = Result<Response, E>> + 'static,
     {
         let location = Location::caller();
-        self.add_route(METHOD_NAME_ALL, path, Rc::new(middleware), location);
+        self.add_route(METHOD_NAME_ALL, path, Rc::new(middleware), false, location);
         self
     }
 
@@ -394,7 +418,7 @@ impl<E: RouteError> WebApp<E> {
     #[track_caller]
     pub fn use_boxed(&mut self, path: &str, middleware: Rc<dyn MiddlewareFn<E>>) -> &mut Self {
         let location = Location::caller();
-        self.add_route(METHOD_NAME_ALL, path, middleware, location);
+        self.add_route(METHOD_NAME_ALL, path, middleware, false, location);
         self
     }
 
@@ -417,6 +441,7 @@ impl<E: RouteError> WebApp<E> {
                 &route.record.method,
                 &route.record.path,
                 handler,
+                route.answers,
                 route.record.registered_at,
             );
         }
@@ -473,11 +498,11 @@ impl<E: RouteError> WebApp<E> {
     /// of registration.
     ///
     /// The router matches in the order routes enter it, so it is built again with the first
-    /// `count` routes at its end. The base pipeline of a Rust service calls it once, at the boot,
-    /// with the routes the app registered before the boot, so they run behind the pipeline,
-    /// divergence D75 of `docs/byte-equality.md`. Under the feature `host-platform` the order
-    /// stays as registered, since the TypeScript option keeps the order of a TypeScript app, whose routes registered
-    /// before the boot run before its pipeline.
+    /// `count` routes at its end. The base pipeline of a Rust service calls it once, at the
+    /// boot, with the routes the app registered before the boot, so they run behind the
+    /// pipeline, a named divergence. Under the feature `host-platform` the order stays as
+    /// registered, since the TypeScript option keeps the order of a TypeScript app, whose
+    /// routes registered before the boot run before its pipeline.
     pub fn put_behind(&mut self, count: usize) {
         if cfg!(feature = "host-platform") {
             return;
@@ -509,20 +534,35 @@ impl<E: RouteError> WebApp<E> {
         self.dispatch(request, execution_ctx, env, &method)
     }
 
-    /// Adds one route.
+    /// Adds one route, whose handler a route method registered where
+    /// `by_method` is true and `use` registered otherwise. The route counts as
+    /// a handler where `by_method` is true or its middleware answers as one.
+    ///
+    /// A path whose parameter carries a constraint `:name{...}` is refused with a panic
+    /// that names the place of the registration, a named divergence.
     fn add_route(
         &self,
         method: &str,
         path: &str,
         handler: Rc<dyn MiddlewareFn<E>>,
+        by_method: bool,
         location: &'static Location<'static>,
     ) {
         // The record carries the method as `app.routes` shows it, so the
         // upper case keeps every mapping of `toUpperCase`.
         let method = upper_case(method);
         let path = merge_path(&self.base_path, path);
+        if let Some((name, constraint)) = constrained_parameter(&path) {
+            panic!(
+                "{} The route is registered at {}:{}.",
+                constraint_refusal(&method, &path, &name, &constraint),
+                location.file(),
+                location.line()
+            );
+        }
         let route = Route {
             csrf: handler.is_csrf(),
+            answers: by_method || handler.is_handler(),
             handler,
             record: RouteRecord {
                 method: method.clone(),
@@ -562,7 +602,16 @@ impl<E: RouteError> WebApp<E> {
             .map(|(route, params)| (route.record.clone(), params.clone()))
             .collect();
         let c = Context::new(request, path, records, env, execution_ctx);
-        if matched.iter().any(|(route, _)| route.csrf) {
+        // The first csrf or handler in the order of the chain decides, a handler of a route
+        // method or a middleware that answers as one, the endpoint of the engine among
+        // them, so the app's own csrf takes the place of the default where it stands ahead
+        // of every handler the request matches.
+        let own_csrf = matched
+            .iter()
+            .map(|(route, _)| route)
+            .find(|route| route.csrf || route.answers)
+            .is_some_and(|route| route.csrf);
+        if own_csrf {
             c.set_extension(Rc::new(crate::middleware::csrf::AppCsrf));
         }
         let error_handler = self.error_handler.clone();

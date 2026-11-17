@@ -3,19 +3,23 @@
  * aosabi-carrier-bluetooth profile: the fixed numbers of the carrier and the
  * values of its two links that a device card fills, core only.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The rule of the packet of the channel and
+ * the rows of both links are those homa::Profile::bluetooth_channel and
+ * homa::Profile::bluetooth_gatt give, and the GATT data path is paced by
+ * readiness at the planning link. The SPSM is the one decided for the carrier.
  */
 
 //! The numbers and the profiles of the carrier Bluetooth.
 //!
 //! The service of Aosabi carries three characteristics: the PSM of the
 //! channel, read with encryption, RX, written without response, and TX,
-//! notified, the last two the GATT data path.
+//! notified, the last two the GATT data path. The UUIDs are fixed in the
+//! source as private 128 bit numbers of the project.
 //!
 //! [`Pace`] holds the values the GATT data path is paced at, since no
 //! platform signal tells a driver of Linux user space that a notification
-//! left the controller, and [`Pace::PLANNING`] is the planning link of the
-//! design note, which a driver takes until its card names its own.
+//! left the controller, and [`Pace::PLANNING`] is the pace the values are
+//! planned at, which a driver takes until its card names its own.
 
 use homa::{
     Limits,
@@ -23,7 +27,8 @@ use homa::{
     Profile, //
 };
 
-/// The fixed SPSM of the channel, ADR-0023 section Fourth amendment.
+/// The fixed SPSM of the channel, which a device publishes in the PSM
+/// characteristic.
 pub const SPSM: u16 = 0x00E0;
 
 /// The UUID of the service of Aosabi, `ab46be00-ba01-4a5f-ba66-9fa7080a2ff4`.
@@ -45,8 +50,7 @@ pub const TX: [u8; 16] = uuid(0x03);
 pub const DEFAULT_ATT_MTU: u16 = 23;
 
 /// The RPCs a central may have open at this end on either link, the eight
-/// slots of the device configuration of the Homa design note, second version,
-/// section 8.3.
+/// slots of a small device's configuration.
 pub const MAX_RPCS: u8 = 8;
 
 /// The packets the GATT data path hands `BlueZ` that the link has not
@@ -105,9 +109,8 @@ const fn uuid(member: u8) -> [u8; 16] {
 }
 
 /// Returns `max_packet` on the channel to a peer whose MPS is `peer_mps`, the
-/// k rule of the design note: the largest whole k for which k times the MPS
-/// less 6 stays at or under 512, and 512 in one K-frame for an MPS of 518 or
-/// more.
+/// k rule: the largest whole k for which k times the MPS less 6 stays at or
+/// under 512, and 512 in one K-frame for an MPS of 518 or more.
 #[must_use]
 pub const fn channel_max_packet(peer_mps: u16) -> u16 {
     Profile::bluetooth_channel(peer_mps, 0).max_packet

@@ -5,7 +5,7 @@
 # links the validator above it.
 [package]
 name = "aosabi-type"
-version = "0.0.0"
+version.workspace = true
 description = "The GraphQL type layer of Aosabi: the type definitions, the schema, the specified directives and the specified scalars, translated from graphql-js 16.12.0."
 edition.workspace = true
 rust-version.workspace = true
@@ -30,9 +30,10 @@ aosabi-lang = { path = "../aosabi-lang" }
 # The value model of scalar coercion, the extensions of every definition and the insertion
 # ordered map and set every map of this crate is.
 aosabi-json = { path = "../aosabi-json" }
-# The memoization cell behind every thunk of a type and the cell behind the built in types.
-# The race cell needs no standard library and no lock, and it is `Sync`, which is what lets
-# a type live in a static the way a module level constant of the reference does. A cell like
-# it cannot be written without unsafe, so the crate is kept, pinned, under reason 4 of
-# ADR-0024, with the reviewed version as the floor.
+# The memoization cell behind every thunk of a type and the cell behind the
+# built in types. The race cell needs no standard library and no lock, and it
+# is `Sync`, which is what lets a type live in a static the way a module level
+# constant of the reference does. A cell like it cannot be written without
+# unsafe, so the crate is kept, pinned, with the reviewed version as the
+# floor.
 once_cell = { version = "1.21.4", default-features = false, features = ["alloc"] }

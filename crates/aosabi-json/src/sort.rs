@@ -12,15 +12,12 @@
 //!
 //! The stable sort of `core` is generic over the element and over the
 //! comparison, so a binary holds a copy of its sort for every element type
-//! and every comparison that sorts, which
-//! `tests/notebooks/17_framework_size.ipynb` counts by element type in its
-//! section 3. This module sorts the indices of a slice instead of its
-//! elements, through a comparison of two indices that the site hands in as a
-//! trait object, so the sort is compiled once a binary, and then permutes the
-//! slice by the answer, the one step made for each element type. A stable
-//! sort gives one order for a comparison that is a total order, so the answer
-//! is the order the stable sort of `core` gives, and
-//! `tests/notebooks/18_size_oracles.ipynb` compares the two.
+//! and every comparison that sorts. This module sorts the indices of a slice
+//! instead of its elements, through a comparison of two indices that the site
+//! hands in as a trait object, so the sort is compiled once a binary, and
+//! then permutes the slice by the answer, the one step made for each element
+//! type. A stable sort gives one order for a comparison that is a total
+//! order, so the answer is the order the stable sort of `core` gives.
 //!
 //! A run of at most 20 elements is sorted by insertion, as the stable sort of
 //! `core` sorts it, and [`sort_by_stable()`] keeps the indices of such a

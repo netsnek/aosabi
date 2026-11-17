@@ -1,12 +1,9 @@
-// SPDX-License-Identifier: MIT AND Apache-2.0
+// SPDX-License-Identifier: MIT
 /*
  * aosabi-core scalars json: the bound `JSON` scalar.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
- * Changed by the Aosabi authors.
- *
- * Binds `JSONResolver` of graphql-scalars as it stands.
+ * The scalar is `JSONResolver` of graphql-scalars as
+ * it stands.
  */
 
 //! The bound `JSON` scalar, the `JSONResolver` of graphql-scalars.

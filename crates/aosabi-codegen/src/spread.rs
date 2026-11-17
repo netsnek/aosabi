@@ -3,9 +3,9 @@
  * aosabi-codegen: the glue of the key `#[aosabi(spread)]` of a field that
  * stands for an object spread.
  *
- * No analogue on the reference side, where the spread is the syntax {..value}
- * of an object literal, whose members the TypeScript checker presents in
- * place of the spread.
+ * No analogue on the reference side, where the spread is the syntax
+ * {...value} of an object literal, whose members the TypeScript checker
+ * presents in place of the spread.
  */
 
 //! The glue of the key `#[aosabi(spread)]`, which presents the members of

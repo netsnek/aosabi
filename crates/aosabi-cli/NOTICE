@@ -1,0 +1,68 @@
+aosabi-cli
+Copyright (c) 2026 Florian Kleber
+
+The crate aosabi-cli is a part of Aosabi, https://github.com/netsnek/aosabi, and
+is licensed under the MIT License. This file names the work of others that the
+crate carries or derives code or data from, with the license of each. It adds
+attribution and no condition to the license of the crate. The texts of the
+licenses are those of LICENSE for MIT, LICENSE-APACHE for Apache-2.0 and
+LICENSE-BSD-2-Clause for BSD-2-Clause, beside this file.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Pylon
+=====
+
+Project: Pylon
+URL: https://github.com/getcronit/pylon
+Packages: @getcronit/pylon 3.0.0-canary, create-pylon 1.1.4,
+  @getcronit/pylon-dev 2.0.0-canary-20260206115650
+License: Apache-2.0
+Copyright 2024 Nico Schett
+
+The code of Pylon that this crate carries was written by Nico Schett, as git
+blame of Pylon's history reads it. The files of the crate translated from
+Pylon's code are src/args.rs, src/build.rs, src/dev/mod.rs,
+src/dev/supervisor.rs, src/dev/watch.rs, src/generate.rs, src/inspect.rs,
+src/later.rs, src/lib.rs, src/mcp/mod.rs, src/mcp/tools.rs,
+src/pull/generate.rs, src/pull/mod.rs, src/pull/remote.rs, src/report.rs and
+src/verify.rs. Every file of Aosabi that carries code added to Pylon on or after
+2024-05-29, the day Pylon took the Apache License 2.0, names Apache-2.0 in its
+SPDX line, as MIT AND Apache-2.0 where Aosabi's own code is mixed in, credits
+Nico Schett and Pylon in its header and says that the Aosabi authors changed it.
+
+Pylon ships the NOTICE file below, reproduced as it reads at the commit Aosabi
+follows:
+
+    Pylon
+    Copyright 2024 Nico Schett <nico.schett@cronit.io>
+
+    This product includes software developed at
+    cronit (https://www.cronit.io/).
+
+
+Other projects
+==============
+
+Project: Commander.js
+URL: https://github.com/tj/commander.js
+Packages: commander 12.1.0
+License: MIT
+Copyright (c) 2011 TJ Holowaychuk <tj@vision-media.ca>
+
+Project: dotenv
+URL: https://github.com/motdotla/dotenv
+Packages: dotenv 16.6.1
+License: BSD-2-Clause
+Copyright (c) 2015, Scott Motte
+
+Project: MCP TypeScript SDK
+URL: https://github.com/modelcontextprotocol/typescript-sdk
+Packages: @modelcontextprotocol/sdk 1.29.0
+License: MIT
+Copyright (c) 2024 Anthropic, PBC

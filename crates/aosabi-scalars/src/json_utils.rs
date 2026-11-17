@@ -2,7 +2,9 @@
 /*
  * aosabi-scalars: the hooks the JSON and JSONObject scalars share.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
+ * Derived from graphql-scalars 1.25.0, esm/scalars/json/utils.js, MIT.
  */
 
 //! The shared functions of the two JSON scalars.

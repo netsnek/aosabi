@@ -88,13 +88,15 @@ use crate::{
 pub type GraphQLErrorExtensions = JsObject;
 
 /// Custom formatted extensions of an error.
+///
+/// The same shape as [`GraphQLErrorExtensions`], which is what the reference
+/// declares.
 pub type GraphQLFormattedErrorExtensions = JsObject;
 
 /// One segment of the path into the execution response.
 ///
 /// The reference types a segment as `string | number`, a field key or a list
-/// index, and the two variants are what row D22 of docs/byte-equality.md asks
-/// for.
+/// index, and the enum has the same two variants.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PathSegment {
     /// A response key.
@@ -491,7 +493,7 @@ fn undefined_if_empty<T>(array: Option<Vec<T>>) -> Option<Vec<T>> {
 ///
 /// The conversions into [`JsObject`] and [`JsValue`] insert `message`,
 /// `locations`, `path` and `extensions` in that order and skip an absent one,
-/// which is the key order of docs/byte-equality.md section 8.1.
+/// which is the key order of the graphql-js layer of the error format.
 ///
 /// Derived from graphql-js 16.12.0, src/error/GraphQLError.ts, MIT.
 #[derive(Debug, Clone, PartialEq)]
@@ -593,8 +595,10 @@ pub fn format_error(error: &GraphQLError) -> GraphQLFormattedError {
 /// Produces a `GraphQLError` representing a syntax error, containing useful
 /// descriptive information about the syntax error's position in the source.
 ///
-/// The description is a JavaScript string, because three descriptions of the
-/// lexer quote the body up to a leading surrogate.
+/// `source` is the document, `position` the UTF-16 code unit offset the lexer
+/// or the parser stopped at and `description` the text after the
+/// `Syntax Error: ` prefix. The description is a JavaScript string, because
+/// three descriptions of the lexer quote the body up to a leading surrogate.
 ///
 /// Derived from graphql-js 16.12.0, src/error/syntaxError.ts, MIT.
 #[must_use]

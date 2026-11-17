@@ -3,7 +3,8 @@
  * aosabi-validate pass lang_feed: the feed of the single pass over the lexer
  * of the language layer.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The tokens are those of the lexer of
+ * aosabi-lang.
  */
 
 //! The feed of the single pass over the lexer of the language layer.
@@ -139,10 +140,9 @@ pub struct NoFeed;
 impl NoFeed {
     /// Returns the feed over the text `source`, which it drops unread.
     // Always inlined, so a caller that builds a feed itself, as the RV32 probe
-    // of tests/notebooks/09_single_pass_budget.ipynb does, keeps the drop of
-    // the source in its own code and links no function of this module, where
-    // a build at opt-level z leaves a function of a few instructions out of
-    // line.
+    // does, keeps the drop of the source in its own code and links no function
+    // of this module, where a build at opt-level z leaves a function of a few
+    // instructions out of line.
     #[expect(
         clippy::inline_always,
         reason = "a conventional build at opt-level z keeps no function of the module for a feed"

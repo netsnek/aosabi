@@ -14,6 +14,8 @@
 
 /// Returns `path.join(...paths)` of Node on a POSIX platform.
 ///
+/// Derived from node v24.13.0, lib/path.js, MIT.
+///
 /// [path.js]: https://github.com/nodejs/node/blob/v24.13.0/lib/path.js
 #[must_use]
 pub fn join(paths: &[&str]) -> String {
@@ -29,6 +31,8 @@ pub fn join(paths: &[&str]) -> String {
 }
 
 /// Returns `path.normalize(path)` of Node on a POSIX platform.
+///
+/// Derived from node v24.13.0, lib/path.js, MIT.
 #[must_use]
 pub fn normalize(path: &str) -> String {
     if path.is_empty() {
@@ -60,6 +64,8 @@ pub fn normalize(path: &str) -> String {
 /// picks the same branches, because a separator and a dot are one unit and
 /// one byte, and a result of at most two units and one of more than two bytes
 /// both hold no `/` and both become empty.
+///
+/// Derived from node v24.13.0, lib/path.js, MIT.
 fn normalize_string(path: &str, allow_above_root: bool) -> String {
     let bytes = path.as_bytes();
     let mut res = String::new();

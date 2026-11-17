@@ -4,9 +4,10 @@
  * GraphTP(Homa) on the device carriers of Linux user space, Serial Line, USB
  * and Bluetooth, and the same bodies in AoFrame alone.
  *
- * No analogue in the reference. Its judging notebooks are
- * tests/notebooks/26_carrier_serial.ipynb, 27_carrier_usb.ipynb and
- * 28_carrier_bluetooth.ipynb.
+ * No analogue in the reference. Its operation serve runs the driver of a
+ * carrier crate over the GraphTP listener of aosabi-core in front of a Yoga
+ * instance of the in process capture, and baseline answers the same bodies in
+ * AoFrame alone with no Homa, a comparison that ships in no artifact.
  */
 
 //! The primitive `carrier` of the seam.
@@ -148,8 +149,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "carrier";
 
-/// The stage the primitive lands at.
-const LANDS_AT: &str = "H3";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "homa";
 
 /// The card a request that names none serves.
 const DEFAULT_CARD: &str = "test-graphtp";
@@ -408,7 +409,7 @@ fn instance_of(fields: &Fields<'_>) -> Result<Rc<HttpServer>, JsString> {
 }
 
 /// Returns the fetch function of the listener over the Yoga instance `yoga`,
-/// the POST of the fixed fields of `docs/graphtp-in-aosabi.md` section 2.1.
+/// the POST of the fixed fields of `Documentation/guides/graphtp.md`.
 fn yoga_fetch(yoga: Rc<HttpServer>) -> Fetch {
     Rc::new(move |request: Request| -> Reply {
         let yoga = Rc::clone(&yoga);

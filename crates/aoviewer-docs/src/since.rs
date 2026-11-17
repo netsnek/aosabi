@@ -8,7 +8,12 @@
 
 //! The change log input.
 //!
-//! The flag `--since` names an older schema in any of the four inputs.
+//! The flag `--since` names an older schema in any of the four inputs. The
+//! function [`changes`] loads it through [`load`], the loader of every input,
+//! and compares its model with the model of the run through [`diff`] of the
+//! core, in the names of the core. The tree writes the differences as the text
+//! change log, `md/changes.md` and `typ/90-changes.typ`, and the changes
+//! chapter with diagrams comes in a later release.
 //!
 //! Both models are compared as the inputs describe them, before any
 //! transform of the views, so the change log lists a member the options of

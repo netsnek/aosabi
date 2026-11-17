@@ -2,7 +2,8 @@
 /*
  * graphql-over-http: the request parsers and the choice of one.
  *
- * Each file of the directory names the file of Yoga it translates.
+ * The last parser whose matcher accepts the request wins. Each file of the
+ * directory names the file of Yoga it translates.
  *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/use-request-parser.js, MIT.
  * Derived from graphql-yoga 5.18.0, cjs/server.js, MIT.
@@ -13,7 +14,8 @@
 //! [`Parsers::choose`] answers the parser of a request before the hooks
 //! `onRequestParse` of the app, which may replace it. Yoga sets the parser of
 //! each of its five parsers whose matcher accepts the request, so the last one
-//! that matches is the one that runs.
+//! that matches is the one that runs. The five match disjoint requests, which
+//! makes their order the order of the first match as well.
 
 use std::rc::Rc;
 
@@ -40,8 +42,8 @@ impl Parsers {
     /// `application/graphql` and forms, in that order.
     ///
     /// The multipart parser stands in the list where `multipart` holds, which
-    /// the function passes for the option `multipart: true` alone, the named
-    /// divergence D49, where Yoga puts it in unless the option is `false`.
+    /// the function passes for the option `multipart: true` alone, a named
+    /// divergence, where Yoga puts it in unless the option is `false`.
     #[must_use]
     pub fn new(multipart: bool) -> Self {
         let mut parsers: Vec<(RequestMatcher, RequestParser)> = Vec::with_capacity(5);

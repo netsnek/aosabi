@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: MIT
 """tests/gen: the schemas the generated runs are written against.
 
-The rich schema below carries one of every construct the executor reaches, and
-its root fields carry the names [`NAMED_BEHAVIOURS`] of `tables.py` turns into
-one of every behaviour kind, so one corpus over it touches every path of the
-port.
+The rich schema below carries one of every construct the executor reaches, and its root fields
+carry the names [`NAMED_BEHAVIOURS`] of `tables.py` turns into one of every behaviour kind, so one
+corpus over it touches every path of the port. Beside it the module names the blog schema of the
+capture corpus and the three fixture schemas, which are read from the repository rather than
+copied, because the fixture build writes them.
 
 A schema of the compatibility layer declares seven scalars that no specification builds in, and the
 seven bound scalars of `aosabi-core` need them to exist before a resolver map
@@ -47,7 +48,7 @@ IN_CONTEXT_DIRECTIVE = (
 
 #: The schemas of the repository a run names beside the rich one.
 SCHEMA_PATHS = {
-    "blog-app": "tests/capture/02_corpus/blog-app-schema.graphql",
+    "blog-app": "tests/capture/20_corpus/blog-app-schema.graphql",
     "errors-app": "tests/fixtures/ts/errors-app/.aosabi/schema.graphql",
     "async-order-app": "tests/fixtures/ts/async-order-app/.aosabi/schema.graphql",
     "numbers-app": "tests/fixtures/ts/numbers-app/.aosabi/schema.graphql",

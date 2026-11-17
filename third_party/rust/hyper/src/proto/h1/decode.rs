@@ -57,7 +57,8 @@ enum Kind {
         trailers_cnt: usize,
         h1_max_headers: Option<usize>,
         h1_max_header_size: Option<usize>,
-        /// The extensions and trailers as llhttp reads them, quirks Q32 and Q33.
+        /// The extensions and trailers as llhttp reads them, quirks
+        /// `LLHTTP_TRAILERS_COUNTED` and `LLHTTP_CHUNK_EXTENSIONS_413`.
         #[cfg(feature = "node-chunked")]
         node: NodeChunked,
     },
@@ -350,7 +351,7 @@ impl ChunkedState {
             #[cfg(not(feature = "node-chunked"))]
             Extension => ChunkedState::read_extension(cx, body, extensions_cnt),
             // The extensions count per chunk and answer 413 past their bound,
-            // quirk Q33.
+            // quirk LLHTTP_CHUNK_EXTENSIONS_413.
             #[cfg(feature = "node-chunked")]
             Extension => {
                 let end = node.extension(byte!(body, cx), extensions_cnt)?;
@@ -372,7 +373,7 @@ impl ChunkedState {
             #[cfg(not(feature = "node-chunked"))]
             EndCr => ChunkedState::read_end_cr(cx, body, trailers_buf, max_headers_bytes),
             // The trailers take the field grammar of a head, count from zero
-            // and are dropped, quirk Q32.
+            // and are dropped, quirk LLHTTP_TRAILERS_COUNTED.
             #[cfg(feature = "node-chunked")]
             EndCr => {
                 let end = node.trailer(byte!(body, cx))?;
@@ -436,7 +437,7 @@ impl ChunkedState {
                 *size = or_overflow!(size.checked_mul(radix));
                 *size = or_overflow!(size.checked_add(u64::from(b + 10 - b'A')));
             }
-            // No space follows the size digits, quirk Q34.
+            // No space follows the size digits, quirk LLHTTP_CHUNK_SIZE_LINE.
             b'\t' | b' ' if !cfg!(feature = "node-chunked") => {
                 return Poll::Ready(Ok(ChunkedState::SizeLws))
             }

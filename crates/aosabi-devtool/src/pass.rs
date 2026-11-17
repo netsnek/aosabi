@@ -4,9 +4,7 @@
  * aosabi-validate, and writes and prints the field table it reads.
  *
  * No analogue in the reference. The crate under test is the module pass of
- * aosabi-validate, and the judging notebook is tests/notebooks/09_single_pass.ipynb,
- * which holds its verdicts to the rules of aosabi-validate and to the
- * validation of graphql-js through tests/sidecar/graphql-js.mjs.
+ * aosabi-validate.
  */
 
 //! The `pass` primitive of the seam.
@@ -24,16 +22,15 @@
 //! does not build, a schema that `assertValidSchema` refuses and a table that
 //! does not build answer `fatal`.
 //!
-//! `--table PATH --out PATH` writes the field table of the SDL in the first
-//! file as one Rust module of statics into the second, the static form of
-//! the table, which a probe compiles beside aosabi-validate. Its lookups are
-//! functions of a `match` over byte strings. The module opens with the line
-//! `SPDX-License-Identifier: MIT`, as section 6 of CONTRIBUTING.md asks of
-//! every source file, since the host probe `tests/budget/pass` commits the
-//! module written for its device schema. `--dump PATH` prints the table
-//! the pass builds for the SDL in the file, the boot form, in the text of
-//! `Table::dump`, which the module of `--table` prints byte for byte alike
-//! for an SDL built with no options.
+//! `--table PATH --out PATH` writes the field table of the SDL in the first file
+//! as one Rust module of statics into the second, the static form of the table,
+//! which a probe compiles beside aosabi-validate. Its lookups are functions of a
+//! `match` over byte strings. The module opens with the line
+//! `SPDX-License-Identifier: MIT`, as section 6 of CONTRIBUTING.md asks of every
+//! source file, since a host probe commits the module written for its device
+//! schema. `--dump PATH` prints the table the pass builds for the SDL in the
+//! file, the boot form, in the text of `Table::dump`, which the module of
+//! `--table` prints byte for byte alike for an SDL built with no options.
 //!
 //! `--branded-scalars` builds every schema through `create_schema` of
 //! aosabi-core, as the primitive `validate` does under the same flag, so the
@@ -101,8 +98,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "pass";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "PASS1";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "pass";
 
 /// The command line of the `pass` primitive.
 pub static GRAMMAR: Grammar = Grammar {

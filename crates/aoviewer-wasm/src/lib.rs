@@ -11,11 +11,12 @@
 //!
 //! The module `abi` holds the exports and the module `host` the safe code they
 //! forward to. The host build of the crate is an rlib, so the seam of the
-//! notebooks can link the same code the module carries.
+//! notebooks can link the same code the module carries. The exports wait for a
+//! named exception to the lint, because a symbol name is an unsafe attribute
+//! in edition 2024 and the workspace forbids `unsafe_code`.
 //!
-//! The judging notebooks are `tests/notebooks/51_viewer_core.ipynb` and
-//! `tests/notebooks/75_docgen.ipynb`. There is no test in this crate, which
-//! is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md
+//! section 3, and no notebook judges the module yet.
 
 mod abi;
 mod host;

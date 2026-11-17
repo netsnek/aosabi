@@ -2,8 +2,10 @@
 /*
  * aosabi-federation: the errors of a failed fetch and of an aborted request.
  *
+ * That rejection hands on the error of the socket of Node.
+ *
  * Derived from @graphql-tools/executor-http 3.1.0, dist/index.cjs, MIT.
- * Derived from whatwg-node 0.8.5, cjs/fetchNodeHttp.js, MIT.
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/fetchNodeHttp.js, MIT.
  */
 
 //! The errors of the HTTP executor, `coerce_fetch_error` and
@@ -17,13 +19,12 @@
 //! reads `Unknown error`, each with the upstream extensions of the request.
 //! The network capability of `aosabi-core` throws that `TypeError` for every
 //! failure below HTTP, so a `FetchError` of the capability is the original
-//! error of `fetch failed to <endpoint>` (the plan, section DELEGATE, rule 2),
-//! but for a refused connection, whose original error is the error of the
-//! socket that [`fetch_rejection`] answers. That exception departs from rule 2
-//! and from the rows `gw1-17` and `gw4-11` of the plan, which read
-//! `fetch failed to <url>`. `createResultForAbort` of `:373-377` wraps the
-//! abort error in a result and is left out with the executor that calls it,
-//! which lands with the network half of the executor.
+//! error of `fetch failed to <endpoint>`, but for a refused connection, whose
+//! original error is the error of the socket that [`fetch_rejection`] answers.
+//! That error reads `connect ECONNREFUSED <address>:<port>` and not
+//! `fetch failed to <endpoint>`. `createResultForAbort` of `:373-377` wraps
+//! the abort error in a result and is left out with the executor that calls
+//! it, which lands with the network half of the executor.
 //!
 //! The executor of the reference fetches through `@whatwg-node/node-fetch`,
 //! which rejects with the error of the socket of Node where the connection

@@ -119,9 +119,10 @@ const WRAPPERS: u32 = 4;
 
 /// A seeded xorshift generator over `u64`.
 ///
-/// The seed is mixed into the start of the paper's state, and a seed that
-/// would leave the state at zero, where the generator stays, starts from the
-/// paper's state itself.
+/// It is Marsaglia's 64 bit generator with the shifts 13, 7 and 17. The seed
+/// is mixed into the start of the paper's state, and a seed that would leave
+/// the state at zero, where the generator stays, starts from the paper's state
+/// itself.
 ///
 /// [Xorshift RNGs]: https://doi.org/10.18637/jss.v008.i14
 #[derive(Clone, Debug, PartialEq, Eq)]

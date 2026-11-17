@@ -3,23 +3,19 @@
  * homa-probe: the endpoint of the crate homa over the device configuration of
  * the ESP32-C3, measured as a static library for its RV32IMC core.
  *
- * The configuration is the one of the Homa design note, second version,
- * homa/design.md section 8.3, lines 2941 to 2991 in the design folder outside
- * this repository: four links, Serial Line, USB serial, Bluetooth and LoRa,
- * two server slots a link, no client slot, and a request page of 512 bytes
- * and an answer of 2,048 a slot (ASSUMED, that section, until
- * tests/notebooks/23_homa_budget.ipynb prints what the probe measures). The
- * probe measures these bytes before a card links an image.
+ * The configuration is four links, Serial Line, USB serial, Bluetooth and
+ * LoRa, two server slots a link, no client slot, and a request page of 512
+ * bytes and an answer of 2,048 a slot. The probe measures these bytes before a
+ * card links an image.
  *
  * The feature client builds the image of a card that federates as well, the
  * role client beside the role server with one client slot a link, which
- * 23_homa_budget holds to the same bound as the server image. From stage H2
- * the probe answers through reply_reserve as well, a reservation of the card's
- * answer buffer of 8,192 bytes written in place by a producer of the bytes and
- * committed, as a listener that spares the buffer calls it. From stage H6 the
- * features pacer-budget, aead, lora and sx1262 build the image of the HT-CT62,
- * a Lora carrier of aosabi-carrier-lora on the fourth link, one part at a
- * time.
+ * 23_homa_budget holds to the same bound as the server image. The probe
+ * answers through reply_reserve as well, a reservation of the card's answer
+ * buffer of 8,192 bytes written in place by a producer of the bytes and
+ * committed, as a listener that spares the buffer calls it. The features
+ * pacer-budget, aead, lora and sx1262 build the image of the HT-CT62, a Lora
+ * carrier of aosabi-carrier-lora on the fourth link, one part at a time.
  */
 
 //! The device probe of the crate `homa`.
@@ -285,8 +281,7 @@ pub fn reply(endpoint: &mut DeviceEndpoint<'_>, id: RpcId, answer: &[u8]) -> Res
 }
 
 /// The card's answer buffer, the longest answer of the ESP32-C3 by the limits
-/// of ADR-0026, which a reservation takes in the pages in its place
-/// (DOCUMENTED, docs/graphtp-in-aosabi.md section 3).
+/// of its device card, which a reservation takes in the pages in its place.
 #[cfg(not(feature = "frame-only"))]
 pub const LONGEST_ANSWER: u32 = 8_192;
 
@@ -301,7 +296,7 @@ const CHUNK: usize = 64;
 /// returns whether the answer was queued.
 ///
 /// No buffer of the answer exists beside the pages of the reservation, which
-/// is what [`Endpoint::reply_reserve`] spares a card (decision P31).
+/// is what [`Endpoint::reply_reserve`] spares a card.
 #[cfg(not(feature = "frame-only"))]
 pub fn reply_reserved(endpoint: &mut DeviceEndpoint<'_>, id: RpcId, len: u32) -> bool {
     let Ok(mut writer) = endpoint.reply_reserve(id, LONGEST_ANSWER) else {
@@ -490,8 +485,7 @@ pub static KEEP_CLIENT: ClientProbe = ClientProbe {
 };
 
 /// The budget of an hour of air of the band P in microseconds, the ledger's
-/// limit of the HT-CT62 (ASSUMED, the Homa design note, second version,
-/// section 6.3).
+/// limit of the HT-CT62 under the duty cycle of 10 percent of the band P.
 #[cfg(feature = "pacer-budget")]
 const AIR_PER_HOUR_US: u32 = 360_000_000;
 

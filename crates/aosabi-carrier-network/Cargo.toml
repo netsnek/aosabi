@@ -1,13 +1,12 @@
-# The carrier Network of layer 4, one carrier and one crate as
-# Documentation/architecture.md section 4.3 asks. It carries the full form of
-# Homa over raw IP protocol 146 on the crate's own engine, the default path,
-# and later over the socket of the crate's kernel module, gives the values of
-# the Network profile as functions a card fills, and serves GraphTP(Homa) on a
-# Linux card through the GraphTP listener as a local task of the runtime of
-# aosabi-serve, beside its HTTP(TCP).
+# The carrier Network of layer 4, one carrier and one crate. It carries the
+# full form of Homa over raw IP protocol 146 on the crate's own engine, the
+# default path, and later over the socket of the crate's kernel module, gives
+# the values of the Network profile as functions a card fills, and serves
+# GraphTP(Homa) on a Linux card through the GraphTP listener as a local task
+# of the runtime of aosabi-serve, beside its HTTP(TCP).
 [package]
 name = "aosabi-carrier-network"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier Network: GraphTP(Homa) over raw IP 146 on the crate's engine, beside HTTP(TCP) on a Linux card."
 edition.workspace = true
 rust-version.workspace = true
@@ -32,9 +31,9 @@ homa-ip = [
     "homa/ip",
 ]
 # The kernel path over the socket of the crate's kernel module, whose code
-# stage H5 writes with the feature kernel-socket of homa. Until then it takes
-# the raw path for the modules both paths share, and a path of the kernel
-# reads NoModule.
+# comes later with the feature kernel-socket of homa. Until then it takes the
+# raw path for the modules both paths share, and a path of the kernel reads
+# NoModule.
 homa-kernel = ["homa-ip"]
 
 [dependencies]

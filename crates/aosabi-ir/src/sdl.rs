@@ -3,7 +3,7 @@
  * aosabi-ir: the SDL printer, the projection of an IR to the GraphQL schema
  * text that an Aosabi build writes.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/sdl.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett, packages/pylon/src/ir/sdl.ts,
  * Apache-2.0. Changed by the Aosabi authors.
  */
 
@@ -31,10 +31,6 @@
 //!   change no unit of them, so the printer indexes no string and no position
 //!   arises in it. The one position of this crate is
 //!   [`CollateError::offset`], a UTF-16 code unit offset.
-//!
-//! The judging notebook is `tests/notebooks/15_sdl_printer.ipynb`, which
-//! drives `aosabi-devtool print-sdl` against the reference over the cases of
-//! `tests/capture/15_corpus/`.
 //!
 //! [enumerable]: https://tc39.es/ecma262/#sec-enumerableownproperties
 //! [to-boolean]: https://tc39.es/ecma262/#sec-toboolean
@@ -70,7 +66,8 @@ use crate::{
     }, //
 };
 
-/// The names of the interfaces the printer drops, the `Set<string>`.
+/// The names of the interfaces the printer drops, the `Set<string>` of the
+/// reference.
 struct Dropped {
     /// The names in insertion order, as a JavaScript `Set` keeps them.
     names: IndexSet<String, KeyHasherBuilder>,
@@ -83,7 +80,8 @@ impl Dropped {
     }
 }
 
-/// The options of [`render_object_type`], the object literal type.
+/// The options of [`render_object_type`], the object literal type of the
+/// reference.
 #[derive(Clone, Copy)]
 struct ObjectOpts<'a> {
     /// The interface names the type implements.
@@ -106,8 +104,8 @@ pub fn render_type(t: &TypeRef) -> String {
 /// two spaces at field level.
 ///
 /// The text is inserted verbatim, with no escaping and no indentation of its
-/// further lines, which is quirk `Q14_DESCRIPTION_VERBATIM`. `None` and the
-/// empty string both render nothing, which is the `!description` test of :17.
+/// further lines, which is quirk `DESCRIPTION_VERBATIM`. `None` and the empty
+/// string both render nothing, which is the `!description` test of :17.
 fn render_description(description: Option<&str>, indent: &str) -> String {
     let Some(description) = description.filter(|text| !text.is_empty()) else {
         return String::new();
@@ -175,6 +173,8 @@ fn render_implements(r#impl: Option<&[String]>, dropped: &Dropped) -> Result<Str
     Ok(format!(" implements {}", sorted.join(" & ")))
 }
 
+/// Sorts `names` the way `[...kept].sort((a, b) => a.localeCompare(b))` does.
+///
 /// The reference calls its comparator only when the list holds two or more
 /// names, so a list of one name is returned unchecked. Every name of a longer
 /// list takes part in at least one comparison of any comparison sort, so
@@ -308,7 +308,7 @@ pub fn to_sdl(ir: &SchemaIr) -> Result<String, CollateError> {
     }
 
     // GraphQL requires at least one field of an input object, so an input
-    // with none renders a placeholder, quirk `Q08_EMPTY_INPUT_PLACEHOLDER`.
+    // with none renders a placeholder, quirk `EMPTY_INPUT_PLACEHOLDER`.
     for input in ir.inputs.values() {
         let fields = if input.fields.is_empty() {
             String::from("  _: String")

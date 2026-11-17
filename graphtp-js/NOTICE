@@ -1,0 +1,30 @@
+graphtp
+Copyright (c) 2026 Florian Kleber
+
+The npm package graphtp is a part of Aosabi, https://github.com/netsnek/aosabi,
+and is licensed under the MIT License. This file names the work of others that
+the package carries or derives code or data from, with the license of each. It
+adds attribution and no condition to the license of the package. The texts of
+the licenses are those of LICENSE for MIT and LICENSE-Zlib for Zlib, beside this
+file.
+
+The package ships graphtp.wasm, which is built from the crate graphtp-wasm of
+the Aosabi repository and the crates it links, so it carries the work of the
+projects below that those crates carry. Each file of those crates names its
+license in its SPDX line there.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Other projects
+==============
+
+Project: zlib
+URL: https://github.com/madler/zlib
+Packages: zlib 1.3.1
+License: Zlib
+Copyright (C) 2002-2013 Mark Adler, all rights reserved

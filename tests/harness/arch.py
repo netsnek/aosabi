@@ -168,7 +168,9 @@ def build_static(
 
 
 def candidates(emulator: str = "") -> list:
-    """A set `emulator` parameter is the one candidate. Otherwise the qemu user
+    """Returns the emulator commands to try, in the order below.
+
+    A set `emulator` parameter is the one candidate. Otherwise the qemu user
     mode emulator of the other architecture, then `FEXInterpreter` under
     `muvm` for an x86-64 binary on an aarch64 host, each only when it is on
     the search path.
@@ -296,10 +298,9 @@ def compare_record(tree: dict, recorded: dict) -> list:
     return lines
 
 
-# The player, the digital audio player the wasabi service runs on, builds for a
-# tier 3 target with no prebuilt standard library, so its standard library
-# builds from the rust-src of one pinned nightly, statically linked with soft
-# float.
+# The player, a digital audio player, builds for a tier 3 target with no
+# prebuilt standard library, so its standard library builds from the rust-src
+# of one pinned nightly, statically linked with soft float.
 PLAYER_TARGET = "mipsel-unknown-linux-musl"
 PLAYER_TOOLCHAIN = "nightly-2026-09-20"
 PLAYER_BUILD_STD = ("-Z", "build-std=std,panic_abort")

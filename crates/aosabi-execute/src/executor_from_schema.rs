@@ -3,6 +3,7 @@
  * aosabi-execute executor_from_schema: the local executor over a schema a delegation runs.
  *
  * Derived from @graphql-tools/executor 1.5.1, cjs/execution/normalizedExecutor.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, typings/Interfaces.d.ts, MIT.
  */
 
 //! The executor of a request over a schema, `executor_from_schema`, which
@@ -24,7 +25,11 @@
 //!
 //! The module uses `core` and `alloc` and no item of the standard library,
 //! shares the executor through `Rc` and holds no static, so a build of the
-//! crate without the standard library changes it in no line.
+//! crate without the standard library changes it in no line. The schema and
+//! the document go through the handles [`ExecutionArgs`] names, the alias
+//! [`SharedSchema`] of the schema and the `into()` of the document, an `Arc`
+//! of each today, and a move to `Rc` for a target with no pointer atomics
+//! changes those handles outside this file.
 
 use alloc::{
     rc::Rc,
@@ -54,6 +59,8 @@ use crate::{
 /// The `signal` and the `schemaCoordinateInErrors` of the request have no
 /// reading, because [`ExecutionArgs`] leaves both out with the branches that
 /// read them.
+///
+/// Derived from @graphql-tools/utils 11.0.0, typings/Interfaces.d.ts, MIT.
 pub struct SchemaRequest {
     /// The document of the request, which the executor shares from then on.
     pub document: DocumentNode,

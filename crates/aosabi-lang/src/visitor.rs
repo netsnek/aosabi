@@ -30,11 +30,12 @@
 //! The reference lets a hook edit the tree by returning `null` or a replacement
 //! node. The walk of this module is read only, and a hook answers with a
 //! [`VisitResult`], which is the `undefined`, `false` and `BREAK` of the
-//! reference. The walk that edits is [󰀅](crate::visitor_edit::visit_edit),
-//! whose hooks answer an [󰀆](crate::visitor_edit::Edit) and which returns the
-//! edited tree, as the transforms and the delegation of Federation edit a
-//! document. Both walks read the children of a node through one table, the
-//! `QueryDocumentKeys` of the reference.
+//! reference. The walk that edits is
+//! [`visit_edit`](crate::visitor_edit::visit_edit), whose hooks answer an
+//! [`Edit`](crate::visitor_edit::Edit) and which returns the edited tree, as
+//! the transforms and the delegation of Federation edit a document. Both walks
+//! read the children of a node through one table, the `QueryDocumentKeys` of
+//! the reference.
 
 use alloc::{
     vec,

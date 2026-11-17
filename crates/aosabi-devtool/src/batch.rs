@@ -3,8 +3,7 @@
  * aosabi-devtool batch: answers a file of request lines one response line per
  * request, in the protocol of the graphql-js oracle.
  *
- * Follows the answer function and the read loop of
- * tests/sidecar/graphql-js.mjs, whose protocol is tests/sidecar/README.md. No
+ * Follows the answer function and the read loop of the graphql-js sidecar. No
  * analogue in the reference.
  */
 
@@ -237,6 +236,7 @@ pub fn parse_options(request: &JsObject) -> Result<ParseOptions, String> {
             options.get("allowLegacyFragmentVariables"),
             Some(JsValue::Bool(true))
         ),
+        max_nesting: None,
     })
 }
 

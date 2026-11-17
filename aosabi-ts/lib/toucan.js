@@ -6,9 +6,12 @@
  * engine keeps for the request, and the options of the last Sentry.init of
  * aosabi/sentry/node, which the boot of the engine takes.
  *
- * Derived from toucan-js 4.1.1, ., MIT.
- * Derived from @sentry/core 8.9.2, ., MIT.
- * Derived from @sentry/node 8.55.0, ., MIT.
+ * Derived from @sentry/node 8.55.0, MIT.
+ *
+ * Derived from @sentry/node 8.55.0, build/cjs/sdk/api.js, MIT.
+ * Derived from toucan-js 4.1.1, MIT.
+ * Derived from @sentry/core 8.9.2, MIT.
+ * Derived from @sentry/node 8.55.0, build/cjs/sdk/index.js, MIT.
  */
 
 // The calls of the op SENTRY of the export ctx, crates/aosabi-js/src/sentry.rs.
@@ -67,8 +70,10 @@ function refuseFunction(key, value, seen) {
 // options of the call, an own member that is undefined among them, so
 // init({dsn: undefined}) names no DSN, and the release of the options where
 // they name one and the release getSentryRelease reads otherwise. The engine
-// takes the DSN, the environment, the release and the sample rate at its
-// boot, and an option that is a function or holds one throws.
+// takes the DSN, the environment, the release and the sample rate at its boot,
+// and enabled where it is false, for which the engine sets up no client, so no
+// event leaves, as the client of @sentry/node sends none then, and an option
+// that is a function or holds one throws.
 export function setInit(options = {}) {
   for (const [key, value] of Object.entries(options)) refuseFunction(key, value, new Set());
   const env = globalThis.process?.env ?? {};
@@ -84,6 +89,7 @@ export function setInit(options = {}) {
     release: typeof merged.release === "string" ? merged.release : undefined,
     sampleRate: typeof merged.sampleRate === "number" ? merged.sampleRate : undefined,
   };
+  if (merged.enabled === false) initialized.enabled = false;
 }
 
 // Returns the options of the last init, or undefined before the first.
@@ -95,9 +101,8 @@ export function initOptions() {
 // name and the message of an Error, No error message for an empty one, as
 // exceptionFromError of Toucan reads them, and the text of any other value
 // under the type Error. Toucan writes a plain object as "Non-Error exception
-// captured with keys" with the extra __serialized__ on its scope and any
-// other value that is no Error as the value itself (dist/index.cjs.js:86-124
-// there), a difference section 14 of docs/ts1-surface.md names.
+// captured with keys" with the extra __serialized__ on its scope and any other
+// value that is no Error as the value itself (dist/index.cjs.js:86-124 there).
 function exceptionOf(exception) {
   const isError = exception instanceof Error;
   const type = isError ? String(exception.name) : "Error";

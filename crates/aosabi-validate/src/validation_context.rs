@@ -392,7 +392,7 @@ impl<'a> AstValidationContext<'a> {
 }
 
 impl fmt::Debug for AstValidationContext<'_> {
-    /// Writes the `Symbol.toStringTag` of the reference, translation.
+    /// Writes the `Symbol.toStringTag` of the reference.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ASTValidationContext")
             .finish_non_exhaustive()
@@ -440,7 +440,7 @@ impl<'a> Deref for SdlValidationContext<'a> {
 }
 
 impl fmt::Debug for SdlValidationContext<'_> {
-    /// Writes the `Symbol.toStringTag` of the reference, translation.
+    /// Writes the `Symbol.toStringTag` of the reference.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("SDLValidationContext")
             .finish_non_exhaustive()
@@ -656,7 +656,7 @@ impl<'a> Deref for ValidationContext<'a> {
 }
 
 impl fmt::Debug for ValidationContext<'_> {
-    /// Writes the `Symbol.toStringTag` of the reference, translation.
+    /// Writes the `Symbol.toStringTag` of the reference.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ValidationContext").finish_non_exhaustive()
     }

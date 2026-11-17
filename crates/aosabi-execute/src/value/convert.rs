@@ -3,6 +3,8 @@
  * aosabi-execute value convert: the conversions between the executor value
  * and the JSON value model.
  *
+ * For a Date the walk asks valueOf before toJSON.
+ *
  * Derived from graphql-js 16.12.0, src/type/scalars.ts, MIT.
  */
 

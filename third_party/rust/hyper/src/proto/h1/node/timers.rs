@@ -5,10 +5,11 @@
  * Translation of the head and request timers of Node 24.13.0,
  * src/node_http_parser.cc:269-287, :496-507, :684-692 and :1124-1181 with
  * lib/_http_server.js:468-510, and of its idle close,
- * lib/_http_server.js:1047-1058 and :881-889. It implements quirk Q43 of
- * docs/byte-equality.md section 13.1.
+ * lib/_http_server.js:1047-1058 and :881-889. It implements the quirk
+ * NODE_TIMERS.
  */
-//! The head, request and idle deadlines of Node over the timer of the connection, quirk Q43.
+//! The head, request and idle deadlines of Node over the timer of the connection, quirk
+//! `NODE_TIMERS`.
 
 use core::time::Duration;
 

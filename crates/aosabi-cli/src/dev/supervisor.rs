@@ -2,14 +2,17 @@
 /*
  * aosabi-cli: the supervisor of the served child of the development loop.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/cli/dev/dev-server.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/dev/dev-server.ts and packages/pylon/src/cli/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! The supervisor.
 //!
-//! A Rust service is a binary, so [`Supervisor`] runs it as a child and the restart is
+//! The reference compiles the schema in its own process, swaps it into the
+//! running app on a `src` edit, rebuilds the whole session on a change of the
+//! configuration, and runs one reload at a time behind a promise chain. A Rust
+//! service is a binary, so [`Supervisor`] runs it as a child and the restart is
 //! the whole reload:
 //!
 //! 1. The first build is steps 3 to 7 of `build` for the `server` card in
@@ -23,24 +26,33 @@
 //!    the served binary binds the port itself and prints nothing. The child
 //!    stays in the process group of the supervisor, so a Ctrl C ends both, and
 //!    its standard output goes to the standard error of the command line.
-//! 3. The first time it answers, the supervisor prints a box of its own, which
-//!    reads `Aosabi is up and running.` and
+//! 3. In the web role the supervisor posts `{"query":"{__typename}"}` to
+//!    `http://127.0.0.1:<port>/graphql` through the client of [`http`] every
+//!    100 ms until a 200 answers, the child exits or 30 seconds pass, the probe
+//!    rule of `tests/harness/procs.py`. When it first answers, the supervisor
+//!    prints a box of its own, which reads `Aosabi is up and running.` and
 //!    `Press Ctrl + C to stop the server.` in the frame `consola.box` draws,
-//!    and then `Aosabi running at http://localhost:<port>`, the line the
-//!    served binary prints outside development. The worker role probes
-//!    nothing and prints `[dev] worker started, watching src for changes`
-//!    once.
+//!    and then `Aosabi running at http://localhost:<port>`, the line the served
+//!    binary prints outside development. The reference's box ends in its issue
+//!    tracker and its feedback line, which would mislead an Aosabi user. The
+//!    worker role probes nothing and prints
+//!    `[dev] worker started, watching src for changes` once.
 //! 4. Every changed path prints `[dev] <kind> reload`, the character U+2014 and
-//!    the path relative to the root, and the highest kind
-//!    of a burst is kept. After 200 ms with no change, 150 ms in the worker
-//!    role, the supervisor prints `[dev] rebuilding` and builds. A burst of the
-//!    kind `config` reads the project again first, since the manifest or the
-//!    configuration changed. A build that succeeds prints
-//!    `[dev] restarted`, kills the old child with [`Child::kill`], since the
-//!    served binary has no graceful shutdown, starts the new one and probes it.
-//!    A build that fails prints what cargo printed and
-//!    `[dev] build failed, the previous server keeps running`, the rule of
-//!    `docs/cli-and-targets.md` section 4, or
+//!    the path relative to the root, and the highest kind of a burst is kept.
+//!    After 200 ms with no change, 150 ms in the worker role, the supervisor
+//!    prints `[dev] rebuilding` and builds. A burst of the kind `config` reads
+//!    the project again first, since the manifest or the configuration changed,
+//!    with every refusal of the loader, and after a reload that failed every
+//!    later burst reads it again before it builds, until a reload succeeds.
+//!    Every other burst builds with the project of the last load, and the build
+//!    reads the lock of the project and the lock it derives with the pin check
+//!    of the loader, so a crate of Aosabi from a registry that a change the
+//!    watcher did not see brings in is refused with `AO-C0108` before cargo
+//!    compiles. A build that succeeds prints `[dev] restarted`, kills the old
+//!    child with [`Child::kill`], since the served binary has no graceful
+//!    shutdown, starts the new one and probes it. A build that fails prints
+//!    what cargo printed and
+//!    `[dev] build failed, the previous server keeps running`, or
 //!    `[dev] build failed, watching for the next change` while no child runs.
 //!
 //! The builds run one after the other on the thread of the supervisor, so a
@@ -181,6 +193,9 @@ pub struct Supervisor {
     child: Option<Child>,
     /// Whether the box or the worker line was printed.
     announced: bool,
+    /// Whether a reload of the project failed since the last one that
+    /// succeeded, so the next build reads the project again first.
+    stale: bool,
 }
 
 impl Supervisor {
@@ -191,16 +206,19 @@ impl Supervisor {
             setup,
             child: None,
             announced: false,
+            stale: false,
         }
     }
 
     /// Runs the first build, then polls `watcher` and rebuilds after every
-    /// burst of changes until the process ends.
+    /// burst of changes until the process ends, and after each reload hands
+    /// `watcher` the other files the project as last read lists, before the
+    /// build.
     ///
     /// It returns only when the root of the project can no longer be read,
     /// with [`ExitCode::FAILURE`].
     pub fn run(&mut self, watcher: &mut Watcher) -> ExitCode {
-        self.cycle(None);
+        self.cycle(None, watcher);
         let mut pending: Option<Kind> = None;
         let mut last_change = Instant::now();
         loop {
@@ -230,7 +248,7 @@ impl Supervisor {
                 && last_change.elapsed() >= self.quiet()
             {
                 pending = None;
-                self.cycle(Some(kind));
+                self.cycle(Some(kind), watcher);
             }
         }
     }
@@ -247,11 +265,17 @@ impl Supervisor {
     /// Builds and, on success, restarts the child: the first build when
     /// `burst` is `None`, else a rebuild after a burst whose highest kind is
     /// `burst`.
-    fn cycle(&mut self, burst: Option<Kind>) {
+    ///
+    /// The files of a reload join the set of `watcher` before the build, so
+    /// a change of one of them while cargo builds counts at the next poll.
+    fn cycle(&mut self, burst: Option<Kind>, watcher: &mut Watcher) {
         if burst.is_some() {
             eprintln!("{REBUILDING_LINE}");
         }
-        let built = self.reload(burst).and_then(|()| self.build());
+        let built = self.reload(burst).and_then(|()| {
+            watcher.watch_loaded(&self.setup.project.watched);
+            self.build()
+        });
         let binary = match built {
             Ok(binary) => binary,
             Err(error) => {
@@ -293,20 +317,31 @@ impl Supervisor {
         }
     }
 
-    /// Reads the project again after a burst of the kind `config`.
+    /// Reads the project again after a burst of the kind `config`, and before
+    /// every build after a reload that failed until one succeeds.
+    ///
+    /// The build takes the manifest from the disk, so a build after a failed
+    /// reload would resolve a manifest the loader refused with the project of
+    /// the last good reload. Each reload runs every refusal of the loader,
+    /// `AO-C0108` first, so such a manifest is refused again before each
+    /// build and cargo resolves nothing of it.
     fn reload(&mut self, burst: Option<Kind>) -> Result<(), CliError> {
-        if burst == Some(Kind::Config) {
+        if burst == Some(Kind::Config) || self.stale {
+            self.stale = true;
             self.setup.project = project::load(
                 &self.setup.cwd,
                 self.setup.manifest_path.as_deref(),
                 self.setup.lock,
                 &self.setup.cargo,
             )?;
+            self.stale = false;
         }
         Ok(())
     }
 
-    /// Runs steps 3 to 7 of `build` for the card and answers the binary.
+    /// Runs steps 3 to 7 of `build` for the card, writes the schema into the
+    /// folder of the project once the build answered a binary, and answers
+    /// the binary.
     fn build(&self) -> Result<PathBuf, CliError> {
         let args = BuildArgs {
             device: None,
@@ -322,12 +357,14 @@ impl Supervisor {
             Output::Inherit,
             &self.setup.cargo,
         )?;
-        outcome.binary.ok_or_else(|| {
+        let binary = outcome.binary.clone().ok_or_else(|| {
             CliError::new(format!(
                 "the card {} built no binary to serve",
                 self.setup.card.name
             ))
-        })
+        })?;
+        build::write_project_schema(&self.setup.project, &outcome)?;
+        Ok(binary)
     }
 
     /// Starts `binary` as the child in the project root.

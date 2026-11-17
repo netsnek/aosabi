@@ -11,11 +11,10 @@
 //! The template joins its strings with its values, escaping a string value and
 //! writing an escaped value as it is, and answers an escaped `String` object,
 //! which `c.html` hands to the response as a body the adapter keeps in no
-//! cache (A5 of the plan's version 2 draft). A number is written as JavaScript
-//! writes it, and a boolean, `null` and `undefined` are left out. The
-//! callbacks and the promises of the reference serve its JSX and a streamed
-//! render, which the pages of an app do not use, so the template here is
-//! synchronous.
+//! cache. A number is written as JavaScript writes it, and a boolean, `null`
+//! and `undefined` are left out. The callbacks and the promises of the
+//! reference serve its JSX and a streamed render, which the pages of an app do
+//! not use, so the template here is synchronous.
 
 use aosabi_json::number_to_string;
 

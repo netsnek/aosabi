@@ -2,19 +2,28 @@
 /*
  * aosabi-scalars: the four graphql-scalars scalars Aosabi binds.
  *
- * This file holds the value model the hooks share and the module table.
+ * The module error translates createGraphQLError of graphql-scalars, js_string
+ * translates a clause of ECMA-262, and js_date translates clauses of ECMA-262
+ * and the date reader of V8. This file holds the value model the hooks share
+ * and the module table.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, MIT.
  */
 
 //! The scalar library of Aosabi.
 //!
-//! Aosabi binds four scalars from graphql-scalars: `DateTimeISO` under the name
-//! `Date`, `JSON`, `JSONObject` and `Void`. This crate is a literal
-//! translation of the files behind those four, with every message string
-//! copied from the installed package, because the byte contract names their
-//! messages. The three scalars with a resolver of their own, `ID`, `GID`
-//! and `Number`, live in the handler and are not part of this crate.
+//! Aosabi binds four scalars from graphql-scalars: `DateTimeISO` under the
+//! name `Date`, `JSON`, `JSONObject` and `Void`. Each module but [`js_string`]
+//! and [`js_date`] translates literally the file of graphql-scalars the table
+//! below names, with every message string copied from the installed package,
+//! because the byte contract names their messages. [`js_string`] translates a
+//! clause of ECMA-262 and carries no message of its own, and [`js_date`]
+//! translates clauses of ECMA-262 and the date reader of V8, and its one
+//! message is the text V8 throws for an invalid time value. Beside its
+//! translation, [`error`] holds [`RangeError`], the error V8 throws from
+//! `Date.prototype.toISOString`. The three scalars with a resolver of their
+//! own, `ID`, `GID` and `Number`, live in the handler and are not part of this
+//! crate.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |

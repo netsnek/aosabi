@@ -2,6 +2,10 @@
 /*
  * aosabi-build: the lowering of the roots of a plain crate into the dump of a
  * descriptor graph, the types the third type source answers for.
+ *
+ * The lowering describes the declarations of a crate as the macros of
+ * crates/aosabi-macros/src/ describe them for the derive path, here read from
+ * the plain source.
  */
 
 //! The lowering of a plain crate.
@@ -45,26 +49,25 @@
 //! `Int` print alike.
 //!
 //! A member takes the name the rule of [`graphql_name`] gives it, and an input
-//! takes the name the inference gives its site, rule 6 of
-//! `docs/schema-inference.md` section 5.1, since a struct presents as a class
-//! with no alias symbol. A member without `pub` is a private property of the
-//! class, as the derive path records it, so the class keeps its identity and no
-//! private member reaches the schema, and its type is the any marker, since the
-//! inference reads no more of it. A member of a type of a path dependency is
-//! private unless it is `pub`, since the crate of the application does not see
-//! it. A function with no receiver is no member, and a member whose name opens
-//! with two underscores is none either. A generic type takes one node for each
-//! GraphQL type its uses print, its parameters substituted, and a lifetime is
-//! ignored. Two uses whose arguments print one GraphQL type, `Wrap<i32>` beside
-//! `Wrap<u8>`, share the node and are two Rust types, so the lowering lowers
-//! the fields, the methods and the payloads of every Rust type a use names
-//! under the arguments of that use, once for each, and so reaches every use
-//! their own types make, `Inner<u8>` beside `Inner<i32>`. An inherent block
-//! belongs to the struct its self type names through every type alias, and of a
-//! generic struct to the uses whose arguments it matches, so `impl Page<User>`
-//! lends its methods to `Page<User>` alone, and a block whose uses the builder
-//! cannot tell is refused at its line. A type of a path dependency lowers as a
-//! type of the crate, whose source the reader reads.
+//! takes the name the inference gives its site, since a struct presents as a
+//! class with no alias symbol. A member without `pub` is a private property of
+//! the class, as the derive path records it, so the class keeps its identity
+//! and no private member reaches the schema, and its type is the any marker,
+//! since the inference reads no more of it. A member of a type of a path
+//! dependency is private unless it is `pub`, since the crate of the application
+//! does not see it. A function with no receiver is no member, and a member
+//! whose name opens with two underscores is none either. A generic type takes
+//! one node for each GraphQL type its uses print, its parameters substituted,
+//! and a lifetime is ignored. Two uses whose arguments print one GraphQL type,
+//! `Wrap<i32>` beside `Wrap<u8>`, share the node and are two Rust types, so the
+//! lowering lowers the fields, the methods and the payloads of every Rust type
+//! a use names under the arguments of that use, once for each, and so reaches
+//! every use their own types make, `Inner<u8>` beside `Inner<i32>`. An inherent
+//! block belongs to the struct its self type names through every type alias,
+//! and of a generic struct to the uses whose arguments it matches, so
+//! `impl Page<User>` lends its methods to `Page<User>` alone, and a block whose
+//! uses the builder cannot tell is refused at its line. A type of a path
+//! dependency lowers as a type of the crate, whose source the reader reads.
 //!
 //! The doc comment of a struct, a field and a method, and of every enum of
 //! unit variants, is its description, read as the derive path reads it,
@@ -116,14 +119,12 @@
 //!
 //! The roots are the parts the entry registers. A root is one object of the
 //! public members of every part in registration order, the twin of the root
-//! object literal of the index of a TypeScript service, whose members are
-//! arrow functions, as the
-//! derive path presents the root of a fragment of `graphql!` and the merged
-//! roots of `compose`. A name two parts hold is refused, as the plan's rule D4
-//! asks. A part with no public member registers nothing, so an empty root
-//! leaves no trace. Every construct the source cannot state is refused with
-//! the file and the line of the author, and the refusal says what to write in
-//! its place.
+//! object literal of the index of a TypeScript service, whose members are arrow
+//! functions, as the derive path presents the root of a fragment of `graphql!`
+//! and the merged roots of `compose`. A name two parts hold is refused. A part
+//! with no public member registers nothing, so an empty root leaves no trace.
+//! Every construct the source cannot state is refused with the file and the
+//! line of the author, and the refusal says what to write in its place.
 
 use std::rc::Rc;
 
@@ -811,6 +812,9 @@ impl Lowering<'_> {
             "Number" => self.primitive("number"),
             "Promise" => self.wrapped(arguments, "promise", text, site),
             "Repeater" => self.wrapped(arguments, "repeater", text, site),
+            // A value no Rust type states, a null or a value of another type
+            // under the type of a cast, which a twin keeps for now, is the node
+            // of its type, as the boxed link of the derive path describes it.
             "Result" | "Unchecked" => self.wrapped(arguments, "", text, site),
             PAYLOAD => self.refuse_type(site, refuse_payload_place(text, &site.key)),
             _ => self.refuse_type(site, refuse_facade(text, &site.key)),

@@ -3,10 +3,10 @@
  * aosabi-devtool cli: the command line parser of the seam.
  *
  * No analogue in the reference, whose command line runs on commander. The seam
- * reads its own command line over std::env::args_os, because the rule of
- * docs/decisions/ADR-0024-dependencies.md takes the standard library first and
- * code written in the project second, and a parser of long options meets none
- * of the four reasons that admit a crate.
+ * reads its own command line over std::env::args_os, because the dependency
+ * rule of the project takes the standard library first and code written in the
+ * project second, and a parser of long options meets none of the four reasons
+ * that admit a crate.
  */
 
 //! The command line of the seam.

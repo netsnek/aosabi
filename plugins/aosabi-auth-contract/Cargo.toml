@@ -1,13 +1,14 @@
-# The authorization contract of layer 4. It builds with no standard library
-# and needs an allocator, and it names aosabi-json alone, so every target
-# links it, riscv32imc-unknown-none-elf among them.
+# The authorization contract of layer 4. It holds ForbiddenError, the
+# principal, its checks and the identity provider seam. It builds
+# with no standard library and needs an allocator, and it names aosabi-json
+# alone, so every target links it, riscv32imc-unknown-none-elf among them.
 [package]
 name = "aosabi-auth-contract"
-version = "0.0.0"
+version.workspace = true
 description = "The authorization contract of Aosabi: the principal, its role and permission checks, the identity provider seam and ForbiddenError, with no standard library."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 
@@ -17,9 +18,11 @@ workspace = true
 [features]
 # The truth of the feature of a ForbiddenError a host made, which the host of
 # the TypeScript option tests on the value it holds, as the map of the
-# identity plugin tests it, so the map writes the copy JSON reads of
-# a true feature whatever the truth of the copy, an invalid Date, whose copy
-# is null, among them.
+# identity plugin tests it, so the map writes the copy JSON reads of a true
+# feature whatever the truth of the copy, an invalid Date, whose copy is
+# null, among them. Only the module of aosabi-js turns it on, through the
+# feature host-errors of aosabi-auth, so a build of the Rust option and of
+# every card keeps its bytes.
 host-errors = []
 
 [dependencies]

@@ -46,7 +46,7 @@ body:
     attributes:
       label: Version
       description: The release of Aosabi or the commit you built.
-      placeholder: 0.1.0, or the hash of a commit
+      placeholder: 0.1.1, or the hash of a commit
     validations:
       required: true
 

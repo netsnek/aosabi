@@ -2,9 +2,7 @@
 /*
  * aosabi-macros: the text of every refusal of the macros.
  *
- * The TypeScript inference is silent where these macros refuse, and
- * docs/schema-inference.md section 13 lists each refusal as a deliberate
- * deviation.
+ * The TypeScript inference is silent where these macros refuse.
  */
 
 //! The text of every refusal of the macros.
@@ -226,68 +224,77 @@ pub(crate) const CONTEXT_DERIVE_NOT_NAMED: &str =
     "the derive belongs on a struct with named fields";
 
 /// A field of a `Bindings` struct has a type the environment cannot answer.
-pub(crate) const BINDING_FIELD_TYPE: &str = "a binding is `String` or `Option<String>` until M12, which reads the typed bindings of a platform";
+pub(crate) const BINDING_FIELD_TYPE: &str = "a binding is `String` or `Option<String>` until a later release reads the typed bindings of a platform";
 
 /// `graphql!` stands outside the feature `mirror`.
-pub(crate) const RETIRED_GRAPHQL: &str = "`graphql!` is retired, and an application registers its roots on the chain of its entry, a public function of the crate root that answers an app, `App::new().query(Query)`, as docs/authoring.md section 4 writes it";
+pub(crate) const RETIRED_GRAPHQL: &str = "`graphql!` is retired, and an application registers its roots on the chain of its entry, a public function of the crate root that answers an app, `App::new().query(Query)`";
 
 /// `#[derive(Aosabi)]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_DERIVE: &str = "`#[derive(Aosabi)]` is retired, and the builder reads a plain struct or enum from the source with no derive, as docs/authoring.md sections 8 and 17 write it";
+pub(crate) const RETIRED_DERIVE: &str = "`#[derive(Aosabi)]` is retired, and the builder reads a plain struct or enum from the source with no derive";
 
 /// `#[aosabi::resolvers]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_RESOLVERS: &str = "`#[aosabi::resolvers]` is retired, and the builder reads the methods of a plain inherent `impl` block from the source, as docs/authoring.md section 9 writes it";
+pub(crate) const RETIRED_RESOLVERS: &str = "`#[aosabi::resolvers]` is retired, and the builder reads the methods of a plain inherent `impl` block from the source";
 
 /// `#[aosabi::resolver]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_RESOLVER: &str = "`#[aosabi::resolver]` is retired, and a method of the root calls the function, as docs/authoring.md section 12 writes it";
+pub(crate) const RETIRED_RESOLVER: &str =
+    "`#[aosabi::resolver]` is retired, and a method of the root calls the function";
 
 /// `#[aosabi::scalar]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_SCALAR: &str = "`#[aosabi::scalar]` is retired with no native form, so a value takes a marker of the facade or `json::Map`, as docs/authoring.md section 20.4 writes it";
+pub(crate) const RETIRED_SCALAR: &str = "`#[aosabi::scalar]` is retired with no native form, so a value takes a marker of the facade or `json::Map`";
 
 /// `#[decorate(..)]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_DECORATE: &str = "`#[decorate(..)]` is retired, and the body of a method calls its guard function first, as docs/authoring.md section 23 writes it";
+pub(crate) const RETIRED_DECORATE: &str =
+    "`#[decorate(..)]` is retired, and the body of a method calls its guard function first";
 
 /// `plugin!` stands outside the feature `mirror`.
-pub(crate) const RETIRED_PLUGIN: &str = "`plugin!` is retired, and a plugin is built with `PluginObject::new(name)` and its calls or is a type that implements `Plugin`, as docs/authoring.md section 7 writes it";
+pub(crate) const RETIRED_PLUGIN: &str = "`plugin!` is retired, and a plugin is built with `PluginObject::new(name)` and its calls or is a type that implements `Plugin`";
 
 /// `plugins!` stands outside the feature `mirror`.
-pub(crate) const RETIRED_PLUGINS: &str = "`plugins!` is retired, and the chain of the entry registers each plugin with `.plugin(..)`, as docs/authoring.md section 7 writes it";
+pub(crate) const RETIRED_PLUGINS: &str =
+    "`plugins!` is retired, and the chain of the entry registers each plugin with `.plugin(..)`";
 
 /// `#[derive(Bindings)]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_BINDINGS: &str = "`#[derive(Bindings)]` is retired, and a service reads its environment with `get_env().var(..)`, as docs/authoring.md section 22 writes it";
+pub(crate) const RETIRED_BINDINGS: &str = "`#[derive(Bindings)]` is retired, and a service reads its environment with `get_env().var(..)`";
 
 /// `#[derive(Variables)]` stands outside the feature `mirror`.
-pub(crate) const RETIRED_VARIABLES: &str = "`#[derive(Variables)]` is retired, and a service declares each variable of a request as a `Key` constant, as docs/authoring.md section 22 writes it";
+pub(crate) const RETIRED_VARIABLES: &str = "`#[derive(Variables)]` is retired, and a service declares each variable of a request as a `Key` constant";
 
 /// The key `typename` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_TYPENAME: &str = "the key `typename` is retired, and a type takes the name of its struct or of a variant of a payload enum, as docs/authoring.md section 16 writes it";
+pub(crate) const RETIRED_KEY_TYPENAME: &str = "the key `typename` is retired, and a type takes the name of its struct or of a variant of a payload enum";
 
 /// The key `anonymous` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_ANONYMOUS: &str = "the key `anonymous` is retired, and every type of the native layer is a named struct, as docs/authoring.md section 8 writes it";
+pub(crate) const RETIRED_KEY_ANONYMOUS: &str =
+    "the key `anonymous` is retired, and every type of the native layer is a named struct";
 
 /// The key `enum` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_ENUM: &str = "the key `enum` is retired, and the builder reads the doc comment of every enum of unit variants, as docs/authoring.md section 17 writes it";
+pub(crate) const RETIRED_KEY_ENUM: &str = "the key `enum` is retired, and the builder reads the doc comment of every enum of unit variants";
 
 /// The key `implements` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_IMPLEMENTS: &str = "the key `implements` is retired with no native form, as docs/authoring.md section 14 writes it";
+pub(crate) const RETIRED_KEY_IMPLEMENTS: &str =
+    "the key `implements` is retired with no native form";
 
 /// The key `extends` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_EXTENDS: &str = "the key `extends` is retired, and a struct writes the shared fields of its base, as docs/authoring.md section 14 writes it";
+pub(crate) const RETIRED_KEY_EXTENDS: &str =
+    "the key `extends` is retired, and a struct writes the shared fields of its base";
 
 /// The key `spread` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_SPREAD: &str = "the key `spread` is retired with no native form yet, as docs/authoring.md section 28 writes it";
+pub(crate) const RETIRED_KEY_SPREAD: &str = "the key `spread` is retired with no native form yet";
 
 /// The key `value` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_VALUE: &str = "the key `value` is retired, and a variant of an enum takes its verbatim spelling, as docs/authoring.md section 17 writes it";
+pub(crate) const RETIRED_KEY_VALUE: &str =
+    "the key `value` is retired, and a variant of an enum takes its verbatim spelling";
 
 /// The key `default` stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_DEFAULT: &str = "the key `default` is retired, and a parameter takes `Option<T>` with `unwrap_or` in the body, as docs/authoring.md section 19 writes it";
+pub(crate) const RETIRED_KEY_DEFAULT: &str =
+    "the key `default` is retired, and a parameter takes `Option<T>` with `unwrap_or` in the body";
 
 /// One of the keys of a pulled registry stands outside the feature `mirror`.
-pub(crate) const RETIRED_KEY_REGISTRY: &str = "the keys `remote`, `arguments` and `select` belong to the registries `aosabi pull` writes, which stay on the derive path until wave 2, as docs/authoring.md section 28 writes it";
+pub(crate) const RETIRED_KEY_REGISTRY: &str = "the keys `remote`, `arguments` and `select` belong to the registries `aosabi pull` writes, which stay on the derive path until a later release";
 
 /// A key no form of the derive path knows stands outside the feature
 /// `mirror`.
-pub(crate) const RETIRED_KEY_OTHER: &str = "the attribute `aosabi(..)` is retired, and the native layer writes no key, as docs/authoring.md section 1.4 writes it";
+pub(crate) const RETIRED_KEY_OTHER: &str =
+    "the attribute `aosabi(..)` is retired, and the native layer writes no key";
 
 /// Returns the refusal with `message` at `span`, for a caller that returns a `Result`.
 pub(crate) fn refusal(span: Span, message: &str) -> syn::Error {

@@ -3,8 +3,12 @@
  * graphtp deflate decode: the DEFLATE decoder, whole into the caller's buffer
  * or streaming with the caller's window, each with a bound.
  *
- * No analogue in the reference. The window and the tables it holds are those of
- * the specification.
+ * No analogue in the reference. The decoder follows RFC 1951 in the structure
+ * of puff.c by Mark Adler, which reads the bits of one whole input and decodes
+ * each symbol bit by bit over the counts of its canonical code. The window and
+ * the tables it holds are those of the specification.
+ *
+ * Derived from zlib 1.3.1, contrib/puff/puff.c, Zlib.
  */
 
 //! The DEFLATE decoder, whole into the caller's buffer or streaming with the
@@ -123,7 +127,7 @@ impl Decoder {
     ///
     /// Each time the ring fills, its bytes go into `sink`, and the rest goes at
     /// the end. A window of 4,096 bytes decodes every stream of the zlib
-    /// profile of `docs/graphtp.md` section 3.2, whose distances reach back
+    /// profile, whose distances reach back
     /// 4,096 bytes at the most. The bytes of `input` after the data are left to
     /// the caller.
     ///

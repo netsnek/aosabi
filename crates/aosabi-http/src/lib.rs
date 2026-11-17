@@ -36,10 +36,15 @@
 //! The items the interfaces use are reached by the path of their module and at
 //! the root of the crate, each behind the feature of its module.
 //!
-//! The app of `aosabi-core` runs on it and the GraphQL layer of
-//! `graphql-over-http` names its Fetch types, so it stands below both, and the
-//! Node adapter of `@hono/node-server` 1.19.9 that writes its answers stands
-//! in `aosabi-serve`. Under it the feature `node-server` makes the Fetch types
+//! The feature `web`, off by default, is the web layer of every Rust target
+//! under Aosabi's own names: the Fetch types, the app of routes and
+//! middleware, the chain of the middleware, the context of a request with its
+//! helpers under hono's names, the router, the cookie helpers, `compress()`,
+//! `cors`, `csrf`, `body_limit`, `except` and `serve_static`. The app of
+//! `aosabi-core` runs on it and the GraphQL layer of `graphql-over-http` names
+//! its Fetch types, so it stands below both, and the Node adapter of
+//! `@hono/node-server` 1.19.9 that writes its answers stands in
+//! `aosabi-serve`. Under it the feature `node-server` makes the Fetch types
 //! answer as the Node adapter fills them, the platform [`NODE_SERVER`] names,
 //! `web-deflate` links the encoder of `compress()`, `platform-coding` hands
 //! the coding of `compress()` to the host, which is the Worker's way,
@@ -60,10 +65,7 @@
 //! beside each host form.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/30_http_tier1.ipynb`
-//! for the tables, the record and the web layer, and
-//! `tests/notebooks/37_content_coding.ipynb` and
-//! `tests/notebooks/35_http_budget.ipynb` for the wrapper.
+//! section 3.
 
 #![cfg_attr(any(not(feature = "web"), target_os = "none"), no_std)]
 

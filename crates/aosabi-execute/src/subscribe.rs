@@ -33,7 +33,9 @@
 //! | `signal?.throwIfAborted()` and the `onSignalAbort` wrapper of `assertEventStream`, `:999` and `:1007-1019` | the server hands the executor no signal, as in [`execute`](mod@crate::execute) |
 //! | `schemaCoordinateInErrors`, the fourth argument of `locatedError` | Yoga never asks for it |
 //!
-//! The module names `core` and `alloc` and no item of `std`.
+//! The module names `core` and `alloc` and no item of `std`. The schema and
+//! the resolvers of a context are `Arc` based, and every value the
+//! module adds is shared through `Rc`.
 
 use alloc::{
     boxed::Box,
@@ -254,7 +256,9 @@ pub(crate) fn build_per_event_execution_context(
 /// back as it is. For each payload yielded from a subscription, the operation
 /// runs over the normal executor with `payload` as the root value, which is
 /// the `ExecuteSubscriptionEvent` algorithm, and a rejection of the source
-/// becomes a `GraphQLError` that blames the operation.
+/// becomes a `GraphQLError` that blames the operation. The execution of each
+/// event starts with the hook of [`Agent::set_event_hook`], which no
+/// reference has.
 fn map_source_to_response(
     agent: &Agent,
     exe_context: &Rc<ExecutionContext>,
@@ -265,6 +269,7 @@ fn map_source_to_response(
     }
     let per_event = Rc::clone(exe_context);
     let on_next: OnValue = Rc::new(move |agent, payload| {
+        agent.start_event();
         let exe_context = Rc::clone(&per_event);
         handle_maybe_promise(
             agent,

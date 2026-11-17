@@ -3,6 +3,9 @@
  * aosabi-http: the view of a request, the view of a Fetch request the handlers
  * of the chain read.
  *
+ * It keeps the readers param, query, queries, header, matchedRoutes, routePath,
+ * text and json under their names and with their rules.
+ *
  * Derived from hono 4.11.9, dist/request.js, MIT.
  */
 

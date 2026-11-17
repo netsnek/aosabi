@@ -5,7 +5,7 @@
  * inheritance to interfaces and projects the result to the intermediate
  * representation.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/schema-parser.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
@@ -21,7 +21,8 @@
 //! the order of `schema-parser.ts:1001-1254`. That order is the whole contract
 //! of this module, because the order in which types are registered is the order
 //! of the blocks in the printed schema. The reference writes `parse` and
-//! `makeReferenceSchema` as two long functions with closures inside.
+//! `makeReferenceSchema` as two long functions with closures inside. Here each
+//! pass and each guard with a body is a private method.
 //!
 //! # JavaScript semantics the port reproduces
 //!
@@ -1583,7 +1584,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
                 }
                 Processing::Inputs => {
                     // An input field takes the documentation of its type and
-                    // not of its property, quirk `Q15_INPUT_DESCRIPTION_FROM_TYPE`.
+                    // not of its property, quirk `INPUT_DESCRIPTION_FROM_TYPE`.
                     let description = self.get_type_documentation(field_type);
                     let field = Argument {
                         name: String::from(property_name),
@@ -1646,7 +1647,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
     /// `schema-parser.ts:909-926`.
     ///
     /// A deprecation tag folds into the text like every other tag, quirk
-    /// `Q07_NO_DEPRECATED`.
+    /// `NO_DEPRECATED`.
     fn get_symbol_documentation(&self, symbol: S::Symbol) -> String {
         let mut header = self.source.get_documentation_comment(symbol);
 
@@ -1965,7 +1966,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
     /// which returns at the first guard. In the output direction every
     /// member that is no `null`, no `undefined` and no primitive is walked.
     /// In the input direction the non nullable type is walked, and of a union
-    /// the first member alone, quirk `Q09_INPUT_UNION_FIRST_MEMBER`.
+    /// the first member alone, quirk `INPUT_UNION_FIRST_MEMBER`.
     fn rec_loop_union(
         &mut self,
         reference_schema: &mut ReferenceSchemaOf<S>,
@@ -2108,7 +2109,7 @@ impl<'s, S: TypeSource> SchemaParser<'s, S> {
     ///
     /// A labeled tuple rest parameter gives one argument per element. A rest
     /// parameter with no labels is skipped with a warning, quirk
-    /// `Q16_UNLABELED_REST_DROPPED`.
+    /// `UNLABELED_REST_DROPPED`.
     fn rec_loop_parameter(
         &mut self,
         reference_schema: &mut ReferenceSchemaOf<S>,

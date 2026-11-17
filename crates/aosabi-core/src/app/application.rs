@@ -2,29 +2,30 @@
 /*
  * aosabi-core: the application, compose and the base pipeline.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/app/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/app/index.ts, Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `App`.
 //!
-//! [`App::new`] stores the run time roots of the fragment, [`App::gate`] wraps
-//! each of them in an async function that awaits the gate first, and
-//! [`App::compose`] records each child and merges its roots one level deep, a
-//! child's member taking the place of the parent's member of the same name and
-//! keeping its position, `{...into[kind], ...map}`. The fragment type is a tag
-//! for the build, and [`IntoApp::into_app`] erases it, so the boot, a setup and
-//! `execute_config` all see one type.
+//! An app is a web app of `aosabi-http` with a GraphQL fragment, a plugin chain
+//! and a boot. [`App::new`] stores the run time roots of the fragment,
+//! [`App::gate`] wraps each of them in an async function that awaits the gate
+//! first, and [`App::compose`] records each child and merges its roots one level
+//! deep, a child's member taking the place of the parent's member of the same
+//! name and keeping its position, `{...into[kind], ...map}`. The fragment type is
+//! a tag for the build, and [`IntoApp::into_app`] erases it, so the boot, a setup
+//! and `execute_config` all see one type.
 //!
 //! The base pipeline is registered on `*` once, at the boot and not in the
 //! constructor: the coding layer, the async context bind, the access logger under
-//! `except(['/__aosabi/*'], ...)`, divergence
-//! D54, the onion of the plugin middleware and the error handler.
-//! [`App::realize`] then mounts each child at its base path or `/`, depth first,
-//! once, so the pipeline stands before every route of the tree. A route an app
-//! registers on the served root before the boot runs behind the pipeline as well,
-//! since the boot moves it behind the pipeline in the order of the router,
-//! divergence D75. The TypeScript option runs it before the pipeline.
+//! `except(['/__aosabi/*'], ...)`, a named divergence, the onion of the plugin
+//! middleware and the error handler. [`App::realize`] then mounts each child at
+//! its base path or `/`, depth first, once, so the pipeline stands before every
+//! route of the tree. A route an app registers on the served root before the boot
+//! runs behind the pipeline as well, since the boot moves it behind the pipeline
+//! in the order of the router, a named divergence. The TypeScript option runs it
+//! before the pipeline.
 //!
 //! The native builder of the facade, `aosabi::App`, which the index of a plain
 //! crate builds, registers the parts of its roots as values of any type, and
@@ -53,12 +54,11 @@
 //! `TypeError`, and Hono's dispatch hands that one to the handler again, whose
 //! 500 is the answer.
 //!
-//! The coding layer stands first, as `compress()`, and reads
-//! the answer once the rest has run. It codes the answer only under the
-//! feature `base-compress`, which `aosabi-js` turns on for the module and the
-//! native library of the TypeScript option, so the base pipeline of a Rust
-//! service codes no answer and an app codes the routes it chooses with
-//! `compress()`, divergence D72 of `docs/byte-equality.md` section 3.
+//! The coding layer stands first, as `compress()`, and reads the answer once the
+//! rest has run. It codes the answer only under the feature `base-compress`,
+//! which `aosabi-js` turns on for the module and the native library of the
+//! TypeScript option, so the base pipeline of a Rust service codes no answer and
+//! an app codes the routes it chooses with `compress()`, a named divergence.
 //!
 //! A method that registers a route bounds its closure by `Fn` directly, so rustc
 //! gives the closure its parameter types. The gate takes a closure that answers
@@ -146,6 +146,7 @@ use crate::{
         AppConfig,
         PluginMiddleware, //
     },
+    random::seed_keys,
     resolvers::Resolvers,
     result::Result, //
 };
@@ -188,7 +189,7 @@ impl IntoGate for Result<()> {
 
 /// The gate of an app of the native layer, which answers the `Result` of the
 /// prelude of the facade, whose error throws as the thrown value of the engine,
-/// since the facade takes `Thrown` off its root of on.
+/// since the facade takes `Thrown` off its root.
 impl IntoGate for core::result::Result<(), Error> {
     fn into_gate(self) -> GateCall {
         GateCall::Done(self.map_err(Thrown::from))
@@ -326,6 +327,12 @@ impl BootedApp {
 
     /// Answers `request`, `app.fetch(request, env, executionCtx)`.
     ///
+    /// The calling thread is keyed by [`seed_keys`] before the request reaches
+    /// the app, so a host that answers from threads of its own keys each of
+    /// them on its first request, and a route that parses a body parses it
+    /// under that key. Where the key fails the request is refused unread, as
+    /// the doc of `crate::random` says.
+    ///
     /// # Errors
     ///
     /// The future answers the value the chain threw when it is no instance of
@@ -336,6 +343,9 @@ impl BootedApp {
         env: Env,
         execution_ctx: Option<ExecutionCtx>,
     ) -> LocalBoxFuture<'static, core::result::Result<Response, Thrown>> {
+        if seed_keys().is_err() {
+            return Box::pin(core::future::ready(Ok(crate::random::refused())));
+        }
         self.web.fetch(request, env, execution_ctx)
     }
 
@@ -839,8 +849,8 @@ impl<G> App<G> {
 
     /// Installs the base pipeline of the served root once, `installBasePipeline()`.
     ///
-    /// The routes the app registered before it then run behind it, divergence
-    /// D75.
+    /// The routes the app registered before it then run behind it, a named
+    /// divergence.
     pub fn install_base_pipeline(&mut self) {
         let registered = self.inner.web.routes().len();
         if self.inner.base_pipeline_installed {
@@ -906,23 +916,25 @@ impl<G> App<G> {
 
         let middleware = Rc::clone(&self.inner.plugins_middleware);
         web.r#use("*", move |c: Context, next: Next| {
-            // The default csrf of a Rust service, hono's check with its
-            // defaults on a request that carries a cookie and that no csrf of
-            // the app matches, runs in this entry ahead of the plugin
-            // middleware, behind the access logger, which logs its 403, so
-            // `app.routes` lists the entries of the TypeScript pipeline,
-            // divergence D70. The TypeScript option has none.
+            // The default csrf of a Rust service, hono's check with its defaults
+            // on a request that carries a cookie and where no csrf of the app
+            // stands ahead of the handlers of the routes it matches, the endpoint
+            // of the engine among them, which counts as a handler, runs in this
+            // entry ahead of the plugin middleware, behind the access logger,
+            // which logs its 403, so `app.routes` lists the entries of the
+            // TypeScript pipeline, a named divergence. The TypeScript option has
+            // none.
             let middleware = Rc::clone(&middleware);
             let value = aosabi_http::middleware::csrf::behind_default_csrf(&c, move |c| {
                 dispatch_plugins(middleware, 0, c, next)
             });
             async move {
-                // The default body limit of a Rust service, hono's bodyLimit
-                // with 1 MiB held to every read of a body that no body limit
-                // of the app takes, runs in this entry around the rest of it,
-                // behind the access logger, which logs its 413, so
-                // `app.routes` lists the entries of the TypeScript pipeline,
-                // divergence D76. The TypeScript option has none.
+                // The default body limit of a Rust service, hono's bodyLimit with
+                // 1 MiB held to every read of a body that no body limit of the
+                // app takes, runs in this entry around the rest of it, behind the
+                // access logger, which logs its 413, so `app.routes` lists the
+                // entries of the TypeScript pipeline, a named divergence. The
+                // TypeScript option has none.
                 let value =
                     aosabi_http::middleware::body_limit::behind_default_body_limit(&c, value);
                 if let Some(response) = value.await? {

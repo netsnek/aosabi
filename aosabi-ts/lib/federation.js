@@ -4,14 +4,21 @@
  * the package aosabi, as markers over
  * the crate aosabi-federation of the engine.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The symbol of a policy and pass, and, the class of a configured federation
- * with its delegate, passthrough and createGateway. This file holds what the
- * reference runs before the first await of delegate: the reads of the resolve
- * info and of the context and the checks of the key, each throw of them a
- * rejection, as an async function throws.
+ * with its delegate, passthrough and createGateway. The cache of remote
+ * schemas, the HTTP executor, the four transforms and the delegation run in
+ * the engine, in the crate aosabi-federation, whose outbound requests go
+ * through the fetch of the host, and the engine calls the patches, the guards
+ * and the headers function of the app on the host, so the value a delegation
+ * settles with stays in the engine (crates/aosabi-js/src/federation.rs of the
+ * Aosabi repository). This file holds what the reference runs before the
+ * first await of delegate: the reads of the resolve info and of the context
+ * and the checks of the key, each throw of them a rejection, as an async
+ * function throws.
  */
 import { context } from "./core.js";
 

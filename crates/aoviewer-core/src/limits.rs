@@ -13,8 +13,8 @@
 ///
 /// The JSON pull parser, the model builder and the `commonmark` subset read
 /// these bounds, so a hostile document ends in an error variant and never in
-/// unbounded memory or time. [`ReadLimits::DEFAULT`] carries the values of the
-/// plan.
+/// unbounded memory or time. [`ReadLimits::DEFAULT`] carries the default
+/// bounds.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ReadLimits {
     /// The length of an input document in bytes.

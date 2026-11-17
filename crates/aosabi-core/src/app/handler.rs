@@ -2,7 +2,7 @@
 /*
  * aosabi-core: the GraphQL handler of an app, over Yoga.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */
@@ -13,16 +13,25 @@
 //! of the app through `resolversToGraphQLResolvers`, the build side resolver
 //! map merged one level deep with the build side winning, and the bound
 //! scalars. It builds Yoga with the options in the order
-//! `graphqlEndpoint: '/graphql'`, `maskedErrors: false` when `NODE_ENV` is
-//! `development`, the whole configuration spread, `landingPage: false`,
-//! `graphiql` as a function of the playground, named Aosabi's by D52, only
-//! when `config.graphiql === true`, the named divergence D48 of
-//! `docs/byte-equality.md` section 3, and the schema. The spread carries
-//! `config.plugins`, which the first pass of the boot wrote back, into the
-//! plugins of Yoga, which places them after its result processors, so the
-//! hooks of the error logger and of the in context plugin run because of it.
-//! The key `logger` reaches Yoga through the spread and Yoga reads `logging`,
-//! so it is ignored there.
+//! `graphqlEndpoint: '/graphql'`, the whole configuration spread,
+//! `landingPage: false` and the schema, with no page of `GraphiQL`, a named
+//! divergence. Pylon puts `maskedErrors: false` before the spread where
+//! `NODE_ENV` is `development`, and the handler puts it there under every
+//! `NODE_ENV` and reads none, so an unexpected error answers its own message
+//! unless the key `maskedErrors` turns the mask on, a named divergence. The
+//! spread carries `config.plugins`, which the first pass of the boot wrote
+//! back, into the plugins of Yoga, which places them after its result
+//! processors, so the hooks of the error logger and of the in context plugin
+//! run because of it. The key `logger` reaches Yoga through the spread and
+//! Yoga reads `logging`, so it is ignored there.
+//!
+//! The middleware answers through
+//! `yoga.fetch(c.req.raw, c.env, executionContext)`, the function
+//! [`answer`](fn@answer) of `graphql-over-http` over the server context of the
+//! environment and the execution context, calls `next()` when Yoga answers
+//! 404, sets `X-Pylon-Version` only when the version global is set, which only
+//! the pages plugin sets and which no fixture reaches, and answers
+//! `c.newResponse(response.body, response)`.
 //!
 //! The hot swap seam of development (source lines 353-361) has no
 //! reading, because a Rust server rebuilds its binary for a new schema.
@@ -74,8 +83,6 @@ use aosabi_http::{
 use graphql_over_http::{
     AgentSetup,
     CacheBudget,
-    Graphiql,
-    GraphiqlOptions,
     HttpOptions,
     HttpPlugin,
     HttpServer,
@@ -85,12 +92,9 @@ use graphql_over_http::{
 };
 
 use crate::{
-    app::{
-        application::{
-            App,
-            Next, //
-        },
-        env_alias,
+    app::application::{
+        App,
+        Next, //
     },
     context::ambient_hooks,
     create_schema::{
@@ -105,6 +109,7 @@ use crate::{
             type_resolver, //
         },
     },
+    random::seed_keys,
     resolvers::{
         Resolvers,
         resolvers_to_graphql_resolvers, //
@@ -115,12 +120,6 @@ use crate::{
 
 /// The endpoint the handler sets first, `graphqlEndpoint: '/graphql'`.
 const GRAPHQL_ENDPOINT: &str = "/graphql";
-
-/// The title of the playground with Aosabi's name, D52.
-const PLAYGROUND_TITLE: &str = "Aosabi Playground";
-
-/// The query of the playground, `defaultQuery` with Aosabi's name, D52.
-const PLAYGROUND_QUERY: &str = "# Welcome to the Aosabi Playground!";
 
 /// The options of [`handler`], the handler options with the type
 /// definitions and the build side type resolvers the build wrote.
@@ -188,7 +187,8 @@ pub fn build_schema(
 /// cache of the card, which changes what the cache keeps and no answer, and
 /// the validation and the bound on nesting of the build settings of
 /// [`crate::single_pass`], which change how a document is validated and no
-/// answer.
+/// answer. The key `maxTokens` of the configuration of `target`, Aosabi's own,
+/// sets the cap on the tokens of a request document the engine parses under.
 #[must_use]
 pub fn build_http_options(
     schema: Arc<aosabi_type::Schema>,
@@ -202,24 +202,19 @@ pub fn build_http_options(
         graphql_endpoint: Some(String::from(GRAPHQL_ENDPOINT)),
         ..HttpOptions::default()
     };
-    // Dev: surface the real error on the GraphQL response and the server log
-    // instead of Yoga's default masking.
-    if env_alias::var("NODE_ENV").as_deref() == Some("development") {
-        options.masked_errors = MaskedErrors::Off;
-    }
-    // The configuration spread, `...config`.
-    if let Some(masked_errors) = config.masked_errors.clone() {
-        options.masked_errors = masked_errors;
-    }
+    // `maskedErrors: false` under every `NODE_ENV`, then the configuration
+    // spread, `...config`, so the mask runs where the key turns it on, a named
+    // divergence.
+    options.masked_errors = config.masked_errors.clone().unwrap_or(MaskedErrors::Off);
     if let Some(endpoint) = config.graphql_endpoint.clone() {
         options.graphql_endpoint = Some(endpoint);
-    }
-    if let Some(endpoint) = config.health_check_endpoint.clone() {
-        options.health_check_endpoint = Some(endpoint);
     }
     if let Some(multipart) = config.multipart {
         options.multipart = Some(multipart);
     }
+    // The cap on the tokens of a request document, Aosabi's own key
+    // `maxTokens`, a named divergence.
+    options.max_tokens = config.max_tokens;
     if let Some(plugins) = &config.plugins {
         options.plugins = plugins
             .slots()
@@ -230,18 +225,6 @@ pub fn build_http_options(
             })
             .collect();
     }
-    // The page of `GraphiQL` only on `graphiql: true`, the named divergence D48.
-    options.graphiql = if config.graphiql == Some(true) {
-        Graphiql::Factory(Rc::new(|_request, _context| {
-            Some(GraphiqlOptions {
-                should_persist_headers: Some(true),
-                title: Some(String::from(PLAYGROUND_TITLE)),
-                default_query: Some(String::from(PLAYGROUND_QUERY)),
-            })
-        }))
-    } else {
-        Graphiql::Off
-    };
     options.schema = Some(schema);
     options.agent = agent_setup(core, host_clock);
     options.parser_and_validation_cache_budget = cache_budget;
@@ -281,6 +264,14 @@ fn agent_setup(core: &Arc<CoreState>, host_clock: Option<Rc<dyn HostClock>>) -> 
 
 /// Returns the GraphQL middleware of `target`, `handler(options, target)`.
 ///
+/// The middleware keys the thread of each request with [`seed_keys`] before it
+/// reads the body, so a host that mounts it in an app of its own keys its
+/// threads as the fetch of a booted app does, and refuses where the key fails
+/// as that fetch refuses. It counts as a handler in the rule of the default
+/// csrf, [`MiddlewareFn::is_handler`], so a `csrf(options)` of the app takes
+/// the place of the default on a request of the endpoint only where it stands
+/// ahead of the endpoint, a named divergence.
+///
 /// # Errors
 ///
 /// Returns what the schema build throws.
@@ -315,9 +306,13 @@ pub(crate) fn handler_with_server(
         spawner: spawner.clone(),
     });
     let middleware = move |c: Context, next: Next| {
+        let keyed = seed_keys().is_ok();
         let server = Rc::clone(&server);
         let spawner = spawner.clone();
         async move {
+            if !keyed {
+                return Ok(crate::random::refused());
+            }
             let server_context = ServerContext {
                 env: c.env(),
                 execution_ctx: c.execution_ctx(),
@@ -347,7 +342,22 @@ pub(crate) fn handler_with_server(
             c.new_response(body, &response)
         }
     };
-    Ok((middleware, mounted))
+    Ok((Endpoint(middleware), mounted))
+}
+
+/// The GraphQL middleware, which tells the dispatch that it answers as a
+/// handler of a route method does, so a `csrf(options)` behind it never takes
+/// the place of the default csrf on the requests it matches.
+struct Endpoint<F>(F);
+
+impl<F: MiddlewareFn<Thrown>> MiddlewareFn<Thrown> for Endpoint<F> {
+    fn call(&self, c: Context, next: Next) -> LocalBoxFuture<'static, Result<Response, Thrown>> {
+        self.0.call(c, next)
+    }
+
+    fn is_handler(&self) -> bool {
+        true
+    }
 }
 
 /// The GraphQL server the middleware answers with and the spawner of its

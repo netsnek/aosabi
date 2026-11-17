@@ -9,7 +9,10 @@
 
 //! The descriptor source.
 //!
-//! The five translated modules never import this module.
+//! [`DescriptorSource`] presents each node of a [`Graph`] the way the
+//! TypeScript checker presents the type the twin of that node has on the
+//! TypeScript side, so the inference walks a Rust application as it walks a
+//! TypeScript one. The five translated modules never import this module.
 //!
 //! | File | Holds |
 //! | --- | --- |
@@ -17,7 +20,7 @@
 //! | `present.rs` | the checker view of each node kind |
 //! | `assignable.rs` | `is_type_assignable_to`, the structural comparison |
 //! | `heritage.rs` | `get_heritage_declarations` |
-//! | `authoring.rs` | the authoring map of a build, the Rust half of `12_authoring_parity` |
+//! | `authoring.rs` | the authoring map of a build, the Rust half of the check of the authoring parity |
 //!
 //! # Handles
 //!

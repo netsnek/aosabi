@@ -12,9 +12,13 @@
 //! Every cargo call of the command line goes through [`Cargo`]:
 //! `cargo metadata` for the project and for the generated workspace,
 //! `cargo locate-project` for the root of a workspace,
-//! `cargo generate-lockfile` for a project with no lock, `cargo build` for the
-//! server package, the inspect package and the builds of a card for another
-//! target, and `cargo check --all-targets` for the typecheck of `verify`.
+//! `cargo generate-lockfile` for a project with no lock,
+//! `cargo update --workspace` for a lock that lacks a pin, `cargo build` for
+//! the server package, the inspect package and the builds of a card for
+//! another target, and `cargo check --all-targets` for the typecheck of
+//! `verify`. Each runs with the pairs of `.env` that the environment does not
+//! set, and the program is the cargo of `CARGO`, which cargo sets for the sub
+//! command `cargo aosabi`, or `cargo` from the path.
 //!
 //! A build runs with `--message-format json-render-diagnostics`, so cargo
 //! writes its JSON messages to standard output, which the command line reads
@@ -204,10 +208,34 @@ impl Cargo {
         manifest: Option<&Path>,
         lock: LockMode,
     ) -> Result<JsValue, CliError> {
+        self.metadata_with(cwd, manifest, lock_flags(lock))
+    }
+
+    /// Returns the JSON of `cargo metadata --format-version 1 --no-deps
+    /// --offline` for the manifest `manifest`, or the one of `cwd`: the
+    /// packages of the workspace with every dependency as its manifest
+    /// declares it, which cargo reads with nothing resolved, fetched or
+    /// written, and no lock read.
+    ///
+    /// # Errors
+    ///
+    /// Returns the failure of cargo, as for [`Cargo::metadata`].
+    pub fn manifests(&self, cwd: &Path, manifest: Option<&Path>) -> Result<JsValue, CliError> {
+        self.metadata_with(cwd, manifest, &["--no-deps", "--offline"])
+    }
+
+    /// Returns the JSON of `cargo metadata --format-version 1` with the flags
+    /// `flags` for the manifest `manifest`, or the one of `cwd`.
+    fn metadata_with(
+        &self,
+        cwd: &Path,
+        manifest: Option<&Path>,
+        flags: &[&str],
+    ) -> Result<JsValue, CliError> {
         let mut command = self.command(cwd);
         command.args(["metadata", "--format-version", "1"]);
         add_manifest(&mut command, manifest);
-        command.args(lock_flags(lock));
+        command.args(flags);
         let output = run_captured(&mut command, "cargo metadata")?;
         parse(&output.stdout)
             .map_err(|error| CliError::new(format!("cargo metadata answered no JSON: {error}")))
@@ -257,6 +285,21 @@ impl Cargo {
         run_captured(&mut command, "cargo generate-lockfile").map(|_| ())
     }
 
+    /// Writes the pins the lock of the manifest `manifest` lacks and drops
+    /// those no package needs with `cargo update --workspace`, which keeps
+    /// every other pin and reads the index of a registry alone, with no crate
+    /// downloaded.
+    ///
+    /// # Errors
+    ///
+    /// Returns the failure of cargo, as for [`Cargo::metadata`].
+    pub fn update_workspace(&self, cwd: &Path, manifest: Option<&Path>) -> Result<(), CliError> {
+        let mut command = self.command(cwd);
+        command.args(["update", "--workspace"]);
+        add_manifest(&mut command, manifest);
+        run_captured(&mut command, "cargo update").map(|_| ())
+    }
+
     /// Runs `cargo build` as `run` describes it and reads its JSON messages.
     ///
     /// The answer carries the exit status, and a build that fails is a run
@@ -294,13 +337,18 @@ impl Cargo {
         run_messages(&mut command, run.output, "cargo build")
     }
 
-    /// Runs `cargo check --all-targets` in `cwd` and reads its JSON messages,
-    /// as [`Cargo::build`] does.
+    /// Runs `cargo check --all-targets` in `cwd` under the lock flags of
+    /// `lock` and reads its JSON messages, as [`Cargo::build`] does.
     ///
     /// # Errors
     ///
     /// Returns a failure when cargo cannot be started.
-    pub fn check_all_targets(&self, cwd: &Path, output: Output) -> Result<CargoRun, CliError> {
+    pub fn check_all_targets(
+        &self,
+        cwd: &Path,
+        lock: LockMode,
+        output: Output,
+    ) -> Result<CargoRun, CliError> {
         let mut command = self.command(cwd);
         command.args([
             "check",
@@ -308,6 +356,7 @@ impl Cargo {
             "--message-format",
             "json-render-diagnostics",
         ]);
+        command.args(lock_flags(lock));
         run_messages(&mut command, output, "cargo check")
     }
 

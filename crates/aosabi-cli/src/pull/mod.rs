@@ -2,11 +2,11 @@
 /*
  * aosabi-cli: the command pull.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/pull/index.ts
- * and packages/pylon/src/cli/index.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/pull/index.ts and packages/pylon/src/cli/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  *
- * Each file of the directory names the part it translates.
+ * Each file of the directory names the part it translates or follows.
  */
 
 //! The command `pull`.

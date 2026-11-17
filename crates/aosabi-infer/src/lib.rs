@@ -3,7 +3,7 @@
  * aosabi-infer: the schema inference, which turns the types of an application
  * into the intermediate representation and the schema text.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/, Apache-2.0.
  * Changed by the Aosabi authors.
  *
@@ -17,9 +17,8 @@
 //! five modules over one seam, the [`TypeSource`] trait, whose methods are
 //! named after the calls of the TypeScript checker. The modules translate
 //! their TypeScript sources literally, function by function and guard by
-//! guard, because the order in which the walk registers
-//! types is the order of the printed schema, and the exit number of the
-//! milestone is byte equality of that text.
+//! guard, because the order in which the walk registers types is the order of
+//! the printed schema, and the goal is byte equality of that text.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |
@@ -51,8 +50,7 @@
 //! text and are entries of [`Built::warnings`].
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3, and the judging notebook is
-//! `tests/notebooks/10_schema_tier1.ipynb`.
+//! section 3.
 
 pub mod builder;
 pub mod descriptor_source;

@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: the task slab, the ready queue and the poll loop.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The loop runs the local tasks of one
+ * thread.
  */
 
 //! The executor.

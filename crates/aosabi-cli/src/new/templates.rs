@@ -9,15 +9,22 @@
 //! service and the specification of the facade filled in. A scaffold carries
 //! no `///` and no repository header.
 //!
-//! It holds the one import of the prelude, the root `Query` with an inherent
+//! The index is the native index, the crate root `src/lib.rs` by cargo's
+//! default, a plain crate with no attribute, derive or macro of Aosabi. It
+//! holds the one import of the prelude, the root `Query` with an inherent
 //! block whose method `hello` answers `Hello, world!`, and the entry `app`,
 //! which the builder finds by its return type and which answers
-//! `App::new().query(Query)`. An empty `Mutation` would register nothing,
-//! since an empty root prints no type and leaves no trace in the schema, so
-//! the index names none. The scaffold needs no build script, no `aosabi.config.rs`, no
-//! `src/bindings.rs`, no `[lib]` path and no allowance of the naming lints,
-//! since the builder reads the plain source and names every member by the
-//! rule of GraphQL.
+//! `App::new().query(Query)`, with the middleware `cors` of the facade for
+//! the one origin `https://aosabi.org` on `/graphql` as lines of the entry,
+//! so the explorer the site of Aosabi hosts reads the service, where the
+//! engine answers no CORS by itself. The comment above the lines points at
+//! the hardening guide, which says what to do with them before production,
+//! and every index of [`lib_rs`] writes them. An empty `Mutation` would
+//! register nothing, since an empty root prints no type and leaves no trace
+//! in the schema, so the index names none. The scaffold needs no build
+//! script, no `aosabi.config.rs`, no `src/bindings.rs`, no `[lib]` path and
+//! no allowance of the naming lints, since the builder reads the plain source
+//! and names every member by the rule of GraphQL.
 //!
 //! The configuration stands in the chain of the entry, which
 //! `aosabi::serve_app` serves. The chain of a scaffold with no feature
@@ -49,7 +56,12 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
-    App::new().query(Query)
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
+    App::new().query(Query).middleware(\"/graphql\", explorer)
 }
 ";
 
@@ -69,8 +81,14 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
     App::new()
         .query(Query)
+        .middleware(\"/graphql\", explorer)
         .plugin(use_identity(zitadel_auth(ZitadelAuthOptions {
             issuer: String::from(\"https://issuer.example.com\"),
             ..ZitadelAuthOptions::default()
@@ -95,7 +113,12 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
-    let app = App::new().query(Query);
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
+    let app = App::new().query(Query).middleware(\"/graphql\", explorer);
     // The file server reads the files of the process, which only the cards
     // that serve sockets have, so the build for the Worker leaves it out.
     #[cfg(unix)]
@@ -125,8 +148,14 @@ impl Query {
 }
 
 pub fn app() -> impl IntoApp {
+    // These lines admit the hosted explorer. The hardening guide says what to do before production.
+    let explorer = aosabi::cors(aosabi::CorsOptions {
+        origin: aosabi::CorsOrigin::Exact(String::from(\"https://aosabi.org\")),
+        ..aosabi::CorsOptions::default()
+    });
     let app = App::new()
         .query(Query)
+        .middleware(\"/graphql\", explorer)
         .plugin(use_identity(zitadel_auth(ZitadelAuthOptions {
             issuer: String::from(\"https://issuer.example.com\"),
             ..ZitadelAuthOptions::default()
@@ -179,9 +208,25 @@ note: .gitignore names /key.json, so the key stays out of git
 note: the service reads the key once, so a key added or changed later takes a restart
 ";
 
+/// The guide a service follows before it goes to production, which the
+/// manifest and `AGENTS.md` of a scaffold point at, as the public tree of the
+/// repository names it.
+pub const HARDENING_GUIDE: &str = "Documentation/guides/hardening.md";
+
+/// The file `AGENTS.md` of a scaffold, which tells an agent that works on the
+/// service to read the hardening guide before it prepares the service for
+/// production.
+pub const AGENTS_MD: &str =
+    "This project is a service built on Aosabi, whose defaults are open for development.
+Before you prepare it for production, read the hardening guide Documentation/guides/hardening.md of
+the Aosabi repository and apply it.
+";
+
 /// The ignore file of the `native` runtime, which keeps the build directory,
 /// the variables of `.env` and the key file `key.json` the auth plugins read
-/// by default out of git.
+/// by default out of git. It names no `schema.graphql`, so the current schema
+/// the build writes beside `Cargo.toml` stays tracked and a service commits
+/// it.
 pub const GITIGNORE: &str = "/target
 .env
 /key.json
@@ -198,19 +243,38 @@ pub const GITIGNORE_WORKERS: &str = "/target
 
 /// Returns the `Cargo.toml` of the service `name`, whose facade is `aosabi`,
 /// the value of its key, and whose table of the facade for a Unix target is
-/// `unix`.
+/// `unix`, with the checkout `excluded` of Aosabi left out of its workspace
+/// where the checkout lies below the target.
 ///
-/// The manifest names no `[lib]` table, so the crate root is cargo's default
+/// Its first line points at the hardening guide, [`HARDENING_GUIDE`]. The
+/// manifest names no `[lib]` table, so the crate root is cargo's default
 /// `src/lib.rs`, and it names no build dependency and no lint table. The
 /// second table of the facade stays, since the lock of the project pins the
 /// packages the engine takes from a registry only through it: a scaffold
 /// without it is refused with `AO-C0301` for `rustix`, `libc` and six more
 /// packages the generated workspace needs.
+///
+/// Cargo takes every path package inside the folder of a workspace as its
+/// member unless the workspace excludes it, so a checkout below the target, a
+/// workspace of its own, stands in the list `exclude` of the workspace table,
+/// written relative to the target. Without it the first cargo call stops on
+/// the facade, whose edition cargo then inherits from the workspace of the
+/// service, which defines none.
 #[must_use]
-pub fn cargo_toml(name: &str, aosabi: &str, unix: &str) -> String {
+pub fn cargo_toml(name: &str, aosabi: &str, unix: &str, excluded: Option<&str>) -> String {
     let name = toml_string(name);
+    let exclude = excluded.map_or_else(String::new, |checkout| {
+        format!(
+            "# The checkout of Aosabi below this folder is a workspace of its own,
+# whose packages cargo would take as members of this one.
+exclude = [{}]
+",
+            toml_string(checkout)
+        )
+    });
     format!(
-        "[package]
+        "# Before production, read {HARDENING_GUIDE} of the Aosabi repository.
+[package]
 name = {name}
 version = \"{PACKAGE_VERSION}\"
 edition = \"2024\"
@@ -219,7 +283,7 @@ publish = false
 # A service is a cargo workspace of its own, so it builds wherever it is
 # created, also below another workspace.
 [workspace]
-
+{exclude}
 [dependencies]
 aosabi = {aosabi}
 
@@ -255,7 +319,7 @@ pub fn public_index_html(name: &str) -> String {
 
 /// Returns the `wrangler.toml` of the `workers` runtime of the service
 /// `name`, with no compatibility flag, and the path of `main` reserved for
-/// the Workers entry.
+/// the Workers entry of a later release.
 #[must_use]
 pub fn wrangler_toml(name: &str) -> String {
     let name = toml_string(name);
@@ -270,17 +334,35 @@ command = \"cargo aosabi build --device worker\"
     )
 }
 
+/// The note `new` prints for a scaffold of `native` whose checkout of Aosabi
+/// lies outside the target, since a runner of the publish workflow checks
+/// out the repository of the service alone and finds no command line to
+/// install there.
+pub const WORKFLOW_NOTE: &str = "note: the publish workflow needs the checkout of Aosabi inside the repository of the service, since a runner checks out that repository alone, and this checkout lies outside it
+note: add the checkout to the repository of the service, as a submodule for example, and name it with --aosabi-path before the first push
+";
+
 /// Returns the publish workflow of the `native` runtime for the image
-/// `image` of the command line of version `version`.
+/// `image`, which installs the command line from the package `cli`,
+/// `crates/aosabi-cli` of the checkout of Aosabi whose facade the manifest
+/// names, written relative to the service as the manifest writes the facade.
 ///
-/// It is the reference's workflow with two steps changed: the command line
-/// installs before the build, and `cargo aosabi build --device docker
-/// --locked` with the engine `docker` builds the image in place of `docker
-/// build`, after which the push step tags `localhost/<image>:0.0.1`. The
-/// licence lines the reference ends the file with are its own and left out,
-/// as a scaffold carries no repository header.
+/// It is the reference's workflow with three steps changed: the checkout
+/// fetches the submodules of the repository, so a checkout of Aosabi that
+/// the service holds as a submodule reaches the runner, the command line
+/// installs from that checkout before the build, since Aosabi is released
+/// through its repository alone, and
+/// `cargo aosabi build --device docker --locked` with the engine `docker`
+/// builds the image in place of `docker build`, after which the push step
+/// tags `localhost/<image>:0.0.1`. The path stands in single quotes for the
+/// shell inside a literal block of YAML, so no character of a folder name
+/// ends the value or the word, and the caller refuses a path with a control
+/// character or the marker of an expression of the workflow. The licence
+/// lines the reference ends the file with are its own and left out, as a
+/// scaffold carries no repository header.
 #[must_use]
-pub fn publish_yml(image: &str, version: &str) -> String {
+pub fn publish_yml(image: &str, cli: &str) -> String {
+    let cli = format!("'{}'", cli.replace('\'', "'\\''"));
     format!(
         "name: publish
 
@@ -299,9 +381,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install the Aosabi command line
-        run: cargo install --locked aosabi-cli --version {version}
+        run: |
+          cargo install --locked --path {cli}
 
       - name: Build image
         run: cargo aosabi build --device docker --locked

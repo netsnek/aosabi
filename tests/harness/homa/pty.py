@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 """A pty pair in raw mode with a noise injector and a cut, the link of the
-`pty` scenario of `homa-sim` and of the pty half of `26_carrier_serial`.
+`pty` scenario of `homa-sim` and of the serial carrier's runs over a pty.
 
 Two pseudo terminals from `os.openpty`, whose slaves are put in raw mode with
 `tty.setraw`, and a relay thread that moves every byte one master reads to the
@@ -10,10 +10,10 @@ the two slave paths through `std::fs::File` and calls no `openpty`, which keeps
 `unsafe` out of the crate. The relay takes a hook that sees every chunk it
 moves and returns what goes on.
 
-`Noise` flips bits at a seeded bit error rate, 10 to the minus 4 in the pty
-half of `26_carrier_serial`, and `Cut` drops every byte for a window, the cut
-of 1 s of the same half, which a serial line without link events shows as
-silence. `chain` runs hooks one after the other, so a relay can take both.
+`Noise` flips bits at a seeded bit error rate, 10 to the minus 4 in the serial
+runs over a pty, and `Cut` drops every byte for a window, the cut of 1 s of the
+same runs, which a serial line without link events shows as silence. `chain`
+runs hooks one after the other, so a relay can take both.
 """
 
 from __future__ import annotations

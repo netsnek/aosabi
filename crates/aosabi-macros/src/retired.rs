@@ -3,7 +3,9 @@
  * aosabi-macros: the answers of the macros under the default features, where
  * every form of the derive path is retired for the native layer.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The forms of the derive path are retired
+ * for application code and kept behind the hidden feature mirror for the twins
+ * that wait for the TypeScript judge.
  */
 
 //! The answers of the macros under the default features.

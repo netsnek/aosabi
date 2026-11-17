@@ -2,7 +2,8 @@
 /*
  * aosabi-core: the descriptor of a named type and the records it lists.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The records hold what the reference asks
+ * the checker of a class, an enum, a union alias and their members.
  */
 
 //! The descriptor of a named type and the records it lists.
@@ -40,8 +41,7 @@ pub enum TypeKind {
 /// The checker answers a symbol with its documentation comment and, apart from
 /// it, with its tags, so the descriptor carries the two apart, and the
 /// inference composes them as the reference does. The macros read both from the
-/// last documentation block of the item by the rule of `docs/authoring.md`
-/// section 29.5.
+/// last documentation block of the item.
 #[derive(Clone, Copy, Debug)]
 pub struct Docs {
     /// The comment, the text before the first tag, empty when the item has
@@ -71,9 +71,8 @@ pub struct DocTag {
 /// Where a described item stands in its source and the documentation block it
 /// carries there, as written.
 ///
-/// The build writes these facts into `authoring.json`, which check C2 of
-/// `tests/notebooks/12_authoring_parity.ipynb` compares with the declarations
-/// of the TypeScript twin. The inference reads none of them.
+/// The build writes these facts into `authoring.json`. The inference reads none
+/// of them.
 #[derive(Clone, Copy, Debug)]
 pub struct Site {
     /// The value of `file!()` at the macro that describes the item.
@@ -135,9 +134,10 @@ pub struct SourceKey {
 /// The descriptor of a named type.
 ///
 /// One of the three macros writes it as a promoted constant, and
-/// [󰀀](super::TypeExpr::Named) carries the reference. Every list keeps the
-/// order of the source, because the order of the inference walk is the order of
-/// the schema. A list that does not apply to the [`TypeKind`] is empty.
+/// [`TypeExpr::Named`](super::TypeExpr::Named) carries the reference. Every
+/// list keeps the order of the source, because the order of the inference walk
+/// is the order of the schema. A list that does not apply to the [`TypeKind`]
+/// is empty.
 #[derive(Debug)]
 pub struct TypeInfo {
     /// What the type is to the inference.

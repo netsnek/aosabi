@@ -5,9 +5,9 @@
  *
  * No analogue on the reference side. The program is the server build that
  * names GraphTP(Homa) on Network with nothing of an app behind its listener,
- * which the raw server cell of the plan of the Homa track weighs by the code
- * and read only bytes of the symbols of homa with its IP driver, of this
- * crate and of socket2. It ships in no artifact.
+ * which the raw server cell of 23_homa_budget weighs by the code and read
+ * only bytes of the symbols of homa with its IP driver, of this crate and of
+ * socket2. It ships in no artifact.
  */
 
 //! A server of `GraphTP`(Homa) on Network alone.

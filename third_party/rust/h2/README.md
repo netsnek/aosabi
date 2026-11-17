@@ -2,30 +2,29 @@
 
 This directory holds the crate `h2` 0.4.19, the HTTP/2 implementation hyper's HTTP/2 server speaks
 through, as crates.io published it and vendored the kernel way. It changes only through the commits
-of its series below, each one behaviour, and the tool `tools/provenance` is the one writer of the
+of its series below, each one behaviour, and the project's vendoring tool is the one writer of the
 files it imports ([CONTRIBUTING.md](../../../CONTRIBUTING.md) section 6).
 
 The crate brings `tokio`, `tokio-util`, `tracing`, `indexmap`, `slab`, `fnv`, `futures-sink`,
 `futures-core` and `atomic-waker`, which the dependency rule does not admit where own code is
 possible, so layer C writes or cuts each of them. HTTP/2 lies outside the byte contract,
-so the crate has no layer A and no layer B (the plan of M5, sections The fork and Layer C, trims,
-facts 128 and 155).
+so the crate has no layer A and no layer B.
 
 ## Provenance
 
 | What | Value |
 | --- | --- |
 | Crate | `h2` |
-| Version | 0.4.19, released on 2026-08-24 (PROVEN, https://crates.io/api/v1/crates/h2/0.4.19, read on 2026-09-26) |
+| Version | 0.4.19 |
 | Upstream | https://github.com/hyperium/h2 |
-| Tag | `v0.4.19` at `d57d1b852fec9dda6d42d3454502006d52104da8` (PROVEN, `git ls-remote --tags`, read on 2026-09-26) |
+| Tag | `v0.4.19` at `d57d1b852fec9dda6d42d3454502006d52104da8` |
 | Commit the archive names | `d57d1b852fec9dda6d42d3454502006d52104da8`, not dirty |
 | Archive | https://static.crates.io/crates/h2/h2-0.4.19.crate |
 | SHA-256 of the archive | `ef8e5e5a340588f4452631496976cf8636d4a7ecf600239fdc27615d2530bc16`, equal to the checksum crates.io publishes |
 | Licence | `MIT`, Copyright (c) 2017 h2 authors |
-| Notice | `NOTICE` sections 2 and 4 |
+| Notice | `LICENSE` of this folder |
 | SPDX line of commit S | `// SPDX-License-Identifier: MIT` above the first line of every Rust file under `src/` |
-| Lines and `unsafe` tokens | 22,328 lines of Rust under `src/` and 2 `unsafe` tokens as published, counted over the import set, the SPDX lines of commit S aside (PROVEN, `wc -l` of the Rust files under `src/` and `grep -ow unsafe` over the import set, on 2026-09-26) |
+| Lines and `unsafe` tokens | 22,328 lines of Rust under `src/` and 2 `unsafe` tokens as published, counted over the import set, the SPDX lines of commit S aside |
 | Reached by path | `http`, through commit W |
 
 The archive names the tag commit itself, not dirty.
@@ -33,12 +32,11 @@ The archive names the tag commit itself, not dirty.
 ## The import set
 
 The import commit takes, byte for byte, the files of the archive that the build and the licence
-need: `Cargo.toml` as cargo published it, `LICENSE` and `src/**`, 54 files in all (PROVEN, the
-import set listed against the archive on 2026-09-26). It leaves out every other file of the archive,
-because the archive's own `README.md` would collide with this file, the packaging records and the
-tests serve no build, and a `.gitignore` of an archive would drop files from the commit. The SHA-256
-of every file it leaves out stands below, so the verify mode checks every file of the archive all
-the same (the plan of M5, section The fork, fact 92).
+need: `Cargo.toml` as cargo published it, `LICENSE` and `src/**`, 54 files in all. It leaves out
+every other file of the archive, because the archive's own `README.md` would collide with this file,
+the packaging records and the tests serve no build, and a `.gitignore` of an archive would drop
+files from the commit. The SHA-256 of every file it leaves out stands below, so the verify mode
+checks every file of the archive all the same.
 
 | File left out | SHA-256 |
 | --- | --- |
@@ -58,26 +56,21 @@ the same (the plan of M5, section The fork, fact 92).
 
 The manifest stays byte for byte, so it still names targets whose files the import set leaves out:
 `akamai` of `example`, `client` of `example`, `server` of `example`, `main` of `bench`. Cargo
-resolves such a target only when a command builds it, so the path dependency builds and `cargo check
---lib` passes, and the fork's own tests in the copy of the vendored crates check run `cargo test
---lib --tests` (the plan of M5, section The fork, fact 150). The archive of `h2` ships no `tests/`,
-so the copy restores no test file from it. The unit tests of the module `hpack` read the stories
-under `fixtures/hpack/` of the repository, 418 files the archive does not ship either, so the copy
-of section Tests takes that directory from the tag `v0.4.19` the tool keeps under
-`target/vendored/git/h2/`, whose commit the verify mode checks against the row (PROVEN, `git
-archive` of the tag's `fixtures/` on 2026-09-26).
+resolves such a target only when a command builds it, so the path dependency builds and
+`cargo check --lib` passes, and the fork's own tests in the copy of the vendored crates check run
+`cargo test --lib --tests`. The archive of `h2` ships no `tests/`, so the copy restores no test file
+from it. The unit tests of the module `hpack` read the stories under `fixtures/hpack/` of the
+repository, 418 files the archive does not ship either, so the copy of section Tests takes that
+directory from the tag `v0.4.19` the tool keeps under `target/vendored/git/h2/`, whose commit the
+verify mode checks against the row.
 
 ## Verify
 
-```text
-python3 tools/provenance/extract.py --crates verify h2
-```
-
-The mode reads the row `[[crate]]` of `tools/provenance/provenance.toml`, checks the SHA-256 of the
-archive against the row and against the checksum crates.io publishes, compares every file of the
-import set at the import commit with the archive, compares every file of the archive with the file
-at the tag, and checks that this file records the digest of every file the import set leaves out.
-The expected differences against the tag are the packaging records `.cargo_vcs_info.json` and
+The mode `verify` of the project's vendoring tool reads the row of the crate, checks the SHA-256 of
+the archive against the row and against the checksum crates.io publishes, compares every file of
+the import set at the import commit with the archive, compares every file of the archive with the
+file at the tag, and checks that this file records the digest of every file the import set leaves
+out. The expected differences against the tag are the packaging records `.cargo_vcs_info.json` and
 `Cargo.lock`, which the tag does not hold, and `Cargo.toml`, which cargo normalizes and whose
 original `Cargo.toml.orig` equals the manifest at the tag. Any other difference fails the mode. The
 vendored crates check of the project runs it in its section Provenance.
@@ -85,13 +78,12 @@ vendored crates check of the project runs it in its section Provenance.
 ## The series
 
 The history of this directory is one line: the import commit I, the wiring commit W, the SPDX commit
-S, this README in commit R, then layer C, the one layer of this crate. The command `python3
-tools/provenance/extract.py --crates series h2` lists the commits after I with their layer, id and
-quirk ids, and holds each layer to its budget. It counts the patched lines of a layer by
-`git diff --numstat` from the commit before the layer to its last commit, so a line that two commits
-of the layer touch counts once. The count leaves out the SPDX lines, and it lists the files the
-layer removes and the lines of this README apart. Each layer adds its subjects here with its last
-commit (the plan of M5, sections Staying close to upstream and The patch series, one commit each).
+S, this README in commit R, then layer C, the one layer of this crate. The mode `series` of the
+vendoring tool lists the commits after I with their layer, id and quirk ids, and holds each layer to
+its budget. It counts the patched lines of a layer by `git diff --numstat` from the commit before
+the layer to its last commit, so a line that two commits of the layer touch counts once. The count
+leaves out the SPDX lines, and it lists the files the layer removes and the lines of this README
+apart. Each layer adds its subjects here with its last commit.
 
 | Id | Summary after the scope `third_party` |
 | --- | --- |
@@ -113,15 +105,14 @@ commit (the plan of M5, sections Staying close to upstream and The patch series,
 | --- | --- | --- | ---: | ---: |
 | C | Tracing, the IO traits of `tokio`, `tokio-util`, `indexmap`, `slab`, `fnv`, the sink of the codec, `atomic-waker` and `futures-core` written in the crate or cut | C1 to C9 | 600 | 800 |
 
-The ceilings are ASSUMED, the series mode counts the layer in the vendored crates check, and a count
+The ceilings are assumed, the series mode counts the layer in the vendored crates check, and a count
 above its ceiling fails there.
 
 Layer C lands in the order C1, C3 to C9, and C2, which gives the crate IO traits of its own in place
 of those of `tokio`, lands last, directly before commit C3 of hyper, which implements them. Hyper
 with `http2` builds after every commit but C2 of `h2`, because the `Compat` of hyper implements the
-traits of `tokio` until C3, and the pair keeps that gap to one commit (the plan of M5, section
-Staying close to upstream, which pairs the two). Each commit writes one crate in the crate or cuts
-its use, in safe code, and none changes a byte on the wire.
+traits of `tokio` until C3, and the pair keeps that gap to one commit. Each commit writes one crate
+in the crate or cuts its use, in safe code, and none changes a byte on the wire.
 The log macros of `src/tracing.rs` expand to `()` with no argument evaluated, so the bindings and
 items that only a log call reads carry a leading underscore or `#[allow(dead_code)]`. The reader of
 the frames in `src/codec/framed_read.rs` keeps the states of the length delimited reader of
@@ -137,13 +128,12 @@ is initialized already, so a read needs no `unsafe` on either side, and the `wri
 preface of the client is a function of the module. The codec, the client, the server and the files
 of `src/proto/` name them in place of `tokio::io`, and the fork of hyper implements them in its
 trim C3. The examples of the documentation still name `tokio`, and no build runs them. After C2 the
-crate names `bytes` and `http` alone (the plan of M5, section Layer C and facts 128, 149 and 155).
+crate names `bytes` and `http` alone.
 
 ## The features Aosabi builds
 
-No crate of the workspace names this fork before commit 98 of M5, the wiring of the forks, because
-the features the builds below name exist only once the layers have landed (the plan of M5, section
-The serial step, The wiring of the forks).
+No crate of the workspace names this fork before the commit that wires the forks, because the
+features the builds below name exist only once the layers have landed.
 
 | Build | Features |
 | --- | --- |
@@ -155,18 +145,14 @@ The serial step, The wiring of the forks).
 The fork follows the newest release of the upstream line 0.4. A release that fixes an advisory of
 RustSec or of the GitHub security advisories of `hyperium` affecting the pinned version is imported
 within one day, another patch release within 30 days once the upstream check passes, a new minor
-release at the next milestone boundary, and a new major release is the owner's decision. An import
-is a new commit I' written by the mode `import`, followed by W, S written by the mode `spdx`, R and
-the layers rebased onto it, each patch keeping its subject and its quirk id. A path a commit of
-layer C removed resolves as removed. The command below imports every newer release in a clone under
-`target/vendored-check/`, rebases the series onto it, runs the fork's own tests in a copy of the
-clone's forks and resolves the clone's lock without `--locked` against the workspace's. Its report
-names every step that waits, the builds and the upstream corpora until their files exist, and the
-lock difference until commit 98 of M5 names the forks by path. The section Upstream releases of the
-vendored crates check runs it when its parameter `upstream` is `newest`. The matrix entry
-`vendored_upstream` of the plan, which is to run it weekly outside the closing sweep, is not in
-`tests/matrix.yaml` yet.
-
-```text
-python3 tools/provenance/extract.py --crates check-release h2
-```
+release with the next release of Aosabi, and a new major release once the project decides to move to
+it. An import is a new commit I' written by the mode `import`, followed by W, S written by the mode
+`spdx`, R and the layers rebased onto it, each patch keeping its subject and its quirk id. A path a
+commit of layer C removed resolves as removed. The mode `check-release` of the vendoring tool
+imports every newer release in a clone under `target/vendored-check/`, rebases the series onto it,
+runs the fork's own tests in a copy of the clone's forks and resolves the clone's lock without
+`--locked` against the workspace's. Its report names every step that waits, the builds and the
+upstream corpora until their files exist, and the lock difference until the commit that wires the
+forks names them by path. The section Upstream releases of the vendored crates check runs it when
+its parameter `upstream` is `newest`. No run of the sweep sets that parameter to `newest`, since
+the check needs the network.

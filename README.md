@@ -55,7 +55,7 @@ type Query {
 
 ## Where it runs
 
-| Where | How | State in 0.1.0 |
+| Where | How | State in 0.1.1 |
 | --- | --- | --- |
 | Linux servers and containers | One native binary for aarch64 or x86_64 | Runs |
 | Cloudflare Workers | A TypeScript app on the engine built as `core.wasm` | Runs on workerd |
@@ -94,15 +94,17 @@ says how to build and run it.
 - [Documentation/guides/](Documentation/README.md#guides) holds the guides to the Rust layer, the
   TypeScript layer, GraphTP, embedded targets, the security defaults, compatibility with Pylon v3
   and the conformance tests against graphql-js.
+- [Documentation/guides/hardening.md](Documentation/guides/hardening.md) lists the steps by which a
+  service hardens itself for production.
 - [roadmap/](roadmap/README.md) is the public roadmap.
 
 ## Status
 
-Version 0.1.0 is the first public release. Aosabi is before 1.0, so its API may still change between
+Version 0.1.1 is the current release. Aosabi is before 1.0, so its API may still change between
 releases. The test suite of the repository judges the engine, the native server, the command line,
-the TypeScript layer and the GraphTP codec. The crates and the npm packages are not published to a
-registry yet, so a service names them by path from a checkout. [CHANGELOG.md](CHANGELOG.md) lists
-what the release holds.
+the TypeScript layer and the GraphTP codec. Aosabi is released through its repository alone, so a
+service names its crates and npm packages by path from a checkout. [CHANGELOG.md](CHANGELOG.md)
+lists what the release holds.
 
 ## Repository layout
 

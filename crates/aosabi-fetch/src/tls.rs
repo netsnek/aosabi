@@ -290,8 +290,13 @@ impl<S: Socket + Unpin> hyper::rt::Write for TlsStream<S> {
 
     fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         let this = self.get_mut();
+        // The TLS bytes rustls holds go out first, an alert among them, and
+        // the error the connection met before answers after them.
+        if this.poll_flush_tls(cx)?.is_pending() {
+            return Poll::Pending;
+        }
         this.conn.writer().flush()?;
-        this.poll_flush_tls(cx)
+        Poll::Ready(Ok(()))
     }
 
     fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {

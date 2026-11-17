@@ -3,7 +3,8 @@
  * aosabi-js host: the buffers the module shares with the host and the tagged
  * record codec of every value that crosses the host boundary.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The records carry a string value in WTF-8 both
+ * ways, and the buffers keep the conditions of the import block.
  */
 
 //! The buffers the host writes and reads, and the records that cross the
@@ -446,6 +447,9 @@ impl<'a> Reader<'a> {
     /// Reads a length and that many bytes as WTF-8, a string value, the name
     /// or the message of an error or the key of a member of an error, so a
     /// lone surrogate crosses as itself.
+    ///
+    /// Safe code could skip this check, since `JsString` keeps its WTF-8 as a
+    /// rule of its own, so the read needs no unsafe code to go faster.
     pub fn string(&mut self) -> Option<JsString> {
         JsString::from_wtf8(self.bytes()?).ok()
     }
@@ -590,9 +594,11 @@ fn file_place(file: &FileBody) -> (usize, usize) {
 /// holds none, so an empty object of extensions crosses as `undefined`, which
 /// the class of the wrapper makes an empty object again. An `AggregateError`
 /// gives its errors as its members, each a value record, so the host makes the
-/// intrinsic class with them. Any other error gives its name and its message
-/// alone. The class the brand names makes the host side instance, so
-/// `instanceof` holds in the app.
+/// intrinsic class with them. An error of a class with members of its own gives
+/// those members, and the brand of a `ForbiddenError` when the Rust value behind
+/// it is one, as a throw of `aosabi-auth` carries it. Any other error gives its
+/// name and its message alone. The class the brand names makes the host side
+/// instance, so `instanceof` holds in the app.
 pub fn encode_error(out: &mut Vec<u8>, error: &ErrorObject, depth: usize) {
     let (brand, path, locations, members) = match error {
         ErrorObject::GraphQL(error) => {

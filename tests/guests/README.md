@@ -1,8 +1,9 @@
 # The harness guests
 
-The virtual machines the carrier notebooks of the Homa track run in, booted under KVM by
-[󰀀](../harness/homa/guest.py) from `target/guests/` and never from `/tmp`, each with 2 GiB and 2
-cores, at most three at once.
+The virtual machines the carrier notebooks of Homa run in, booted under KVM by
+[`../harness/homa/guest.py`](../harness/homa/guest.py) from `target/guests/` and never from `/tmp`,
+each with 2 GiB and 2 cores, at most three at once. The carrier notebooks need them because the host
+has neither `tc` nor `dummy_hcd`.
 
 - [`guests.lock`](guests.lock) pins every image, kernel package, source and host tool a guest boots
   from or installs by its URL, its SHA-256 and its size. The harness refuses a file that differs,

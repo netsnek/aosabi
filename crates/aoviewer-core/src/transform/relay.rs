@@ -4,6 +4,9 @@
  * with its dry run.
  *
  * The collapse follows Voyager's structural test and its dry run.
+ *
+ * Derived from graphql-voyager 656b8ddb4e7bec958d7300e2d737f632c7b5ba30, src/introspection/introspection.ts, MIT.
+ * Derived from graphql-voyager 656b8ddb4e7bec958d7300e2d737f632c7b5ba30, src/utils/collect-referenced-types.ts, MIT.
  */
 
 //! The Relay collapse.

@@ -49,8 +49,8 @@ from .paths import paths
 
 LOCK_VERSION = 1
 
-# The largest download the harness takes. The Voyager archive is the largest
-# the plan names and is a few MB, so 64 MiB leaves room without letting a wrong
+# The largest download the harness takes. The Voyager archive is the largest a
+# lock names and is a few MB, so 64 MiB leaves room without letting a wrong
 # URL fill the quota of the machine.
 MAX_BYTES = 64 * 1024 * 1024
 

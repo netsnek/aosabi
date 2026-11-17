@@ -2,7 +2,15 @@
 /*
  * aosabi-scalars: the reading of a date-time-string into a Date.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
+ * The function parseDateTime of graphql-scalars is new Date(dateTime), here
+ * over the reader of JsDate, and the one function of the formatter a bound
+ * scalar reaches, while the others serve the Date, Time and LocalTime
+ * scalars. The doc comment of parse_date_time is the comment of that
+ * function as it reads.
+ *
+ * Derived from graphql-scalars 1.25.0, esm/scalars/iso-date/formatter.js, MIT.
  */
 
 //! The formatter of the date time scalar.

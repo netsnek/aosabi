@@ -4,7 +4,7 @@
 # compiles none of it.
 [package]
 name = "aoviewer-docs-pdf"
-version = "0.0.0"
+version.workspace = true
 description = "The PDF of a generated reference, behind the pdf feature and off by default."
 edition.workspace = true
 rust-version.workspace = true
@@ -18,7 +18,8 @@ workspace = true
 [features]
 default = []
 # The compilation of api.typ into a PDF. It names nothing yet, so a
-# cfg(feature = "pdf") is a known condition.
+# cfg(feature = "pdf") is a known condition. What it takes is still open, and
+# the dependency rule decides it.
 pdf = []
 
 [dependencies]

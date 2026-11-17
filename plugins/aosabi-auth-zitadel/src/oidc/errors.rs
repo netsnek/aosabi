@@ -2,7 +2,9 @@
 /*
  * aosabi-auth-zitadel oidc/errors: the errors both halves throw.
  *
- * Derived from openid-client 6.8.2, ., MIT.
+ * Derived from openid-client 6.8.2, MIT.
+ *
+ * Derived from openid-client 6.8.2, build/index.js, MIT.
  * Derived from oauth4webapi 3.8.4, build/index.js, MIT.
  */
 

@@ -33,7 +33,7 @@ def lock_dir(directory):
     """Hold an exclusive lock on `directory` while the block runs.
 
     Entries that run at once under `tests/run.py --jobs` can reach a step they
-    share together, such as the install of `tests/clients`, so the step runs
+    share together, such as the install of the test clients, so the step runs
     inside this block and another entry waits for it and then finds its result
     whole. The lock is `flock` on the directory itself, so it leaves no file,
     no child process inherits it, and it ends with the process that holds it.
@@ -54,6 +54,9 @@ def _argv(cmd) -> list:
 
 def _environment(env=None, argv=None) -> dict:
     """The child environment: this process, then the two harness pins, then env.
+
+    A call `argv` of the command line at the switch AOSABI_STD at source takes the
+    private copy of the pin as its toolchain where env names none.
     """
     merged = dict(os.environ)
     merged.update(TELEMETRY_OFF)

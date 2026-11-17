@@ -1,0 +1,33 @@
+aosabi-json
+Copyright (c) 2026 Florian Kleber
+
+The crate aosabi-json is a part of Aosabi, https://github.com/netsnek/aosabi,
+and is licensed under the MIT License. This file names the work of others that
+the crate carries or derives code or data from, with the license of each. It
+adds attribution and no condition to the license of the crate. The texts of the
+licenses are those of LICENSE for MIT and LICENSE-BSL-1.0 for BSL-1.0, beside
+this file.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Other projects
+==============
+
+Project: hashbrown
+URL: https://github.com/rust-lang/hashbrown
+Packages: hashbrown 0.17.1
+License: MIT
+Offered: MIT OR Apache-2.0
+Copyright (c) 2016 Amanieu d'Antras
+
+Project: Ryu and ryu-js
+URL: https://github.com/boa-dev/ryu-js
+Packages: ryu-js 1.0.3
+License: BSL-1.0
+Offered: Apache-2.0 OR BSL-1.0
+Copyright 2018 Ulf Adams

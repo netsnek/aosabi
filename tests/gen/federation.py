@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
-"""The module writes what the federation notebooks send to both sides:
+"""tests/gen: the seeded corpora of Federation.
+
+The module writes what the federation notebooks send to both sides:
 
 - `operations`, the client documents over a front schema with aliases,
   fragments on the abstract types, the forced and the allowed argument of a
@@ -22,13 +24,12 @@
   stub with the canned answers of the stub, `dg-order-01` and a delegation from
   outside a resolver among them.
 
-Every request is a line of the protocol of tests/sidecar/federation.mjs,
-`tests/sidecar/federation.md`, without its `id`, which a case carries beside it.
-A case id is a hash of the request, and every family draws on until it holds its
-count of distinct ids, so an id is a key of the goldens and of the remote stub.
-The module decides nothing about correctness. The verdict of a run is the byte
-comparison of the sidecar and `aosabi-devtool federation` over the same
-requests. Every value is a neutral test string.
+Every request is a line of the protocol of the federation sidecar without its `id`,
+which a case carries beside it. A case id is a hash of the request, and every family
+draws on until it holds its count of distinct ids, so an id is a key of the goldens
+and of the remote stub. The module decides nothing about correctness. The verdict of a
+run is the byte comparison of the sidecar and `aosabi-devtool federation` over the
+same requests. Every value is a neutral test string.
 
 The manifest of the families that need no pair prints with the command below,
 and two runs print the same bytes. The package imports this module, so the
@@ -53,7 +54,7 @@ from .sdl import EnumValue, TypeRef, print_value
 #: The seed a run takes when its parameters name none.
 SEED = 20261003
 
-#: The counts of the plan, section The notebooks and section The Federation cases.
+#: The count of distinct cases each family holds.
 COUNTS = {
     "operations_g1": 120,
     "operations_g2": 80,
@@ -159,7 +160,7 @@ def _distinct(count: int, draw, first=()) -> list:
     with the next index until the count is reached. A draw reads only the
     streams of its own index, so the cases of a smaller count are a prefix of
     the cases of a larger one. A family whose space is too small for its count
-    raises rather than return fewer cases than the plan counts.
+    raises rather than return fewer cases than its count.
     """
     out: list = []
     seen: set = set()
@@ -450,9 +451,10 @@ def transform_requests(count: int = COUNTS["transforms"], seed: int = SEED) -> l
     field with files where an input takes `File`, a needs map, policies and a
     context. The two named cases come first: `dg-force-needs`, a need with
     `__args` on the field a policy forces, which reaches the remote because the
-    policy runs before the need (quirk Q10-5), and `dg-needs-typename`, a nested
-    need under a patched type, whose selection set carries no `__typename`
-    because the patch transform ran before the need was added.
+    policy runs before the need (the quirk `FEDERATION_FORCE_BEFORE_NEEDS`), and
+    `dg-needs-typename`, a nested need under a patched type, whose selection set
+    carries no `__typename` because the patch transform ran before the need was
+    added.
     """
     rng = Rng(seed)
     first = [

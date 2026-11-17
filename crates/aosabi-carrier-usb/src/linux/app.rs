@@ -4,7 +4,12 @@
  * GraphTP listener, and the randomness the endpoint of the driver starts
  * from.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. A call runs straight through the hooks
+ * and the engine of the booted app with the fixed fields of
+ * Documentation/guides/graphtp.md as its request, through the fetch of a
+ * carrier of aosabi_core::graphtp::served, and the seed of the endpoint is
+ * read from /dev/urandom itself, outside the randomness capability of
+ * aosabi_core::random.
  */
 
 //! The fetch of the booted app and the seed of an endpoint.

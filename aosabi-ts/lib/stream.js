@@ -6,7 +6,10 @@
  *
  * No analogue in the reference, where the server sent events processor of
  * graphql-yoga 5.18.0 enqueues each piece into a ReadableStream of its
- * platform and a route of hono answers the ReadableStream of the app.
+ * platform and a route of hono answers the ReadableStream of the app. The
+ * engine writes each frame of a subscription as graphql-over-http writes it,
+ * and each chunk of the body of a route, and pushes its bytes through the
+ * import host_push into a ReadableStream the Response carries.
  */
 
 // The kinds of a record of the import host_push,

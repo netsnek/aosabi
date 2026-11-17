@@ -11,12 +11,20 @@
 //!
 //! A [`Service`] is what `handler` builds below HTTP: the roots of an
 //! application run through the resolver wrapping, the seven bound scalars and
-//! the schema both enter. [`Service::execute`] runs one request through the one
-//! pipeline of the executor crate, inside a fresh [`Context`], the way a TypeScript
-//! service runs every request inside `asyncContext.run`. [`Service::subscribe`] runs a
-//! subscription the same way, inside a fresh context that carries the
-//! [`CarrierPolicy`] of the carrier that called, and answers its single result
-//! or its stream.
+//! the schema both enter. [`Service::execute`] runs one request through the
+//! one pipeline of the executor crate, inside a fresh [`Context`], the way a
+//! TypeScript service runs every request inside `asyncContext.run`. The
+//! context is the one of a synthetic
+//! `POST /graphql`, so `get_context()` answers below HTTP as it answers above
+//! it, and the bytes of every answer stay the same. [`Service::subscribe`]
+//! runs a subscription the same way, inside a fresh context that carries the
+//! [`CarrierPolicy`] of the carrier that called, and answers its single
+//! result or its stream.
+//!
+//! [`Execute`] for [`Service`] is the entry below HTTP a carrier calls: a
+//! query and a mutation answer one result, and a subscription answers
+//! [`ServiceStream::Events`], whose results a carrier reads one by one
+//! with the revision of the publish each came from.
 //!
 //! A service is `Send` and `Sync` and is shared between requests. Everything
 //! of one request, its agent, its context and its values, lives on the
@@ -84,6 +92,7 @@ use aosabi_lang::{
     ast::OperationTypeNode,
     parser::{
         ParseOptions,
+        REQUEST_TOKENS,
         parse, //
     }, //
 };
@@ -111,6 +120,10 @@ use crate::{
         create_schema, //
     },
     in_context::apply_in_context,
+    random::{
+        NO_RANDOMNESS,
+        seed_keys, //
+    },
     resolvers::{
         Resolvers,
         resolvers_to_graphql_resolvers, //
@@ -118,18 +131,19 @@ use crate::{
     scalars::leaf_serializers, //
 };
 
-/// The one error a persisted operation answers until the document table exists.
-const PERSISTED_DOCUMENTS_PENDING: &str = "Persisted documents land at M12.";
+/// The one error a persisted operation answers, since no table of persisted documents exists.
+const PERSISTED_DOCUMENTS_REFUSED: &str = "The engine accepts no persisted document.";
 
 /// The unique fields cache, by the name of a possible type.
 type UniqueFields = IndexMap<String, Vec<String>, KeyHasherBuilder>;
 
 /// What lives as long as the service.
 ///
-/// A type lives as long as its schema, so the port keys the cache by the type
-/// name and keeps it with the service. The leaf serializers are the side table
-/// of the bound scalars, which the executor asks before the hook of the type
-/// layer.
+/// The unique fields cache is `uniqueFieldsCache` of the reference, which it
+/// keys by the type object. A type lives as long as its schema, so the port keys
+/// the cache by the type name and keeps it with the service. The leaf
+/// serializers are the side table of the bound scalars, which the executor asks
+/// before the hook of the type layer.
 pub struct CoreState {
     /// The unique fields cache.
     unique_fields: Mutex<UniqueFields>,
@@ -196,6 +210,7 @@ impl Service {
             type_defs,
             roots: Resolvers::default(),
             resolvers: ResolverMap::default(),
+            max_tokens: REQUEST_TOKENS,
         }
     }
 
@@ -203,6 +218,14 @@ impl Service {
     #[must_use]
     pub const fn schema(&self) -> &Arc<Schema> {
         &self.executor.schema
+    }
+
+    /// Returns the cap on the tokens of a request document the service parses
+    /// under, the key `maxTokens` of the app or `REQUEST_TOKENS`, a named
+    /// divergence.
+    #[must_use]
+    pub const fn max_tokens(&self) -> u32 {
+        self.executor.max_tokens
     }
 
     /// Returns the SDL text the service was built from.
@@ -228,11 +251,25 @@ impl Service {
     /// what the plugin `useInContext` does in `onExecute`. A subscription
     /// operation answers the one error of `run_request`, because its answer is
     /// a stream, which [`Service::subscribe`] returns.
+    ///
+    /// The calling thread is keyed by [`seed_keys`] before the request makes
+    /// a map. The variables of `request` are a map the caller made, though,
+    /// under the key its thread held when it parsed them, so a caller that
+    /// parses the body of a client calls [`seed_keys`] before it parses it, as
+    /// the embedding entry and the request lines do. On a thread that
+    /// [`seed_keys`] leaves without a key, the request answers the one error
+    /// [`NO_RANDOMNESS`] with no data and its document is never parsed.
     #[must_use]
     pub fn execute(&self, request: &Request<'_>, options: AgentOptions) -> Executed {
+        if seed_keys().is_err() {
+            return Executed {
+                outcome: Ok(one_error(NO_RANDOMNESS)),
+                trace: Vec::new(),
+            };
+        }
         let context = service_context();
-        if !is_subscription(request) {
-            apply_in_context(&context, request);
+        if !is_subscription(request, self.max_tokens()) {
+            apply_in_context(&context, request, self.max_tokens());
         }
         let context_value: Rc<dyn Any> = Rc::new(context.clone());
         run_with_context(context, || {
@@ -255,10 +292,14 @@ impl Service {
     /// where only a foreign waker could move the agent on, because nothing on
     /// the calling thread wakes it. The answer and its trace are taken before
     /// the drain, so the drain changes neither.
+    ///
+    /// Its two callers, the embedding entry and the request lines, key the
+    /// thread with [`seed_keys`] before they parse the body that carries the
+    /// request, so the thread holds its key here already.
     pub(crate) fn execute_drained(&self, request: &Request<'_>, options: AgentOptions) -> Executed {
         let context = service_context();
-        if !is_subscription(request) {
-            apply_in_context(&context, request);
+        if !is_subscription(request, self.max_tokens()) {
+            apply_in_context(&context, request, self.max_tokens());
         }
         let context_value: Rc<dyn Any> = Rc::new(context.clone());
         let kept = RefCell::new(None);
@@ -286,7 +327,9 @@ impl Service {
     /// it before the subscribe resolver runs. The `@inContext` directive is
     /// not applied, because the reference applies it in `onExecute` alone,
     /// which a subscription never reaches. An operation that is no
-    /// subscription runs to its one result without the directive.
+    /// subscription runs to its one result without the directive. The thread
+    /// and the variables are keyed as for [`Service::execute`], and on a
+    /// thread with no key the single result is the one error [`NO_RANDOMNESS`].
     ///
     /// # Errors
     ///
@@ -299,6 +342,9 @@ impl Service {
         options: AgentOptions,
         policy: CarrierPolicy,
     ) -> Result<Subscribed, RunFailure> {
+        if seed_keys().is_err() {
+            return Ok(Subscribed::One(one_error(NO_RANDOMNESS)));
+        }
         let context = service_context();
         set_carrier_policy(&context, policy);
         self.subscribe_in(&context, request, options)
@@ -334,15 +380,16 @@ fn setup_agent(agent: &Agent) {
 ///
 /// A subscription operation is written with the keyword `subscription`, so a
 /// text without it is answered with no parse. A text with it is parsed once
-/// more, and a document that does not parse is no subscription, because it
+/// more, under the cap `max_tokens` on its tokens that the executor parses it
+/// under, and a document that does not parse is no subscription, because it
 /// reaches no resolver.
-fn is_subscription(request: &Request<'_>) -> bool {
+fn is_subscription(request: &Request<'_>, max_tokens: u32) -> bool {
     if !request.document.contains("subscription") {
         return false;
     }
     let options = ParseOptions {
         no_location: true,
-        ..ParseOptions::default()
+        ..ParseOptions::request_capped(max_tokens)
     };
     parse(request.document, options).is_ok_and(|document| {
         operation_type(&document, request.operation_name) == Some(OperationTypeNode::Subscription)
@@ -364,6 +411,8 @@ pub struct ServiceBuilder {
     roots: Resolvers,
     /// The build side resolver map.
     resolvers: ResolverMap,
+    /// The cap on the tokens of a request document.
+    max_tokens: u32,
 }
 
 impl ServiceBuilder {
@@ -398,6 +447,18 @@ impl ServiceBuilder {
         self
     }
 
+    /// Sets the cap on the tokens of a request document, the key `maxTokens`
+    /// of the app, in place of `REQUEST_TOKENS`.
+    ///
+    /// Every parse of a request document of the service takes it, the parse of
+    /// the executor and the second parses for a subscription and for
+    /// `@inContext`, a named divergence.
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: u32) -> Self {
+        self.max_tokens = max_tokens;
+        self
+    }
+
     /// Builds the service.
     ///
     /// # Errors
@@ -416,6 +477,7 @@ impl ServiceBuilder {
             // a service never reads its source.
             root_value: Arc::new(|| Value::Undefined),
             leaf_serializers: Some(Arc::clone(core.leaf_serializers())),
+            max_tokens: self.max_tokens,
         };
         Ok(Service {
             type_defs: self.type_defs,
@@ -508,20 +570,29 @@ impl Execute for Service {
     /// query and a mutation run through [`Service::execute`] and a
     /// subscription through the body of [`Service::subscribe`]. What the entry
     /// throws and a stalled run both answer as one error with no data, and a
-    /// persisted operation answers the one error that names the milestone of
-    /// the document table.
+    /// persisted operation answers the one error that says the engine accepts
+    /// no persisted document.
+    ///
+    /// The calling thread is keyed by [`seed_keys`] first, for a subscription
+    /// as for a query. The variables are a map the carrier made under the key
+    /// its thread held when it parsed them, so a carrier that parses them from
+    /// a client calls [`seed_keys`] before it parses them. A thread with no
+    /// key answers the one error [`NO_RANDOMNESS`] for every operation.
     fn execute(
         &self,
         operation: Operation<'_>,
         variables: &Self::Variables,
         policy: &Self::Context,
     ) -> Self::Stream {
+        if seed_keys().is_err() {
+            return ServiceStream::One(Some(one_error(NO_RANDOMNESS)));
+        }
         let Operation::Document {
             text,
             operation_name,
         } = operation
         else {
-            return ServiceStream::One(Some(one_error(PERSISTED_DOCUMENTS_PENDING)));
+            return ServiceStream::One(Some(one_error(PERSISTED_DOCUMENTS_REFUSED)));
         };
         let request = Request {
             document: text,
@@ -529,7 +600,7 @@ impl Execute for Service {
             operation_name,
             validate: true,
         };
-        if !is_subscription(&request) {
+        if !is_subscription(&request, self.max_tokens()) {
             let executed = Service::execute(self, &request, AgentOptions::default());
             return ServiceStream::One(Some(result_of(executed.outcome)));
         }

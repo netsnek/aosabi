@@ -3,14 +3,9 @@
  * homa types: the items every engine module shares, re-exported at the crate
  * root.
  *
- * The shapes are those of the Homa design note, first version, homa/design-v1.md
- * section 2.5, lines 566 to 1088, with the additions of its second version,
- * homa/design.md sections 7.2 and 7.4, lines 2113 to 2326 and 2438 to 2539. Three
- * items take their shape here: the report of RPC_UNKNOWN to a request that asks
- * for it, after the outcome the second version calls unknown in section 4.7,
- * lines 1314 to 1406, the Homa port of a peer, after its sections 4.3 and 7.3,
- * lines 1036 to 1206 and 2327 to 2437, and the state of an RPC that `rpc_info`
- * writes, after its section 7.4.
+ * Three items take their shape here: the report of RPC_UNKNOWN to a request that
+ * asks for it, the Homa port of a peer, and the state of an RPC that `rpc_info`
+ * writes.
  */
 
 //! The types, the traits and the errors every engine module shares.
@@ -194,8 +189,13 @@ pub struct Incast {
 
 /// The values of a carrier's links.
 ///
-/// A card writes its own values into the fields where it knows better, with their
-/// provenance.
+/// [`Profile::network`] takes `HomaModule`'s defaults and two assumed values
+/// where the module has none. [`Profile::link`] gives the assumed shape every
+/// point to point link shares, around the sizes and the timers its caller passes.
+/// Each point to point constructor from [`Profile::unix_socket`] to
+/// [`Profile::lora`] gives the values of one carrier, assumed until the notebooks
+/// of that carrier measure them. A card writes its own values into the fields
+/// where it knows better, with their provenance.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Profile {
     /// How a message longer than `unsched_bytes` starts.
@@ -267,7 +267,7 @@ impl Profile {
     /// granted offset to the end of the range it names, since the module takes
     /// such a RESEND as the GRANT that was lost. Each file is read at <https://github.com/PlatformLab/HomaModule/tree/50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3>.
     ///
-    /// Two values are the design note's, since the module has none. A patient
+    /// Two values are the project's own, since the module has none. A patient
     /// request waits 5 s before its first RESEND, because the module has no
     /// patient RPCs. Incast control marks a request above 8 outstanding RPCs and
     /// lets 300 bytes of its response go unscheduled.

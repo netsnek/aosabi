@@ -3,7 +3,10 @@
  * aosabi-js execute: the executor of the engine over the app of the boot,
  * below HTTP, in a test build of the module.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the side the notebooks judge in place
+ * of aosabi-devtool execute on their side ts, over the same protocol as the
+ * executor sidecar, which runs normalizedExecutor of @graphql-tools/executor
+ * 1.5.1 under Yoga.
  */
 
 //! The executor of the engine below HTTP, the feature `execute`.
@@ -76,7 +79,7 @@ use aosabi_lang::js_string::to_string_lossy;
 pub const PATH: &str = "/.ts1/execute";
 
 /// The message of a request whose body is no request of the protocol.
-const NOT_A_REQUEST: &str = "the body is no request of the protocol of tests/sidecar/execute.mjs";
+const NOT_A_REQUEST: &str = "the body is no request of the protocol of the executor sidecar";
 
 /// The message of a request that ends with its result pending, the text of
 /// `aosabi-devtool execute`.
@@ -116,12 +119,13 @@ pub async fn answer(body: Rc<[u8]>) -> Vec<u8> {
 /// with the agent driven by the request loop of the module.
 async fn execute(service: &Service, request: &Request<'_>) -> Executed {
     let context = service_context();
-    apply_in_context(&context, request);
+    apply_in_context(&context, request, service.max_tokens());
     let context_value: Rc<dyn Any> = Rc::new(context.clone());
     let executor = GeneralExecutor {
         schema: Arc::clone(service.schema()),
         root_value: Arc::new(|| Value::Undefined),
         leaf_serializers: Some(Arc::clone(service.core().leaf_serializers())),
+        max_tokens: service.max_tokens(),
     };
     let prepared = run_with_context(context, || {
         prepare_request(

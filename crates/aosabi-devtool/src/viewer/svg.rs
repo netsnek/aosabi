@@ -25,6 +25,10 @@
 //! route under the page budget with its parts. The title is the one the
 //! generator gives the file of the diagram unless `title` names another, so
 //! the drawing of a diagram the tree writes is the bytes of its file.
+//! `svg_text` takes `text`, the default, and `outlines`, which the request
+//! answers with `AO-D0015` before it reads the input, as the generator does,
+//! since the core refuses the outlines until a later release vendors the
+//! face.
 
 use std::fmt::Write as _;
 

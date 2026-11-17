@@ -2,57 +2,59 @@
 /*
  * aosabi-js boot: the boot of the app the host hands in.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It boots over aosabi_core::boot, the schema record
+ * of aosabi_core::boot::canary_schema_record and the schema build of
+ * aosabi_core::app::build_schema.
  */
 
 //! The boot of the app the host hands in.
 //!
 //! The boot record is the SDL, as `.aosabi/schema.mjs` of the build holds it, then
-//! the JSON text of the IR of the same build, then the type resolvers of the
-//! form of the canary among those the glue hands `handler()`, a count and
-//! each the name of its union or interface, a count of its members and each
-//! the name of the member, a count and the names of the fields its check
-//! tests with `in`, none for a build of the reference, then one byte for `graphiql`
-//! and one for `landingPage`, each 0 when the configuration leaves it out, 1
-//! for `true` and 2 for `false`, then one byte for the job mode, 0 for the
-//! faithful mode and 1 for the fast mode, one byte for the read mode, 0 for
-//! one `js_get` per read and 1 for the projection, and one byte for the
-//! platform of the host, 1 for Bun and 0 for any other. Then come the
-//! variables of the process of the host, a count and each name and value,
-//! which the engine takes as the variables of its process, since the module
-//! reads no environment of its own, then the option `logger`, a byte 0 when
-//! the configuration leaves it out, 1 for `true`, 2 for `false` and 3 for an
-//! object, whose value record follows, then the options of the last
-//! `Sentry.init` of `aosabi/sentry/node` the app made before the boot, a byte
-//! 0 for none or 1 and their JSON, and last the plugins of the configuration
-//! in their order, a count and each a byte 0, the name of a marker, the JSON
-//! of its options and a count of the functions of its options, each its key
-//! and its handle in the table of the boot, 0 for a function the engine runs
-//! none of, or a byte 1 and a plugin of the app.
+//! the JSON text of the IR of the same build, then the type resolvers of the form
+//! of the canary among those the glue hands `handler()`, a count and each the name
+//! of its union or interface, a count of its members and each the name of the
+//! member, a count and the names of the fields its check tests with `in`, none for
+//! a build of the reference, then one byte for `introspection` and one for
+//! `maskedErrors`, each 0 when the configuration leaves the key out, 2 for `false`
+//! and 1 for any other value, then one byte for the job mode, 0 for the faithful
+//! mode and 1 for the fast mode, one byte for the read mode, 0 for one `js_get` per
+//! read and 1 for the projection, and one byte for the platform of the host, 1 for
+//! Bun and 0 for any other. Then come the variables of the process of the host, a
+//! count and each name and value, which the engine takes as the variables of its
+//! process, since the module reads no environment of its own, then the option
+//! `logger`, a byte 0 when the configuration leaves it out, 1 for `true`, 2 for
+//! `false` and 3 for an object, whose value record follows, then the options of the
+//! last `Sentry.init` of `aosabi/sentry/node` the app made before the boot, a byte
+//! 0 for none or 1 and their JSON, then the plugins of the configuration in their
+//! order, a count and each a byte 0, the name of a marker, the JSON of its options
+//! and a count of the functions of its options, each its key and its handle in the
+//! table of the boot, 0 for a function the engine runs none of, or a byte 1 and a
+//! plugin of the app, and last the key `maxTokens`, a byte 0 when the configuration
+//! leaves it out or 1 and the cap on the tokens of a request document as a word,
+//! which every parse of a request document of the app takes, a named divergence.
+//! The key stands last, so a module built before it reads the record of a host that
+//! writes it and leaves the key unread.
 //!
-//! A plugin of the app is the record of [`crate::plugin::read`], the keys the
-//! host reports of its object: its name, its strategy, its roles, its
-//! dependencies, its hook `onExecute` and the other hooks of Envelop and Yoga
-//! it holds, which fail the boot. Its middleware and the routes its setup
-//! registers run in the hono of the host, `aosabi/pylon`, as do the routes and
-//! the middleware of the app, the base pipeline and the children of the
-//! app. So the app the engine boots holds no route of the app and installs no
-//! base pipeline,
-//! [`App::hosted_pipeline`]: its first middleware puts the context of the
-//! dispatch and the logger of the request the host opened in place, [`seed`],
-//! and then come the routes the plugins of the engine register in their
-//! setups, the viewer, the landing page and the login of Zitadel, each of
-//! which the host hands a request where its own routing reaches it.
+//! A plugin of the app is the record of [`crate::plugin::read`], the keys the host
+//! reports of its object: its name, its strategy, its roles, its dependencies, its
+//! hook `onExecute` and the other hooks of Envelop and Yoga it holds, which fail
+//! the boot. Its middleware and the routes its setup registers run in the hono of
+//! the host, `aosabi/pylon`, as do the routes and the middleware of the app, the
+//! base pipeline and the children of the app. So the app the engine boots holds no
+//! route of the app and installs no base pipeline, [`App::hosted_pipeline`]: its
+//! first middleware puts the context of the dispatch and the logger of the request
+//! the host opened in place, [`seed`], and then come the routes the plugins of the
+//! engine register in their setups, the login of Zitadel, which the host hands a
+//! request where its own routing reaches it.
 //!
 //! The boot runs the two passes of [`aosabi_core::boot`] with the GraphQL layer
 //! built between them, the server of `graphql-over-http` over the schema of the
 //! app, which the function `answer` of that crate answers with, mounted on `*`
-//! where the boot of a Rust app mounts its handler, and keeps that server
-//! beside the app, [`Booted`]. The host routes a request of the GraphQL
-//! endpoint in its own hono, so the engine hands it to that server with no
-//! router, [`crate::endpoint`], and the router and the chain of the port of
-//! hono run for the routes of the plugins of the engine and its not found
-//! handler alone.
+//! where the boot of a Rust app mounts its handler, and keeps that server beside
+//! the app, [`Booted`]. The host routes a request of the GraphQL endpoint in its
+//! own hono, so the engine hands it to that server with no router,
+//! [`crate::endpoint`], and the router and the chain of the port of hono run for
+//! the routes of the plugins of the engine, the login of Zitadel, alone.
 //!
 //! A boot with no handle of a graphql object, [`ABSENT`], boots the logger
 //! alone, before the glue of the app runs, so a logger call of the app at the
@@ -112,9 +114,9 @@ use std::{
 
 use aosabi::{
     AppConfig,
-    BUILTINS,
     ExecutionOutcome,
-    IntoApp as _, //
+    IntoApp as _,
+    MaskedErrors, //
 };
 use aosabi_core::{
     App,
@@ -204,7 +206,7 @@ const POLLS: usize = 1_000_000;
 /// The booted app and the GraphQL layer it answers its endpoint with.
 pub struct Booted {
     /// The app of the engine, the routes the plugins of the engine register
-    /// and its not found handler.
+    /// in their setups.
     pub app: BootedApp,
     /// The server of `graphql-over-http` over the schema of the app, which
     /// the function `answer` of that crate answers the GraphQL endpoint with.
@@ -222,6 +224,8 @@ thread_local! {
     static VARS: RefCell<Vec<(String, String)>> = const { RefCell::new(Vec::new()) };
     /// The environment of a request over [`VARS`], made once after they change.
     static ENV: RefCell<Option<Rc<dyn core::any::Any>>> = const { RefCell::new(None) };
+    /// Whether [`seed_keys`] keyed the hashes of this thread.
+    static SEEDED: Cell<bool> = const { Cell::new(false) };
 }
 
 /// Returns the environment of a request of the app, `c.env`: the variables of
@@ -278,20 +282,22 @@ pub fn app() -> Option<Rc<Booted>> {
 /// buffer and the handle `graphql` of its graphql object, or the logger alone
 /// where `graphql` is [`ABSENT`], and returns 0 or the address of the message
 /// of the failure.
+///
+/// Either boot tries once at its end to key the hashes of the thread,
+/// [`seed_keys`], which keys it where the global scope of the host hands
+/// random values.
 pub fn boot(len: u32, graphql: u32) -> usize {
     let record = host::input(len);
-    if graphql == ABSENT {
-        return match prime(&record) {
-            Ok(()) => 0,
-            Err(message) => host::output(message.as_bytes()),
-        };
-    }
-    let roots = ROOT_NAMES.map(|name| value::boot_member(graphql, name).unwrap_or(ABSENT));
-    match request::with_current(BOOT, || boot_from(&record, roots)) {
-        Ok(app) => {
-            APP.with_borrow_mut(|slot| *slot = Some(Rc::new(app)));
-            0
-        }
+    let booted = if graphql == ABSENT {
+        prime(&record).map_err(String::from)
+    } else {
+        let roots = ROOT_NAMES.map(|name| value::boot_member(graphql, name).unwrap_or(ABSENT));
+        request::with_current(BOOT, || boot_from(&record, roots))
+            .map(|app| APP.with_borrow_mut(|slot| *slot = Some(Rc::new(app))))
+    };
+    seed_keys();
+    match booted {
+        Ok(()) => 0,
         Err(message) => host::output(message.as_bytes()),
     }
 }
@@ -340,16 +346,13 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     let ir = reader.text().ok_or("the boot record holds no IR")?;
     let canary = canary_resolvers(&mut reader).ok_or(BROKEN)?;
     let schema = crate::prebuilt::schema_record_of(schema, ir, &canary)?;
-    let graphiql = flag(
+    let introspection = flag(
         reader
             .byte()
-            .ok_or("the boot record holds no graphiql byte")?,
+            .ok_or("the boot record holds no introspection byte")?,
     );
-    let landing_page = flag(
-        reader
-            .byte()
-            .ok_or("the boot record holds no landing byte")?,
-    );
+    let masks = flag(reader.byte().ok_or(BROKEN)?) == Some(true);
+    value::set_masks(masks);
     request::set_fast(reader.byte().ok_or(BROKEN)? == 1);
     value::set_project(reader.byte().ok_or(BROKEN)? == 1);
     aosabi_http::fetch::response::set_listed_text_type(reader.byte().ok_or(BROKEN)? != BUN);
@@ -386,6 +389,11 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
             slots.push(PluginSlot::new(read.plugin));
         }
     }
+    let max_tokens = match reader.byte().ok_or(BROKEN)? {
+        0 => None,
+        1 => Some(reader.word().ok_or(BROKEN)?),
+        _ => return Err(String::from(BROKEN)),
+    };
     value::set_identity_map(identity);
     // A pass of the host made the root logger and set the line of each
     // request, which the boot keeps: `false` turns the line off and keeps the
@@ -393,14 +401,15 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     let configured = CONFIGURED.get();
     let access = access_log_enabled();
     let config = AppConfig {
-        graphiql,
-        landing_page,
+        introspection,
+        masked_errors: masks.then_some(MaskedErrors::On),
         logger: if configured {
             Some(LoggerOption::Enabled(false))
         } else {
             logger
         },
         plugins: Some(PluginList::new(slots)),
+        max_tokens,
         ..AppConfig::default()
     };
     let options = HandlerOptions {
@@ -413,7 +422,7 @@ fn boot_from(record: &[u8], roots: [u32; 3]) -> Result<Booted, String> {
     };
     ROOTS.set(roots);
     #[cfg(feature = "execute")]
-    crate::execute::set_service(service(&schema).map_err(|error| error.to_string())?);
+    crate::execute::set_service(service(&schema, max_tokens).map_err(|error| error.to_string())?);
     let mut app = App::new(HostFragment).hosted_pipeline().into_app();
     app.use_boxed("*", seed());
     let booted = run(boot_engine(app, config, options));
@@ -477,10 +486,12 @@ async fn boot_engine(
 
 /// Returns the service of the app over the schema record `schema`, the
 /// schema, the roots and the type resolvers the handler of Yoga runs over,
-/// which the executor of a test build runs a request on below HTTP.
+/// under the cap `max_tokens` of the configuration where it sets one, which
+/// the executor of a test build runs a request on below HTTP.
 #[cfg(feature = "execute")]
 fn service(
     schema: &aosabi_core::boot::SchemaRecord,
+    max_tokens: Option<u32>,
 ) -> Result<aosabi_core::Service, aosabi_core::CreateSchemaError> {
     let mut build_side = aosabi_core::ResolverMap::default();
     for rule in schema.resolve_types {
@@ -489,10 +500,14 @@ fn service(
             aosabi_core::glue::resolve_type::type_resolver(rule),
         );
     }
-    aosabi_core::Service::builder(schema.type_defs)
+    let builder = aosabi_core::Service::builder(schema.type_defs)
         .roots(HostFragment.resolvers())
-        .resolvers(build_side)
-        .build()
+        .resolvers(build_side);
+    match max_tokens {
+        Some(max_tokens) => builder.max_tokens(max_tokens),
+        None => builder,
+    }
+    .build()
 }
 
 /// Reads the type resolvers of the form of the canary at the cursor of
@@ -525,12 +540,10 @@ fn flag(byte: u8) -> Option<bool> {
     }
 }
 
-/// The built in plugins of the boot: the viewer and the landing page of the
-/// facade, and before every plugin of a pass the plugin of [`finish_plugin`].
+/// The plugins the host hands the boot: before every plugin of a pass the
+/// plugin of [`finish_plugin`].
 const HOST_BUILTINS: Builtins = Builtins {
     first: Some(finish_plugin),
-    viewer: BUILTINS.viewer,
-    unhandled_route: BUILTINS.unhandled_route,
 };
 
 /// Returns the plugin that makes the reads of the thrown errors of
@@ -720,6 +733,43 @@ pub(crate) fn logger_config(object: &JsValue) -> LoggerConfig {
         sink: None,
         job_level,
     }
+}
+
+/// Keys the keyed hashes of this thread from the randomness of the host, once.
+///
+/// A map of the engine hashes its keys with the state
+/// `aosabi_json::value::KeyState` takes when the map is made, the key
+/// [`aosabi_json::value::seed`] stores for the thread or the fixed key, and on
+/// `wasm32-unknown-unknown` every map takes that state, the maps of the JSON reader
+/// that hold the variables of a request among them. The fixed key is public, so
+/// without a key a client can send keys that collide and cost time quadratic in
+/// their count. The boot calls it once at its end, and each export that decodes a
+/// record of the host into values calls it before it decodes one, `fetch`, `ctx`,
+/// `logger` and `publish`, and the first of those calls the host hands sixteen
+/// bytes of [`HostRandom`] keys the thread. So a host whose global scope hands
+/// random values, Node and Bun among them, holds the key from its boot on, and
+/// workerd, which refuses them in the global scope where the host boots the module,
+/// from the first of those calls in a request or another event of the Worker. A
+/// host that hands no bytes leaves the thread without a key, and the next call
+/// tries again. A request to the endpoint or to the app of the engine on a thread
+/// without a key calls `aosabi_core::random::seed_keys`, which keys the thread of
+/// the native library for Bun from the source of its standard library and finds
+/// none on `wasm32-unknown-unknown`, where the request answers the refusal of
+/// `aosabi_core::random`, the status 503 with the text of `NO_RANDOMNESS` and no
+/// header field, before the engine reads any part of it. So the module answers no
+/// request under the fixed key. A thread keyed before keeps its key, which `seed`
+/// answers.
+pub fn seed_keys() {
+    if SEEDED.get() {
+        return;
+    }
+    let mut key = [0; 16];
+    if HostRandom.fill(&mut key).is_err() {
+        return;
+    }
+    SEEDED.set(true);
+    // A key stored on this thread before stays the key.
+    let _ = aosabi_json::value::seed(key);
 }
 
 /// The randomness of the host, the bytes `crypto.getRandomValues` of the host

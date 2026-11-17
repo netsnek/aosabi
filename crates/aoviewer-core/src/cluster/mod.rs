@@ -10,10 +10,10 @@
 //!
 //! [`Clustering::pick`] places the nodes of a [`Schema`]'s graph into
 //! clusters. The nodes it places are every node of the graph but the roots,
-//! which are pages of their own. The clusters, the other bucket and the types
-//! outside of `zitadel-gql` add up to 75 of its 77 composite types. The two
-//! types the counts leave out are its query and its mutation root, so every
-//! node but the roots is placed.
+//! which are pages of their own. On the largest measured schema the clusters,
+//! the other bucket and the types outside add up to 75 of its 77 composite
+//! types. The two types the counts leave out are its query and its mutation
+//! root, so every node but the roots is placed.
 //!
 //! Three sources place the nodes.
 //!
@@ -105,7 +105,7 @@ pub const MAX_DECLARED: usize = 256;
 /// The most globs of one declared cluster [`Clustering::pick`] reads.
 ///
 /// A longer list is cut after this many globs, the cap of `hide=` as well,
-/// [󰀁](crate::transform::MAX_HIDE_GLOBS).
+/// [`MAX_HIDE_GLOBS`](crate::transform::MAX_HIDE_GLOBS).
 pub const MAX_DECLARED_GLOBS: usize = 64;
 
 /// The size under which an automatic group merges into its strongest
@@ -115,8 +115,7 @@ const SMALL: usize = 3;
 /// The smallest size cap of a cluster.
 const MIN_CAP: usize = 24;
 
-/// The divisor of the size cap, the count of boxes docs/aoviewer.md gives as
-/// the bound of a cluster map.
+/// The divisor of the size cap, the count of boxes that bounds a cluster map.
 ///
 /// The size cap it enters as the divisor bounds the size of a part and not the
 /// count of the clusters, so the map of a large schema can hold more boxes

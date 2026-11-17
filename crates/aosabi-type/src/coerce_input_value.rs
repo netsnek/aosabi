@@ -737,8 +737,11 @@ where
 
 /// Reports the first key of a one of object when its coerced value is null.
 ///
-/// The keys of a coerced object are field names, none of which is an array
-/// index, so its first key in insertion order is `keys[0]` of `Object.keys`.
+/// The second half of the `isOneOf` check, which names the null at the path
+/// of its key and not the whole object, so an object whose fields were
+/// coerced where they stand reports it as well. The keys of a coerced object
+/// are field names, none of which is an array index, so its first key in
+/// insertion order is `keys[0]` of `Object.keys`.
 fn check_one_of_null<F>(
     coerced_value: &JsObject,
     on_error: &mut F,

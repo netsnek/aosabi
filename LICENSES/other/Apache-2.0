@@ -2,11 +2,12 @@ Valid-License-Identifier: Apache-2.0
 SPDX-URL: https://spdx.org/licenses/Apache-2.0.html
 Usage-Guide:
   Do not use for new code. The Apache License 2.0 is the license of the code
-  Aosabi copies or translates from Pylon, of the documentation texts the
-  engine carries from TypeScript, and one of the two licenses a fork under
-  third_party/ offers. A file that carries such code names the license in its
-  SPDX line, together with MIT where Aosabi's own code is mixed in, and says
-  in its header that it was changed, as section 4 of the license asks:
+  Aosabi copies or translates from Pylon, of the JSDoc parser it translates
+  from TypeScript, of the documentation texts the engine carries from
+  TypeScript, and one of the two licenses a fork under third_party/ offers. A
+  file that carries such code names the license in its SPDX line, together
+  with MIT where Aosabi's own code is mixed in, and says in its header that it
+  was changed, as section 4 of the license asks:
     SPDX-License-Identifier: MIT AND Apache-2.0
   The text below is the LICENSE file of Pylon as it reads at the commit Aosabi
   follows.

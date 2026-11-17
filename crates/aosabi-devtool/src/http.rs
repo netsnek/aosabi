@@ -4,7 +4,8 @@
  * tables of the HTTP layer and drives the Node connection of the fork of
  * hyper in process.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The tables are those of Node 24.13.0 that
+ * aosabi-http and the fork carry, and the connection is node1 of the fork.
  */
 
 //! The primitive `http` of the seam.
@@ -12,7 +13,7 @@
 //! - The flag `--tables` prints `aosabi_http::node::STATUS_CODES` as the object
 //!   `STATUS_CODES` of Node, `hyper::ext::NODE_METHODS` as `METHODS`, the
 //!   bound of a head as `maxHeaderSize`, and every bound of `NodeLimits`,
-//!   which `30_http_tier1` compares with the pinned Node.
+//!   which a check of the HTTP layer compares with the pinned Node.
 //! - The flag `--requests PATH` answers every request line of the file, one
 //!   response line each. A request line is
 //!   `{"id", "writes": [base64, ...], "pauses_ms": [...], "shut"}`, the
@@ -55,8 +56,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "http";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M5";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "http";
 
 /// The command line of the `http` primitive.
 pub static GRAMMAR: Grammar = Grammar {

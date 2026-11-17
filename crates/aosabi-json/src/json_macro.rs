@@ -2,7 +2,9 @@
 /*
  * aosabi-json: the macro json!, exported at the root of the crate.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The macro builds an object literal with
+ * its keys in source order, the twin of a JavaScript object literal such as
+ * the details of a ServiceError and the fields of a log record.
  */
 
 //! The macro `json!`.

@@ -13,8 +13,9 @@
 //! resolvers are the specs of the table, with no scalar bound. A table of
 //! [`Mode::Service`] becomes a [`Service`], so its root objects go through the
 //! resolver wrapping of aosabi-core and the seven scalars it adds are bound,
-//! and the factory of its root `Query` stays beside the service for the
-//! operation `project`. Both run a request through `run_request` of aosabi-execute, which is the
+//! and the factories of its roots and the text of its schema stay beside the
+//! service, for the operation `project` and for the app the operation
+//! `revisions` boots over the table. Both run a request through `run_request` of aosabi-execute, which is the
 //! one pipeline a served application runs through too, and a subscription
 //! through `run_subscription` of the same crate, which the service reaches
 //! through [`Service::subscribe`] with the policy of Network.
@@ -31,7 +32,12 @@
 
 use std::{
     rc::Rc,
-    sync::Arc, //
+    sync::Arc,
+    task::{
+        Context,
+        Poll,
+        Waker, //
+    }, //
 };
 
 use aosabi_core::{
@@ -40,6 +46,11 @@ use aosabi_core::{
     Resolvers,
     Service,
     carrier::CarrierPolicy,
+    kernel::execute_closed::{
+        Execute,
+        Operation,
+        ResultStream, //
+    },
     make_executable_schema,
     resolvers::resolvers_to_graphql_resolvers::read_root_member, //
 };
@@ -63,11 +74,15 @@ use aosabi_execute::{
         Agent,
         AgentOptions, //
     },
+    result::ExecutionResult,
     value::{
         Completion,
+        ContextValue,
         Value, //
     }, //
 };
+use aosabi_json::JsValue;
+use aosabi_lang::REQUEST_TOKENS;
 use aosabi_type::{
     ObjMap,
     ResolverHandle,
@@ -120,9 +135,12 @@ enum Runner {
     Service {
         /// The service.
         service: Service,
-        /// The factory of the root `Query` the service holds, which
-        /// [`Session::query_root`] answers.
-        query: Option<RootFactory>,
+        /// The text of its schema, which [`Session::app_parts`] answers.
+        type_defs: &'static str,
+        /// The factories of the roots the service holds, whose root `Query`
+        /// [`Session::query_root`] answers and all of which
+        /// [`Session::app_parts`] answers.
+        roots: Resolvers,
     },
 }
 
@@ -253,11 +271,49 @@ impl Session {
         Some(subscribed)
     }
 
+    /// Hands the id `id` of a persisted document to the `Execute` of the
+    /// table `name` and returns the results its stream yields.
+    ///
+    /// A table of [`Mode::Plain`] runs it through its general executor with a
+    /// context value that holds nothing, and a table of [`Mode::Service`]
+    /// through its service with the policy of Network. Returns `None` when
+    /// the session holds no table of that name.
+    pub fn persisted(&self, name: &str, id: u32) -> Option<Vec<ExecutionResult>> {
+        let operation = Operation::Persisted { id };
+        let results = match self.tables.get(name)? {
+            Runner::Plain(executor) => {
+                let context: ContextValue = Rc::new(());
+                ready_results(Execute::execute(
+                    executor,
+                    operation,
+                    &JsValue::Undefined,
+                    &context,
+                ))
+            }
+            Runner::Service { service, .. } => ready_results(Execute::execute(
+                service,
+                operation,
+                &JsValue::Undefined,
+                &CarrierPolicy::NETWORK,
+            )),
+        };
+        Some(results)
+    }
+
     /// Returns the schema of the table `name`, `None` when the session holds no such table.
     pub fn schema(&self, name: &str) -> Option<&Arc<Schema>> {
         match self.tables.get(name)? {
             Runner::Plain(executor) => Some(&executor.schema),
             Runner::Service { service, .. } => Some(service.schema()),
+        }
+    }
+
+    /// Returns the service of the table `name`, `None` when the session holds
+    /// no such table of [`Mode::Service`].
+    pub fn service(&self, name: &str) -> Option<&Service> {
+        match self.tables.get(name)? {
+            Runner::Plain(_) => None,
+            Runner::Service { service, .. } => Some(service),
         }
     }
 
@@ -267,9 +323,37 @@ impl Session {
     pub fn query_root(&self, name: &str) -> Option<(&SharedSchema, &RootFactory)> {
         match self.tables.get(name)? {
             Runner::Plain(_) => None,
-            Runner::Service { service, query } => Some((service.schema(), query.as_ref()?)),
+            Runner::Service { service, roots, .. } => {
+                Some((service.schema(), roots.query.as_ref()?))
+            }
         }
     }
+
+    /// Returns the text of the schema and the factories of the roots of the
+    /// table `name`, which an app booted over the table takes, `None` when the
+    /// session holds no such table of [`Mode::Service`].
+    pub fn app_parts(&self, name: &str) -> Option<(&'static str, Resolvers)> {
+        match self.tables.get(name)? {
+            Runner::Plain(_) => None,
+            Runner::Service {
+                type_defs, roots, ..
+            } => Some((type_defs, roots.clone())),
+        }
+    }
+}
+
+/// Returns the results `stream` yields until it ends or waits.
+///
+/// The stream of a persisted document yields its one result on the first
+/// poll and ends on the second, so no waker is ever woken.
+fn ready_results<S: ResultStream<Item = ExecutionResult>>(stream: S) -> Vec<ExecutionResult> {
+    let mut stream = Box::pin(stream);
+    let mut context = Context::from_waker(Waker::noop());
+    let mut results = Vec::new();
+    while let Poll::Ready(Some(result)) = stream.as_mut().poll_next(&mut context) {
+        results.push(result);
+    }
+    results
 }
 
 /// Builds the executor of a table of [`Mode::Plain`].
@@ -293,6 +377,7 @@ fn plain_runner(table: &Table) -> Result<Runner, CreateSchemaError> {
         schema,
         root_value: Arc::new(|| Value::Undefined),
         leaf_serializers: None,
+        max_tokens: REQUEST_TOKENS,
     }))
 }
 
@@ -329,17 +414,20 @@ fn plain_binding(spec: &Arc<Spec>, subscription: bool) -> FieldBinding {
 
 /// Builds the service of a table of [`Mode::Service`].
 fn service_runner(mut table: Table) -> Result<Runner, CreateSchemaError> {
-    let query = root_factory(&mut table, "Query");
     let roots = Resolvers {
-        query: query.clone(),
+        query: root_factory(&mut table, "Query"),
         mutation: root_factory(&mut table, "Mutation"),
         subscription: root_factory(&mut table, "Subscription"),
     };
     // A service keeps its SDL text for the life of the process, so the text
     // of a table outlives the table, also one the run drops.
     let type_defs: &'static str = Box::leak(table.sdl.into_boxed_str());
-    let service = Service::builder(type_defs).roots(roots).build()?;
-    Ok(Runner::Service { service, query })
+    let service = Service::builder(type_defs).roots(roots.clone()).build()?;
+    Ok(Runner::Service {
+        service,
+        type_defs,
+        roots,
+    })
 }
 
 /// Returns the factory of the root object `type_name`, `None` when the table

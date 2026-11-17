@@ -3,10 +3,8 @@
  * homa endpoint recv: reassembly, the answers of a receiver and the checks of
  * every packet taken.
  *
- * The rules are those of receiving, of LIMITS and of retransmission in the
- * Homa design note, first version, homa/design-v1.md section 2.4, lines 504 to
- * 565, with the additions of its section 1.5, lines 282 to 320, and the check
- * of a destination port of the second version, homa/design.md section 7.3.
+ * The rules are those of receiving, of LIMITS and of retransmission, with the
+ * check of a destination port.
  */
 
 //! The receiving half of the endpoint.

@@ -5,47 +5,36 @@
  *
  * The generated files hold data only and every drawing function lives here,
  * so the whole visual language is restyled by editing this one file, which a
- * rerun keeps (DOCUMENTED, docs/documentation-generator.md sections 3 and
- * 8.1).
+ * rerun keeps.
  */
 
 // The file carries no schema text. Every string of a schema reaches these
-// functions as a string literal of a generated file, and a string is shown
-// as text and never read as markup, so no description runs as Typst
-// (DOCUMENTED, docs/documentation-generator.md section 8.2).
+// functions as a string literal of a generated file, and a string is shown as
+// text and never read as markup, so no description runs as Typst.
 //
 // A chapter imports the functions with `#import "/sabi-theme.typ": *`, and
 // the main file applies the page setup with `#show: sv-setup`, or
-// `#show: sv-setup.with(dark: true)` for a document in the dark theme
-// (DOCUMENTED, docs/documentation-generator.md section 9, paper is light by
-// default).
+// `#show: sv-setup.with(dark: true)` for a document in the dark theme.
 //
 // Every coordinate of a diagram is a length in points, a centipixel of the
 // scene times 3/400, so one pixel of the scene is `sv-px`.
 
 // The monospace face of every diagram, of every name and of every code span.
 // Sabi Mono is the ASCII subset of this face, so a box drawn here has the
-// widths the layout measured (DOCUMENTED, docs/aoviewer.md section 4.1, and
-// PROVEN, typst-assets 0.15.1, files/fonts/).
+// widths the layout measured.
 #let sv-mono = "DejaVu Sans Mono"
 
 // The face of the prose. The Typst asset crate carries no proportional sans
 // text face, and Libertinus Serif is one of its two text faces, NewCM10 the
-// other (PROVEN, typst-assets 0.15.1, src/lib.rs, `fonts()`, which bundles
-// Libertinus Serif, NewCM10, NewCMMath and DejaVu Sans Mono alone). The Foxit
-// Sans files beside them in files/fonts/ are the PDF standard fonts of its
-// `pdf` module and are not offered to a document (PROVEN, the same file,
-// module `pdf`).
+// other. The Foxit Sans files beside them in files/fonts/ are the PDF
+// standard fonts of its `pdf` module and are not offered to a document.
 #let sv-serif = "Libertinus Serif"
 
 // One pixel of a scene, which is 0.75 pt, since a pixel is 1/96 inch and a
-// point 1/72 inch (DOCUMENTED, CSS Values and Units Module Level 3, the
-// absolute lengths).
+// point 1/72 inch.
 #let sv-px = 0.75pt
 
-// The measures of a box, of a chip and of an edge (DOCUMENTED,
-// docs/aoviewer.md sections 4.1, 4.2 and 4.4, and ASSUMED where
-// crates/aoviewer-core/src/render_svg/mod.rs marks its own measure so).
+// The measures of a box, of a chip and of an edge.
 #let sv-header = 30 * sv-px
 #let sv-row = 22 * sv-px
 #let sv-padding = 12 * sv-px
@@ -69,20 +58,17 @@
 #let sv-notch-half = 4 * sv-px
 
 // The cells a header gives the letter badge, the cells between the name and
-// the type of a row, and the cells of one mark of a row (PROVEN,
-// BADGE_CELLS, GAP_CELLS and MARK_CELLS in
-// crates/aoviewer-core/src/layout/measure.rs).
+// the type of a row, and the cells of one mark of a row.
 #let sv-badge-cells = 3
 #let sv-gap-cells = 2
 #let sv-mark-cells = 2
 
 // Returns the advance of one glyph of the monospace face at `size`, 1233 of
-// 2048 em (ASSUMED, docs/aoviewer.md section 4.1).
+// 2048 em.
 #let sv-cell(size) = size * 1233 / 2048
 
 // The colours of both themes: the neutrals, the brand accent of links, and
-// the accent and the header tint of each of the six kinds (DOCUMENTED,
-// docs/aoviewer.md section 4.3).
+// the accent and the header tint of each of the six kinds.
 #let sv-palettes = (
   light: (
     canvas: rgb("#F5F6F8"),
@@ -116,7 +102,7 @@
   ),
 )
 
-// The letter badge of each kind (DOCUMENTED, docs/aoviewer.md section 4.3).
+// The letter badge of each kind.
 #let sv-letters = (
   object: "O",
   input: "IN",
@@ -136,17 +122,13 @@
 // The page setup of the document, applied as `#show: sv-setup`.
 //
 // The page is an A4 landscape page with margins of 2 cm, a body of 728.5 pt
-// by 481.9 pt (ASSUMED for the paper and the margins). The page budget of a
-// diagram limits its width to 1400 px at 13 px text and says nothing of its
-// height (DOCUMENTED, docs/documentation-generator.md section 6.2). Fitted to
-// the width of the body alone, a diagram of that width prints its 13 px text
-// at 6.76 pt, above the 6.5 pt the same section names, and the 11 px text of
-// its chips and stub page numbers at 5.72 pt, below it. The height fit of
-// `sv-diagram` scales a diagram taller than 614.4 pt, 819.2 px, below two
-// thirds, so its 13 px text prints below 6.5 pt although it is inside the
-// budget (ASSUMED, the arithmetic of these measures and of
-// `sv-diagram-share`, with the 13 px and the 11 px DOCUMENTED,
-// docs/aoviewer.md section 4.1).
+// by 481.9 pt. The page budget of a diagram limits its width to 1400 px at 13
+// px text and says nothing of its height. Fitted to the width of the body
+// alone, a diagram of that width prints its 13 px text at 6.76 pt, above the
+// 6.5 pt the same section names, and the 11 px text of its chips and stub
+// page numbers at 5.72 pt, below it. The height fit of `sv-diagram` scales a
+// diagram taller than 614.4 pt, 819.2 px, below two thirds, so its 13 px text
+// prints below 6.5 pt although it is inside the budget.
 #let sv-setup(dark: false, body) = {
   let mode = if dark { "dark" } else { "light" }
   let p = sv-palettes.at(mode)
@@ -193,8 +175,7 @@
 
 // A mark: the badge of a kind, the filled mark of a deprecated member, the
 // hollow mark of a member its description marks deprecated, the mark of a
-// Relay connection and the mark of a root (DOCUMENTED, docs/aoviewer.md
-// sections 3.10 and 4.3).
+// Relay connection and the mark of a root.
 #let sv-mark(name) = context {
   let p = sv-palette()
   let r = 0.25em
@@ -296,10 +277,9 @@
   start
 }
 
-// A table, its header an array of cells and each row an array of cells,
-// every cell an array of inlines. A row is cut or filled to the columns of
-// the header, as a GitHub table is (DOCUMENTED, the GitHub Flavored Markdown
-// specification section 4.10).
+// A table, its header an array of cells and each row an array of cells, every
+// cell an array of inlines. A row is cut or filled to the columns of the
+// header, as a GitHub table is.
 #let sv-table(aligns, header, rows) = {
   let n = calc.max(1, header.len())
   let fit(cells) = {
@@ -356,8 +336,7 @@
   }
 }
 
-// Returns the dash pattern of an edge in `style` (DOCUMENTED,
-// docs/aoviewer.md section 4.4).
+// Returns the dash pattern of an edge in `style`.
 #let sv-dash(style) = if style == "union" {
   (6 * sv-px, 4 * sv-px)
 } else if style == "implements" {
@@ -370,8 +349,7 @@
 
 // A head whose tip is `tip`, pointing right when `dir` is 1 and left when it
 // is -1, filled for a field and a union member and hollow otherwise. A head
-// grows with the stroke it ends, so it stays wider than a trunk (ASSUMED, as
-// the SVG writer draws it).
+// grows with the stroke it ends, so it stays wider than a trunk.
 #let sv-head(tip, dir, style, width, p) = {
   let extra = calc.max(0pt, width - sv-edge-width)
   let length = sv-head-length + 2 * extra
@@ -406,7 +384,7 @@
 }
 
 // A trunk: the last 24 px of the edges into one target in its width, and one
-// head for all of them (DOCUMENTED, docs/aoviewer.md section 3.4, item 6).
+// head for all of them.
 #let sv-trunk(t, p) = {
   place(curve(
     stroke: (paint: p.edge, thickness: t.width),
@@ -522,8 +500,7 @@
   }
 }
 
-// The frame of a scalar, a pill in its tint with no body (DOCUMENTED,
-// docs/aoviewer.md section 4.3).
+// The frame of a scalar, a pill in its tint with no body.
 #let sv-pill(b, k, p, border) = {
   let radius = calc.min(b.h, sv-header) / 2
   place(rect(width: b.w, height: b.h, radius: radius, fill: k.tint))
@@ -532,8 +509,7 @@
 }
 
 // The hatching of a deprecated row whose band starts at `top`, lines at 45
-// degrees between the bar and the right side (DOCUMENTED, docs/aoviewer.md
-// section 3.10).
+// degrees between the bar and the right side.
 #let sv-hatch(w, top, p) = {
   let span = calc.max(0pt, w - sv-bar)
   place(dx: sv-bar, dy: top, block(width: span, height: sv-row, clip: true, {
@@ -552,7 +528,7 @@
 // deprecated, its name, its type in the muted ink and its marks, each mark in
 // the second of its two cells. A row without the height of its port sits in
 // the band of its position under the header, where the layout puts every
-// port (PROVEN, `port` in crates/aoviewer-core/src/layout/measure.rs).
+// port.
 #let sv-box-row(b, i, row, p) = {
   let (name, type-text) = (row.at(0), row.at(1))
   let y = row.at(2, default: b.y + sv-header + i * sv-row + sv-row / 2)
@@ -585,14 +561,12 @@
   }
 }
 
-// Returns the text of the row of the `count` inherited fields a box folds
-// (PROVEN, `inherited_label` in crates/aoviewer-core/src/scene/mod.rs).
+// Returns the text of the row of the `count` inherited fields a box folds.
 #let sv-inherited-text(count) = str(count) + " inherited"
 
-// Returns the text of the row that counts the `count` rows the box `b`
-// leaves out: `+N types` in a cluster box of the map, `+N values` in an enum
-// and `+N fields` otherwise (PROVEN, `more_label` in
-// crates/aoviewer-core/src/scene/mod.rs).
+// Returns the text of the row that counts the `count` rows the box `b` leaves
+// out: `+N types` in a cluster box of the map, `+N values` in an enum and
+// `+N fields` otherwise.
 #let sv-more-text(b, count) = {
   let what = if b.at("cluster", default: false) {
     "types"
@@ -605,11 +579,10 @@
 }
 
 // A box of a diagram: its frame, its header with the letter badge, the name
-// linked to the page of its type and the root mark, its rows, and the rows
-// of its folded inherited fields and of what it leaves out, which the data
-// gives as the counts `inherited` and `more` and the theme words, so both
-// texts change here. The layout measured the width of a box with these
-// words (PROVEN, `size` in crates/aoviewer-core/src/layout/measure.rs).
+// linked to the page of its type and the root mark, its rows, and the rows of
+// its folded inherited fields and of what it leaves out, which the data gives
+// as the counts `inherited` and `more` and the theme words, so both texts
+// change here. The layout measured the width of a box with these words.
 #let sv-box(b, p) = {
   let k = p.at(b.kind)
   let border = if b.at("focus", default: false) { sv-focus-border } else { sv-border }
@@ -645,8 +618,7 @@
 }
 
 // A chip: a count chip, or a stub chip whose page number follows it in a
-// printed document (DOCUMENTED, docs/documentation-generator.md section
-// 6.2).
+// printed document.
 #let sv-chip(c, p) = {
   let target = c.at("target", default: none)
   place(dx: c.x, dy: c.y, rect(
@@ -667,21 +639,19 @@
 }
 
 // The share of the height of a page a diagram takes at most, which leaves
-// room for the title and the breadcrumb above it on the same page (ASSUMED).
-// On the page of `sv-setup` it holds a diagram to 409.6 pt of height, so the
-// 13 px text of a diagram taller than 614.4 pt, and the 11 px text of one
-// taller than 519.9 pt, prints below 6.5 pt (ASSUMED, 0.85 of 481.9 pt, and
-// 9.75 pt or 8.25 pt of text times 409.6 over the height).
+// room for the title and the breadcrumb above it on the same page. On the
+// page of `sv-setup` it holds a diagram to 409.6 pt of height, so the 13 px
+// text of a diagram taller than 614.4 pt, and the 11 px text of one taller
+// than 519.9 pt, prints below 6.5 pt.
 #let sv-diagram-share = 0.85
 
-// A diagram, the call a generated file writes for a scene (DOCUMENTED,
-// docs/documentation-generator.md section 8.1): the edges, the trunks, the
-// boxes and the chips, drawn from the back to the front on the canvas, and
-// scaled down to the width of the page and to `sv-diagram-share` of its
-// height when it is larger. It is never scaled up. The width fit keeps the
-// 13 px text of a diagram inside the page budget at 6.5 pt or larger but not
-// the 11 px text of its chips and stub page numbers, and the height fit keeps
-// neither, as `sv-setup` and `sv-diagram-share` say.
+// A diagram, the call a generated file writes for a scene: the edges, the
+// trunks, the boxes and the chips, drawn from the back to the front on the
+// canvas, and scaled down to the width of the page and to `sv-diagram-share`
+// of its height when it is larger. It is never scaled up. The width fit keeps
+// the 13 px text of a diagram inside the page budget at 6.5 pt or larger but
+// not the 11 px text of its chips and stub page numbers, and the height fit
+// keeps neither, as `sv-setup` and `sv-diagram-share` say.
 #let sv-diagram(
   width: 0pt,
   height: 0pt,
@@ -708,8 +678,7 @@
   })
 }
 
-// An image of a diagram in place of its primitives, the light SVG file of
-// the tree under the flag `--typst-diagrams svg` (DOCUMENTED,
-// docs/documentation-generator.md section 8.1). `path` is a path from the
-// root of the tree, such as `/svg/type/Product.light.svg`.
+// An image of a diagram in place of its primitives, the light SVG file of the
+// tree under the flag `--typst-diagrams svg`. `path` is a path from the root
+// of the tree, such as `/svg/type/Product.light.svg`.
 #let sv-image(path, width: auto) = block(breakable: false, image(path, width: width))

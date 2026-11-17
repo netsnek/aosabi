@@ -3,7 +3,7 @@
  * aosabi-core resolvers resolvers_to_graphql_resolvers: the root resolvers
  * of a service.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/define-pylon.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
@@ -155,6 +155,9 @@ struct RootCall {
 /// source lines 426, 440 and 453.
 struct RootMember {
     /// The factory the member comes from.
+    ///
+    /// A weak handle keeps the allocation of its factory, so no other factory
+    /// takes the address the member is found by while the entry stands.
     factory: Weak<dyn Fn() -> Value + Send + Sync>,
     /// The member.
     value: Value,
@@ -188,12 +191,11 @@ pub struct RootMemberCounts {
 
 /// Returns the counts of the entries of the table of root members of the calling thread.
 ///
-/// The devtool answers them, so section 8 of `tests/notebooks/20_execute.ipynb`
-/// reads that a fill leaves no entry of a factory that is gone, over a root the
-/// devtool holds outside every schema. A service built from SDL keeps its
-/// factories alive after it is dropped, since its schema holds its types in a
-/// reference cycle with the scope of its build, which holds the bindings, so
-/// the entries of its roots stay live entries.
+/// The devtool answers them, over a root it holds outside every schema. A
+/// service built from SDL keeps its factories alive after it is dropped,
+/// since its schema holds its types in a reference cycle with the scope of
+/// its build, which holds the bindings, so the entries of its roots stay live
+/// entries.
 #[must_use]
 pub fn root_member_counts() -> RootMemberCounts {
     ROOT_MEMBERS.with_borrow(|members| {
@@ -222,8 +224,7 @@ fn member_key(root: &RootFactory, key: &str) -> Box<[u8]> {
 ///
 /// The read is the one of [`root_graphql_resolver`], with the key of the
 /// table made per call. The devtool reads a root through it outside every
-/// schema, so `tests/notebooks/20_execute.ipynb` drops a factory the table
-/// holds entries of, which no service built from SDL drops.
+/// schema.
 #[must_use]
 pub fn read_root_member(root: &RootFactory, key: &str) -> Value {
     root_member(root, &member_key(root, key), key)
@@ -402,7 +403,7 @@ fn root_binding(resolver: FieldResolverFn, subscribes: bool) -> FieldBinding {
 /// when no context is in place or none was set. A refused field throws the
 /// refusal synchronously, an original `GraphQLError` the executor locates at
 /// the field and the masking passes, so it reaches the caller as an error
-/// before the first yield. The rule is rule 9 of the plan's section KERNEL.
+/// before the first yield. It is rule 9 of the kernel's publish module.
 fn allowed(resolver: FieldResolverFn) -> FieldResolverFn {
     Arc::new(move |agent, source, args, context, info| {
         let policy = ambient_context().map_or(CarrierPolicy::NETWORK, |ctx| carrier_policy(&ctx));

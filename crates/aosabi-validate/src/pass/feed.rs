@@ -3,7 +3,8 @@
  * aosabi-validate pass feed: the stream of tokens the single pass pulls a
  * document from.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The token kinds are those of graphql-js that
+ * an executable document holds.
  */
 
 //! The feed of the single pass.

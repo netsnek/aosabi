@@ -14,9 +14,8 @@
 //! translates `createWrappingSchema` of `@graphql-tools/wrap` 11.1.9 and
 //! `astFromType` of `@graphql-tools/utils` 11.0.0, the wrapping schema of a
 //! remote. Every function keeps the name of the function it translates in snake
-//! case and follows its source line by line, because the exit numbers of the
-//! milestone are byte equality of the printed schema and of the invalid schema
-//! message.
+//! case and follows its source line by line, because the goal is byte equality
+//! of the printed schema and of the invalid schema message.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |
@@ -62,8 +61,7 @@
 //! The crate builds with no standard library and needs an allocator, because
 //! the bare metal build of a microcontroller card links it. The `std` feature
 //! is the configuration symbol of a host build and gates nothing today. There
-//! is no test in this crate, which is the rule of CONTRIBUTING.md section 3,
-//! and the judging notebook is `tests/notebooks/02_language.ipynb`.
+//! is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 

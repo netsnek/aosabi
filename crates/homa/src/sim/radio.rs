@@ -2,14 +2,11 @@
 /*
  * homa sim radio: half duplex LoRa radios with a time on air and collisions.
  *
- * The model is the Radio of the Homa design note, second version,
- * homa/design.md section 7.8, lines 2784 to 2815: LoRa with the time on air
- * of its section 6.2, lines 1754 to 1809, half duplex radios, channel
+ * The model is LoRa with its time on air, half duplex radios, channel
  * activity detection, collisions of packets that overlap in time at the same
  * spreading factor, and loss. The time on air is the formula of the SX1261/2
  * datasheet, revision 1.2, section 6.1.4, at 125 kHz, the coding rate 4/5, a
- * preamble of 8 symbols, the explicit header and the CRC, as section 6.2 of
- * the note reads it.
+ * preamble of 8 symbols, the explicit header and the CRC.
  */
 
 //! The simulated `LoRa` radios.

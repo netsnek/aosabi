@@ -15,10 +15,10 @@
 //! `@sentry/node` turns every call into a breadcrumb. The devtools sink
 //! writes through `process.stdout.write` and is no call of the console. A
 //! Rust process has no console object, so the lines that are `console.log` on
-//! the reference go through [󰀆](crate::console_log), which prints the line on
-//! standard output, and the line of the JSON sink, which is bytes the writer
-//! of `aosabi-json` makes, goes through [`log_utf8`], which prints those
-//! bytes as they are.
+//! the reference go through [`console_log!`](crate::console_log), which
+//! prints the line on standard output, and the line of the JSON sink, which
+//! is bytes the writer of `aosabi-json` makes, goes through [`log_utf8`],
+//! which prints those bytes as they are.
 //!
 //! A host with no standard output of its own, the module `core.wasm` of the
 //! TypeScript option, installs a writer under the same feature, which takes
@@ -32,7 +32,7 @@
 //! thread, which `set_watcher` installs, the one seam of the console an SDK
 //! reaches. The watcher runs after the print and on the thread of the caller,
 //! inside the request whose code wrote the line, so it reads the context of
-//! that request through [󰀄](crate::context::ambient_context).
+//! that request through [`ambient_context`](crate::context::ambient_context).
 //!
 //! The feature is read where the macro is defined, so the macro follows the
 //! features of this crate and not those of the crate that calls it, and a

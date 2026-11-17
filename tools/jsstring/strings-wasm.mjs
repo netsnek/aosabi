@@ -2,15 +2,14 @@
 /*
  * strings-wasm.mjs: writes aosabi-ts/strings.wasm, the module of the hand over
  * of strings between the wrapper and core.wasm through the JS String Builtins
- * of V8, the probe of round JSSTRING.
+ * of V8.
  *
  * Rust has no stable externref and no arrays of WasmGC, so the module is
- * assembled here by hand, as the probe of the lead assembles its module of one
- * function. It imports the memory of core.wasm as aosabi.memory and the
- * functions length, intoCharCodeArray and fromCharCodeArray of wasm:js-string,
- * which workerd links to the builtins of V8 when a Worker carries the
- * compatibility flag wasm_esm_integration_builtins (cloudflare/workerd
- * PR #7685), and exports two functions:
+ * assembled here by hand. It imports the memory of core.wasm as aosabi.memory
+ * and the functions length, intoCharCodeArray and fromCharCodeArray of
+ * wasm:js-string, which workerd links to the builtins of V8 when a Worker
+ * carries the compatibility flag wasm_esm_integration_builtins
+ * (cloudflare/workerd PR #7685), and exports two functions:
  *
  * - encode(string, at) writes the WTF-8 bytes of the string at `at` of the
  *   memory and answers their count: UTF-8 where the string is well formed, as

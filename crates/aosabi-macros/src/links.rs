@@ -3,8 +3,7 @@
  * aosabi-macros: the link from a member to its type.
  *
  * The link stands in for the `ts.Type` the checker hands the inference for a
- * member, and the refusals are rows of the table of
- * docs/schema-inference.md section 13.
+ * member, and the refusals are the ones a macro decides from the tokens alone.
  */
 
 //! The link from a member to its type, and the refusals a macro can decide

@@ -3,7 +3,9 @@
  * aosabi-core: the contract of the registry aosabi pull writes for a remote
  * schema.
  *
- * No reference file.
+ * No reference file. The module is the Rust counterpart of the interface
+ * RemoteRegistry, which a pulled registry compiles against with nothing of the
+ * federation.
  */
 
 //! The contract of a pulled registry.
@@ -30,8 +32,8 @@
 //! object, a `None` inside a list is `null`, a file is the host object it
 //! holds, and a date is a host object too, the `Date` a TypeScript registry
 //! types the argument as, which the federation writes as an input object with
-//! no field and sends as `{}`, quirk
-//! `Q83_FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT`.
+//! no field and sends as `{}`, quirk `FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT`.
+//! The federation builds on these traits and decides how a file travels.
 //!
 //! A record a delegation hands back keeps the remote object it was read from,
 //! so the executor reads every member of that object and not a view over the
@@ -214,7 +216,7 @@ impl IntoArgument for Date {
     /// argument, valid or not, as the input object `{}`. A host object carried
     /// through unread is what `ast_from_js_value` of the federation and the
     /// writer of the JSON model write as `{}`, so the outbound variables equal
-    /// the reference's, quirk `Q83_FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT` of
+    /// the reference's, quirk `FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT` of
     /// `aosabi-compat`.
     fn into_argument(&self) -> JsValue {
         JsValue::Opaque(Opaque(host_date(JsDate::from_time_value(self.get_time()))))
@@ -340,12 +342,13 @@ impl fmt::Debug for TypeName {
 /// A field with arguments on a remote object, the method signature of the
 /// reference registry.
 ///
-/// `A` is the arguments struct of the field and `R` what it returns. It is
-/// described as a callable with the parameters of `A` returning `R`, the method
-/// `orders(status?, limit?)` the reference writes, so a front that hands the
-/// member on presents it as the reference presents it. Its value is
-/// `undefined`, since the executor reads the member from the remote object a
-/// record keeps.
+/// `A` is the arguments struct of the field and `R` what it returns. The struct
+/// holds no value, since a pulled registry describes the remote and the
+/// federation makes the call. It is described as a callable with the parameters
+/// of `A` returning `R`, the method `orders(status?, limit?)` the reference
+/// writes, so a front that hands the member on presents it as the reference
+/// presents it. Its value is `undefined`, since the executor reads the member
+/// from the remote object a record keeps.
 pub struct Callable<A, R>(PhantomData<(A, R)>);
 
 impl<A, R> Callable<A, R> {

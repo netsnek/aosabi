@@ -7,7 +7,7 @@ socket of the system bus: the `EXTERNAL` authentication with the uid of the
 process, the little endian marshalling of every type the BlueZ API uses,
 method calls with their replies and errors, signals with match rules, and
 Unix file descriptors passed beside a message, which BlueZ hands for
-`AcquireWrite` and `AcquireNotify`.
+`AcquireWrite` and `AcquireNotify`. No Python package is taken.
 
 A value is written as Python writes it: `y` `n` `q` `i` `u` `x` `t` and `h`
 as int, `b` as bool, `d` as float, `s` `o` and `g` as str, `ay` as bytes, an

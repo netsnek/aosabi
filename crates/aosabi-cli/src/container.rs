@@ -1,10 +1,9 @@
-// SPDX-License-Identifier: MIT AND Apache-2.0
+// SPDX-License-Identifier: MIT
 /*
  * aosabi-cli: the container files and the image of the docker card.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/create-pylon/src/create-directory/files.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * The image builds in stages and serves port 3000 as a user without privileges,
+ * with container files of its own.
  */
 
 //! The container files and the image.

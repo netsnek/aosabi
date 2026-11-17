@@ -4,10 +4,11 @@
  *
  * Translation of _storeHeader of Node 24.13.0, lib/_http_outgoing.js:397-517
  * and :574-602, and of the constructor of ServerResponse,
- * lib/_http_server.js:195-213 and :488-494. It implements quirk Q44 of
- * docs/byte-equality.md section 13.1.
+ * lib/_http_server.js:195-213 and :488-494. It implements the quirk
+ * NODE_DATE_AND_LINES.
  */
-//! The head of an answer with Node's date and connection lines, quirk Q44.
+//! The head of an answer with Node's date and connection lines, quirk
+//! `NODE_DATE_AND_LINES`.
 
 use alloc::vec::Vec;
 
@@ -66,7 +67,7 @@ pub(crate) fn encode(
             body: has_body.then_some(BodyLength::Unknown),
             keep_alive,
             req_method: &mut req_method,
-            // Node's own lines carry capitals, quirk Q44.
+            // Node's own lines carry capitals, quirk NODE_DATE_AND_LINES.
             title_case_headers: cfg!(feature = "node-lines"),
             date_header: !cfg!(feature = "node-lines") && date.is_some(),
             #[cfg(not(feature = "std"))]
@@ -89,7 +90,8 @@ fn lines(parts: &mut Parts, request: &NodeHead, _: &NodeConfig, _: Option<&[u8]>
 }
 
 /// Appends Node's own lines after the record and returns whether the
-/// connection stays open after the answer (quirk Q44).
+/// connection stays open after the answer (quirk
+/// `NODE_DATE_AND_LINES`).
 ///
 /// The lines are `Date` unless the record names `date`, then, unless the
 /// record names `connection`, `Connection: keep-alive` with
@@ -121,7 +123,8 @@ fn lines(
     }
     let length = headers.contains_key(CONTENT_LENGTH);
     let encoding = headers.contains_key(TRANSFER_ENCODING);
-    // A chunked record on a 204 or a 304 is not kept alive, quirk Q30.
+    // A chunked record on a 204 or a 304 is not kept alive, quirk
+    // NODE_TE_ON_204_304.
     if cfg!(feature = "node-framing")
         && matches!(
             parts.status,
@@ -168,7 +171,7 @@ fn lines(
 }
 
 /// Appends `lines` after the record, with their spellings in its case map
-/// when the answer carries one (quirk Q28).
+/// when the answer carries one (quirk `NODE_RECORD_VERBATIM`).
 #[cfg(feature = "node-lines")]
 fn append(parts: &mut Parts, lines: Vec<(HeaderName, &'static str, HeaderValue)>) {
     #[cfg(feature = "node-record")]

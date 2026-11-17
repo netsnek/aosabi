@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-http: the Fetch Headers of a request and an answer.
+ *
+ * Derived from undici 7.18.2, MIT.
  */
 
 //! The Fetch `Headers`.
@@ -17,7 +19,7 @@
 //! character above U+00FF are refused with a `TypeError`, and a value loses its
 //! leading and trailing HTTP whitespace. A value with another control byte
 //! passes, which is why Node's own check of a record can still refuse it, quirk
-//! `Q59_NODE_RECORD_CHECK_500` of `docs/byte-equality.md` section 13.1.
+//! `NODE_RECORD_CHECK_500`.
 
 use core::fmt;
 use std::rc::Rc;

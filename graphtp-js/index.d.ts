@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 /*
- * graphtp: the types of the package, written by hand, as docs/graphtp-fetch.md section 3 of the
- * Aosabi repository gives them.
+ * graphtp: the types of the package, written by hand.
  */
 
 /**

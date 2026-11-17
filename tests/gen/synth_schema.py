@@ -8,27 +8,27 @@ The same seed writes the same bytes, and the notebook compares their SHA-256
 with the digest recorded beside the goldens before any tree is compared. Every
 type and field name is generic and copied from no application.
 
-The counts of synthetic-176 are those of the row `zitadel-gql`: 176 types, 93
-objects, 40 inputs, 21 interfaces, 10 enums, 12 scalars, 771 fields, 72
+The counts of synthetic-176 are those of the largest measured schema: 176 types,
+93 objects, 40 inputs, 21 interfaces, 10 enums, 12 scalars, 771 fields, 72
 arguments, 18 connection and 18 edge types, with 23 fields on the query root and
 25 on the mutation root. A field is a field of an object or an interface or an
 input field, and an enum value is no field, which is how the counts add up to 771.
-The larger schemas scale every count of that row by the number of types beside
-the twelve scalars, so the three sizes of the linear shape share one shape, and
-the types stand in domains of about 14 types that reference each other mostly
-inside the domain. The depth one neighbourhood of every type but the two roots
-and `PageInfo` therefore keeps its size from 2500 to 10,000 types, and the
-neighbours of all types together grow with the type count alone, which is the
-shape the linear pass is judged on.
+The larger schemas scale every count of that schema by the number of types
+beside the twelve scalars, so the three sizes of the linear shape share one
+shape, and the types stand in domains of about 14 types that reference each
+other mostly inside the domain. The depth one neighbourhood of every type but
+the two roots and `PageInfo` therefore keeps its size from 2500 to 10,000 types,
+and the neighbours of all types together grow with the type count alone, which
+is the shape the linear pass is judged on.
 
 The output is an introspection result in the shape the operation introspect of
-`tests/sidecar/graphql-js.mjs` answers, `{"data":{"__schema":..}}`, with the
-keys in the order of `getIntrospectionQuery` of graphql-js 16.12.0 under its
-four options and written the way `JSON.stringify` writes it. It carries the
-declared types alone, in the order a schema of the compatibility layer prints them, so the eight
-introspection types and the five specified directives a server adds are left
-out, and the five specified scalars carry no description. The transforms of the
-core fold the introspection types and the twelve branded scalars, the five
+the graphql-js sidecar answers, `{"data":{"__schema":..}}`, with the keys in the
+order of `getIntrospectionQuery` of graphql-js 16.12.0 under its four options
+and written the way `JSON.stringify` writes it. It carries the declared types
+alone, in the order a schema of the compatibility layer prints them, so the
+eight introspection types and the five specified directives a server adds are
+left out, and the five specified scalars carry no description. The transforms of
+the core fold the introspection types and the twelve branded scalars, the five
 specified ones among them, into the field `builtin` of `Transformed`. The
 specified directives are no types and never enter that field. All three parts
 are left out to keep text that graphql-js wrote out of this repository.
@@ -55,9 +55,8 @@ from .sdl import print_string
 #: The seed every synthetic schema is written from.
 SEED = 20260923
 
-#: The schemas the generator writes, by name, with their type counts. The plan
-#: names synthetic-176 and synthetic-5000 and gives the two other sizes of the
-#: linear shape no name, so they take the same form.
+#: The schemas the generator writes, by name, with their type counts. The sizes
+#: 2500 and 10,000 take the form of the names synthetic-176 and synthetic-5000.
 SCHEMAS = {
     "synthetic-176": 176,
     "synthetic-2500": 2500,
@@ -239,7 +238,7 @@ P_VALUE_DEPRECATED = 300
 MAX_ATTEMPTS = 64
 
 #: The composite kinds, object, interface and union, whose types the walks of
-#: `docs/aoviewer.md` section 2.3 count.
+#: aoviewer count.
 COMPOSITE_KINDS = ("OBJECT", "INTERFACE", "UNION")
 
 

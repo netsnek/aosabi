@@ -8,6 +8,14 @@ node_modules/
 # option
 .aosabi/
 
+# The schema the build of each example writes beside its manifest
+/examples/bookshelf/schema.graphql
+/examples/worker/schema.graphql
+
+# The native library a checkout builds and copies into the folder of a
+# platform package, which an app installs by the path of that folder
+/aosabi-ts-native/*/libaosabi.so
+
 # Python environment of the harness
 .venv/
 

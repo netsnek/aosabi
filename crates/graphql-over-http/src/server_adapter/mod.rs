@@ -16,10 +16,9 @@
 //! environment and the execution context of that request, [`ServerContext`],
 //! as `yoga.fetch(request, env, executionCtx)`. The hooks `onRequest` and
 //! `onResponse` of an app's plugin are [`ServerAdapterPlugin`], which the
-//! function calls at the points of the adapter (rule 2 of section YOGA of the
-//! old page of the plan). This module also holds the types every file of the
-//! directory shares: the request handler and the server context a fetch
-//! passes.
+//! function calls at the points of the adapter. This module also holds the
+//! types every file of the directory shares: the request handler and the
+//! server context a fetch passes.
 
 use std::rc::Rc;
 

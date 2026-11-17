@@ -50,6 +50,9 @@ use aosabi_json::{
 
 use crate::error::BuildError;
 
+/// The exit status of a run with a wrong invocation, which is `EX_USAGE` of
+/// `sysexits.h`.
+///
 /// [sysexits(3)]: https://man.freebsd.org/cgi/man.cgi?query=sysexits&sektion=3
 const EX_USAGE: u8 = 64;
 
@@ -130,9 +133,9 @@ fn introspect_app_data<R: Roots>() -> Result<JsValue, BuildError> {
 /// directory `package`, the object the inspect runner writes, from its
 /// source as rustc compiles it over the active set `cfg`.
 ///
-/// The inference is the one [󰀀](crate::build_source) runs, and nothing is
-/// validated and nothing is compiled, so the command `inspect` answers for a
-/// plain crate with no runner.
+/// The inference is the one [`build_source`](crate::build_source) runs, and
+/// nothing is validated and nothing is compiled, so the command `inspect`
+/// answers for a plain crate with no runner.
 ///
 /// # Errors
 ///

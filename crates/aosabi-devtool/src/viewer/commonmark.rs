@@ -2,6 +2,9 @@
 /*
  * aosabi-devtool viewer commonmark: the operation commonmark, the HTML the
  * CommonMark subset of the core writes for Markdown texts.
+ *
+ * The examples of the CommonMark specification 0.31.2 judge it, on the sections
+ * of its constructs.
  */
 
 //! The `commonmark` operation.

@@ -2,6 +2,8 @@
 /*
  * aosabi-execute promise_for_object: the result object of a selection set with promised fields.
  *
+ * Its order of settling is not the one of `promiseForObject` of graphql-js.
+ *
  * Derived from @graphql-tools/executor 1.5.1, cjs/execution/promiseForObject.js, MIT.
  * Derived from graphql-js 16.12.0, src/jsutils/promiseForObject.ts, MIT.
  */

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Guest B of the harness: the Fedora 43 cloud image on its own kernel, for the
-# user space engine in the raw IP and kernel module notebooks, 29_homa_raw and
-# 29_homa_kmod.
+# user space engine in the checks of Homa over raw IP and over its kernel
+# module.
 
 name = "B"
 description = "Fedora 43 cloud image for the user space engine of the raw IP and kernel module notebooks"

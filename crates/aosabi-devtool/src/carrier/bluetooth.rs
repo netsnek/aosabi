@@ -26,6 +26,12 @@
 //! realtime clock of the machine, whether `send` handed it to the bus or
 //! `recv` took it from RX, and its compact header, so a notebook sets the
 //! stamps of the driver beside those of its central.
+//!
+//! `baseline` on `gatt` answers whole messages in prefixed `AoFrame` alone,
+//! cut to values of the largest packet the data path sends at the `ATT_MTU`
+//! of the first write, on the same data path with no pace, first in first
+//! out, and ends the same way. `serve` and `baseline` on `channel` answer
+//! that the Linux socket of the channel waits on its L2CAP address.
 
 use std::{
     collections::VecDeque,
@@ -315,8 +321,8 @@ fn message_json(message: &Message) -> JsObject {
     object
 }
 
-/// Answers `serve` and `baseline` on the channel, whose Linux socket waits of
-/// the plan.
+/// Answers `serve` and `baseline` on the channel, whose Linux socket waits
+/// on its L2CAP address.
 pub(super) fn serve_channel() -> JsObject {
     let mut payload = JsObject::with_capacity(2);
     payload.insert("stopped", "not run");

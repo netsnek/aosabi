@@ -6,8 +6,8 @@
  * The rule that a deprecation filter never deletes a type it empties is a
  * translation of graphql-voyager src/introspection/introspection.ts:208-250 at
  * commit 656b8ddb4e7bec958d7300e2d737f632c7b5ba30, MIT, copyright
- * IvanGoncharov, whose notice travels in NOTICE section 4. A description line
- * that starts with the tag marks its member.
+ * IvanGoncharov, as the entry GraphQL Voyager of NOTICE names. A description
+ * line that starts with the tag marks its member.
  */
 
 //! The deprecation marks.
@@ -26,9 +26,9 @@
 //! The marks are the whole rule, and no type is ever deleted by it, not even
 //! one whose every field the graph hides, because a schema may carry the
 //! directive inconsistently and a live field may still point at a type whose
-//! fields are all deprecated. [󰀀](super::Transformed::hides) applies the
-//! filter to the members in the graph alone, and the documents list every
-//! member with its mark.
+//! fields are all deprecated. [`Transformed::hides`](super::Transformed::hides)
+//! applies the filter to the members in the graph alone, and the documents list
+//! every member with its mark.
 //!
 //! The marks cover the fields and input fields, the arguments of fields and
 //! the enum values. An argument of a directive has no element id, so it

@@ -2,7 +2,7 @@
 /*
  * aosabi-infer: the scalar table, the twelve scalars every schema declares.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/schema/scalars.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */

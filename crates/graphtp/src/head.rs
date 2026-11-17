@@ -5,7 +5,7 @@
  *
  * No analogue in the reference. Both heads, their sizes and their fields are
  * those of the specification, and the reader of a request head checks rules 1
- * to 4 of section 5.3.
+ * to 4.
  */
 
 //! The head of a request, its 3 bytes, and the head of an answer, its 2.
@@ -42,7 +42,7 @@ pub struct RequestHead {
     pub version: Version,
     /// The kind of the request.
     pub kind: Kind,
-    /// Whether the content is one zlib stream of the profile of section 3.2.
+    /// Whether the content is one zlib stream of the profile.
     pub compressed: bool,
     /// The length of the credential that follows the head, in bytes.
     pub credential_len: u16,
@@ -54,7 +54,7 @@ impl RequestHead {
 
     /// Reads the head at the start of the request `message`.
     ///
-    /// The checks are rules 1 to 4 of `docs/graphtp.md` section 5.3 in their
+    /// The checks are rules 1 to 4 of `Documentation/guides/graphtp.md` in their
     /// order, so a message that breaks two of them is refused by the first.
     ///
     /// # Errors
@@ -115,8 +115,7 @@ impl AnswerHead {
     ///
     /// # Errors
     ///
-    /// Returns [`WireError::Short`] for a message of fewer than 2 bytes, which
-    /// `docs/graphtp.md` section 5.4 reads as malformed.
+    /// Returns [`WireError::Short`] for a message of fewer than 2 bytes.
     pub fn parse(message: &[u8]) -> Result<AnswerHead, WireError> {
         let [status, substatus, ..] = *message else {
             return Err(WireError::Short);

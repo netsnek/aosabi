@@ -4,12 +4,12 @@
  * its descriptors and strings, its control endpoint and its two bulk
  * endpoints.
  *
- * No analogue on the reference side. The layouts are those of the FunctionFS
- * interface of include/uapi/linux/usb/functionfs.h and of
- * drivers/usb/gadget/function/f_fs.c at the tag v6.17 of Linux, read at
+ * No analogue on the reference side. It follows the FunctionFS interface of
+ * include/uapi/linux/usb/functionfs.h and of drivers/usb/gadget/function/f_fs.c
+ * at the tag v6.17 of Linux, read at
  * https://github.com/torvalds/linux/tree/v6.17, the descriptors of the USB 2.0
  * specification, sections 9.6.5 and 9.6.6, and the extended compat ID of the
- * Microsoft OS 1.0 descriptors.
+ * Microsoft OS 1.0 descriptors, and carries no code of Linux.
  */
 
 //! The bulk function over `FunctionFS`.

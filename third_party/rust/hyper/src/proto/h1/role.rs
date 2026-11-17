@@ -159,8 +159,7 @@ impl Http1Transaction for Server {
     fn parse(buf: &mut BytesMut, ctx: ParseContext<'_>) -> ParseResult<RequestLine> {
         debug_assert!(!buf.is_empty(), "parse called with empty buf");
 
-        // Under `node-llhttp` a head is read as llhttp reads it, quirks Q18
-        // to Q26.
+        // Under `node-llhttp` a head is read as llhttp reads it.
         if cfg!(feature = "node-llhttp") {
             return node_parse(buf, ctx);
         }
@@ -446,7 +445,8 @@ impl Http1Transaction for Server {
             extend(dst, b"HTTP/1.1 200 OK\r\n");
         } else {
             match msg.head.version {
-                // Node writes HTTP/1.1 whatever the version, quirk Q27.
+                // Node writes HTTP/1.1 whatever the version, quirk
+                // NODE_STATUS_LINE_11.
                 Version::HTTP_10 if !cfg!(feature = "node-status-line") => {
                     extend(dst, b"HTTP/1.0 ")
                 }
@@ -481,7 +481,7 @@ impl Http1Transaction for Server {
         let orig_headers;
         let extensions = core::mem::take(&mut msg.head.extensions);
         // A request of another version whose `TE` names `chunked` takes
-        // chunked framing, quirk Q29.
+        // chunked framing, quirk NODE_FRAMING_OTHER_VERSIONS.
         #[cfg(all(feature = "node-framing", feature = "node-llhttp"))]
         if extensions
             .get::<crate::ext::NodeHead>()
@@ -581,7 +581,7 @@ impl Server {
 
     /// Returns whether a record's `transfer-encoding` naming `chunked` stands
     /// on a 204 or a 304, whose line Node keeps with the connection closed,
-    /// quirk Q30.
+    /// quirk `NODE_TE_ON_204_304`.
     fn node_chunked_without_body(status: StatusCode, value: &HeaderValue) -> bool {
         cfg!(feature = "node-framing")
             && matches!(status, StatusCode::NO_CONTENT | StatusCode::NOT_MODIFIED)
@@ -591,7 +591,8 @@ impl Server {
     /// Writes each line of a record as the record spells it and in its order,
     /// a name at two places at both and the repeated lines of one name apart,
     /// with no `, chunked` appended and a `transfer-encoding` kept on every
-    /// version, as Node's `writeHead` stores a record, quirk Q28.
+    /// version, as Node's `writeHead` stores a record, quirk
+    /// `NODE_RECORD_VERBATIM`.
     #[cfg(feature = "node-record")]
     fn encode_record(
         msg: Encode<'_, StatusCode>,
@@ -1181,7 +1182,7 @@ impl Server {
     }
 }
 
-/// Reads a request head with the parser of llhttp, quirks Q18 to Q26.
+/// Reads a request head with the parser of llhttp, the quirks of `node-llhttp`.
 #[cfg(all(feature = "server", feature = "node-llhttp"))]
 fn node_parse(buf: &mut BytesMut, ctx: ParseContext<'_>) -> ParseResult<RequestLine> {
     super::node::parse::server(buf, ctx)

@@ -4,22 +4,29 @@
  * of the step aosabi build, server.mjs with the entry aosabi, the Worker entry worker.mjs, schema.mjs
  * and the IR of the build.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts,
+ * packages/pylon/src/cli/builder/bundler/transpile-app.ts and 2 more files of
+ * Pylon, Apache-2.0. Changed by the Aosabi authors.
+ *
+ * In server.mjs the specifier of the root is mapped to aosabi, and two lines expose the IR of the
+ * build as globalThis.__AOSABI_IR__, which the entries aosabi/bun and aosabi/worker of the package
+ * hand the engine. Each file of src/ and the configuration takes its file under .aosabi/ through
+ * ts.transpileModule, with every import kept and a relative specifier given the extension a module of
+ * the platform resolves.
  */
 
 import fs from 'node:fs'
 import path from 'node:path'
 import ts from 'typescript'
 
-/** The extensions of the sources the transpile takes from src/, transpile-app.ts:21. */
+/** The extensions of the sources the transpile takes from src/, transpile-app.ts:22. */
 const SRC_EXTS = ['.ts', '.tsx', '.mts', '.cts']
 
-/** The extensions a relative specifier resolves to, transpile-app.ts:22. */
+/** The extensions a relative specifier resolves to, transpile-app.ts:23. */
 const RESOLVE_EXTS = ['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs']
 
-/** The configuration files of an app in the order the build looks for them. */
+/** The configuration files of an app in the order the build looks for them, CONFIG_FILES of build-config.ts:4-9. */
 export const CONFIG_FILES = ['aosabi.config.ts', 'aosabi.config.mts', 'aosabi.config.js', 'aosabi.config.mjs']
 
 /** The entry of the package the glue imports. */
@@ -28,7 +35,7 @@ const ROOT_ENTRY = 'aosabi'
 /** The entry of the package whose default export is the fetch handler of a Worker over the glue. */
 const WORKER_ENTRY = 'aosabi/worker'
 
-/** Returns the configuration file of the app in `cwd`, or null, findConfigFile of build-config.ts:20-22. */
+/** Returns the configuration file of the app in `cwd`, or null, findConfigFile of build-config.ts:19-21. */
 export function findConfigFile(cwd) {
   return CONFIG_FILES.map(file => path.join(cwd, file)).find(file => fs.existsSync(file)) ?? null
 }
@@ -44,7 +51,7 @@ export function updateFileIfChanged(file, content) {
   return true
 }
 
-/** Returns every file under `dir` whose name `match` takes, in the order readdir answers, transpile-app.ts:24-38. */
+/** Returns every file under `dir` whose name `match` takes, in the order readdir answers, transpile-app.ts:25-39. */
 function walk(dir, match) {
   const out = []
   let entries
@@ -107,7 +114,7 @@ function specifierTransformer(importer) {
 
 /**
  * Transpiles the sources of the app in `cwd` into `outDir` and returns the files of the entry and
- * of the configuration there, transpileApp of transpile-app.ts:76-130 with ts.transpileModule.
+ * of the configuration there, transpileApp of transpile-app.ts:76-121 with ts.transpileModule.
  *
  * The entries are the files of `srcDir` with an extension of SRC_EXTS and the configuration file,
  * each written to the path it holds under `cwd` with the extension `.js` under `outDir`, so the

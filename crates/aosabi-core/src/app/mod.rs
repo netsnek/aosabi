@@ -16,7 +16,7 @@
 //! | `execute_config` | the GraphQL handler, lines 82-188, `emit-server-glue.ts:146-158` | [`fn@execute_config`], [`ExecuteConfigArgs`], [`Builtins`], [`boot`], [`BootError`], [`load_plugins_middleware`], [`current_role`] and [`role_allows`] |
 //! | `plugin_order` | `app/plugin-order.ts:1-45` | [`topo_sort_plugins`], [`SortedOrder`] and [`PluginOrderError`] |
 //! | `route_error` | none | `impl RouteError for Thrown` and [`PluginError`] |
-//! | `env_alias` | `docs/cli-and-targets.md` section 6.2 | [`env_alias::var`] |
+//! | `env_alias` | none | [`env_alias::var`] |
 
 pub mod application;
 pub mod entry;

@@ -2,25 +2,29 @@
 """Aosabi harness: the staging, building and serving of both sides of a fixture.
 
 The TypeScript side of a fixture is staged under target/harness/fixtures/, built
-there with the vendored command line and served with the overlay
-tests/sidecar/config-overlay.mjs in place of its built configuration, so
-the build of the reference never writes into vendor/ or tests/fixtures/ and the port reaches
-the reference through the plugin option. The Rust side of a fixture is its twin
-under tests/fixtures/rs/, built with `cargo build --locked` and served with an
-explicit, non zero `PORT`, because the twin keeps `use_node_server()` with no
-option and the rule of the port is the same on both sides. A served twin writes
-its boot report where `AOSABI_BOOT_REPORT` names a file, and `read_boot_report`
-reads it. HTTP(Unix Socket) gets a fresh runtime directory of mode 0700 under
-target/harness/.
+there with the vendored command line and served with the configuration overlay in
+place of its built configuration, so the build of the reference never writes into
+vendor/ or tests/fixtures/ and the port reaches the reference through the plugin
+option. The Rust side of a fixture is its twin, built with `cargo build --locked`
+and served with an explicit, non zero `PORT`, because the twin keeps
+`use_node_server()` with no option and the rule of the port is the same on both
+sides. A served twin writes its boot report where `AOSABI_BOOT_REPORT` names a
+file, and `read_boot_report` reads it. HTTP(Unix Socket) gets a fresh runtime
+directory of mode 0700 under target/harness/.
 
 A twin is built the way its layout asks. A twin with a `server/` crate of its own
-is a cargo workspace, built with `cargo build --locked` in its directory. The
-binary sits in the twin's `target/` under the name of its server package,
-`<package>-server` for a generated one, at `target/debug/` in the dev profile and
-at `target/<host>/release/` in the release profile, because a release build of the
-command line passes `--target` with the host for the lean link. A helper that is
-handed no cargo runs the cargo of the rustup home, `rustup_cargo`, so a notebook
-builds a twin through `build_twin` and names no cargo of its own.
+is a cargo workspace, built with `cargo build --locked` in its directory. A twin
+in the layout the scaffold of `aosabi new` writes is one package whose server
+package `cargo aosabi build` generates under its `target/aosabi/`, built with
+`target/debug/cargo-aosabi build --locked --manifest-path <twin>/Cargo.toml` from
+the root, after `cargo build --locked -p aosabi-cli` once per kernel. Every twin
+of the tree takes that layout. The binary sits in the twin's `target/` under the
+name of its server package, `<package>-server` for a generated one, at
+`target/debug/` in the dev profile and at `target/<host>/release/` in the release
+profile, because a release build of the command line passes `--target` with the
+host for the lean link. A helper that is handed no cargo runs the cargo of the
+rustup home, `rustup_cargo`, so a notebook builds a twin through `build_twin` and
+names no cargo of its own.
 
 The opt ins `tls` and `h2c` of the card server stay out of a build of the byte
 contract, because h2c answers the preface of HTTP/2 that Node refuses with 400. A
@@ -31,12 +35,19 @@ for a Unix target names them, the form an application that wants them writes unt
 the card names them. The copy keeps the lock of the twin, so the lock check of
 `cargo aosabi build` holds it to the same pins.
 
-`issuer_environment` writes what one side of a variant needs: `OIDC_ISSUER`, the
-CA variable of the side, and `AUTH_KEY` or the key files the variant asks for in
-the working directory of the side, from the client key of tests/harness/tls.py.
-The working directory of the reference is its stage, and that of the twin is a
-directory of its own under target/harness/issuer-cwd/, which `serve_twin` takes as
-`cwd`, because a key file never enters tests/fixtures/rs/.
+A side that sends to the HTTPS port of the mock Sentry ingest trusts the test CA
+of tests/harness/tls.py through one variable of its environment,
+`NODE_EXTRA_CA_CERTS` on the reference and `AOSABI_EXTRA_CA_CERTS` on the twin,
+which `ca_environment` writes.
+
+The two fixtures of the login, `zitadel-login-app` and `zitadel-auth-app`, talk to
+the mocked issuer of tests/harness/mock_issuer.py. `issuer_environment` writes
+what one side of a variant needs: `OIDC_ISSUER`, the CA variable of the side, and
+`AUTH_KEY` or the key files the variant asks for in the working directory of the
+side, from the client key of tests/harness/tls.py. The working directory of the
+reference is its stage, and that of the twin is a directory of its own under
+target/harness/issuer-cwd/, which `serve_twin` takes as `cwd`, because a key file
+never enters tests/fixtures/rs/.
 
 Entries that run at once under `tests/run.py --jobs` can stage one fixture
 together, so the stage writes its links under a lock of its directory and each
@@ -51,8 +62,17 @@ A build on a toolchain with the component rust-src writes the panic locations of
 the standard library with the path the prebuilt one carries, and a build without
 the component writes the bytes it wrote before.
 
-A later build at `prebuilt` puts its own binary back, since cargo links the
-artifact of a binary to that place on every build, a fresh one included.
+A release build of the layout of the scaffold also takes the switch `AOSABI_STD`,
+which the command line reads: at `prebuilt`, the default, the harness adds
+nothing, and at `source` `switch_env` of tests/harness/toolchain.py gives the
+build the private copy of the pin, on which the command line builds the card
+`server` with the set of that card into the target directory `target/std-source/`
+of the project, one target directory per value, inside `target/`, which every copy
+of a twin leaves out, and puts its binary where a build at `prebuilt` puts its
+own, under `target/<host>/release/`, which `twin_binary`, the notebooks and the
+harness modules of other runs read. A later build at `prebuilt` puts its own
+binary back, since cargo links the artifact of a binary to that place on every
+build, a fresh one included.
 """
 
 from __future__ import annotations
@@ -77,31 +97,48 @@ SENTRY_NODE_VERSION = "8.55.0"
 #: The variable each side reads the file of an extra CA from, by side.
 CA_VARIABLES = {"reference": "NODE_EXTRA_CA_CERTS", "twin": "AOSABI_EXTRA_CA_CERTS"}
 
-#: The variants of docs/harness.md section 8, which the overlay spreads by name,
-#: and the two configurations of subscription-app, `identity` and `database`,
-#: which the overlay lets through as names that spread no key, because the fixture
-#: selects its plugins by `AOSABI_CONFIG` itself.
+#: The variants, which the overlay spreads by name, and the two configurations of
+#: subscription-app, `identity` and `database`, which the overlay lets through as
+#: names that spread no key, because the fixture selects its plugins by
+#: `AOSABI_CONFIG` itself. The variants `switches_on`, `cors_star` and `cors_list`
+#: of in-context-app judge the secure defaults, and its variants `tokens_low` and
+#: `tokens_high` the key `maxTokens` of Aosabi below and above the cap of an app
+#: that sets none, a named divergence. The variant `introspection_false` of
+#: in-context-app holds the key `introspection`, and the variant
+#: `masked_errors_true` of errors-app the key `maskedErrors` that hardens an app.
 VARIANTS = ("default", "graphiql_false", "landing_false", "both", "logger_false", "identity", "database",
-            "switches_on", "cors_star", "cors_list")
+            "switches_on", "cors_star", "cors_list", "tokens_low", "tokens_high", "introspection_false",
+            "masked_errors_true")
 
-#: The failure variants of plugins-app never finish a boot, so
-#: tests/harness/boot.py boots them and serve_reference does not. The app
-#: zitadel-providers-app of tests/ts1/apps, which no fixture holds, selects its
-#: providers the same way for section 5b of `39_ts1_parity`.
+#: The variants a fixture selects in its own configuration through
+#: `AOSABI_CONFIG`, which its module exports as `variants` and the overlay serves
+#: with no keys spread. The failure variants of plugins-app never finish a boot,
+#: so tests/harness/boot.py boots them and serve_reference does not. The app
+#: zitadel-providers-app, which no fixture holds, selects its providers the same
+#: way. The variant `cookie_name_host` of zitadel-login-app stands in the twin
+#: alone, which its notebook serves with no reference, since the reference has no
+#: key that names the session cookie.
 FIXTURE_VARIANTS = {
     "plugins-app": ("default", "fail_named", "fail_unnamed", "fail_value", "fail_last", "cycle"),
     "use-identity-app": ("default", "async", "numeric", "failing", "none", "twice"),
-    "sentry-app": ("default", "null_key", "custom_key", "skip", "env_dsn", "initialized"),
-    "zitadel-login-app": ("default", "endpoint", "http_issuer", "bad_key", "key_file", "no_key", "pkcs8_key"),
-    "zitadel-auth-app": ("default", "mapped", "key_file", "two_keys", "with_login"),
+    "sentry-app": ("default", "null_key", "custom_key", "skip", "env_dsn", "initialized", "variables", "disabled"),
+    "zitadel-login-app": ("default", "endpoint", "http_issuer", "bad_key", "key_file", "no_key", "pkcs8_key",
+                          "cookie_name", "cookie_name_host"),
+    "zitadel-auth-app": ("default", "mapped", "key_file", "two_keys", "with_login", "cookie_name"),
     "zitadel-providers-app": ("default", "unused_first", "second_first", "per_request", "streamed"),
 }
 
+#: How each variant of the two fixtures of the login hands both sides the client
+#: key: `pkcs1` and `pkcs8` in `AUTH_KEY`, `file` as `key.json` in the working
+#: directory, `files_ab` as `a.json` and `b.json` there, `bad_json` as an
+#: `AUTH_KEY` that is no JSON, and `none` as neither, and the same for the
+#: variants of zitadel-providers-app.
 KEY_SOURCES = {
     "zitadel-login-app": {"default": "pkcs1", "endpoint": "pkcs1", "http_issuer": "pkcs1", "bad_key": "bad_json",
-                          "key_file": "file", "no_key": "none", "pkcs8_key": "pkcs8"},
+                          "key_file": "file", "no_key": "none", "pkcs8_key": "pkcs8", "cookie_name": "pkcs1",
+                          "cookie_name_host": "pkcs1"},
     "zitadel-auth-app": {"default": "pkcs1", "mapped": "pkcs1", "key_file": "file", "two_keys": "files_ab",
-                         "with_login": "pkcs1"},
+                         "with_login": "pkcs1", "cookie_name": "pkcs1"},
     "zitadel-providers-app": {"default": "pkcs1", "unused_first": "pkcs1", "second_first": "files_ab",
                               "per_request": "pkcs1", "streamed": "pkcs1"},
 }
@@ -115,7 +152,7 @@ KEY_FILES = ("key.json", "a.json", "b.json")
 REFERENCE_OUT = ".pylon"
 REFERENCE_CONFIG = "pylon.config.ts"
 
-#: The TypeScript fixtures of tests/fixtures/ts/, the rest are the reference's own.
+#: The TypeScript fixtures of the repository, the rest are the reference's own.
 OWN_FIXTURES = (
     "async-order-app", "docs-app", "errors-app", "federation-boundary-app", "federation-catalogue-app",
     "identity-app", "numbers-app", "plugins-app", "pubsub-app", "roots-app", "sentry-app",
@@ -124,16 +161,21 @@ OWN_FIXTURES = (
 )
 
 #: The port the variant `down` of the boundary pair points the front at under
-#: `--jobs 1`. It is the last port of the range of 90_federation, which no case
-#: binds, so a delegation there meets a closed port, and a run with jobs shifts it
-#: by the `port_offset` of its slot as it shifts every port of the notebook.
+#: `--jobs 1`. It is the last port of the range of the federation notebook, which
+#: no case binds, so a delegation there meets a closed port, and a run with jobs
+#: shifts it by the `port_offset` of its slot as it shifts every port of the
+#: notebook.
 FEDERATION_DOWN_PORT = 4929
 
 
 def federation_variants(port_offset: int = 0) -> dict:
-    """Each changes the federation of the front and not its configuration, so the
+    """The variants of the boundary pair of the federation, their environment by name.
+
+    Each changes the federation of the front and not its configuration, so the
     overlay serves each as `default`, and the variant travels on both sides as the
-    environment below, which the front reads at boot.
+    environment below, which the front reads at boot. The variant `headers` gives
+    the federation its headers, and the variant `shared` adds the second
+    federation of one URL with a headers function of its own.
     """
     return {
         "default": {},
@@ -152,8 +194,8 @@ ENVIRONMENT_VARIANTS = {"federation-boundary-app": federation_variants}
 def variant_environment(name: str, variant: str, port_offset: int = 0) -> tuple[str, dict]:
     """The configuration and the environment one variant of a fixture serves with.
 
-    A variant of docs/harness.md section 8 or of `FIXTURE_VARIANTS` is the
-    configuration `AOSABI_CONFIG` names and adds no environment. A variant of
+    A variant of `VARIANTS` or of `FIXTURE_VARIANTS` is the configuration
+    `AOSABI_CONFIG` names and adds no environment. A variant of
     `ENVIRONMENT_VARIANTS` is served as the overlay's `default` with the
     environment of its table, whose ports `port_offset` shifts.
     """
@@ -174,7 +216,7 @@ def variants_of(name: str) -> tuple:
 
 def fixture_source(name: str, root=None) -> Path:
     """The source directory of a TypeScript fixture, the repository's own or the reference's, or of an app of the
-    TypeScript option under tests/ts1/apps that no fixture holds, such as zitadel-providers-app."""
+    TypeScript option that no fixture holds, such as zitadel-providers-app."""
     base = paths(root).root
     own = base / "tests" / "fixtures" / "ts" / name
     if own.is_dir():
@@ -277,9 +319,8 @@ def ca_environment(side: str, ca_cert) -> dict:
 
 
 def side_cwd(name: str, side: str, root=None) -> Path:
-    """The working directory a side of a fixture runs in: the stage of the reference,
-    or a directory of the twin under target/harness/issuer-cwd/, which a key file
-    may enter."""
+    """The working directory a side of a fixture of the login runs in: the stage of the reference,
+    or a directory of the twin under target/harness/issuer-cwd/, which a key file may enter."""
     if side == "reference":
         return stage_fixture(name, root)
     if side != "twin":
@@ -291,7 +332,9 @@ def side_cwd(name: str, side: str, root=None) -> Path:
 
 def issuer_environment(name: str, variant: str, side: str, issuer: str, tls_files, keys=None,
                        root=None) -> dict:
-    """`issuer` is the URL of the mocked issuer, `https://127.0.0.1:<port>`, which
+    """The environment of one side of an OIDC fixture, with the key files its variant asks written.
+
+    `issuer` is the URL of the mocked issuer, `https://127.0.0.1:<port>`, which
     both sides read as `OIDC_ISSUER`, `tls_files` the files of tls.py whose CA
     the side trusts, and `keys` the client keys, the key of the run first and,
     for `two_keys`, the key of `b.json` second, which defaults to the first.
@@ -324,7 +367,7 @@ def issuer_environment(name: str, variant: str, side: str, issuer: str, tls_file
 
 
 def graphql_ready(port: int) -> bool:
-    """The readiness probe of docs/harness.md section 2.1, over the raw client."""
+    """The readiness probe, over the raw client."""
     from .http import send, tcp
 
     answer, _ = send(tcp(port), b'POST /graphql HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\n'
@@ -355,7 +398,7 @@ def serve_reference(name: str, port: int, variant: str = "default", node_env: st
 
 def serve_development(name: str, port: int, variant: str = "default", env: dict | None = None, root=None,
                       timeout_s: float = 40.0, port_offset: int = 0) -> Server:
-    """Serves the development variant of a fixture through tests/sidecar/serve-dev.mjs.
+    """Serves the development variant of a fixture through the sidecar of the development server.
 
     A variant and `env` reach the front as they reach `serve_reference`: the
     overlay's variant or a fixture's own in `AOSABI_CONFIG`, then `env`, then
@@ -374,15 +417,17 @@ def serve_development(name: str, port: int, variant: str = "default", env: dict 
                  name="%s %s development" % (name, variant), timeout_s=timeout_s)
 
 
-def serve_ts1(name: str, port: int, host: str, module, variant: str = "default", node_env: str | None = "test",
+def serve_ts_side(name: str, port: int, host: str, module, variant: str = "default", node_env: str | None = "test",
               mode: str = "faithful", read: str = "get", root=None, timeout_s: float = 90.0, env=None,
               ready=None) -> Server:
-    """The side is the reference's own build of the fixture with only its import specifiers
-    rewritten, booted on the module `module` of `aosabi-js` through the staged
-    package `aosabi`, which tests/harness/ts1.py stages and serves. A variant and
-    `node_env` reach it as they reach `serve_reference`, through the configuration
-    overlay, and the variables of `env` and the readiness check `ready` as
-    `ts1.serve_judge` takes them.
+    """Serves the TypeScript side of a fixture in the judge mode on `host`, `workerd` or `bun`.
+
+    The side is the reference's own build of the fixture with only its import
+    specifiers rewritten, booted on the module `module` of `aosabi-js` through the
+    staged package `aosabi`. A variant and `node_env` reach it as they reach
+    `serve_reference`, through the configuration overlay, and the variables of
+    `env` and the readiness check `ready` as the server of the judge mode takes
+    them.
     """
     from . import ts1
 
@@ -405,7 +450,9 @@ def twin_layout(name: str, root=None) -> str:
 
 
 def is_served_twin(name: str, root=None) -> bool:
-    """The main a build generates for a twin in the scaffold layout calls one of them
+    """Whether a twin's server calls `aosabi::serve` or `aosabi::serve_app`, its two target forms.
+
+    The main a build generates for a twin in the scaffold layout calls one of them
     always, `aosabi::serve` with the configuration of `aosabi.config.rs` and
     `aosabi::serve_app` with the configuration the app of a twin without that file
     carries.
@@ -458,7 +505,9 @@ def opt_in_dir(name: str, opt_ins, root=None) -> Path:
     The copy holds the manifest with the paths of the facade and of the build side
     made relative to it, the lock, the build script, `src/`, the configuration and
     `twin.toml`, each written only where its bytes changed, so cargo keeps its
-    build of the copy.
+    build of the copy. A file the copy holds outside its `target/` and the twin no
+    longer does goes, such as the build script and the index a twin drops when it
+    moves to the native index, so the copy holds the twin as it stands.
     """
     source = twin_dir(name, root)
     base = paths(root).root
@@ -551,10 +600,15 @@ def build_twin(name: str, cargo=None, release: bool = True, root=None, timeout_s
 def generated_manifest(name: str, root=None, cargo=None, opt_ins=()) -> Path:
     """The manifest of the workspace `cargo aosabi build` generates for a twin of the scaffold layout.
 
-    A notebook builds the server package of that workspace with cargo itself where
-    it needs a profile the command line does not build, such as `size`, with
-    `--target-dir` the twin's `target/`, so the build script writes the artifacts
-    where the command line writes them.
+    The twin is built in the dev profile first, which writes the workspace and its
+    derived lock as the twin stands, since a workspace an earlier tree wrote can
+    hold another layout, the build side of the derive path where the twin is now a
+    plain crate, or a lock the twin's manifest no longer matches, and a build that
+    changes nothing takes a fraction of a second. A notebook builds the server
+    package of that workspace with cargo itself where it needs a profile the
+    command line does not build, such as `size`, with `--target-dir` the twin's
+    `target/`, so the build script writes the artifacts where the command line
+    writes them.
     """
     directory = opt_in_dir(name, opt_ins, root) if opt_ins else twin_dir(name, root)
     build_twin(name, cargo, release=False, root=root, opt_ins=opt_ins, check=False)
@@ -599,7 +653,10 @@ def serve_twin(name: str, port: int, variant: str = "default", node_env: str | N
     directory of `side_cwd` that holds the key file of a variant. A variant
     reaches the twin as it reaches the reference, the configuration in
     `AOSABI_CONFIG` and the environment of a variant of `ENVIRONMENT_VARIANTS`
-    last, its ports shifted by `port_offset`.
+    last, its ports shifted by `port_offset`. A twin reads `AOSABI_CONFIG` in its
+    own code: the function `config` of its `aosabi.config.rs`, or the entry of a
+    twin in the native index, whose chain carries the configuration of the
+    variant.
     """
     overlay, variant_env = variant_environment(name, variant, port_offset)
     full = {"PORT": str(port), "AOSABI_CONFIG": overlay, "NODE_ENV": node_env}

@@ -4,8 +4,8 @@
  * node:net, which carries one Homa packet per frame of prefixed AoFrame.
  *
  * A Unix Socket server of GraphTP offers a stream socket of the prefixed framing beside
- * SOCK_SEQPACKET, and Node.js reaches it with node:net, which opens stream sockets alone
- * (docs/graphtp-fetch.md section 9, and docs/graphtp.md sections 4.2 and 11). The module of the
+ * SOCK_SEQPACKET, and Node.js reaches it with node:net, which opens stream sockets alone.
+ * The module of the
  * package frames and unframes, and this file moves the bytes.
  */
 

@@ -2,8 +2,12 @@
 /*
  * graphql-over-http: the one function that answers a GraphQL request over HTTP.
  *
+ * The adapter runs every onRequest until one ends the response, then the
+ * request handler, then every onResponse, and the hooks of an app run in that
+ * order here.
+ *
  * Derived from graphql-yoga 5.18.0, cjs/server.js, MIT.
- * Derived from whatwg-node 0.10.18, cjs/createServerAdapter.js, MIT.
+ * Derived from @whatwg-node/server 0.10.18, cjs/createServerAdapter.js, MIT.
  */
 
 //! [`answer`], Yoga's five jobs as straight code.
@@ -11,15 +15,15 @@
 //! The function reads GET and POST JSON, and forms, `application/graphql` and
 //! uploads, it refuses a wrong method, a mutation over GET, broken parameters,
 //! an unknown body and a batch, it answers with the status and the type the
-//! client accepts, JSON or an event stream and never `multipart/mixed`, the
-//! named divergence D59, it masks unexpected errors, and it caches parsed and
+//! client accepts, JSON or an event stream and never `multipart/mixed`, a
+//! named divergence, it masks unexpected errors, and it caches parsed and
 //! validated documents. Each step stands where its plugin stood in Yoga's
 //! list, so every hook of an app's plugin runs at Yoga's point and in Yoga's
 //! order:
 //!
 //! | Phase | Steps in order |
 //! | --- | --- |
-//! | `onRequest` | the health check, the fall through of an `OPTIONS` request, the page of `GraphiQL`, the hooks of the app, the unhandled route |
+//! | `onRequest` | the fall through of an `OPTIONS` request, the hooks of the app, the unhandled route |
 //! | the request parse | the request parser the method and the type choose, the hooks of the app, the check of the method, the parse, the done hooks of the app, the refusal of a batch |
 //! | `onParams` | the hooks of the app, the check of the parameters |
 //! | the run | the hook layer of `aosabi-hooks`, then `onExecutionResult` of the app |
@@ -28,10 +32,9 @@
 //!
 //! A throw of the request parse, of the parameters or of the run is handled
 //! into a result that is processed in turn, so a 415 and a 406 are the only
-//! answers that pass the processors by (rule 3 of section YOGA of the old page
-//! of the plan). A hook `onRequest` of the app may answer the request, replace
-//! it or replace the request handler, [`HttpServer::handle`] by default, as
-//! the server adapter allows.
+//! answers that pass the processors by. A hook `onRequest` of the app may
+//! answer the request, replace it or replace the request handler,
+//! [`HttpServer::handle`] by default, as the server adapter allows.
 
 use std::rc::Rc;
 
@@ -70,10 +73,6 @@ use crate::{
         errors_result,
         handle_error, //
     },
-    graphiql::{
-        render_graphiql,
-        should_render_graphiql, //
-    },
     plugin::{
         GraphQLParams,
         HttpResult,
@@ -86,7 +85,10 @@ use crate::{
         entry, //
     },
     process_request::process_request,
-    routes::matches_endpoint,
+    routes::{
+        is_plain_endpoint,
+        matches_endpoint, //
+    },
     server::HttpServer,
     server_adapter::{
         LazyUrl,
@@ -118,7 +120,7 @@ pub fn answer(
         let mut request = request;
         let mut request_handler = Rc::clone(&server.handler);
         let url = LazyUrl::new();
-        let mut response = on_request_steps(&server, &request, &server_context, &url)?;
+        let mut response = on_request_steps(&request)?;
         if response.is_none() {
             for plugin in &server.plugins {
                 plugin.on_request(&mut OnRequest {
@@ -134,17 +136,19 @@ pub fn answer(
             }
         }
         // The unhandled route, `useUnhandledRoute`, after the hooks of the
-        // app, which may answer a path of their own.
-        if response.is_none() {
-            let pathname = || url.get(&request.url).map(|url| url.pathname.clone());
-            if !matches_endpoint(&request, pathname, &server.graphql_endpoint)? {
-                response = Some(new_response(
-                    ResponseBody::Text(Vec::new()),
-                    404,
-                    Some("Not Found"),
-                    NO_HEADERS,
-                )?);
-            }
+        // app, which may answer a path of their own, and the endpoint matched
+        // by its whole path, a named divergence. A plain URL that no hook had
+        // parsed is tested by its text, which the parser reads the same way.
+        if response.is_none()
+            && !(url.is_unparsed() && is_plain_endpoint(&request.url, &server.graphql_endpoint))
+            && !matches_endpoint(&url.get(&request.url)?.pathname, &server.graphql_endpoint)
+        {
+            response = Some(new_response(
+                ResponseBody::Text(Vec::new()),
+                404,
+                Some("Not Found"),
+                NO_HEADERS,
+            )?);
         }
         let mut response = match response {
             Some(response) => response,
@@ -163,30 +167,20 @@ pub fn answer(
 
 /// Returns the answer of the steps of Yoga's list before the hooks `onRequest` of the app, or none.
 ///
-/// The health check answers every method whose whole URL ends in its endpoint
-/// with 200 and `x-yoga-id`, an `OPTIONS` request gets the empty 404 of the
-/// unhandled route, which the mount hands on to the web server or the host,
-/// where Yoga's CORS answers every one with 204 and `Content-Length: 0`, the
-/// named divergence D46, and `GraphiQL` answers a GET at the endpoint that
-/// accepts HTML with its page unless the option is `false`.
+/// The function answers no health check, so a request for `/health` takes the
+/// steps of any other path, where Yoga's health check answers every method
+/// whose whole URL ends in its endpoint with 200 and `x-yoga-id`, a named
+/// divergence. An `OPTIONS` request gets the empty 404 of the unhandled route,
+/// which the mount hands on to the web server or the host, where Yoga's CORS
+/// answers every one with 204 and `Content-Length: 0`, a named divergence.
 ///
 /// # Errors
 ///
 /// Returns the `TypeError` of a URL the parser refuses or of a header the
 /// response refuses.
-fn on_request_steps(
-    server: &HttpServer,
-    request: &Rc<Request>,
-    server_context: &HookContext,
-    url: &LazyUrl,
-) -> Result<Option<Response>, Value> {
-    if request.url.ends_with(&server.health_check_endpoint) {
-        server.logger.debug("Responding Health Check");
-        let headers = [(String::from("x-yoga-id"), server.id.clone())];
-        return empty_response(200, None, &headers).map(Some);
-    }
+fn on_request_steps(request: &Rc<Request>) -> Result<Option<Response>, Value> {
     // The engine answers no `OPTIONS` request, which falls through to the web
-    // server or the host as an unhandled route does, the named divergence D46.
+    // server or the host as an unhandled route does, a named divergence.
     if upper_ascii_exact(&request.method) == "OPTIONS" {
         return new_response(
             ResponseBody::Text(Vec::new()),
@@ -196,41 +190,7 @@ fn on_request_steps(
         )
         .map(Some);
     }
-    match &server.graphiql {
-        Some(options) if should_render_graphiql(request) => {
-            render_page(server, request, server_context, url, options)
-        }
-        _ => Ok(None),
-    }
-}
-
-/// Returns the page of `GraphiQL` for `request`, which asks for it, where its
-/// path is the endpoint and the options of the request are not `false`.
-///
-/// # Errors
-///
-/// Returns the `TypeError` of a URL the parser refuses or of a header the
-/// response refuses.
-// Out of line, so a request that asks for no page compiles none of it.
-#[inline(never)]
-fn render_page(
-    server: &HttpServer,
-    request: &Rc<Request>,
-    server_context: &HookContext,
-    url: &LazyUrl,
-    options: &crate::graphiql::GraphiqlOptionsFactory,
-) -> Result<Option<Response>, Value> {
-    let pathname = || url.get(&request.url).map(|url| url.pathname.clone());
-    if !matches_endpoint(request, pathname, &server.graphql_endpoint)? {
-        return Ok(None);
-    }
-    server.logger.debug("Rendering GraphiQL");
-    let Some(options) = options(request, server_context) else {
-        return Ok(None);
-    };
-    let body = render_graphiql(&options);
-    let headers = [(String::from("Content-Type"), String::from("text/html"))];
-    new_response(ResponseBody::Text(body.into_bytes()), 200, None, &headers).map(Some)
+    Ok(None)
 }
 
 impl HttpServer {
@@ -238,8 +198,7 @@ impl HttpServer {
     ///
     /// The request parse, the run of the one operation, and the result
     /// processing, where every throw of the chain is handled into a result
-    /// that is processed in turn. A batch is refused, the named divergence D58
-    /// of `docs/byte-equality.md` section 3.
+    /// that is processed in turn. A batch is refused, a named divergence.
     pub fn handle(
         self: &Rc<Self>,
         request: Rc<Request>,

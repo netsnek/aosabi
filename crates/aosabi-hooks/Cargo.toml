@@ -5,7 +5,7 @@
 # host.
 [package]
 name = "aosabi-hooks"
-version = "0.0.0"
+version.workspace = true
 description = "Aosabi's hook layer: the plugins of a GraphQL request, the order their hooks run in, and the engine, schema, context and masked errors plugins."
 edition.workspace = true
 rust-version.workspace = true

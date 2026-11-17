@@ -2,17 +2,17 @@
 /*
  * aosabi-cli: the failure report every command prints.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts, Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! The failure report.
 //!
 //! Most failures of a command line are expected, and a stack through the
-//! user's own paths reads like a crash and buries the one line that matters.
-//! A command of Aosabi therefore returns a [`CliError`], and
-//! [`report_failure`] prints it once, at the top, so every teardown of the
-//! command has run before the process sets its exit code.
+//! user's own paths looks like a fault of the tool and hides the one line
+//! that says what failed. A command of Aosabi therefore returns a
+//! [`CliError`], and [`report_failure`] prints it once, at the top, so every
+//! teardown of the command has run before the process sets its exit code.
 //!
 //! The report reads `error: ` and the message, the code first where the
 //! failure is a refusal of the table in [`crate::codes`], then the command

@@ -35,6 +35,28 @@ status and the substatus, and the body. Every integer is big endian.
 GraphTP carries no method, no URL, no header field, no cookie, no session and no cache. Every
 exchange stands alone, so there is no handshake before the first request.
 
+A server checks a request by these rules of the wire form in their order and answers the first one
+it breaks, so nothing reaches the service before every check has passed.
+
+| Rule | The request | Answer |
+| ---: | --- | --- |
+| 1 | The message holds at least 3 bytes | 400.7 |
+| 2 | The version is one the server speaks, and `00` never is | 505.0 |
+| 3 | The kind is one the server knows | 501.0 |
+| 4 | The reserved bits are 0 | 400.7 |
+| 5 | The credential does not pass the end of the message | 400.7 |
+| 6 | Every byte of the credential is 0x20 to 0x7E, and the credential is empty on PULL and CANCEL | 400.7 |
+| 7 | The credential is within the bound of the server | 431.0 |
+| 8 | A PULL is plain and has no content, and a CANCEL is plain with a content of exactly 2 bytes | 400.7 |
+| 9 | A coded content starts with a zlib header that section 3 allows, checked in three steps: at least 2 bytes, then FCHECK, then the fields | 400.8 for fewer than 2 bytes or a broken FCHECK, then 415.1 for CINFO above 4, FDICT set or CM other than 8 |
+| 10 | The decoded content stays within the bound of the server | 413.0, as soon as the decoder passes the bound |
+| 11 | The zlib stream decodes, its Adler-32 matches, and no byte follows it | 400.8 |
+
+Rule 9 reads FCHECK before the fields, because 2 bytes that fail FCHECK are no zlib header, so a
+header that breaks both answers 400.8. Rule 10 meets the bound in the order the plain bytes decode,
+so a stored block cut short answers 413.0 when its bytes pass the bound before the input ends, and
+400.8 when the input ends first.
+
 ## 2. Status and substatus
 
 The status keeps the meaning HTTP gives it, so a client that knows no substatus reads the status
@@ -55,6 +77,8 @@ alone and is right about the class of the outcome. The substatus names what the 
 | 400.8 | Bad Coding | The zlib stream does not decode |
 | 413.0 | Content Too Large | The decoded content exceeds the bound of the server |
 | 415.1 | Unsupported Coding | The zlib header asks for more than the protocol allows |
+| 431.0 | Request Header Fields Too Large | The credential exceeds the bound of the server |
+| 501.0 | Not Implemented | The kind is one the server does not know |
 | 505.0 | HTTP Version Not Supported | The server speaks another version of GraphTP |
 
 The crate `graphtp` holds every code of the registry with its name, the codes of streams, refusals

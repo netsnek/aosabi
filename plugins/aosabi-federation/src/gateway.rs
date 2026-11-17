@@ -3,8 +3,9 @@
  * aosabi-federation: the configured federation and the delegation of a typed
  * field.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The cache of remote schemas, and, the class of a configured federation with
  * createGateway.
@@ -17,7 +18,7 @@
 //! the options, the table of the patches and the policies collected from them
 //! once. `delegate` takes the arguments struct of a remote root field, which
 //! fixes the path, the registry and the record the field answers, and the
-//! literal [󰀅](crate::needs!), whose closure is typed by that record. It
+//! literal [`needs!`](crate::needs!), whose closure is typed by that record. It
 //! answers a [`DelegateCall`], a future that owns a handle of its federation,
 //! so a `Lazy` member that moves it in answers a `'static` future. The value it
 //! answers is read through `FromDelegated<D::Return>`, so a resolver states
@@ -33,20 +34,26 @@
 //! result that is an error is thrown, what is left goes to `T::from_delegated`,
 //! and the guard then answers `None` for the typed value it rejects, so the
 //! guard reads the record `T` reads and not the raw object the reference hands
-//! its guard.
+//! its guard. The read of a pulled record is lenient: a member the value does
+//! not carry, a member that holds an error and a member the field type cannot
+//! read each read as the value an absent member reads as, its `Default`, and
+//! only a value that is no object is refused, so the guard meets every object
+//! the reference's guard meets.
 //!
 //! The cache holds one slot per URL and headers function, the introspection in
 //! flight with the tasks that wait on it and then the wrapping schema beside
 //! the subschema configuration its resolvers reach, whose executor sends with
 //! that headers function. The map of the reference is keyed by the URL alone,
 //! so every later federation of a URL sends through the executor and the
-//! headers of the first, the credentials of the first among them, which the
-//! owner answered with "A2 Fix it", so a federation with another headers
+//! headers of the first, the credentials of the first among them. This cache is
+//! keyed by the headers function as well, so a federation with another headers
 //! function introspects the URL once more and sends through an executor of its
 //! own, the entry of the cache in `NOT_PORTED`. The patches, the policies and
 //! `strict` are read from the delegating federation at each delegation and
 //! never from the slot, so the headers function is the one part of a
-//! configuration the slot keeps.
+//! configuration the slot keeps. A failed introspection leaves the cache only
+//! when the slot is still the one its attempt installed, an identity guard, so
+//! the next delegation introspects again.
 
 use std::{
     cell::RefCell,
@@ -331,7 +338,7 @@ impl Config {
     /// copy of what the headers function of the configuration answers for the
     /// context of the request, or no header without one. The introspection
     /// carries no context, so the function of the configuration answers for
-    /// none (quirk Q77).
+    /// none (quirk `FEDERATION_INTROSPECTION_HEADERS`).
     fn executor(&self) -> Executor {
         let headers = self.headers;
         #[cfg(feature = "host-headers")]
@@ -612,8 +619,8 @@ where
 /// gets the four transforms in the array order of the reference, which
 /// `Transformer::new` reverses, so the request passes the patch, the force, the
 /// inline and the needs transforms in that order. That order is quirk
-/// `Q79_FEDERATION_FORCE_BEFORE_NEEDS`, where the comment of the reference says
-/// the force transform runs last. A synchronous throw of the delegation is the
+/// `FEDERATION_FORCE_BEFORE_NEEDS`, where the comment of the reference says the
+/// force transform runs last. A synchronous throw of the delegation is the
 /// rejection of the call, and any other answer is awaited, as
 /// `await delegateToSchema(...)` awaits it. The slot of the remote schema is
 /// kept until the answer settles, so the subschema configuration the proxying
@@ -818,11 +825,11 @@ thread_local! {
     /// The map is per runtime thread, which is per process for a served
     /// card with its one runtime thread, so two federations over one URL
     /// with one headers function share a slot as the module wide map of the
-    /// reference does (the plan, section FEDERATION, rule 6), and a
-    /// federation with another headers function takes a slot of its own,
-    /// where the reference shares the first (the entry of `NOT_PORTED`).
-    /// A URL holds one slot for each headers function its federations
-    /// name, so the slots of one URL are few and found by a scan.
+    /// reference does, and a federation with another headers function takes
+    /// a slot of its own, where the reference shares the first (the entry
+    /// of `NOT_PORTED`). A URL holds one slot for each headers function its
+    /// federations name, so the slots of one URL are few and found by a
+    /// scan.
     static SCHEMA_CACHE: RefCell<IndexMap<String, Vec<Rc<Slot>>, KeyHasherBuilder>> =
         RefCell::new(IndexMap::default());
 }

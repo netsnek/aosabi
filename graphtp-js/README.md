@@ -15,9 +15,8 @@ const client = new ApolloClient({
 })
 ```
 
-The design is `docs/graphtp-fetch.md` of the Aosabi repository, and the protocol is
-`docs/graphtp.md` there. This folder is the source of the package until its repository has a
-remote, and nothing of it is published.
+The protocol is `Documentation/guides/graphtp.md` of the Aosabi repository. This folder is the source of the
+package until its repository has a remote, and nothing of it is published.
 
 ## What it does
 

@@ -25,7 +25,7 @@
 //! code a caller can read.
 //!
 //! The comparison of this reader against `JSON.parse` is the work of a later
-//! milestone, and no notebook judges it yet.
+//! release, and no notebook judges it yet.
 
 use alloc::vec::Vec;
 use core::{

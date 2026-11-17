@@ -2,7 +2,12 @@
 /*
  * aosabi-execute plan: the field plan of a document under a schema.
  *
- * No analogue in the reference.
+ * No analogue in the reference for the plan. The field plan keeps across the
+ * requests of one document what the memoize3 around collectSubfields keeps for
+ * one execution, and the fragment map the memoize1 around
+ * getFragmentsFromDocument keeps for one document.
+ *
+ * Derived from @graphql-tools/executor 1.5.1, cjs/execution/execute.js, MIT.
  */
 
 //! The field plan of a document under a schema.
@@ -61,7 +66,9 @@
 //! request parsed in between. An execution of a document no keeper keeps
 //! builds the map and a plan of its own, which end with it.
 //!
-//! The plan is not `Send` and does not need to be.
+//! The plan is not `Send` and does not need to be. It lives on the thread of
+//! its keeper, beside the shared document and never inside it, so the document
+//! stays `Send` and `Sync` whatever the plan holds.
 
 use core::{
     cell::{
@@ -265,8 +272,8 @@ impl KeptDocument {
     /// first executions build them, each admitted by `keeper` byte for byte.
     /// The fill of the table of the thread first sweeps it where it has grown
     /// to the count of its next sweep.
-    // Out of line, as a fill of a miss, so `20_exec_cost` reads its count by
-    // its name.
+    // Out of line, as a fill of a miss, so the cost model of the executor
+    // reads its count by its name.
     #[must_use]
     #[inline(never)]
     pub fn keep(document: &SharedDocument, keeper: Box<dyn Keeper>) -> Rc<Self> {
@@ -407,10 +414,11 @@ pub(crate) fn plan_for(
 
 /// Returns the fragment definitions of `document` by name.
 ///
-/// A later definition of a name replaces an earlier one and keeps its
-/// position. A definition is copied with its head alone, and the copy shares
-/// the selections of the document.
-// Out of line, so `20_exec_cost` counts the builds of a map by their calls.
+/// A later definition of a name replaces an earlier one and keeps its position.
+/// A definition is copied with its head alone, and the copy shares the
+/// selections of the document.
+// Out of line, so the cost model of the executor counts the builds of a map by
+// their calls.
 #[inline(never)]
 fn build_fragments(document: &SharedDocument) -> Fragments {
     let mut fragments = ObjMap::default();
@@ -555,6 +563,10 @@ impl Plan {
 
     /// Returns the root node of the operation of `exe_context` on `root_type`.
     ///
+    /// Plays the role of the `collectFields` call of `executeOperation` at
+    /// `execute.js:267`, made once per operation and root type and read by
+    /// every later execution of the plan.
+    ///
     /// A collection shares its field nodes through the cache of the plan
     /// while the plan may keep what it builds. The copies it adds there stay
     /// once the keeper admits their bytes, with the node, or alone for a
@@ -653,7 +665,9 @@ impl Plan {
 
     /// Returns the node of the subfields of `field` on `runtime_type`.
     ///
-    /// The field holds its field nodes, so a field and a runtime type name the
+    /// Plays the role of `collectSubfields` at `execute.js:28`, whose memo keys
+    /// a collection on the context, the return type and the field nodes. The
+    /// field holds its field nodes, so a field and a runtime type name the
     /// node, which the plan keeps for every later execution, and a node the
     /// plan does not keep is kept by the execution for its own later reads.
     /// The collection shares its field nodes as [`Plan::root`] says, the

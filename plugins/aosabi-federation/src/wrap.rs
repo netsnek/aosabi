@@ -8,7 +8,10 @@
 
 //! The wrapping of a remote schema, `wrap_schema` and the proxying resolvers.
 //!
-//! [`wrap_schema`] makes the wrapping schema of the subschema configuration
+//! [`schema_from_executor`] sends the introspection query with its default
+//! options through the executor of a remote and builds the client schema of
+//! the answer's `data.__schema` with `build_client_schema`. [`wrap_schema`]
+//! makes the wrapping schema of the subschema configuration
 //! `{schema, executor}` over that client schema: every root field resolves
 //! through a proxying resolver that delegates to the configuration, so the
 //! inner delegation sends through the executor, and every object field

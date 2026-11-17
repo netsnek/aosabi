@@ -14,12 +14,14 @@
 //! source lexes to its end the lexer returns the same end of file token for
 //! every further call. The token readers below follow the reference function by
 //! function and keep its names, and every syntax error message is the vendored
-//! text, because the exit number of the milestone is byte equality of error text
-//! and locations.
+//! text, because the goal is byte equality of error text and locations.
 //!
 //! Three shapes of the reference read differently in Rust.
 //!
 //! - The reference links each token to its neighbours through object references.
+//!   A token here lives in the [`TokenArena`] of the lexer and links through a
+//!   [`TokenId`], and [`Lexer::lookahead`] sets both links as the reference
+//!   does.
 //! - A `throw syntaxError(...)` is an `Err` here, so every reader returns a
 //!   `Result` and the parser propagates it. The error is a boxed
 //!   [`GraphQLError`], so the error variant of a `Result` is one pointer
@@ -99,9 +101,11 @@ use crate::{
 
 /// The bytes of a body the arena of the lexer reserves one token for.
 ///
-/// The divisor is that ratio rounded down, so the reserve errs toward a token
-/// more, and the notebook asserts it. A document denser than the ratio grows the
-/// arena once it is full, and a sparser one keeps room it never fills.
+/// Documents of GraphQL lex into one token besides `<SOF>` and `<EOF>` for every
+/// 7.12 bytes, 4,555 tokens over 32,450 bytes of 770 vendored documents and four
+/// queries. The divisor is that ratio rounded down, so the reserve errs toward a
+/// token more, and the notebook asserts it. A document denser than the ratio
+/// grows the arena once it is full, and a sparser one keeps room it never fills.
 ///
 /// The reserve is made before the first token, whatever the body holds, so it
 /// costs the room of a token for every 7 bytes of the body, about 9.14 bytes per

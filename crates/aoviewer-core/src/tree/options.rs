@@ -29,16 +29,16 @@
 //! | `svg_text` | `text` or `outlines` | `text` |
 //! | `document_date` | Unix seconds, an optional `-` and decimal digits | none |
 //!
-//! The keys are the pairs the plan names, `schema`, `generator`, `formats`,
-//! `themes`, `layout`, `view` and `cluster.<name>`, and the keys of
-//! `aosabi.docs.toml` for the rest, so one word names one option in the file
-//! and in the query. The defaults are the ones of the design: Markdown, Typst
-//! and SVG in both themes, the layout chosen by the size of the schema, native
-//! diagrams in Typst and text that stays text. The words of `formats`,
-//! `themes`, `layout` and `typst_diagrams` are public as [`Formats::WORDS`],
-//! [`Themes::WORDS`], [`LayoutChoice::WORDS`] and [`TypstDiagrams::WORDS`]
-//! with the lookups beside them, so the configuration file and the flags read
-//! them here and nowhere else.
+//! The keys are `schema`, `generator`, `formats`, `themes`, `layout`, `view`
+//! and `cluster.<name>`, and the keys of `aosabi.docs.toml` for the rest, so
+//! one word names one option in the file and in the query. The defaults are
+//! the ones of the design: Markdown, Typst and SVG in both themes, the layout
+//! chosen by the size of the schema, native diagrams in Typst and text that
+//! stays text. The words of `formats`, `themes`, `layout` and `typst_diagrams`
+//! are public as [`Formats::WORDS`], [`Themes::WORDS`],
+//! [`LayoutChoice::WORDS`] and [`TypstDiagrams::WORDS`] with the lookups
+//! beside them, so the configuration file and the flags read them here and
+//! nowhere else.
 //!
 //! The pairs are split and decoded as the option string of a route splits and
 //! decodes them, `&` between pairs, the first `=` between a key and its value,
@@ -144,8 +144,8 @@ pub struct DocsOptions {
     pub typst_template: bool,
     /// How the text of a drawing is written.
     pub svg_text: SvgText,
-    /// The date of the Typst document in Unix seconds, which passes as the
-    /// `source_date_epoch` of a card.
+    /// The date of the Typst document in Unix seconds, which the device cards
+    /// pass as the `source_date_epoch` of a card.
     pub document_date: Option<i64>,
 }
 

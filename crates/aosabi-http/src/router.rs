@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
- * aosabi-http: the trie router with the method rule of the smart router.
+ * aosabi-http: the trie router the app matches its routes with.
  *
  * Derived from hono 4.11.9, dist/router/trie-router/router.js, MIT.
+ * Derived from hono 4.11.9, dist/router/trie-router/node.js, MIT.
  * Derived from hono 4.11.9, dist/router/smart-router/router.js, MIT.
  */
 
@@ -11,13 +12,13 @@
 //! The reference builds a `SmartRouter` over a `RegExpRouter` and a
 //! `TrieRouter` and keeps the first that accepts every route, and the two
 //! answer the same matches by contract. The port carries the trie router: a
-//! static label, `:name`, `:name?`, `*` and a trailing `/*`, every route of
-//! the method and of `ALL` that matches in registration order, and a
-//! middleware under `use` matching its path and everything below it. A label
-//! with a constraint `:name{...}` is stored with its key, and its constraint
-//! matches any label, because a constraint is a regular expression the
-//! workspace has no engine for, and no route of an app or of a fixture names
-//! one.
+//! static label, `:name`, `:name?`, `*` and a trailing `/*`, every route of the
+//! method and of `ALL` that matches in registration order, and a middleware
+//! under `use` matching its path and everything below it. A route whose label
+//! carries a constraint `:name{...}` is refused at its registration, a named
+//! divergence, because a constraint is a regular expression the workspace has
+//! no engine for, and no route of an app or of a fixture names one. An app
+//! writes the parameter as `:name` and checks its value in the handler.
 
 use crate::utils::url::{
     Pattern,
@@ -105,7 +106,16 @@ impl<H: Clone> Router<H> {
     /// Adds the route `path` of `method` with `handler`.
     ///
     /// A path with an optional parameter adds each path it stands for.
+    ///
+    /// # Panics
+    ///
+    /// Panics where a parameter of `path` carries a constraint `:name{...}`,
+    /// [`constrained_parameter`], which the router does not match, a named
+    /// divergence.
     pub fn add(&mut self, method: &str, path: &str, handler: &H) {
+        if let Some((name, constraint)) = constrained_parameter(path) {
+            panic!("{}", constraint_refusal(method, path, &name, &constraint));
+        }
         match check_optional_parameter(path) {
             Some(results) => {
                 for result in results {
@@ -284,6 +294,40 @@ impl<H: Clone> Router<H> {
             .map(|(_, handler, params)| (handler, params))
             .collect()
     }
+}
+
+/// Returns the name and the constraint of the first parameter of the route
+/// path `path` that carries a constraint `:name{...}`, `None` where none does.
+///
+/// The labels are read as the router reads them, [`split_routing_path`], so a
+/// `/` inside a constraint stays in its label. A label that starts with `:`
+/// and holds a `{` carries a constraint, an optional parameter `:name{...}?`
+/// among them, and the constraint runs from the first `{` to the last `}`.
+#[must_use]
+pub fn constrained_parameter(path: &str) -> Option<(String, String)> {
+    split_routing_path(path).into_iter().find_map(|label| {
+        let rest = label.strip_prefix(':')?;
+        let open = rest.find('{')?;
+        let close = rest
+            .rfind('}')
+            .filter(|&close| close > open)
+            .unwrap_or(rest.len());
+        Some((
+            String::from(&rest[..open]),
+            String::from(&rest[open + 1..close]),
+        ))
+    })
+}
+
+/// Returns the message of the refusal of the route `path` of `method`, whose
+/// parameter `name` carries the constraint `constraint`.
+#[must_use]
+pub fn constraint_refusal(method: &str, path: &str, name: &str, constraint: &str) -> String {
+    format!(
+        "The route {method} {path} gives the parameter :{name} the constraint {{{constraint}}}, \
+         which the router of Aosabi does not match. Write the parameter as :{name} and check \
+         its value in the handler."
+    )
 }
 
 /// Returns the value of `key` in `params`.

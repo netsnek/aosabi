@@ -3,7 +3,12 @@
  * aosabi-build lib/schema-record: the schema record of a build, which the boot of an app reads in
  * place of the IR with no lexer, no parser and no validation of the schema at its start.
  *
- * No analogue in the reference, whose Worker builds its schema from the SDL text at every start.
+ * No analogue in the reference, whose Worker builds its schema from the SDL text at every start. The
+ * build runs the export schema_record of the module core.wasm of the package aosabi over the SDL and
+ * the IR of the app, so the record is written by the code that reads it, and the engine refuses a
+ * record of another SDL than the build hands its boot. The step aosabi build calls no step of this
+ * module yet, so the harness writes the record for each fixture of the judge and for a build of
+ * Pylon's canary.
  */
 
 import fs from 'node:fs'

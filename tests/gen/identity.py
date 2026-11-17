@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: MIT
-"""Each case is one request of the table of the plan, `id-01` to `id-31` under
-the variant `default`, `as-01` to `as-04` under `async`, `nu-01` and `nu-02`
-under `numeric`, `fa-01` to `fa-03` under `failing`, `no-01` to `no-03` under
-`none` and `tw-01` under `twice`. Every case runs under `NODE_ENV` `test`,
-unset and `development`, and is sent as it stands and again with
-`Accept-Encoding: identity`. The principal of a case is the trusted headers
-the provider of the fixture reads, `x-user-id`, `x-org`, `x-role` and
-`x-perm`, as the header lists of this module write them. Every identifier is a
-neutral test string, `u1`, `u2`, `42`, `orgA` and `orgB`, and names no
-customer.
+"""tests/gen: the served cases of use-identity-app, the identity fixture.
+
+Each case is one request, `id-01` to `id-31` under the variant `default`, `as-01` to
+`as-04` under `async`, `nu-01` and `nu-02` under `numeric`, `fa-01` to `fa-03` under
+`failing`, `no-01` to `no-03` under `none` and `tw-01` under `twice`. Every case runs
+under `NODE_ENV` `test`, unset and `development`, and is sent as it stands and again
+with `Accept-Encoding: identity`. The principal of a case is the trusted headers the
+provider of the fixture reads, `x-user-id`, `x-org`, `x-role` and `x-perm`, as the
+header lists of this module write them. Every identifier is a neutral test string,
+`u1`, `u2`, `42`, `orgA` and `orgB`, and names no customer.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def role(name: str) -> list:
 
 
 def identity_cases() -> list:
-    """Every served case of use-identity-app in the order of the table of the plan."""
+    """Every served case of use-identity-app, variant by variant in the order of their ids."""
     cases = []
 
     def add(case_id, variant, request, pins):
@@ -67,7 +67,7 @@ def identity_cases() -> list:
     add("id-26", "default", get("/admin/secure/data", U1_PLAIN + [("x-perm", "admin:secure")]),
         "a middleware of a child app that passes")
     add("id-27", "default", get("/early/whoami", U1),
-        "{\"id\":null} on the reference, the principal's id on the twin, divergence D75")
+        "{\"id\":null} on the reference, the principal's id on the twin, a named divergence")
     add("id-28", "default", post("{whoami}", [("x-user-id", "")]), "an empty header is anonymous")
     add("id-29", "default", get(get_target("{adminOnly}")), "the mapping over GET")
     add("id-30", "default", get("/admin/export", role("viewer")), "the branch of the route example, 403")
@@ -94,7 +94,7 @@ def identity_cases() -> list:
 
 
 def log_case():
-    """Case `log-01` of `65_logs`: `{adminOnly}` anonymous under `NODE_ENV=production`, quirk."""
+    """Case `log-01`: `{adminOnly}` anonymous under `NODE_ENV=production`."""
     return served("log-01", "use-identity-app", "default", post("{adminOnly}"),
                   "the graphql error record of a refusal before the remap", ("production",))
 

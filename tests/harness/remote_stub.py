@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: MIT
-"""`tests/notebooks/90_federation_transforms.ipynb` runs whole delegations with no
-served pair: the sidecar `tests/sidecar/federation.mjs` and the devtool
-primitive `aosabi-devtool federation` each execute a front document whose root
-resolvers delegate through a federation, and the federation's URL is this stub.
-The stub answers the introspection request of a case with the introspection JSON
-the sidecar computed from the case's target SDL, the answer to the query the
-federation sends, and the n-th data request of a case with the case's n-th
-canned answer, and it records every request. So the answers never depend on the
-bytes being compared, and the recorded requests of the two sides are what the
-notebook compares.
+"""Aosabi harness: the remote stub of the delegation corpus.
+
+A suite runs whole delegations with no served pair: the federation sidecar and
+the devtool primitive `aosabi-devtool federation` each execute a front document
+whose root resolvers delegate through a federation, and the federation's URL is
+this stub. The stub answers the introspection request of a case with the
+introspection JSON the sidecar computed from the case's target SDL, the answer
+to the query the federation sends, and the n-th data request of a case with the
+case's n-th canned answer, and it records every request. So the answers never
+depend on the bytes being compared, and the recorded requests of the two sides
+are what the notebook compares.
 
 Each case lives under its own path, `/<side>/<case>/graphql`, so a whole batch
 of requests streams through one process of either side while the stub keeps

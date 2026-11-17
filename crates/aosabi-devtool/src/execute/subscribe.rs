@@ -3,9 +3,8 @@
  * aosabi-devtool execute subscribe: subscribes to one document against a
  * loaded behaviour table and pulls its stream.
  *
- * Follows `opSubscribe`, `pullStream` and `runInterleave` of
- * tests/sidecar/execute.mjs, whose protocol is tests/sidecar/README.md, the
- * operation subscribe. No analogue in the reference.
+ * Follows `opSubscribe`, `pullStream` and `runInterleave` of the executor
+ * sidecar. No analogue in the reference.
  */
 
 //! The operation `subscribe` of the batch form.

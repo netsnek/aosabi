@@ -4,10 +4,9 @@
  *
  * This file is the root of the crate. It re-exports the items of the crates
  * behind it, and defines the functions serve_app and serve, the constant
- * BUILTINS and the macro build_output, which name the engine and the two
- * plugins every boot adds, so that no crate behind it names the carrier or the
- * engine of another. The builder of an app and the prelude stand in the modules
- * app and prelude.
+ * BUILTINS and the macro build_output, which name the engine, so that no crate
+ * behind it names the carrier or the engine of another. The builder of an app
+ * and the prelude stand in the modules app and prelude.
  */
 
 //! The facade of Aosabi, the one crate a service names under `[dependencies]`.
@@ -37,15 +36,15 @@
 //! | [`Bindings`], [`Variables`], [`Key`] | the typed environment and the variables of a request, the two derives of the derive path a compile error under the default features |
 //! | [`descriptor`] | the static description of a type, which the glue and the macros write |
 //! | [`ID`], [`Int`], [`Float`], [`Number`], [`Date`], [`File`], [`JSON`], [`Any`] | the scalar markers, the twins of the TypeScript types that name a built in scalar, and of `number` |
-//! | [`Service`], [`request_stream`] |  |
+//! | [`Service`], [`request_stream`] | the service below HTTP and the request lines a binary answers without a socket |
 //! | [`mod@json`] | the JSON value types a resolver builds, `json::Map` and `json::Value`, and [`json!`] of the derive path, a compile error under the default features |
-//! | [󰀀](mod@fetch) | the Fetch types a route answers with, `Response` over a string, bytes or a stream |
+//! | [`fetch`](mod@fetch) | the Fetch types a route answers with, `Response` over a string, bytes or a stream |
 //! | [`time`], [`task`] | the timers of a request and of a setup and the job queue of a request, `sleep`, `set_timeout`, `delay` and `tick` |
 //! | [`create_graphql_error`], [`GraphQLError`], [`GraphQLErrorOptions`], [`MaskedErrors`] | `createGraphQLError` of graphql-yoga, the `GraphQLError` it makes and its options, and the type of the key of Yoga a configuration sets, `MaskedErrors` with its options |
 //! | [`get_cookie`], [`get_cookies`], [`set_cookie`], [`delete_cookie`], [`CookieOptions`] | the cookie helpers of hono, the signed forms aside |
-//! | [`fn@body_limit`], [`BodyLimitOptions`] | the middleware `body_limit(options)` of hono under its names, with the options `max_size` and `on_error`, which `app.use_boxed(path, Rc::new(body_limit(options)))` registers in place of the default bound of 1 MiB on that path, divergence D76 |
-//! | [`fn@cors`], [`CorsOptions`], [`CorsOrigin`] | the middleware `cors(options)` of hono under its names, with the option `origin`, which `app.use_boxed(path, Rc::new(cors(options)))` registers |
-//! | [`fn@csrf`], [`CsrfOptions`], [`CsrfOrigin`], [`CsrfSecFetchSite`] | the middleware `csrf(options)` of hono under its names, with the options `origin` and `sec_fetch_site`, which `app.use_boxed(path, Rc::new(csrf(options)))` registers in place of the default csrf on that path, divergence D70 |
+//! | [`fn@body_limit`], [`BodyLimitOptions`] | the middleware `body_limit(options)` of hono under its names, with the options `max_size` and `on_error`, which `.middleware(path, body_limit(options))` of the app registers in place of the default bound of 1 MiB on that path, and which reads a body with no usable `Content-Length` through its bound before the routes run, where the default decides as the route reads |
+//! | [`fn@cors`], [`CorsOptions`], [`CorsOrigin`] | the middleware `cors(options)` of hono under its names, with the option `origin`, which `.middleware(path, cors(options))` of the app registers |
+//! | [`fn@csrf`], [`CsrfOptions`], [`CsrfOrigin`], [`CsrfSecFetchSite`] | the middleware `csrf(options)` of hono under its names, with the options `origin` and `sec_fetch_site`, which takes the place of the default csrf, a named divergence, on the path where `use_boxed` of the engine's app registers it ahead of the handlers of the routes a request matches, the endpoint of the engine among them, a call the app of the facade does not have, since the closure `.middleware(path, f)` takes is no csrf the dispatch tells apart |
 //! | [`on_execute_done`], [`ExecutionOutcome`] | the done hook of a plugin literal and the result it reads |
 //! | [`current_role`], [`Role`] | the run role of the process |
 //! | [`db`] | `ForbiddenError` |
@@ -55,11 +54,12 @@
 //! | `fetch`, `FetchError`, `Request`, `Headers`, `Body` | the outbound HTTP call of a service, its failure and the request it sends, under the feature `fetch`, which `sentry`, `auth-zitadel` and `federation` turn on |
 //! | `Lazy` | a member whose value is computed when it is selected, the twin of a property `() => value`, a form of the derive path under the hidden feature `mirror` |
 //! | `create_gateway`, `Gateway`, `GatewayFactory`, `GatewayOptions`, `DelegateCall`, `passthrough`, `Passthrough`, `Patches`, `pass`, `FieldPolicy`, `PatchPolicy`, `Force`, `Pass`, `HeadersFn`, `Needs`, `headers!`, `needs!`, `patches!`, `policy!`, `federation` | the federation, `createGateway` with its patches, policies, needs and headers, under the feature `federation`, the four literals a compile error under the default features |
-//! | `remote` |  |
-//! | [`BUILTINS`] | the viewer and the landing page every boot adds |
+//! | `remote` | the contract of the registry `aosabi pull` writes for a remote schema, with the delegated value contract `FromDelegated`, `RemoteType`, `Params` and `Unchecked` beside the traits of the registry, under the hidden feature `mirror`, since only the registries of the derive path name it |
+//! | [`BUILTINS`] | the plugins a boot of Rust takes from its host, none |
 //! | `serve_app`, `BuildOutput`, `build_output!`, `use_node_server` | the engine, under the feature `serve` on a native target |
 //! | `serve_static`, `ServeStaticOptions` | the middleware that serves the files of a directory, `serveStatic` of the Node adapter, under the feature `serve` on a native target |
-//! | [`fn@compress`] | the middleware `compress()` of hono under its name, which codes the answers of the routes after it in deflate, since the base pipeline codes none, divergence D72 |
+//! | [`embed`], [`embed_output!`] | the engine and the roots of an app inside the program of a host, such as a module of WebAssembly in a Web Worker, which answers GraphQL request bodies with no socket |
+//! | [`fn@compress`] | the middleware `compress()` of hono under its name, which `.middleware(path, compress())` of the app registers and which codes the answers of the routes after it in deflate, since the base pipeline codes none, a named divergence |
 //!
 //! A plain crate builds its app with the builder [`App`], which [`prelude`]
 //! exports as well, `App::new().query(Query)`. The chain carries the
@@ -67,15 +67,25 @@
 //! `aosabi.config.ts` as well, and `serve_app` serves the configuration the app
 //! carries, so a project holds no `aosabi.config.rs`.
 //!
-//! Under the default features each macro of the derive path, each key of
-//! `#[aosabi(..)]`, `json!`, the four literals of the federation and
-//! `create_decorator` answer a compile error that names the native form, and
-//! the command line refuses the entry `default` of the derive path and
-//! `aosabi.config.rs`. The feature keeps `aosabi::serve`, which serves the
-//! configuration of `aosabi.config.rs`, beside `serve_app`, and keeps `Lazy`
-//! and the module `remote`, the contract of the registries of `aosabi pull`, at
-//! their paths, so under the default features each of these names answers
-//! rustc's own error.
+//! The forms of the derive path stand behind the hidden feature `mirror`, which
+//! the twins and the cases that wait for the TypeScript judge alone enable and
+//! no application names. Under the default features each macro of the derive
+//! path, each key of `#[aosabi(..)]`, `json!`, the four literals of the
+//! federation and `create_decorator` answer a compile error that names the
+//! native form, and the command line refuses the entry `default` of the derive
+//! path and `aosabi.config.rs`. The engine's app, the `Result` over its thrown
+//! value, that thrown value `Thrown`, `Unchecked`, `JsObject` and `JsValue`
+//! stand outside the root, and the feature reaches them through the module
+//! `mirror`, `aosabi::mirror::App` among them, while the engine keeps every
+//! item the boot of the TypeScript option and `aosabi-devtool` call. The
+//! feature keeps `aosabi::serve`, which serves the configuration of
+//! `aosabi.config.rs`, beside `serve_app`, and keeps `Lazy` and the module
+//! `remote`, the contract of the registries of `aosabi pull`, at their paths,
+//! so under the default features each of these names answers rustc's own error.
+//! The engine's names `Repeater`, `experimental_create_pub_sub` and `mutation`,
+//! which the TypeScript option maps, stay at the root under the default
+//! features beside their native forms `stream::task`, `PubSub::new` and
+//! `MutationPayload`.
 //!
 //! The defaults of the crate are the translation alone, which every card
 //! links, and the package of a card names the engine and the coding of its
@@ -116,6 +126,7 @@
 //! ```
 
 pub mod app;
+pub mod embed;
 pub mod prelude;
 
 /// The engine's `createDecorator`, under the hidden feature `mirror`.
@@ -278,7 +289,7 @@ pub use crate::{
 };
 
 /// Returns the decorator of `callback`, `createDecorator(callback)` of the
-/// derive path, which retires.
+/// derive path, which is retired for application code.
 ///
 /// Under the default features every call answers a compile error that names the
 /// native form, a guard function the body of a method calls first, since no
@@ -290,8 +301,8 @@ pub fn create_decorator<F: __private::RetiredDecorator>(callback: F) -> Decorato
     callback.decorator()
 }
 
-/// Builds a JSON value from a literal, `json!` of the derive path, which
-/// retires.
+/// Builds a JSON value from a literal, `json!` of the derive path, which is
+/// retired for application code.
 ///
 /// Under the default features it answers a compile error that names the native
 /// form, `json::Map::from([..])`, `json::Value::from(..)` or `collect()`, and
@@ -302,23 +313,23 @@ pub fn create_decorator<F: __private::RetiredDecorator>(callback: F) -> Decorato
 macro_rules! json {
     ($($body:tt)*) => {
         ::core::compile_error!(
-            "`json!` is retired, and an application builds a JSON value with `json::Map::from([..])`, `json::Value::from(..)` or `collect()`, as docs/authoring.md section 20.3 writes it"
+            "`json!` is retired, and an application builds a JSON value with `json::Map::from([..])`, `json::Value::from(..)` or `collect()`"
         )
     };
 }
 
-/// The viewer in the first slot and the landing page of the unhandled route,
-/// the two plugins every boot adds, `useViewer()` and `useUnhandledRoute()`.
-pub const BUILTINS: Builtins = Builtins {
-    first: None,
-    viewer: aosabi_viewer::use_viewer,
-    unhandled_route: aosabi_landing::use_unhandled_route,
-};
+/// The plugins a boot of Rust takes from its host, none, since a host of
+/// Rust puts no plugin before the plugins of a pass.
+pub const BUILTINS: Builtins = Builtins { first: None };
 
 /// The JSON value types a resolver builds and a `ServiceError` carries.
 ///
-/// [󰀀](json::Map) and [󰀁](json::Value) are the object and the value under the
-/// names of `serde_json`, which an application builds with no macro.
+/// [`Map`](json::Map) and [`Value`](json::Value) are the object and the value
+/// under the names of `serde_json`, which an application builds with no macro.
+/// The hidden feature `mirror` adds the same two types under the names of the
+/// engine, `JsObject` and `JsValue`, with the string `JsString` and the
+/// conversion `IntoJson`, which the forms of the derive path and the registries
+/// `aosabi pull` writes name, since they are retired for application code.
 pub mod json {
     #[cfg(feature = "mirror")]
     pub use aosabi_json::{
@@ -335,6 +346,14 @@ pub mod json {
 
 /// The forms of the derive path that left the root of the facade, under the
 /// hidden feature `mirror`.
+///
+/// The root name `App` names the builder of an app and the root name `Result`
+/// the `Result` of the prelude, and `Thrown`, `Unchecked`, `JsObject` and
+/// `JsValue` stand off the root, so the twins and the cases that wait for the
+/// TypeScript judge import those names from here: the engine's app `App` with
+/// its constructor from a fragment, the `Result` over `Thrown`, the thrown
+/// value `Thrown` with `Thrown::value`, `Unchecked` and the JSON types under
+/// the names of the engine.
 #[cfg(feature = "mirror")]
 #[doc(hidden)]
 pub mod mirror {
@@ -403,13 +422,12 @@ pub mod task {
     pub use aosabi_core::execute::promise::tick;
 }
 
-/// `createGraphQLError` of the package `graphql-yoga`, which a
-/// resolver throws a `GraphQLError` with its extensions through, and the
-/// error and its options, at the root as the root of the package `aosabi`
-/// exports them, and the type of the key of Yoga that a configuration
-/// spreads into the options of Yoga, which the builder of an app sets
-/// through `.masked_errors(..)`. The keys `batching` and `cors` are no keys
-/// of Aosabi, the named divergences D58 and D46.
+/// `createGraphQLError` of the package `graphql-yoga`, which a resolver throws
+/// a `GraphQLError` with its extensions through, and the error and its options,
+/// at the root as the root of the package `aosabi` exports them, and the type
+/// of the key of Yoga that a configuration spreads into the options of Yoga,
+/// which the builder of an app sets through `.masked_errors(..)`. The keys
+/// `batching` and `cors` are no keys of Aosabi, named divergences.
 pub use aosabi_core::{
     GraphQLError,
     GraphQLErrorOptions,
@@ -617,7 +635,9 @@ pub mod federation {
 ///
 /// A name is an identifier or a string literal, and a value is an expression
 /// that converts into a `String`. A name written twice keeps its first place
-/// and its last value, as in an object literal.
+/// and its last value, as in an object literal. The literal is a form of the
+/// derive path, retired for application code, so the fronts of the federation
+/// that still wait for a native form alone write it.
 ///
 /// # Examples
 ///
@@ -639,17 +659,18 @@ macro_rules! headers {
 }
 
 /// The literal of the headers of a federation, `headers!` of the derive path,
-/// which retires, under the feature `federation`.
+/// retired for application code, under the feature `federation`.
 ///
 /// Under the default features it answers a compile error that names the native
 /// form, `federation::Headers::new()` with `set(name, value)`, and the hidden
-/// feature `mirror` keeps the literal for the fronts that wait for wave 2.
+/// feature `mirror` keeps the literal for the fronts of the federation that
+/// still wait for a native form.
 #[cfg(all(feature = "federation", not(feature = "mirror")))]
 #[macro_export]
 macro_rules! headers {
     ($($body:tt)*) => {
         ::core::compile_error!(
-            "`headers!` is retired, and an application builds the headers with `federation::Headers::new()` and `set(name, value)`, as docs/authoring.md section 28 writes it"
+            "`headers!` is retired, and an application builds the headers with `federation::Headers::new()` and `set(name, value)`"
         )
     };
 }
@@ -659,7 +680,9 @@ macro_rules! headers {
 ///
 /// Each field holds `args`, the names a caller may set, and `force`, the forced
 /// arguments, each optional and in either order. A forced value is a closure of
-/// the context or an expression of a JSON kind.
+/// the context or an expression of a JSON kind. The literal is a form of the
+/// derive path, retired for application code, so the fronts of the federation
+/// that still wait for a native form alone write it.
 ///
 /// # Examples
 ///
@@ -676,18 +699,19 @@ macro_rules! policy {
     };
 }
 
-/// The literal of a policy of a federation, `policy!` of the derive path, which
-/// retires, under the feature `federation`.
+/// The literal of a policy of a federation, `policy!` of the derive path,
+/// retired for application code, under the feature `federation`.
 ///
 /// Under the default features it answers a compile error that names the native
 /// form, the struct `FieldPolicy { args, force }` per field, and the hidden
-/// feature `mirror` keeps the literal for the fronts that wait for wave 2.
+/// feature `mirror` keeps the literal for the fronts of the federation that
+/// still wait for a native form.
 #[cfg(all(feature = "federation", not(feature = "mirror")))]
 #[macro_export]
 macro_rules! policy {
     ($($body:tt)*) => {
         ::core::compile_error!(
-            "`policy!` is retired, and an application writes the struct `FieldPolicy { args, force }` for each field, as docs/authoring.md section 28 writes it"
+            "`policy!` is retired, and an application writes the struct `FieldPolicy { args, force }` for each field"
         )
     };
 }
@@ -699,7 +723,9 @@ macro_rules! policy {
 /// The literal is a closure over the builder of the record the delegated field
 /// answers, so a name the record lacks is refused at that name. A key is a
 /// field name, alone or with `true`, with `false`, or with a nested literal,
-/// whose key `__args` holds the arguments of its field.
+/// whose key `__args` holds the arguments of its field. The literal is a form
+/// of the derive path, retired for application code, so the fronts of the
+/// federation that still wait for a native form alone write it.
 ///
 /// # Examples
 ///
@@ -714,20 +740,18 @@ macro_rules! needs {
     };
 }
 
-/// The literal of the selection of a delegation, `needs!` of the derive path,
-/// which retires, under the feature `federation`.
+/// The literal of the selection of a delegation, `needs!` of the derive
+/// path, retired for application code, under the feature `federation`.
 ///
 /// Under the default features it answers a compile error that says the literal
 /// has no native form yet, since the plain form of a selection stays open, as
 /// the key `spread` answers, and the hidden feature `mirror` keeps the literal
-/// for the fronts that wait for wave 2.
+/// for the federation fronts that still wait for one.
 #[cfg(all(feature = "federation", not(feature = "mirror")))]
 #[macro_export]
 macro_rules! needs {
     ($($body:tt)*) => {
-        ::core::compile_error!(
-            "`needs!` is retired with no native form yet, as docs/authoring.md section 28 writes it"
-        )
+        ::core::compile_error!("`needs!` is retired with no native form yet")
     };
 }
 
@@ -737,7 +761,9 @@ macro_rules! needs {
 ///
 /// A patch is a closure that takes the type its key names,
 /// `pass(closure, policy! { .. })`, or the bare `passthrough()`, and a key that
-/// names another type, or a type the registry lacks, fails to compile.
+/// names another type, or a type the registry lacks, fails to compile. The
+/// literal is a form of the derive path, retired for application code, so the
+/// fronts of the federation that still wait for a native form alone write it.
 ///
 /// # Examples
 ///
@@ -756,17 +782,18 @@ macro_rules! patches {
 }
 
 /// The literal of the patches of a federation, `patches!` of the derive path,
-/// which retires, under the feature `federation`.
+/// retired for application code, under the feature `federation`.
 ///
 /// Under the default features it answers a compile error that names the native
 /// form, `federation::Patches::new()` and its calls, and the hidden feature
-/// `mirror` keeps the literal for the fronts that wait for wave 2.
+/// `mirror` keeps the literal for the fronts of the federation that still wait
+/// for a native form.
 #[cfg(all(feature = "federation", not(feature = "mirror")))]
 #[macro_export]
 macro_rules! patches {
     ($($body:tt)*) => {
         ::core::compile_error!(
-            "`patches!` is retired, and an application builds the patches with `federation::Patches::new()` and its calls, as docs/authoring.md section 28 writes it"
+            "`patches!` is retired, and an application builds the patches with `federation::Patches::new()` and its calls"
         )
     };
 }
@@ -907,6 +934,8 @@ mod engine {
     /// the network under the feature `fetch`. The entry answers an app or a
     /// `Result` of one, [`IntoEntry`], and a configuration the app carries is
     /// left out, since `config` is the configuration of the project.
+    /// `aosabi.config.rs` is retired for [`serve_app`], so the generated main
+    /// of a twin that waits for the TypeScript judge alone calls it.
     ///
     /// The whole `main` of the server crate of a card of a project with
     /// `aosabi.config.rs`:
@@ -1026,7 +1055,7 @@ pub mod __private {
     /// that names the native form of a decorator.
     #[cfg(not(feature = "mirror"))]
     #[diagnostic::on_unimplemented(
-        message = "`create_decorator` is retired, and the body of a method calls its guard function first, as docs/authoring.md section 23 writes it",
+        message = "`create_decorator` is retired, and the body of a method calls its guard function first",
         label = "the callback of a decorator of the derive path"
     )]
     pub trait RetiredDecorator {

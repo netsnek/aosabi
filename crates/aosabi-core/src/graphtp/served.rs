@@ -6,10 +6,10 @@
  *
  * No analogue in the reference. A call runs the steps of the HTTP layer after
  * its request parse on the GraphQL server the boot mounted, and a call of an
- * app whose router holds more than the core takes the POST of steps 2 and 3
- * of docs/graphtp-in-aosabi.md section 3 through the fetch of the app. The
- * answer carries what step 4 of that section reads, with the substatus of
- * section 4 copied from the field of the Response the HTTP layer sets.
+ * app whose router holds more than the core takes the POST of the listener
+ * through the fetch of the app. The answer carries the status, the substatus
+ * copied from the field of the Response the HTTP layer sets, the media type
+ * and the body.
  */
 
 //! The fetch of a served build and of a carrier.
@@ -37,8 +37,8 @@
 //!    GraphQL middleware lets it fall through, and the rest of an app the
 //!    road serves is the not found handler of its router. The road answers
 //!    the not found answer of hono, since neither the router nor the booted
-//!    app hands out a handler an app sets, the landing page among them, and
-//!    a client of `GraphTP` reads either as the status 404 with an empty body.
+//!    app hands out a handler an app sets, and a client of `GraphTP` reads
+//!    either as the status 404 with an empty body.
 //!
 //! The call runs inside a context of its own, bound as the base pipeline binds
 //! the context of a request, so `getContext()` answers in every hook and
@@ -55,13 +55,12 @@
 //! The road serves an app a call would pass through the core alone, which
 //! `straight_server` decides once per app from what the boot built and never
 //! from what a plugin declares. A plugin of the configuration of the app in
-//! any form, `use_identity` above all, a plugin a host hands the boot, the
-//! viewer and the landing page among them, a plugin of the core with a member
-//! the road does not run, a middleware on the plugin chain, a route or
-//! middleware of the app on the path of a call, another endpoint or a health
-//! check on the path of a call keep the app on its fetch, the
-//! POST of `docs/graphtp-in-aosabi.md` section 3, so every check the app
-//! holds runs on every call as it runs over HTTP.
+//! any form, `use_identity` above all, a plugin a host hands the boot, a
+//! plugin of the core with a member the road does not run, a middleware on
+//! the plugin chain, a route or middleware of the app on the path of a call
+//! or another endpoint keep the app on its fetch, the POST of
+//! `Documentation/guides/graphtp.md`, so every check the app holds runs
+//! on every call as it runs over HTTP.
 //!
 //! A body the app writes whole reaches the listener whole, and a body the app
 //! writes as a stream reaches it as its [`Chunks`], which the listener reads
@@ -133,6 +132,7 @@ use crate::{
         Request,
         URL, //
     },
+    random::seed_keys, //
 };
 
 /// The status a fetch the app rejected with an error of any name but
@@ -159,10 +159,9 @@ const NOT_FOUND: u16 = 404;
 /// which the router answers where the app sets no not found handler.
 ///
 /// The road answers it for every app it serves, since neither the router nor
-/// [`BootedApp`] hands out a handler an app sets, the landing page of
-/// `aosabi-landing` among them. The listener answers the text and the landing
-/// page alike, the status with substatus 0 and an empty body, since neither
-/// names the answer type.
+/// [`BootedApp`] hands out a handler an app sets. The listener answers the
+/// text as the status with substatus 0 and an empty body, since it names no
+/// answer type.
 const NOT_FOUND_TEXT: &str = "404 Not Found";
 
 /// The registrations of the core a call passes on every path, which the
@@ -223,12 +222,19 @@ struct Straight {
 /// pair of an incoming and an outgoing message of Node. A call the road
 /// rejects answers with no media type and an empty body, 504 for an error
 /// named `TimeoutError` and 500 for every other, as `handleFetchError` of the
-/// adapter of Node answers, which the listener answers as 504.0 and 500.0 by
-/// step 4.
+/// adapter of Node answers, which the listener answers as 504.0 and 500.0.
+/// Each call keys the thread that makes it with [`seed_keys`] before
+/// it reads the call, the straight road among them, which passes the fetch
+/// of the booted app, and where the key fails answers the refusal of that
+/// fetch unread, which `Documentation/guides/graphtp.md` carries as 503.0 with
+/// an empty body.
 #[must_use]
 pub fn fetch(app: Rc<BootedApp>) -> Fetch {
     let straight = straight_server(&app);
     Rc::new(move |call: Request| -> Reply {
+        if seed_keys().is_err() {
+            return Box::pin(core::future::ready(answer(&crate::random::refused())));
+        }
         let request = request(&call);
         let pending: LocalBoxFuture<'static, Result<(Response, aosabi_http::Body), Thrown>> =
             if let Some(straight) = &straight {
@@ -419,23 +425,16 @@ async fn operate(
 /// the core makes itself, with members [`STRAIGHT_MEMBERS`] holds, the plugin
 /// chain holds no middleware, counted at every push of the loader, the
 /// router meets `POST /graphql` with the five registrations of
-/// [`CORE_LAYERS`] alone, each from the sources of the core, the endpoint is
-/// `/graphql` and no health check endpoint ends the URL of a call, the test
-/// of `useHealthCheck`. Any other app answers every call
-/// through [`BootedApp::fetch`], so a check it holds, the principal
-/// `use_identity` binds above all, holds on every call as it holds over
-/// HTTP. What a plugin of the configuration or of the host declares never
-/// opens the road, since its members may name fewer hooks than it runs, so
-/// every boot that adds the viewer or the landing page of its host keeps its
-/// app on the fetch.
+/// [`CORE_LAYERS`] alone, each from the sources of the core, and the endpoint
+/// is `/graphql`. Any other app answers every call through
+/// [`BootedApp::fetch`], so a check it holds, the principal `use_identity`
+/// binds above all, holds on every call as it holds over HTTP. What a plugin
+/// of the configuration or of the host declares never opens the road, since
+/// its members may name fewer hooks than it runs.
 fn straight_server(app: &BootedApp) -> Option<Straight> {
     let mounted = app.graphql_server()?;
     let server = mounted.server();
-    let health = app
-        .config()
-        .and_then(|config| config.health_check_endpoint.as_deref())
-        .is_some_and(|endpoint| URL.ends_with(endpoint));
-    if server.graphql_endpoint() != GRAPHQL_PATH || health {
+    if server.graphql_endpoint() != GRAPHQL_PATH {
         return None;
     }
     let boot = app.boot_record();
@@ -473,12 +472,10 @@ fn straight_server(app: &BootedApp) -> Option<Straight> {
 /// `config.plugins`, which the boot labels by its index there whatever form it
 /// takes, a plugin in the form of the trait or of the HTTP layer joined
 /// through `from_http` naming none by default and a plugin object that spreads
-/// such a plugin naming none of its hooks, the viewer and the landing page,
-/// which the host hands the boot in [󰀅](crate::app::execute_config::Builtins)
-/// and which the boot labels by their role whatever the constructor of the
-/// host returns, the plugin a host puts before every plugin of a pass, which
-/// carries no label of the boot, and the refusal of introspection, a plugin of
-/// the HTTP layer joined through `from_http`.
+/// such a plugin naming none of its hooks, the plugin a host puts before every
+/// plugin of a pass in [`Builtins`](crate::app::execute_config::Builtins),
+/// which carries no label of the boot, and the refusal of introspection, a
+/// plugin of the HTTP layer joined through `from_http`.
 fn made_by_core(plugin: &PluginRecord) -> bool {
     matches!(
         plugin.label,
@@ -551,9 +548,9 @@ pub fn request(call: &Request) -> Rc<aosabi_http::Request> {
     let mut headers = Headers::new();
     for (name, value) in call.fields() {
         // The values are the two fixed types and a credential of visible
-        // ASCII, which the server of graphtp-homa checks by rule 6 of
-        // docs/graphtp.md section 5.3, so each is text the platform takes as
-        // a field, and a value past rule 6 travels as no credential does.
+        // ASCII, which the server of graphtp-homa checks, so each is text the
+        // platform takes as a field, and a value past that check travels as
+        // no credential does.
         if let Ok(value) = core::str::from_utf8(value) {
             let _ = headers.append(name, value);
         }

@@ -4,8 +4,9 @@
  * coalescing per slot, the allowlist of a carrier and the lock the
  * environment supplies.
  *
- * No analogue in the reference, whose pub sub dispatches on an EventTarget. The
- * allowlist and the lock build without alloc, and the hub needs it.
+ * No analogue in the reference, whose pub sub dispatches on an EventTarget.
+ * The primitive is the rule below every protocol. The allowlist and the lock
+ * build without alloc, and the hub needs it.
  */
 
 //! The publish primitive of the kernel.
@@ -24,20 +25,20 @@
 //!
 //! # The rules
 //!
-//! The plan of the kernel numbers the rules of the module, and the push model of
-//! the harness states them in the same words. Rules 1 to 5 are the hub's and
-//! stand in its module doc, rule 9 is the allowlist's and stands in [`allow`],
-//! and rule 8 is the one of [`Revision`]:
+//! The rules of the module are numbered, and the push model of the harness
+//! states them in the same words. Rules 1 to 5 are the hub's and stand in its
+//! module doc, rule 9 is the allowlist's and stands in [`allow`], and rule 8
+//! is the one of [`Revision`]:
 //!
 //! 8. The revision rides on every delivered event for the pump and the devtool,
 //!    and it reaches no frame of HTTP(TCP) and no event of GraphTP(Homa), which
 //!    carry only what the payload carries. In the lean
 //!    frame of `GraphTP` an entry `next` holds the bytes after `data: ` of one
-//!    `next` event of the service's stream verbatim, and a stream entry carries
-//!    a handle and a batch count `seq` and no revision. The revision is the
-//!    hub's, so a service has one counter per pub sub, and a service with one
-//!    pub sub, which every example and the wasabi service write, has the
-//!    one global counter of ADR-0017, Rules kept from the prototype.
+//!    `next` event of the service's stream verbatim, and a stream entry
+//!    carries a handle and a batch count `seq` and no revision. The revision
+//!    is the hub's, so a service has one counter per pub sub, and a service
+//!    with one pub sub, which every example writes, counts all its topics on
+//!    one counter.
 
 pub mod allow;
 #[cfg(feature = "alloc")]

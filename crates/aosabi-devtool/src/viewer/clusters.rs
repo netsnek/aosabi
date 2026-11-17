@@ -4,8 +4,9 @@
  * clusterings of an input with their shares and the pick.
  *
  * The rule that picks among the declared map, the name stems and the root
- * field territories is docs/aoviewer.md section 5.5, and 51_viewer_core
- * prints the table for 75_docgen to judge.
+ * field territories is the cluster rule of aoviewer, and a check of the
+ * viewer core prints the table for the checks of the documentation generator
+ * to judge.
  */
 
 //! The `clusters` operation.

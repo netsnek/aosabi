@@ -3,8 +3,7 @@
  * aosabi-devtool http: the tables of Node the HTTP layer carries.
  *
  * No analogue in the reference. The keys STATUS_CODES, METHODS and
- * maxHeaderSize are the names of require('http') of Node 24.13.0, which the
- * table cell of tests/notebooks/30_http_tier1.ipynb reads beside them.
+ * maxHeaderSize are the names of require('http') of Node 24.13.0.
  */
 
 //! `tables`.

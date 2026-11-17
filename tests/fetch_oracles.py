@@ -12,8 +12,8 @@ pins, cloned into the folder the notebooks read, which git ignores. A folder tha
 pinned commit is left as it is, and a folder that holds anything else stops the script, so a local
 change in an oracle is never lost.
 
-The script only fetches. Installing the packages of an oracle, which the TypeScript side of a suite
-needs, is described in section 5 of Documentation/guides/conformance.md.
+The script only fetches, and it installs no package of an oracle. Section 5 of
+Documentation/guides/conformance.md says which suites read an oracle.
 """
 
 from __future__ import annotations

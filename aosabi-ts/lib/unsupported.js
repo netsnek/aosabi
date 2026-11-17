@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
+ * aosabi lib/unsupported: the entry aosabi/unsupported/*, which stands in for the seven subpaths of
+ * Pylon whose engine items wait for a later release and exports each of their names as a function
+ * that throws when it is called.
+ *
  * The names are the values that db/index.ts, db/plugin.ts, queues/index.ts, pages/index.ts,
  * pages/plugin.ts, query/index.ts and ir/index.ts of the reference at 2653a81
  * export, read through the checker of typescript 5.9.3, each once, with every subpath that exports
@@ -12,12 +16,15 @@
 const ORIGIN = '@getcronit/pylon/'
 
 /**
+ * Returns a function named `name` that throws an Error naming `name`, the subpaths of Pylon in
+ * `subpaths` that export it and the release it waits for, whenever it is called or constructed.
+ *
  * The stand in is a plain function and no arrow, so a construction throws as a call does, and a
  * class of the app that extends a stand in still loads and throws at its first construction.
  */
 function unsupported(name, subpaths) {
   const where = subpaths.map(subpath => ORIGIN + subpath).join(' and ')
-  const message = name + ' of ' + where + ' has no engine item in aosabi before M9'
+  const message = name + ' of ' + where + ' has no engine item in aosabi until a later release'
   const stand = function () {
     throw new Error(message)
   }

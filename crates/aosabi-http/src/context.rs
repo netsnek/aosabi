@@ -14,14 +14,13 @@
 //! headers, the response once one is set, the variables of `c.set` and the
 //! typed slots the core keeps its request state in.
 //!
-//! The helpers `c.text`, `c.json`, `c.html` and `c.body` take the status and the
-//! headers that `c.status` and `c.header` prepared, because Rust has no optional
-//! argument: `c.status(403); c.text(t)` gives the same status, headers and body as
-//! `c.text(t, 403)` of the reference, since every helper takes the prepared status
-//! and headers when no argument names them (rule 8 of section HONO of the old page
-//! of the plan). The helper `c.text` with nothing prepared answers
-//! `new Response(text)`, the fast path whose `content-type` the adapter writes
-//! with the space.
+//! The helpers `c.text`, `c.json`, `c.html` and `c.body` take the status and
+//! the headers that `c.status` and `c.header` prepared, because Rust has no
+//! optional argument: `c.status(403); c.text(t)` gives the same status, headers
+//! and body as `c.text(t, 403)` of the reference, since every helper takes the
+//! prepared status and headers when no argument names them. The helper `c.text`
+//! with nothing prepared answers `new Response(text)`, the fast path whose
+//! `content-type` the adapter writes with the space.
 //!
 //! A call of `c.header` that the platform refuses throws in the reference. It
 //! returns nothing here, keeps the `TypeError`, and the next helper that makes
@@ -534,8 +533,7 @@ impl Context {
     /// Returns `c.html(html)`.
     ///
     /// A string is a string body, and the output of the `html` template is the
-    /// `String` object of the reference, which the adapter keeps in no cache (A5
-    /// of the plan's version 2 draft).
+    /// `String` object of the reference, which the adapter keeps in no cache.
     ///
     /// # Errors
     ///

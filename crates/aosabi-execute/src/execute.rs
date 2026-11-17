@@ -859,7 +859,7 @@ impl LeafRules {
 }
 
 /// The positions of the five specified scalars in [`specified_scalar_types`],
-/// the order of `specifiedScalarTypes`, `String` first.
+/// the order of `specifiedScalarTypes` of graphql-js, `String` first.
 const SPECIFIED_STRING: usize = 0;
 /// The position of `Int` in [`specified_scalar_types`].
 const SPECIFIED_INT: usize = 1;
@@ -3700,7 +3700,7 @@ pub fn invalid_return_type_error(
 ///
 /// The sub fields are the node of the plan for `field` on `return_type`, which
 /// the plan collects once, as `collectSubfields` does with its memo at
-/// `execute.js:28` (see [󰀆](crate::plan::Plan)).
+/// `execute.js:28` (see [`Plan::sub`](crate::plan::Plan)).
 ///
 /// # Errors
 ///

@@ -1,10 +1,11 @@
 # The task runner of the repository, run as cargo xtask through the alias of
-# .cargo/config.toml. Its one sub command, viewer-assets, is the only writer of the
-# committed wasm files and of assets.lock. It is never published and no crate depends
-# on it.
+# .cargo/config.toml. Its one sub command, viewer-assets, is the only writer of
+# the committed wasm files and of assets.lock. A later release adds the two
+# font files to it under --fonts, as their only writer, and no tool writes them
+# yet. It is never published and no crate depends on it.
 [package]
 name = "xtask"
-version = "0.0.0"
+version.workspace = true
 description = "The task runner of the repository: cargo xtask viewer-assets writes the committed viewer products and assets.lock."
 publish = false
 edition.workspace = true

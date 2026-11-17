@@ -4,7 +4,7 @@
  *
  * The flag --wasm answers an operation through the exports of the committed
  * module in place of the linked core, so the same call judges the shipped
- * bytes.
+ * bytes. Which engine runs the module is still open.
  */
 
 //! The runner of the committed module.

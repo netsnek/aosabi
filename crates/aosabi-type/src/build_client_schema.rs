@@ -269,6 +269,9 @@ pub fn build_client_schema(
 }
 
 /// Returns `introspection.__schema` when both are object like.
+///
+/// The `devAssert` over `isObjectLike`, which an array and an object pass and
+/// `null` fails.
 fn schema_of(introspection: &JsValue) -> Option<&JsValue> {
     if !is_object_like(Some(introspection)) {
         return None;
@@ -751,6 +754,9 @@ impl Scope {
 
 /// The parts of an argument and of an input field, which the reference
 /// builds with one function.
+///
+/// The object literal, which the reference hands to an argument and to an
+/// input field alike.
 struct InputValue {
     description: Option<String>,
     ty: Type,
@@ -1047,6 +1053,9 @@ fn inspect_member(value: Option<&JsValue>) -> String {
 }
 
 /// Asserts the name a constructor of the reference receives.
+///
+/// The two `devAssert` calls that open `assertName`, which [`assert_name`]
+/// leaves to its argument type, followed by [`assert_name`] itself.
 fn assert_name_value(name: Option<&JsValue>) -> Result<String, DefinitionError> {
     match name {
         None | Some(JsValue::Undefined | JsValue::Null) => {
@@ -1058,6 +1067,9 @@ fn assert_name_value(name: Option<&JsValue>) -> Result<String, DefinitionError> 
 }
 
 /// Returns the source of a default value the parser reads.
+///
+/// The `devAssert` of the source constructor, which the parser calls on a body
+/// that is not a source.
 fn source_of(default_value: &JsValue) -> Result<Source, DefinitionError> {
     match default_value {
         JsValue::String(body) => Ok(Source::from(body.clone())),
@@ -1093,7 +1105,9 @@ const OBJECT_LEVEL: u64 = 1747;
 /// has opened an input object, the lists opened before that object among them,
 /// and an input object spends the same: the front serves 741 pairs of a list
 /// and an input object and throws for 742, and serves 1,000 lists around 535
-/// input objects and throws for 536.
+/// input objects and throws for 536. These costs put the edges of those four
+/// shapes, and of six more, where the reference has them, and a shape no edge
+/// measures is assumed to follow them.
 const VALUE_STACK: u64 = 1747 * LIST_LEVEL - 1;
 
 /// Returns whether the parser of the reference ends its stack with the

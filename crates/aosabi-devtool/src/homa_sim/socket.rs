@@ -4,8 +4,7 @@
  * homa-sim scenario, both ends in this process over a real Unix Socket.
  *
  * No analogue in the reference. The links run the ends of a scenario over the
- * Unix Socket transports of homa::unix, the plan's section The devtool gives
- * them to stage H2, and the judging notebook is
+ * Unix Socket transports of homa::unix, and the judging notebook is
  * tests/notebooks/21_homa_loopback.ipynb, whose real socket half runs them.
  */
 

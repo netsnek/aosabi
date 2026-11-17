@@ -39,10 +39,7 @@
 //! procedural macros and into the build host alone, never into a card.
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are
-//! `tests/notebooks/10_schema_tier1.ipynb`,
-//! `tests/notebooks/30_http_tier1.ipynb` and
-//! `tests/notebooks/31_http_errors.ipynb` for the glue of both paths.
+//! section 3.
 
 use syn::{
     Generics,
@@ -71,8 +68,7 @@ pub struct TypeItem<'a> {
 }
 
 /// Returns the name of `ident` with a raw prefix removed and nothing else
-/// changed, which is the field name policy of the derive path,
-/// `docs/schema-inference.md` section 5.3.
+/// changed, which is the field name policy of the derive path.
 #[must_use]
 pub fn unraw(ident: &Ident) -> String {
     ident.unraw().to_string()

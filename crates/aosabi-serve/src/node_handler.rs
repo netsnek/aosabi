@@ -2,11 +2,14 @@
 /*
  * aosabi-serve: the service hyper calls for a request, over the booted app.
  *
- * Derived from hono 1.19.9, dist/listener.js, MIT.
+ * The request listener the adapter hands Node's server, with the scheme of the
+ * connection. Hyper calls it as a service for each request, over the booted
+ * app.
  *
- * It carries the halves of the serve layer of the quirks
- * Q51_NODE_ADAPTER_NULL_BODY and Q60_NODE_REASON_TABLE of docs/byte-equality.md
- * section 13.1.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
+ *
+ * It carries the halves of the serve layer of the quirks NODE_ADAPTER_NULL_BODY
+ * and NODE_REASON_TABLE.
  */
 
 //! `NodeHandler`.
@@ -31,21 +34,22 @@
 //! it.
 //!
 //! The answer of the adapter becomes the response: the status with the reason
-//! of Node's table, quirk `Q60_NODE_REASON_TABLE`, the lines of the record in
-//! its order with its spellings, each value in the bytes the first write gives
-//! it, quirk `Q58_NODE_ENCODING_FIRST_WRITE`, what the answer asks of the
-//! connection, and the body as a body of unknown size, so a null body is
-//! framed chunked where Node frames it, quirk `Q51_NODE_ADAPTER_NULL_BODY`.
+//! of Node's table, quirk `NODE_REASON_TABLE`, the lines of the record in its
+//! order with its spellings, each value in the bytes the first write gives it,
+//! quirk `NODE_ENCODING_FIRST_WRITE`, what the answer asks of the connection,
+//! and the body as a body of unknown size, so a null body is framed chunked
+//! where Node frames it, quirk `NODE_ADAPTER_NULL_BODY`.
 //!
 //! The driver of a stream body, which runs the agent of a subscription while
 //! its chunks are written, is spawned as a local task before the answer goes to
 //! the connection, so before its first chunk is polled. `spawn_local` answers
 //! no handle and none is kept. When a write fails or the client closes, the
 //! Node connection runs every service it called to its answer and drops the
-//! answers (quirk Q45), and the drop of a [`ServeBody`] drops its stream, which
-//! cancels it, so the driver runs the cancel to its end on its own task. The
-//! drain of the agents of a request after its answer belongs to the core, over
-//! the spawner the boot hands in, step 3 of [`crate::serve`].
+//! answers (quirk `NODE_HANDLERS_RUN_ON`), and the drop of a [`ServeBody`]
+//! drops its stream, which cancels it, so the driver runs the cancel to its end
+//! on its own task. The drain of the agents of a request after its answer
+//! belongs to the core, over the spawner the boot hands in, step 3 of
+//! [`crate::serve`].
 //!
 //! A panic of the application is caught at the handler in a build with debug
 //! assertions, the development profile, and answered as a fetch that rejected,
@@ -400,7 +404,8 @@ impl IncomingBody for HyperBody {
                 Poll::Ready(Some(Err(error))) => return Poll::Ready(Some(Err(body_error(&error)))),
                 Poll::Ready(Some(Ok(frame))) => {
                     // A trailer section carries no byte of the body, and the
-                    // Node parser drops it before it gets here (quirk Q32).
+                    // Node parser drops it before it gets here (quirk
+                    // LLHTTP_TRAILERS_COUNTED).
                     if let Ok(data) = frame.into_data() {
                         return Poll::Ready(Some(Ok(data.to_vec())));
                     }

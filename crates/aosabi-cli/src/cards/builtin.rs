@@ -2,11 +2,13 @@
 /*
  * aosabi-cli: the table of the built in cards.
  *
- * No analogue in the reference. The rows are those of docs/cli-and-targets.md
- * section 5.0.
+ * No analogue in the reference.
  */
 
 //! The table of the built in cards.
+//!
+//! Five cards ship with the command line, among them `server-legacy`, a second
+//! server card:
 //!
 //! | Card | Class | Carriers and protocols | Compiles | Target and profile |
 //! | --- | --- | --- | --- | --- |
@@ -23,7 +25,15 @@
 //! the benchmark harness's and no product of `cargo aosabi build`.
 //!
 //! The field `source` holds the set a release build takes at the switch
-//! `AOSABI_STD` at `source` ([`crate::std_source`]).
+//! `AOSABI_STD` at `source` ([`crate::std_source`]). The cards `server`,
+//! `server-legacy` and `docker` take [`LINUX_SET`], the standard library from
+//! source without its symbolizer with the options per crate, which keeps the
+//! speed of stock on the native card. The card `worker` builds stock at every
+//! value, since the set of the Worker runs two of 64 request shapes slower
+//! than stock in workerd, which takes it off the card until its cause is
+//! found. The card `esp32c3-devkitm1` compiles the kernel crates alone, and
+//! its image, which takes the set of its release image, is built once device
+//! cards land.
 
 use crate::{
     cards::{

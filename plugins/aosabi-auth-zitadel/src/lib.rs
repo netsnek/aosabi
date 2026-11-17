@@ -2,8 +2,9 @@
 /*
  * aosabi-auth-zitadel: the Zitadel integration of Aosabi.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/zitadel.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/zitadel.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * This file holds the module list.
  */
@@ -19,10 +20,11 @@
 //! default, signs and digests over `ring` on a target of `cfg(unix)`, and the feature
 //! `host-crypto` hands the signature, the digest and the read of a key file to the functions of
 //! the host the crate runs in, `Host`, which `install_host` keeps, the build of the module
-//! `core.wasm` and of the native library of the TypeScript option. There the bootstrap, which
-//! imports the key of the signer, never settles with a configuration, so every path after it is
-//! dead, and the bootstrap, the login routes and the provider return that error where those paths
-//! start, which keeps them out of the module of a Worker.
+//! `core.wasm` and of the native library of the TypeScript option. A build with neither has no
+//! signer, and a call that signs or digests answers a thrown `TypeError`. There the bootstrap,
+//! which imports the key of the signer, never settles with a configuration, so every path after it
+//! is dead, and the bootstrap, the login routes and the provider return that error where those
+//! paths start, which keeps them out of the module of a Worker.
 //!
 //! The modules, each with what it translates and what it holds:
 //!
@@ -41,9 +43,7 @@
 //! hidden `verify_rs256` serves the devtool alone, and `Host` with `install_host` the host of the
 //! TypeScript option, which `ZitadelAuth::claims` answers the claims of a request to.
 //!
-//! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are `tests/notebooks/61_oidc_login.ipynb`
-//! and `tests/notebooks/63_zitadel_auth.ipynb`.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![forbid(unsafe_code)]
 

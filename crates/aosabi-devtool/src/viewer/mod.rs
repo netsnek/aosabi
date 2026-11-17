@@ -4,17 +4,19 @@
  * documentation generator.
  *
  * No analogue in the reference. The crates under test are aoviewer-core and
- * aoviewer-docs, and the judging notebooks are 51_viewer_core, 75_docgen and
- * 76_docs_pdf.
+ * aoviewer-docs, and the checks of the viewer core, of the documentation
+ * generator and of its PDF judge them.
  */
 
 //! The `viewer` primitive of the seam.
 //!
 //! The flag `--requests PATH` answers every request line of the file, one
 //! response line each, in the batch form of [`crate::batch`], so a notebook
-//! drives thousands of cases through one process. Each module below carries
-//! one operation, but `text.rs` carries `md` and `typ` and `sha256.rs`
-//! carries `json-str` beside `sha256`.
+//! drives thousands of cases through one process. The operations avoid the
+//! eight names a later release adds, `events`, `page`, `sdl`, `assets`,
+//! `model`, `export`, `diff` and `link`. Each module below carries one
+//! operation, but `text.rs` carries `md` and `typ` and `sha256.rs` carries
+//! `json-str` beside `sha256`.
 //!
 //! - `schema {input, form}` answers the input kind, the SHA-256 of the
 //!   canonical introspection form, the counts of the model and, unless `form`
@@ -58,7 +60,9 @@
 //! refuses answers `refused`, its code of the family `AO-D`, and `message`,
 //! the sentence of the generator, in place of the payload. A request the seam
 //! cannot read, a missing field or a route outside the grammar among them,
-//! answers `fatal`.
+//! answers `fatal`. The flag `--wasm`, which answers through the exports of
+//! the committed module, waits on the engine that runs the module and on the
+//! module itself, so the runner under `wasm/` holds no code yet.
 
 mod bench;
 mod clusters;
@@ -149,8 +153,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "viewer";
 
-/// The milestone the operations of the primitive land at.
-const LANDS_AT: &str = "M14";
+/// The area the operations of the primitive land at.
+const LANDS_AT: &str = "docs";
 
 /// The largest integer n such that n and n + 1 are both exact doubles, which
 /// is 2^53 less 1, the largest whole number [`crate::homa_packet::whole`]
@@ -160,7 +164,8 @@ pub(super) const MAX_SAFE_INTEGER: u64 = (1 << 53) - 1;
 /// The most routes, texts, byte strings or repetitions one request names.
 ///
 /// The cap keeps one request line from asking for unbounded work, and it is
-/// ten times the 10,000 strings of step 9 of `51_viewer_core`.
+/// ten times the 10,000 strings of the check of the small primitives of the
+/// viewer core.
 pub(super) const MAX_ITEMS: usize = 100_000;
 
 /// The command line of the `viewer` primitive.

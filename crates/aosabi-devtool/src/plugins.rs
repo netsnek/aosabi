@@ -3,7 +3,8 @@
  * aosabi-devtool plugins: the primitive through which a notebook sorts
  * plugins, gates them by role, boots them and remaps refusals in process.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the Rust half of the plugins sidecar on Node, whose
+ * four operations call the reference's own topoSortPlugins, executeConfig and useIdentity.
  */
 
 //! The primitive `plugins` of the seam.
@@ -15,7 +16,7 @@
 //! | --- | --- | --- |
 //! | `topo_sort` | `plugins`, `{name, depends_on}` each | `order`, the input indices, or `error`, the message of the cycle |
 //! | `role_gate` | `plugins`, `{name, strategy, roles}` each | `ran`, the names whose setup ran |
-//! | `boot` | `plugins`, `{name?, depends_on?, strategy?, roles?, setup?, middleware?}` each, `landing_page?`, `graphiql?`, `viewer?` | `role` and `passes`, or `thrown` and `cause` |
+//! | `boot` | `plugins`, `{name?, depends_on?, strategy?, roles?, setup?, middleware?}` each, `introspection?` | `role` and `passes`, or `thrown` and `cause` |
 //! | `map_forbidden` | `errors`, `{message, path?, forbidden?, extensions?}` each | `errors` as `toJSON` writes them, or `unchanged` |
 //!
 //! `role_gate` and `boot` run [`execute_config`](fn@execute_config) over a
@@ -103,19 +104,15 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "plugins";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M7";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "plugins";
 
 /// The most polls a pass may take, since every setup of a line answers at once.
 const POLLS: usize = 1024;
 
-/// The built in plugins the facade hands the boot, the viewer of the first
-/// slot and the landing page.
-const BUILTINS: Builtins = Builtins {
-    first: None,
-    viewer: aosabi_viewer::use_viewer,
-    unhandled_route: aosabi_landing::use_unhandled_route,
-};
+/// The plugins the facade hands the boot, none, which the operation
+/// `revisions` of the primitive `execute` hands its boot as well.
+pub(crate) const BUILTINS: Builtins = Builtins { first: None };
 
 /// The operations of the primitive.
 const OPERATIONS: &Operations = &[
@@ -248,9 +245,7 @@ fn op_boot(request: &JsObject) -> Result<JsObject, JsString> {
     }
     let mut config = AppConfig {
         plugins: Some(PluginList::new(slots)),
-        landing_page: optional_bool(request, "landing_page", "boot")?,
-        graphiql: optional_bool(request, "graphiql", "boot")?,
-        viewer: optional_bool(request, "viewer", "boot")?,
+        introspection: optional_bool(request, "introspection", "boot")?,
         ..AppConfig::default()
     };
     let mut target = App::default();

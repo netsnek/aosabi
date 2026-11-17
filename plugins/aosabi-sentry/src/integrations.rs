@@ -3,8 +3,15 @@
  * aosabi-sentry: the integrations of init that write into the scope of a
  * request, the scope itself and the request data it carries.
  *
- * Derived from @sentry/node 8.55.0, build/cjs, MIT.
+ * Both write into the scope of a request.
+ *
  * Derived from @sentry/core 8.55.0, build/cjs, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/breadcrumbs.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils-hoist/requestdata.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils-hoist/string.js, MIT.
+ * Derived from @sentry/core 8.55.0, build/cjs/utils-hoist/severity.js, MIT.
+ * Derived from @sentry/core 10.38.0, build/cjs/utils/request.js, MIT.
+ * Derived from @sentry/node 8.55.0, build/cjs, MIT.
  */
 
 //! The scope of a request, its request data and the breadcrumbs of the
@@ -35,11 +42,17 @@
 //!
 //! The request data is read from the Fetch request of the context: the URL is
 //! the scheme of the request, the `host` field and the path with the query,
-//! the headers are the fields of the request with their names in lower case,
-//! and the cookies are those of the `cookie` field. The body, which the
-//! reference reads while the request streams, is gone once the handler has
-//! read it, so `data` is left out, a field the comparison of the plan reports
-//! and never compares.
+//! and the headers are the fields of the request with their names in lower
+//! case. The body, which the reference reads while the request streams, is
+//! gone once the handler has read it, so `data` is left out, a field the
+//! comparison with the reference reports and never compares. The credentials
+//! of the request stay out: every field whose name holds a part of
+//! [`CREDENTIAL_PARTS`], the cookies and the parameter `token` of the query.
+//! The parameter `variables`, which holds the variables of an operation sent
+//! by `GET`, stays out as well, a named divergence.
+//!
+//! The client of the middleware takes the same rule for the fields and the
+//! parameters ([`crate::toucan`]).
 
 use core::cell::RefCell;
 use std::rc::Rc;
@@ -170,6 +183,76 @@ fn request_isolation() -> Option<Rc<Isolation>> {
     Some(isolation)
 }
 
+/// The parts of the name of a field that carries a credential, which the
+/// request data of an event leaves out wherever the lower case of its name
+/// holds one.
+pub(crate) const CREDENTIAL_PARTS: [&str; 17] = [
+    "auth",
+    "token",
+    "secret",
+    "session",
+    "password",
+    "passwd",
+    "pwd",
+    "key",
+    "jwt",
+    "bearer",
+    "sso",
+    "saml",
+    "csrf",
+    "xsrf",
+    "credentials",
+    "set-cookie",
+    "cookie",
+];
+
+/// The parameters of the query the request data of an event leaves out:
+///
+/// `token`, and `variables`, which holds the variables of an operation sent
+/// by `GET`.
+///
+/// No option brings `variables` back, since the request data is built apart
+/// from the plugin, whose option `includeExecuteVariables` writes the
+/// variables into the extra and the `GraphQL` context of its own captures.
+pub(crate) const LEFT_OUT_PARAMETERS: [&str; 2] = ["token", "variables"];
+
+/// Returns whether the field `name` carries a credential, a name whose lower
+/// case holds a part of [`CREDENTIAL_PARTS`].
+fn is_credential_field(name: &str) -> bool {
+    let name = name.to_ascii_lowercase();
+    CREDENTIAL_PARTS.iter().any(|part| name.contains(part))
+}
+
+/// The names of the fields of a request that carry the address of the client.
+pub(crate) const ADDRESS_FIELDS: [&str; 12] = [
+    "X-Client-IP",
+    "X-Forwarded-For",
+    "Fly-Client-IP",
+    "CF-Connecting-IP",
+    "Fastly-Client-Ip",
+    "True-Client-Ip",
+    "X-Real-IP",
+    "X-Cluster-Client-IP",
+    "X-Forwarded",
+    "Forwarded-For",
+    "Forwarded",
+    "X-Vercel-Forwarded-For",
+];
+
+/// Returns whether the field `name` carries the address of the client.
+fn is_address_field(name: &str) -> bool {
+    ADDRESS_FIELDS
+        .iter()
+        .any(|field| field.eq_ignore_ascii_case(name))
+}
+
+/// Returns whether the request data of an event leaves the field `name` out,
+/// a field that carries a credential, [`is_credential_field`], or the
+/// address of the client, [`is_address_field`].
+pub(crate) fn is_left_out_field(name: &str) -> bool {
+    is_credential_field(name) || is_address_field(name)
+}
+
 /// Returns the request data of the request of `c` as an event carries it,
 /// and the name of its transaction.
 fn request_data(c: &Context) -> (JsObject, String) {
@@ -183,25 +266,31 @@ fn request_data(c: &Context) -> (JsObject, String) {
         .map_or(NO_HOST, |(_, value)| value.as_str());
     let mut headers = JsObject::new();
     for (name, value) in &fields {
-        headers.insert(name.as_str(), value.as_str());
+        if !is_left_out_field(name) {
+            headers.insert(name.as_str(), value.as_str());
+        }
     }
-    let cookies = fields
-        .iter()
-        .find(|(name, _)| name == "cookie")
-        .map(|(_, value)| parse_cookie(value))
-        .unwrap_or_default();
-    let mut data = JsObject::new();
-    data.insert("headers", JsValue::Object(headers));
-    data.insert("method", raw.method.as_ref());
-    data.insert("url", format!("{scheme}://{host}{target}"));
-    data.insert("cookies", JsValue::Object(cookies));
+    let path = target.split(['?', '#']).next().unwrap_or("/");
     let query = target
         .split_once('?')
         .map_or("", |(_, query)| query.split('#').next().unwrap_or_default());
-    if !query.is_empty() {
-        data.insert("query_string", query);
+    let kept = without_left_out(query);
+    // A query with no such pair keeps the target as the request sent it.
+    let url = if kept == query {
+        format!("{scheme}://{host}{target}")
+    } else if kept.is_empty() {
+        format!("{scheme}://{host}{path}")
+    } else {
+        format!("{scheme}://{host}{path}?{kept}")
+    };
+    let mut data = JsObject::new();
+    data.insert("headers", JsValue::Object(headers));
+    data.insert("method", raw.method.as_ref());
+    data.insert("url", url);
+    data.insert("cookies", JsValue::Object(JsObject::new()));
+    if !kept.is_empty() {
+        data.insert("query_string", kept);
     }
-    let path = target.split(['?', '#']).next().unwrap_or("/");
     let transaction = format!("{} {path}", raw.method.to_ascii_uppercase());
     (data, transaction)
 }
@@ -216,46 +305,29 @@ fn scheme_and_target(href: &str) -> (&str, &str) {
     (scheme, target)
 }
 
-/// Returns the cookies of a `cookie` field, `parseCookie(text)`.
+/// Returns `query` without the pairs of the parameters the request data of
+/// an event leaves out.
 ///
-/// Each pair up to the next `;`, the name and the value trimmed, the first
-/// value of a name kept, a value in quotes taken without them, and a value
-/// with a `%` decoded by `decodeURIComponent`, kept as it is where that
-/// throws.
-fn parse_cookie(text: &str) -> JsObject {
-    let mut cookies = JsObject::new();
-    let mut index = 0;
-    while index < text.len() {
-        let Some(eq) = text[index..].find('=').map(|at| index + at) else {
-            break;
-        };
-        let end = match text[index..].find(';').map(|at| index + at) {
-            None => text.len(),
-            Some(end) if end < eq => {
-                index = text[..eq].rfind(';').map_or(0, |at| at + 1);
-                continue;
-            }
-            Some(end) => end,
-        };
-        let key = text[index..eq].trim();
-        if !cookies.contains_key(key) {
-            let mut value = text[eq + 1..end].trim();
-            if let Some(inner) = value.strip_prefix('"') {
-                // `slice(1, -1)` drops the last character whatever it is.
-                let mut characters = inner.chars();
-                characters.next_back();
-                value = characters.as_str();
-            }
-            let value = if value.contains('%') {
-                decode_uri_component(value).unwrap_or_else(|| String::from(value))
+/// The other pairs keep their order and spelling.
+///
+/// A pair is the text up to the next `&`, and its name the text before its
+/// first `=`, read with a `+` as a space and its percent encoding
+/// decoded.
+fn without_left_out(query: &str) -> String {
+    query
+        .split('&')
+        .filter(|pair| {
+            let name = pair.split('=').next().unwrap_or_default();
+            if name.contains(['%', '+']) {
+                let spaced = name.replace('+', " ");
+                let name = decode_uri_component(&spaced).unwrap_or(spaced);
+                !LEFT_OUT_PARAMETERS.contains(&name.as_str())
             } else {
-                String::from(value)
-            };
-            cookies.insert(key, value);
-        }
-        index = end + 1;
-    }
-    cookies
+                !LEFT_OUT_PARAMETERS.contains(&name)
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("&")
 }
 
 /// Returns `str.length <= max ? str : str.slice(0, max) + '...'` over UTF-16

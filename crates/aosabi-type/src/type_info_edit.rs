@@ -2,6 +2,9 @@
 /*
  * aosabi-type: the walk with type information over the edit path.
  *
+ * The edit walk itself is the one of aosabi_lang::visitor_edit, whose hooks
+ * this file implements.
+ *
  * Derived from graphql-js 16.12.0, src/utilities/TypeInfo.ts, MIT.
  * Derived from graphql-js 16.12.0, src/language/visitor.ts, MIT.
  */
@@ -11,11 +14,12 @@
 //!
 //! [`visit_with_type_info_edit()`] wraps an [`EditVisitor`] so that a
 //! [`TypeInfo`] moves with the walk of
-//! [󰀃](aosabi_lang::visitor_edit::visit_edit), as
-//! [󰀄](crate::type_info::visit_with_type_info) wraps a visitor of the read
-//! only walk. The transforms of Federation read the input type of a string to
-//! turn it into an enum value, and the delegation reads the parent type and
-//! the field of each selection it filters, both inside hooks that edit.
+//! [`visit_edit`](aosabi_lang::visitor_edit::visit_edit), as
+//! [`visit_with_type_info()`](crate::type_info::visit_with_type_info) wraps a
+//! visitor of the read only walk. The transforms of Federation read the input
+//! type of a string to turn it into an enum value, and the delegation reads
+//! the parent type and the field of each selection it filters, both inside
+//! hooks that edit.
 //!
 //! The reference leaves the type information again when a hook answers
 //! anything but `undefined`, because the walk then skips the leave of that

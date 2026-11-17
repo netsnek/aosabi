@@ -13,7 +13,7 @@
 //! [`normalized_executor`] on a fresh agent and drives the agent until the
 //! result has settled. A syntax error and a validation error answer as a
 //! result with errors and no `data` key, which is the body Yoga answers them
-//! with (docs/byte-equality.md section 8.2).
+//! with.
 //!
 //! The pipeline splits where the agent is driven. [`prepare_request`] runs
 //! everything before that point and answers a [`Prepared`], and
@@ -36,7 +36,9 @@
 //! first encoder of a result, [`Encode`]. The kernel builds without an
 //! allocator, so the sink that grows, [`VecSink`], sits here.
 //!
-//! The module names `core` and `alloc` and no item of `std`.
+//! The module names `core` and `alloc` and no item of `std`. The schema and
+//! the factory of the root value are shared between threads, so they stay
+//! behind an `Arc`.
 //!
 //! [`Drive`]: crate::promise::Drive
 
@@ -139,6 +141,10 @@ pub struct GeneralExecutor {
     pub root_value: RootFactory,
     /// The serializers that see the executor value, by scalar name.
     pub leaf_serializers: Option<Arc<ObjMap<LeafSerializer>>>,
+    /// The cap on the tokens of a request document, `REQUEST_TOKENS` of
+    /// `aosabi-lang` unless the app sets its own with the key `maxTokens`, a
+    /// named divergence.
+    pub max_tokens: u32,
 }
 
 /// One request as a carrier hands it over.
@@ -241,7 +247,13 @@ fn check_request(
     executor: &GeneralExecutor,
     request: &Request<'_>,
 ) -> Result<DocumentNode, Executed> {
-    let document = match parse(request.document, ParseOptions::default()) {
+    // The nesting bound and the token cap of a request document, named
+    // divergences, keep a deep document off the end of the stack and bound
+    // its parse.
+    let document = match parse(
+        request.document,
+        ParseOptions::request_capped(executor.max_tokens),
+    ) {
         Ok(document) => document,
         Err(syntax_error) => return Err(errors_only(vec![syntax_error])),
     };
@@ -656,8 +668,9 @@ impl Execute for GeneralExecutor {
     /// operation runs through [`run_request`] and answers
     /// [`GeneralStream::One`]. A thrown value answers as a result with one
     /// error that carries its message, the `message` of an error and
-    /// `String(value)` of any other value. Both texts are texts of Aosabi and
-    /// of no reference.
+    /// `String(value)` of any other value. A persisted document answers with
+    /// one error, since the engine accepts no persisted document. Both texts
+    /// are texts of Aosabi and of no reference.
     fn execute(
         &self,
         operation: Operation<'_>,
@@ -669,7 +682,7 @@ impl Execute for GeneralExecutor {
             operation_name,
         } = operation
         else {
-            return GeneralStream::one(one_error("Persisted documents land at M12."));
+            return GeneralStream::one(one_error("The engine accepts no persisted document."));
         };
         let request = Request {
             document: text,

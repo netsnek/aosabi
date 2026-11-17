@@ -18,19 +18,20 @@
 //!   every other page takes level 2. A table, a name grid and a section take
 //!   the level under the heading that holds them, and every heading stops at
 //!   level 6, the deepest one the [CommonMark specification] knows.
-//! - A description that ends inside a fenced code block outside every list item
-//!   gets its closing fence, so the page after it stays Markdown. A fence
-//!   indented by two or three columns while a list may be open may sit in one
-//!   of its items, which the next line at the margin closes together with its
-//!   fence, and a fence after a line that may open an HTML block may be text of
-//!   that block, so both are left as written. A line indented by four columns
-//!   or more, as every line led by a tab is, may continue an item and so never
-//!   ends a list.
+//! - A description is written through [`to_markdown`] verbatim with its
+//!   headings demoted by the level of the heading that holds it, and by default
+//!   its raw HTML stays as written. A description that ends inside a fenced
+//!   code block outside every list item gets its closing fence, so the page
+//!   after it stays Markdown. A fence indented by two or three columns while a
+//!   list may be open may sit in one of its items, which the next line at the
+//!   margin closes together with its fence, and a fence after a line that may
+//!   open an HTML block may be text of that block, so both are left as written.
+//!   A line indented by four columns or more, as every line led by a tab is,
+//!   may continue an item and so never ends a list.
 //! - A table is a GitHub table under a heading with its title, which a table
 //!   titled as its page leaves out, as a name grid does. A cell of a name
 //!   writes the anchor of its element before the name, and every name of a
-//!   cell, a link or a grid is a code span, as in the shape of the page of
-//!   `Product` in the plan, where rule 4 of subsection C4 sends names through
+//!   cell, a link or a grid is a code span and not text escaped through
 //!   [`md_text`]. A type reference writes every name as a link and every run of
 //!   wrappers as code, a description writes its first paragraph through
 //!   [`first_paragraph_cell`], a link `more` to its entry in the details when
@@ -49,13 +50,13 @@
 //! A link inside the tree is relative to the file being written, and its
 //! fragment is the anchor of its target. [`page_path`] names the file of every
 //! page of the tree. An element links to the page [`page_of`] answers under its
-//! anchor from [󰀂](crate::id::Anchors), which writes its anchor exactly once.
-//! The section of the arguments of a field carries the anchor of the field with
-//! `args-` in place of `field-`, and the entry of a description in the details
-//! the anchor of its element behind `details-`. Neither prefix starts the
-//! anchor of an element, which is the text of a stable id, so no two anchors
-//! meet. In the single layout a page that documents no element carries an
-//! anchor of its own, `home`, `clusters`, `scalars`, `relay`, `unreachable`,
+//! anchor from [`Anchors`](crate::id::Anchors), which writes its anchor exactly
+//! once. The section of the arguments of a field carries the anchor of the
+//! field with `args-` in place of `field-`, and the entry of a description in
+//! the details the anchor of its element behind `details-`. Neither prefix
+//! starts the anchor of an element, which is the text of a stable id, so no two
+//! anchors meet. In the single layout a page that documents no element carries
+//! an anchor of its own, `home`, `clusters`, `scalars`, `relay`, `unreachable`,
 //! `deprecated` or `cluster-<slug>`, since every page shares one file there.
 //! None of them starts as the anchor of an element does, with `type`, `field`,
 //! `arg`, `enumvalue` or `inputfield` and a hyphen. A route whose page the tree
@@ -971,8 +972,7 @@ impl Writer<'_> {
 
     /// Writes a table with its header row and its rows.
     ///
-    /// An empty cell is written as one space between its pipes, as in the shape
-    /// of the plan.
+    /// An empty cell is written as one space between its pipes.
     fn table(&mut self, columns: &[&'static str], rows: &[Vec<Cell>]) {
         self.gap();
         self.out.push('|');

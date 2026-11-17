@@ -4,16 +4,18 @@
  * topics live in the pub sub of the engine.
  *
  * No analogue in the reference, whose createPubSub of @graphql-yoga/subscription 5.0.5
- * dispatches the events of its topics on an EventTarget of the process.
+ * dispatches the events of its topics on an EventTarget of the process. It is the
+ * marker over experimental_create_pub_sub of aosabi-core, the port of that
+ * createPubSub over the hub of the kernel.
  */
 
 //! The pub subs of the app in the pub sub of the engine.
 //!
 //! The function `createPubSub` of the entry `aosabi`, which the entry also exports as
-//! `experimentalCreatePubSub`, answers a pub sub of the host that
-//! holds a number and no topic of its own. Its `subscribe(routingKey, id)` answers a
-//! marker, which crosses as the tag [󰀄](crate::host::Tag::Topic) where a resolver
-//! answers it, and [`topic`] reads it into the repeater of the topic that
+//! `experimentalCreatePubSub`, answers a pub sub of the host that holds a number and
+//! no topic of its own. Its `subscribe(routingKey, id)` answers a marker, which
+//! crosses as the tag [`Tag::Topic`](crate::host::Tag::Topic) where a resolver answers
+//! it, and [`topic`] reads it into the repeater of the topic that
 //! [`aosabi_core::PubSub::subscribe_value`] answers, the repeater of the executor a
 //! Rust service subscribes through. Its `publish(routingKey, ...args)` crosses through
 //! the export `publish` in a microtask of the host, never inside an import, with each
@@ -98,8 +100,14 @@ pub fn topic(reader: &mut Reader<'_>) -> Option<Value> {
 /// export `publish`: the number of the pub sub, the routing key and the count
 /// and the copies of the arguments, and drives every request whose body the
 /// module pushes. A broken record publishes nothing.
+///
+/// The call keys the hashes of the thread before it decodes the arguments,
+/// [`crate::boot::seed_keys`], since an app can publish before any request.
 pub fn publish(len: u32) {
     let record = host::input(len);
+    // The randomness of the host comes through the input buffer, so the
+    // record is read first.
+    crate::boot::seed_keys();
     let mut reader = Reader::new(&record);
     let Some((pub_sub, routing_key, args)) = read_publish(&mut reader) else {
         return;

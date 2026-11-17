@@ -3,9 +3,12 @@
  * aosabi-cli: the command grammar of the two programs, their argument structs
  * and their usage texts.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts and
- * packages/create-pylon/src/index.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts and packages/create-pylon/src/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
+ *
+ * Derived from commander 12.1.0, lib/command.js, MIT.
+ * Derived from commander 12.1.0, lib/help.js, MIT.
  */
 
 //! The command grammar.
@@ -41,7 +44,7 @@
 //!
 //! The help texts are commander's layout, wrapped at 80 columns as commander
 //! wraps them when standard output is no terminal, with the program named
-//! `aosabi`, as `docs/cli-and-targets.md` section 1 names it. An option that
+//! `aosabi`. An option that
 //! names the entry reads its default as the Rust entry, the crate root, which
 //! is cargo's default `src/lib.rs` in a scaffold of `aosabi new`. The
 //! descriptions write U+2014 and U+2192 and the source spells them as
@@ -116,11 +119,11 @@ pub enum Command {
     Pull(PullArgs),
     /// `new`.
     New(NewArgs),
-    /// A command that lands with a later milestone or track row.
+    /// A command that lands with a later release or arrives with device cards.
     Later {
         /// The command as typed, its words joined by one space.
         command: String,
-        /// The milestone or the track row that lands it.
+        /// When it lands, with a later release or with device cards.
         lands: &'static str,
     },
     /// `-h`, `--help` or `help`, for the program or for one command.
@@ -211,7 +214,8 @@ pub struct NewArgs {
     pub features: Vec<Feature>,
     /// `--force`.
     pub force: bool,
-    /// `--aosabi-path`, the Aosabi checkout the scaffold names by path.
+    /// `--aosabi-path`, the Aosabi checkout the scaffold names by path,
+    /// without which `new` refuses, `AO-C0405`.
     pub aosabi_path: Option<PathBuf>,
 }
 
@@ -553,7 +557,7 @@ const NEW_OPTIONS: [Opt; 5] = [
         "--aosabi-path <dir>",
         None,
         "--aosabi-path",
-        "Name aosabi by path from the Aosabi checkout at <dir>",
+        "Required, the Aosabi checkout at <dir> the scaffold names aosabi from by path",
     ),
     VERBOSE,
 ];
@@ -933,12 +937,7 @@ fn later_command(word: &str, operands: &[Arg], unknown: &[Arg]) -> Result<Comman
         });
     }
     let texts: Vec<String> = operands.iter().map(|arg| arg.text.clone()).collect();
-    let all: Vec<String> = texts
-        .iter()
-        .cloned()
-        .chain(unknown.iter().map(|arg| arg.text.clone()))
-        .collect();
-    match later::resolve(word, &texts, &all) {
+    match later::resolve(word, &texts) {
         Some(Resolved::Later { command, lands }) => Ok(Command::Later { command, lands }),
         Some(Resolved::UnknownSub(name)) => {
             let subs: Vec<&str> = later::row(word)

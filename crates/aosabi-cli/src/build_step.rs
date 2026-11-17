@@ -3,21 +3,21 @@
  * aosabi-cli: the build step, the one run of the built binary under
  * AOSABI_BUILD=1.
  *
- * No analogue in the reference. The step is the one of docs/cli-and-targets.md
- * section 3.3.
+ * No analogue in the reference.
  */
 
 //! The build step.
 //!
 //! After the cargo build, `cargo aosabi build` runs the binary once with
 //! `AOSABI_BUILD=1`. That run evaluates the configuration, calls the `build`
-//! hook of every plugin once and exits, and a configuration that panics aborts
-//! the build there with the abort message of the reference, whose one file
-//! name reads `aosabi.config`. The binary prints that message itself, so the
-//! step passes its streams through and adds no text: under [`Output::Inherit`]
-//! its standard output goes to the standard error of the command line, which
-//! carries every line that is no result, and its standard error goes there as
-//! it comes.
+//! hook of every plugin once and exits, and a configuration that panics
+//! aborts the build there with the abort message of the reference, whose one
+//! file name reads `aosabi.config`. The binary prints that message itself,
+//! so the step passes its streams through and adds no text: under
+//! [`Output::Inherit`] its standard output goes to the standard error of the
+//! command line, which carries every line that is no result, and its
+//! standard error goes there as it comes. A run that exits with a status
+//! other than 0 ends the command with 1.
 
 use std::{
     io,

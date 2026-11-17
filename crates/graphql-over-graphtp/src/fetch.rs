@@ -4,9 +4,9 @@
  * function and the answer it reads back.
  *
  * No analogue in the reference. The request is the POST of
- * docs/graphtp-in-aosabi.md section 2.1 and docs/graphtp.md section 7, step 2,
- * and the answer carries what step 4 of that section reads: the status, the
- * substatus the HTTP layer decides beside it, the media type and the body.
+ * Documentation/guides/graphtp.md,
+ * and the answer carries the status, the substatus the HTTP layer decides
+ * beside it, the media type and the body.
  */
 
 //! The request of the listener and the answer of a fetch function.
@@ -49,8 +49,7 @@ pub const CONTENT_TYPE: &str = "application/json";
 /// event stream.
 pub const ACCEPT: &str = "application/graphql-response+json, text/event-stream";
 
-/// The request an OPERATION becomes, the POST of `docs/graphtp-in-aosabi.md`
-/// section 2.1.
+/// The request an OPERATION becomes, the POST of `Documentation/guides/graphtp.md`.
 ///
 /// The request carries exactly the fields [`Request::fields`] names and no
 /// `accept-encoding`, so the compression middleware of the app leaves the

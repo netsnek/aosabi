@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: the clock of the runtime and its heap of deadlines.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The clock is the host clock of the
+ * executor's agents, and its heap is the one hyper's timer reads.
  */
 
 //! `RuntimeClock`.

@@ -2,6 +2,8 @@
 /*
  * aosabi-hooks: the entry of the hook layer, which builds the orchestrator of
  * a list of plugins and the functions of each request.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/create.js, MIT.
  */
 
 //! [`hooks`], the entry of the crate.

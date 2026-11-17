@@ -7,14 +7,14 @@
 
 //! [`HttpOptions`] and [`HttpServer`].
 //!
-//! [`HttpServer::new`] reads the options once, the way Yoga's constructor
-//! reads them: the logger, the masking, the endpoint, the options of
-//! `GraphiQL`, the request parsers and the result processors. The option
-//! `batching` has no reading, the named divergence D58 of
-//! `docs/byte-equality.md` section 3, so the function refuses every batch as
-//! Yoga does with batching off. It hands the hook layer of `aosabi-hooks` the
-//! list of hooks Yoga hands envelop, with no plugin of its own list that has
-//! no hook there:
+//! [`HttpServer::new`] reads the options once, the way Yoga's constructor reads them:
+//! the logger, the masking, the endpoint, the request parsers and the result
+//! processors. The options `batching`, `graphiql` and `healthCheckEndpoint` have no
+//! reading, named divergences, so the function refuses every batch as Yoga does with
+//! batching off, answers a request for the page of `GraphiQL` as one for a type it
+//! does not serve and answers no health check. It hands the hook layer of
+//! `aosabi-hooks` the list of hooks Yoga hands envelop, with no plugin of its own list
+//! that has no hook there:
 //!
 //! | Place in Yoga's list | Hook of the hook layer |
 //! | --- | --- |
@@ -27,13 +27,14 @@
 //! | 20 | the masking of an unexpected error, unless the options turn it off |
 //! | 21 | the stamp of a validation error |
 //!
-//! The steps of Yoga's list that hold no hook of the hook layer, the health
-//! check, `GraphiQL`, the five request parsers, the result processors, the
-//! refusal of a batch, the checks of the parameters and of the method and the
-//! unhandled route, are straight code of the function in [`crate::answer()`]
-//! at the same places. The hooks of Yoga and of the server adapter an app's
-//! plugin implements are read off the array the hook layer answers after its
-//! splices, as Yoga reads them.
+//! The places are those of the list of `server.js:110-203`, so every hook of the app's
+//! plugins runs before and after the same steps as in Yoga. The steps of Yoga's list
+//! that hold no hook of the hook layer, the five request parsers, the result
+//! processors, the refusal of a batch, the checks of the parameters and of the method
+//! and the unhandled route, are straight code of the function in [`crate::answer()`]
+//! at the same places. The hooks of Yoga and of the server adapter an app's plugin
+//! implements are read off the array the hook layer answers after its splices, as Yoga
+//! reads them.
 //!
 //! Four options of the reference have no reading here, because the app passes
 //! none of them: `fetchAPI`, `allowedHeaders`, `renderGraphiQL` and a schema
@@ -86,6 +87,7 @@ use aosabi_http::{
     Request,
     Response, //
 };
+use aosabi_lang::parser::REQUEST_TOKENS;
 use aosabi_type::{
     ObjMap,
     Schema, //
@@ -100,10 +102,6 @@ use crate::{
     error::{
         HttpMaskErrorFn,
         MaskedErrorsOpts, //
-    },
-    graphiql::{
-        Graphiql,
-        GraphiqlOptionsFactory, //
     },
     logger::{
         HttpLogger,
@@ -121,7 +119,6 @@ use crate::{
     },
     request_parser::Parsers,
     result_processor::Processors,
-    routes::DEFAULT_HEALTH_CHECK_ENDPOINT,
     server_adapter::RequestHandler,
     utils::mask_error::mask_error, //
 };
@@ -132,9 +129,8 @@ pub const VERSION: &str = "5.18.0";
 /// The default endpoint, `/graphql`.
 pub const DEFAULT_GRAPHQL_ENDPOINT: &str = "/graphql";
 
-/// Aosabi only: whether a server validates through the single pass when its
-/// options choose neither, on, verbatim "i want to decide between single pass
-/// or conventional in build time but default is single pass".
+/// Aosabi only: whether a server validates through the single pass when its options
+/// choose neither, on by default.
 pub const SINGLE_PASS_DEFAULT: bool = true;
 
 /// The option `logging`.
@@ -159,7 +155,7 @@ pub struct MaskedErrorsConfig {
     pub mask_error: Option<HttpMaskErrorFn>,
     /// `errorMessage`, `Unexpected error.` when absent.
     pub error_message: Option<String>,
-    /// `isDev`, read from `NODE_ENV` at each mask when absent.
+    /// `isDev`, `false` when absent, where Yoga reads `NODE_ENV` at each mask.
     pub is_dev: Option<bool>,
 }
 
@@ -183,8 +179,7 @@ pub type AgentHook = Rc<dyn Fn(&aosabi_execute::Agent)>;
 /// Aosabi only. The reference runs every operation on the one event loop of
 /// the process with the resolvers bound in its schema, and here an operation
 /// runs on an agent of its own made with `options` and handed to `setup`,
-/// and the executor takes the resolvers the schema binds (rule 4 of
-/// section YOGA of the old page of the plan).
+/// and the executor takes the resolvers the schema binds.
 #[derive(Clone, Default)]
 pub struct AgentSetup {
     /// The options of the agent.
@@ -216,13 +211,8 @@ pub struct HttpOptions {
     pub masked_errors: MaskedErrors,
     /// `graphqlEndpoint`, `/graphql` when absent or empty.
     pub graphql_endpoint: Option<String>,
-    /// `healthCheckEndpoint`, `/health` when absent.
-    pub health_check_endpoint: Option<String>,
-    /// `graphiql`.
-    pub graphiql: Graphiql,
-    /// `multipart`, which puts the multipart parser in only when `true`, the
-    /// named divergence D49 of `docs/byte-equality.md` section 3, where Yoga
-    /// puts it in unless the option is `false`.
+    /// `multipart`, which puts the multipart parser in only when `true`, a named
+    /// divergence, where Yoga puts it in unless the option is `false`.
     pub multipart: Option<bool>,
     /// `parserAndValidationCache`, which leaves the cache out when `false`.
     pub parser_and_validation_cache: Option<bool>,
@@ -251,6 +241,10 @@ pub struct HttpOptions {
     /// pass leaves it to the rules, the bound of the card a build serves, and
     /// `aosabi_validate::pass::MAX_DEPTH` when absent. No answer depends on it.
     pub single_pass_max_depth: Option<u32>,
+    /// Aosabi only: the cap on the tokens of a request document the parse function of
+    /// the engine takes, the key `maxTokens` of the app, and `REQUEST_TOKENS` of
+    /// `aosabi-lang` when absent, a named divergence.
+    pub max_tokens: Option<u32>,
 }
 
 /// The state the function reads on every request, the server of Yoga, `YogaServer`.
@@ -264,10 +258,6 @@ pub struct HttpServer {
     pub(crate) logger: HttpLogger,
     /// `graphqlEndpoint`.
     pub(crate) graphql_endpoint: String,
-    /// `healthCheckEndpoint`, which the health check answers.
-    pub(crate) health_check_endpoint: String,
-    /// The options of the page of `GraphiQL` of a request, none when the option `graphiql` is `false`.
-    pub(crate) graphiql: Option<GraphiqlOptionsFactory>,
     /// The request parsers.
     pub(crate) parsers: Parsers,
     /// The result processors.
@@ -301,11 +291,9 @@ impl HttpServer {
         let masked_errors = masked_errors_opts(&options.masked_errors, logger);
         let hooks = hooks(hook_list(&options, masked_errors.as_ref()));
         let plugins = app_plugins(&hooks, &options.plugins);
-        let graphiql = crate::graphiql::options_factory(&options.graphiql);
         let HttpOptions {
             id,
             graphql_endpoint,
-            health_check_endpoint,
             multipart,
             extra_param_names,
             agent,
@@ -317,9 +305,6 @@ impl HttpServer {
             graphql_endpoint: graphql_endpoint
                 .filter(|endpoint| !endpoint.is_empty())
                 .unwrap_or_else(|| String::from(DEFAULT_GRAPHQL_ENDPOINT)),
-            health_check_endpoint: health_check_endpoint
-                .unwrap_or_else(|| String::from(DEFAULT_HEALTH_CHECK_ENDPOINT)),
-            graphiql,
             parsers: Parsers::new(multipart == Some(true)),
             processors: Processors::new(),
             extra_param_names,
@@ -489,20 +474,23 @@ fn masked_errors_opts(
 
 /// Returns the engine the hook layer runs first.
 ///
-/// The engine of Yoga is graphql-js with `normalizedExecutor`, and Aosabi
-/// installs the same engine with the single pass in the seat of the validator
-/// where `single_pass` is on or absent with [`SINGLE_PASS_DEFAULT`] on. That
-/// engine meets the refusal of introspection after the specified rules, which
-/// the server hands it, and the bound on nesting of the options.
+/// The engine of Yoga is graphql-js with `normalizedExecutor`, and Aosabi installs the
+/// same engine with the single pass in the seat of the validator where `single_pass`
+/// is on or absent with [`SINGLE_PASS_DEFAULT`] on. That engine meets the refusal of
+/// introspection after the specified rules, which the server hands it, and the bound
+/// on nesting of the options. Either engine parses under the cap on the tokens of the
+/// options, `REQUEST_TOKENS` when absent.
 fn engine(options: &HttpOptions) -> Engine {
+    let max_tokens = options.max_tokens.unwrap_or(REQUEST_TOKENS);
     let on = options.single_pass.unwrap_or(SINGLE_PASS_DEFAULT);
     if !on && options.single_pass_counts.is_none() {
-        return Engine::graphql();
+        return Engine::graphql_capped(max_tokens);
     }
     Engine::graphql_single_pass(SinglePass {
         on,
         max_depth: options.single_pass_max_depth.unwrap_or(MAX_DEPTH),
         extra_rule: Some(NO_SCHEMA_INTROSPECTION_CUSTOM_RULE),
         counts: options.single_pass_counts.clone(),
+        max_tokens,
     })
 }

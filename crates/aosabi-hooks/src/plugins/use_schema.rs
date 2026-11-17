@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-hooks: the schema plugin, which sets the schema of every request.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/plugins/use-schema.js, MIT.
  */
 
 //! `use_schema`.

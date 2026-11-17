@@ -4,15 +4,21 @@
  * the schema inference of Aosabi over the live checker of typescript behind
  * the host boundary of the author mode of the TypeScript option.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the second type source of aosabi-infer,
+ * whose methods the host answers from the ts.TypeChecker of a ts.Program it
+ * made with the compiler options of the reference's builder.
  */
 
 //! The module `infer.wasm` of the npm package `aosabi-build`.
 //!
-//! The command `aosabi build` of the package makes a `ts.Program` of an app and
-//! hands this module the questions of the inference to answer. Then it prints
-//! the schema text, writes the JSON form of the IR through `aosabi-ir`, writes
-//! `resolvers.js` and validates the schema text through the writers of
+//! The command `aosabi build` of the package makes a `ts.Program` of an app
+//! and hands this module the questions of the inference to answer. The module
+//! runs the inference of `aosabi-infer` over its trait `TypeSource`, whose
+//! every method is an import of the one block of the module `abi`, which the
+//! host answers lazily from the live `ts.TypeChecker` through three handle
+//! tables, one for types, one for symbols and one for call signatures. Then it
+//! prints the schema text, writes the JSON form of the IR through `aosabi-ir`,
+//! writes `resolvers.js` and validates the schema text through the writers of
 //! `aosabi-build`, so the bytes of `.aosabi/schema.graphql`, `ir.json` and
 //! `resolvers.js` are the bytes the Rust option writes for a twin.
 //!
@@ -37,12 +43,7 @@
 //! could take the place of. Every module but this root and `abi` forbids
 //! `unsafe_code`, and no unsafe block exists. The root holds no code but the
 //! declarations of its modules, and a forbid there would bind `abi` as well.
-//! The judging notebooks are `tests/notebooks/10_schema_tier1.ipynb`, whose
-//! side `ts` holds the three files of `aosabi build` to the sidecar for every
-//! fixture G8 counts, `tests/notebooks/39_ts1_parity.ipynb` in the author
-//! mode, and `tests/notebooks/08_card_builds.ipynb` and
-//! `tests/notebooks/32_graphtp_fetch.ipynb`, which count the boundary, and
-//! there is no test in this crate, the rule of `CONTRIBUTING.md` section 3.
+//! There is no test in this crate, the rule of `CONTRIBUTING.md` section 3.
 #![cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 
 mod abi;

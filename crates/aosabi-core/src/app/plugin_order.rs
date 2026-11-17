@@ -2,7 +2,7 @@
 /*
  * aosabi-core: the order in which the plugins of a phase load.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/app/plugin-order.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */
@@ -60,6 +60,7 @@ impl PluginOrderError {
     ///
     /// The path is the names on the walk and the name of the plugin met twice,
     /// joined by a space, U+2192 and a space, so the cycle of `a` and `b`
+    /// reads `Aosabi plugin dependency cycle: a → b → a`.
     #[must_use]
     pub fn message(&self) -> &str {
         &self.message

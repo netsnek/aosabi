@@ -28,11 +28,14 @@
 //! | [`Bindings`](macro@Bindings) | a struct of bindings | `current()`, which reads each field from the environment of the context |
 //! | [`Variables`](macro@Variables) | a struct of context variables | one `Key` constant per field and `impl Variables` |
 //!
-//! Under the default features each one answers a compile error that names its
-//! native form, the plain Rust the builder of `aosabi-build` reads from the
-//! source with no attribute, derive or macro of Aosabi, and a derive or an
-//! attribute answers one error per key of `#[aosabi(..)]` its item carries
-//! before its own.
+//! Every macro of the table is a form of the derive path, which is retired for
+//! application code. Under the default features each one answers a compile
+//! error that names its native form, the plain Rust the builder of
+//! `aosabi-build` reads from the source with no attribute, derive or macro of
+//! Aosabi, and a derive or an attribute answers one error per key of
+//! `#[aosabi(..)]` its item carries before its own. The hidden feature
+//! `mirror`, which the facade turns on for the twins that wait for the
+//! TypeScript judge alone, keeps the expansions this file documents.
 //!
 //! The declaration list of a target is the file the build script of the crate
 //! writes, which calls `aosabi_build::declarations_main`, and it names the
@@ -76,10 +79,7 @@
 //! | `guards` | the leading guard calls of a body, recorded as guard facts |
 //! | `retired` | the answers of the macros under the default features, a refusal that names the native form of each form and each key |
 //!
-//! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebooks are
-//! `tests/notebooks/10_schema_tier1.ipynb` for the descriptors and
-//! `tests/notebooks/31_http_errors.ipynb` for the glue.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 use proc_macro::TokenStream;
 use syn::{
@@ -124,7 +124,7 @@ mod variables;
 /// the twin of a union of object types. The name of the type and of every
 /// member is the identifier with a raw prefix removed and nothing else
 /// changed. The documentation comment of the type and of every member becomes
-/// its description by the rule of `docs/authoring.md` section 29.5: only the
+/// its description: only the
 /// last block counts, the gutter goes against the margin of the first text,
 /// and the text splits into the comment and the tags the TypeScript checker
 /// reads. A field without `pub` is recorded as private, and the inference
@@ -346,9 +346,10 @@ pub fn resolvers(args: TokenStream, item: TokenStream) -> TokenStream {
 /// comment of the struct is the documentation of the type. The printer writes
 /// the `scalar Name` line with no description, so the comment reaches the
 /// schema only as the description of a non null input field typed by the
-/// scalar, which takes the documentation of its type (quirk `Q15`). The built
-/// in scalars have markers of their own in the facade, `ID`, `Int`, `Float`,
-/// `Date`, `File`, `JSON` and `Any`, and a service names those.
+/// scalar, which takes the documentation of its type (quirk
+/// `INPUT_DESCRIPTION_FROM_TYPE`). The built in scalars have markers of their
+/// own in the facade, `ID`, `Int`, `Float`, `Date`, `File`, `JSON` and `Any`,
+/// and a service names those.
 ///
 /// The attribute emits the struct unchanged, `impl Described` with
 /// `TypeKind::Scalar` and every list empty, and one `Declaration` constant

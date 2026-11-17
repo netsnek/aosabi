@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: MIT
 /*
- * aosabi-kernel document_table: the persisted document table.
+ * aosabi-kernel document_table: the persisted document table, withdrawn.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The table was to map the id of a persisted
+ * document to the generated resolver plan a closed build carries in place of
+ * a parser, and it was withdrawn with the closed executor and the CBOR
+ * codec.
  */
 
-//! The module holds no item yet. What lands here is `DocumentTable`: an operation travels
-//! as an identifier plus its variables, and the table maps that identifier to the
-//! generated resolver plan a closed build carries in place of a parser, a validator and an
-//! in memory schema.
+//! The persisted document table, withdrawn.
+//!
+//! The module holds no item. A carrier sends the text of a document, which
+//! the engine parses and validates at run time, and the general executor and
+//! the service answer an operation that names a persisted document with one
+//! error, since the engine accepts no persisted document.

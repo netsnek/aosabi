@@ -6,14 +6,13 @@
  * It holds the mark of the coding compress() leaves to the host, which only
  * compress() under the feature platform-coding sets, and the substatus of
  * GraphTP, which no file of the reference has and which only the port of Yoga
- * sets (docs/graphtp-in-aosabi.md section 4).
+ * sets.
  *
- * Derived from hono 1.19.9, dist/listener.js, MIT.
- * Derived from hono 1.19.9, dist/response.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/response.js, MIT.
  *
- * It carries the quirks Q52_NODE_ADAPTER_CACHED_LENGTH,
- * Q53_HONO_TEXT_DEFAULT_SPACE and Q57_HONO_HEAD_FROM_GET of
- * docs/byte-equality.md section 13.1.
+ * It carries the quirks NODE_ADAPTER_CACHED_LENGTH, HONO_TEXT_DEFAULT_SPACE and
+ * HONO_HEAD_FROM_GET.
  */
 
 //! The Fetch `Response` and the lightweight answer of the Node adapter.
@@ -29,18 +28,17 @@
 //! `content-type: text/plain; charset=UTF-8` with the space when it has none,
 //! and it builds the platform's response from its body and its init only when
 //! something reads a member the cache does not hold, the body or the status
-//! text among them, which drops the cache (A4 of the plan's version 2 draft,
-//! quirk `Q52_NODE_ADAPTER_CACHED_LENGTH`). While the cache holds, the adapter
-//! writes the answer on its cached path. A response made from another one takes
-//! that one's built response when it was built and copies its init otherwise,
-//! and a response of `c.text` with nothing prepared has no init, so a response
-//! made from it fails, which is the 500 of a `HEAD` on that path (A9, quirk
-//! `Q57_HONO_HEAD_FROM_GET`).
+//! text among them, which drops the cache (quirk `NODE_ADAPTER_CACHED_LENGTH`).
+//! While the cache holds, the adapter writes the answer on its cached path. A
+//! response made from another one takes that one's built response when it was
+//! built and copies its init otherwise, and a response of `c.text` with nothing
+//! prepared has no init, so a response made from it fails, which is the 500 of
+//! a `HEAD` on that path (A9, quirk `HONO_HEAD_FROM_GET`).
 //!
 //! Without the feature, which is the Worker, a response is the platform's
 //! `Response` of the Fetch Standard, built at once, and a string body with no
 //! `content-type` gets `text/plain;charset=UTF-8` with no space, quirk
-//! `Q53_HONO_TEXT_DEFAULT_SPACE`.
+//! `HONO_TEXT_DEFAULT_SPACE`.
 //!
 //! A response also carries the substatus of `GraphTP`, one byte that refines
 //! its status and that no response of the reference has. The port of Yoga sets
@@ -317,7 +315,7 @@ impl Response {
     /// Under the feature `node-server` the adapter's cache holds
     /// `content-type: text/plain; charset=UTF-8` with the space, and without it
     /// the platform writes `text/plain;charset=UTF-8` with none, quirk
-    /// `Q53_HONO_TEXT_DEFAULT_SPACE`.
+    /// `HONO_TEXT_DEFAULT_SPACE`.
     #[must_use]
     pub fn from_text(text: impl Into<Rc<str>>) -> Self {
         let state = State {
@@ -384,7 +382,7 @@ impl Response {
     /// Returns the `TypeError` the adapter's constructor throws when `other`
     /// has no init, the response of `c.text` with nothing prepared, whose
     /// `init.#init.headers` reads a property of `undefined`, quirk
-    /// `Q57_HONO_HEAD_FROM_GET`.
+    /// `HONO_HEAD_FROM_GET`.
     pub fn from_response(body: Body, other: &Response) -> Result<Self, FetchError> {
         if !cfg!(feature = "node-server") {
             let init = ResponseInit {
@@ -594,8 +592,8 @@ impl Response {
     /// Returns the adapter's cache, `[status, body, headers]`, while it holds.
     ///
     /// The adapter writes an answer whose response has a cache on its cached
-    /// path (A4 of the plan's version 2 draft, quirk
-    /// `Q52_NODE_ADAPTER_CACHED_LENGTH`).
+    /// path (quirk
+    /// `NODE_ADAPTER_CACHED_LENGTH`).
     #[must_use]
     pub fn node_cache(&self) -> Option<(u16, Body, CachedHeaders)> {
         let state = self.0.borrow();

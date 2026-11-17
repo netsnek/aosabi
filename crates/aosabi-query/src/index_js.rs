@@ -6,17 +6,20 @@
  * No reference file. The bytes are the output of rolldown 1.2.4 for the files
  * generate.rs writes, printed from the pinned segments of the literal
  * client_index_js_segments by four rules. The file index_js.segments beside
- * this file is written by tools/provenance and by nothing else.
+ * this file is pinned byte for byte.
  */
 
 //! The bundled client.
 //!
 //! The build of the reference bundles `index.ts` with rolldown into `index.js`
-//! in the ESM format, keeping the imported query package external
-//! and inlining the relative import `./types`. Of `types.ts` only the enum
-//! objects carry runtime code, so the bundle is the import line, a region of
-//! the enums when the schema has one, the index body with the descriptor
-//! printed as an object literal, and the export list.
+//! in the ESM format, keeping the imported query package external and inlining
+//! the relative import `./types`. Of `types.ts` only the enum objects carry
+//! runtime code, so the bundle is the import line, a region of the enums when
+//! the schema has one, the index body with the descriptor printed as an object
+//! literal, and the export list.
+//!
+//! [`bundle_index_js()`] writes those four parts by four rules, each assumed
+//! from the recorded output of the reference:
 //!
 //! 1. The segment `import`, the external import line and a newline.
 //! 2. When the schema holds at least one enum, the region of `types.ts`,

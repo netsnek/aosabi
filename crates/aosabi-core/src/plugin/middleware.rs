@@ -2,8 +2,9 @@
 /*
  * aosabi-core: the member middleware of a plugin and the value it hands up.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/index.ts and
- * packages/pylon/src/app/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/index.ts and packages/pylon/src/app/index.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `PluginMiddleware`, `ValueMiddlewareFn` and `IntoMiddlewareValue`.
@@ -27,11 +28,10 @@
 //! | `Result<()>` | [`PluginMiddleware::Value`] | `await next()` with nothing returned |
 //! | `Result<Option<Response>>` | [`PluginMiddleware::Value`] | a response of its own on one branch and nothing on another |
 //!
-//! The first form is the one of `docs/authoring.md` section 5: its
-//! continuation sets the value of the rest of the chain on the context, so
-//! `next.run(c)` answers it. The second keeps the value of the middleware
-//! apart from the context, so its continuation drops what the rest of the
-//! chain answered, as the reference does.
+//! In the first form its continuation sets the value of the rest of the chain
+//! on the context, so `next.run(c)` answers it. The second keeps the value of
+//! the middleware apart from the context, so its continuation drops what the
+//! rest of the chain answered, as the reference does.
 
 use core::future::Future;
 use std::rc::Rc;

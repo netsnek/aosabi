@@ -7,8 +7,8 @@
  * slot listened or unlistened during a dispatch is not reached by it, which is
  * the rule of
  * https://dom.spec.whatwg.org/#concept-event-listener-inner-invoke, and a slow
- * slot keeps the latest value of its section, which is the coalescing of
- * ADR-0017. The hub needs alloc.
+ * slot keeps the latest value of its section and drops an intermediate one.
+ * The hub needs alloc.
  */
 
 //! The fan out of the publish primitive.
@@ -22,8 +22,8 @@
 //!
 //! # The rules
 //!
-//! The rules carry the numbers of the plan's section KERNEL, and the push
-//! model of the harness states them in the same words.
+//! These are rules 1 to 5 of the publish module, and the push model of the
+//! harness states them in the same words.
 //!
 //! 1. [`Hub::publish`] increments the revision once, walks the slots in listen
 //!    order, and for each slot of the topic appends a clone of the payload

@@ -12,8 +12,8 @@
 //! The crate is a literal translation of the validation directory of graphql-js
 //! 16.12.0, the version the wire is pinned to. Every function keeps the
 //! graphql-js name in snake case and follows the TypeScript line by line,
-//! because the exit number of the milestone is byte equality of the error text
-//! and the locations of every specified rule.
+//! because the goal is byte equality of the error text and the locations of
+//! every specified rule.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |
@@ -41,8 +41,7 @@
 //! The crate builds with no standard library and needs an allocator, because
 //! the bare metal build of a microcontroller card links it. The `std` feature
 //! is the configuration symbol of a host build and gates nothing today. There
-//! is no test in this crate, which is the rule of CONTRIBUTING.md section 3,
-//! and the judging notebook is `tests/notebooks/02_language.ipynb`.
+//! is no test in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 

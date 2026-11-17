@@ -4,10 +4,8 @@
  * device card fills, core only.
  *
  * No analogue on the reference side. The values are the rows of USB bulk and
- * USB serial of the Homa design note, first version, homa/design-v1.md
- * section 3.1 in the design folder outside this repository, which
- * homa::Profile::usb_bulk and homa::Profile::usb_serial give, and the rule of
- * the zero length packet is that of its section 3.3.
+ * USB serial that homa::Profile::usb_bulk and homa::Profile::usb_serial give,
+ * with a rule for the zero length packet.
  */
 
 //! The profiles of USB bulk and USB serial.
@@ -46,8 +44,7 @@ impl Speed {
 }
 
 /// The RPCs a peer may have open at this end on either link, the eight slots
-/// of the device configuration of the Homa design note, second version,
-/// section 8.3.
+/// of a small device's configuration.
 pub const MAX_RPCS: u8 = 8;
 
 /// Returns the profile of USB bulk at `speed`.

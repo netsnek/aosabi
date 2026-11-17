@@ -88,6 +88,8 @@ pub fn inspect(value: &Value) -> String {
 ///
 /// An array prints whole, an object to a depth of three, and an error through
 /// its `toString`.
+///
+/// Derived from cross-inspect 1.0.1, cjs/index.js, MIT.
 #[must_use]
 pub fn cross_inspect(value: &Value) -> String {
     CROSS_INSPECT.format_value(value, &[])
@@ -115,6 +117,7 @@ impl Printer {
     /// Formats a value whose `typeof` is `object`.
     ///
     /// Derived from graphql-js 16.12.0, src/jsutils/inspect.ts, MIT.
+    /// Derived from cross-inspect 1.0.1, cjs/index.js, MIT.
     fn format_object_value(&self, value: &Value, previously_seen_values: &[*const ()]) -> String {
         if let (true, Value::Error(error)) = (self.errors_through_to_string, value) {
             return self.format_error_value(error, previously_seen_values);
@@ -145,6 +148,8 @@ impl Printer {
     /// The items of an `AggregateError` print below the values seen so far,
     /// without the error itself among them, as the reference passes
     /// `previouslySeenValues` on.
+    ///
+    /// Derived from cross-inspect 1.0.1, cjs/index.js, MIT.
     fn format_error_value(&self, error: &ErrorObject, seen_values: &[*const ()]) -> String {
         if let ErrorObject::Aggregate { errors, .. } = error {
             return format!(
@@ -218,6 +223,7 @@ impl Printer {
     /// Formats an array as `[item, ...]`.
     ///
     /// Derived from graphql-js 16.12.0, src/jsutils/inspect.ts, MIT.
+    /// Derived from cross-inspect 1.0.1, cjs/index.js, MIT.
     fn format_array(&self, array: &[Value], seen_values: &[*const ()]) -> String {
         if array.is_empty() {
             return String::from("[]");
@@ -254,6 +260,8 @@ impl Printer {
 /// the error, which a later read of `name` would see. An [`ErrorObject`] is
 /// not written to, and nothing in the executor reads the name of an error
 /// after it printed it.
+///
+/// Derived from cross-inspect 1.0.1, cjs/index.js, MIT.
 fn format_error(value: &ErrorObject) -> String {
     if let ErrorObject::GraphQL(error) = value {
         return error.to_string();

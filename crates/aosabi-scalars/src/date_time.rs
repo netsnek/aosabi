@@ -2,11 +2,13 @@
 /*
  * aosabi-scalars: the DateTime configuration the DateTimeISO scalar spreads.
  *
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
  * Aosabi binds DateTimeISO and not DateTime, and DateTimeISO spreads this
  * configuration and replaces only the name, the description and serialize,
  * so parseValue and parseLiteral of the bound scalar are the functions here.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/scalars/iso-date/DateTime.js, MIT.
  */
 
 //! The `DateTime` scalar configuration.

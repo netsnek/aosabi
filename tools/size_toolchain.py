@@ -6,7 +6,8 @@ compiler that builds it, and the shared pin 1.95.0 of the machine carries none. 
 component stays out of the shared pin until every build remaps the source of the
 standard library, since rustc writes the panic locations of inlined code of the
 standard library with the path of the machine while rust-src is present, and cargo
-keeps the artifacts built in that window.
+keeps the artifacts built in that window. So this tool makes a private copy of the
+pin that alone carries it:
 
 1. Every file of the pin is hard linked under target/size/toolchain/ of the tree,
    on the file system of the rustup home, so the copy takes no second copy of the
@@ -35,15 +36,16 @@ default toolchain of the machine is another stable.
 
 A download that still fails after its retries ends the tool with the exit status
 75, EX_TEMPFAIL of sysexits.h, and no whole copy, at most one without its mark that
-the next run makes again, since the plan retries such a failure and never judges
-it, and the rows that need the copy print WAITING. Every other failure ends it with
-the status 1.
+the next run makes again, since such a failure is retried and never judged, and the
+rows that need the copy print WAITING. Every other failure ends it with the status 1.
 
 The tool runs without the harness, so it keeps its own copies of the pin, its
 commit, the host, the variable, the mark, the place of the copy, the status of a
 failed download, and the flags of its warming build with the remap of the source
 of the standard library, which the module text of tests/harness/toolchain.py
 names, so a bump of the pin or a renamed flag edits both files.
+
+The tool never changes the shared pin and never adds rust-src to it.
 """
 
 from __future__ import annotations

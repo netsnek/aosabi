@@ -5,6 +5,8 @@
  *
  * The engine of the single pass, Engine::graphql_single_pass, has no analogue in
  * the reference.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/plugins/use-engine.js, MIT.
  */
 
 //! `use_engine`.
@@ -17,6 +19,12 @@
 //! [`Engine::graphql`] is: `aosabi_lang::parse`, `aosabi_validate::validate`,
 //! its specified rules and `normalized_executor`, run on the agent the caller
 //! passes.
+//!
+//! The parse function of an engine reads a request document under the bound on
+//! its nesting and the cap on its tokens, named divergences. The cap is
+//! `REQUEST_TOKENS` of `aosabi-lang`, and [`Engine::graphql_capped`] and the
+//! field `max_tokens` of [`SinglePass`] take the cap an app sets with the key
+//! `maxTokens`.
 //!
 //! # The engine of the single pass
 //!
@@ -78,6 +86,7 @@ use aosabi_lang::{
     ast::DocumentNode,
     parser::{
         ParseOptions,
+        REQUEST_TOKENS,
         parse, //
     }, //
 };
@@ -138,11 +147,13 @@ pub struct Engine {
     pub schema_seen: Option<SchemaSeenFn>,
 }
 
-/// Parses `source` as the parse function of the engine of Yoga parses it.
+/// Parses `source` as the parse function of the engine of Yoga parses it, under
+/// the bound on the nesting of a request document and the cap `max_tokens` on
+/// its tokens, named divergences.
 ///
 /// A parse error is the thrown `GraphQLError`.
-fn parse_document(source: &str) -> Result<Arc<DocumentNode>, Value> {
-    parse(source, ParseOptions::default())
+fn parse_document(source: &str, max_tokens: u32) -> Result<Arc<DocumentNode>, Value> {
+    parse(source, ParseOptions::request_capped(max_tokens))
         .map(Arc::new)
         .map_err(|error| Value::from(ErrorObject::GraphQL(error)))
 }
@@ -184,11 +195,20 @@ impl Engine {
     /// Returns the engine the HTTP server installs: graphql-js with `normalizedExecutor`.
     ///
     /// A parse error is the thrown `GraphQLError`, and a schema the validation
-    /// refuses is the throw of the type layer.
+    /// refuses is the throw of the type layer. The parse function takes the
+    /// cap `REQUEST_TOKENS` on the tokens of a document.
     #[must_use]
     pub fn graphql() -> Self {
+        Self::graphql_capped(REQUEST_TOKENS)
+    }
+
+    /// Returns the engine of [`Engine::graphql`] whose parse function takes the
+    /// cap `max_tokens` on the tokens of a document, the cap an app sets with
+    /// the key `maxTokens`, a named divergence.
+    #[must_use]
+    pub fn graphql_capped(max_tokens: u32) -> Self {
         Self::with_normalized_executor(
-            Rc::new(parse_document),
+            Rc::new(move |source: &str| parse_document(source, max_tokens)),
             Rc::new(validate_document),
             SPECIFIED_RULES.to_vec(),
             None,
@@ -219,8 +239,9 @@ impl Engine {
             counts: settings.counts,
         };
         let parsed = Rc::clone(&shared);
+        let max_tokens = settings.max_tokens;
         let parse_fn: ParseFn = Rc::new(move |source: &str| {
-            let document = parse_document(source)?;
+            let document = parse_document(source, max_tokens)?;
             if let Ok(mut state) = parsed.try_borrow_mut() {
                 state.document = Arc::downgrade(&document);
             }
@@ -262,23 +283,28 @@ pub struct SinglePass {
     /// The counters of the verdicts and of the gates that closed, and `None`
     /// to count nothing.
     pub counts: Option<Rc<PassCounts>>,
+    /// The cap on the tokens of a document the parse function of the engine
+    /// takes, as [`Engine::graphql_capped`] takes it.
+    pub max_tokens: u32,
 }
 
 impl Default for SinglePass {
-    /// Returns the pass on with the bound of `pass::MAX_DEPTH`, no extra rule
-    /// and no counters.
+    /// Returns the pass on with the bound of `pass::MAX_DEPTH`, no extra rule,
+    /// no counters and the cap `REQUEST_TOKENS`.
     ///
-    /// A served build takes two settings beyond these, which the server of
+    /// A served build takes three settings beyond these, which the server of
     /// `graphql-over-http` hands every engine it builds: the refusal of
-    /// introspection as the extra rule, and the bound of its options, which
+    /// introspection as the extra rule, the bound of its options, which
     /// `build_http_options` of `aosabi-core` sets to the bound of the card the build
-    /// serves.
+    /// serves, and the cap of its options, which that function sets to the
+    /// cap of the app.
     fn default() -> Self {
         Self {
             on: true,
             max_depth: pass::MAX_DEPTH,
             extra_rule: None,
             counts: None,
+            max_tokens: REQUEST_TOKENS,
         }
     }
 }

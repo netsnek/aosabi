@@ -311,7 +311,7 @@ fn implements_info(base: &syn::Type) -> syn::Result<TokenStream> {
 }
 
 /// The name of an identifier with a raw prefix removed and nothing else
-/// changed, the field name policy of `docs/schema-inference.md` section 5.3,
+/// changed, the field name policy,
 /// which the glue of `aosabi-codegen` reads by the same rule.
 pub(crate) use aosabi_codegen::unraw;
 

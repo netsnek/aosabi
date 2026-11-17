@@ -41,7 +41,7 @@
 //! Every generated path starts with `::aosabi::__private::glue::`. A field, a
 //! parameter or a return whose type the glue cannot carry refuses at compile
 //! time with the message of the trait it lacks, which is the refusal through
-//! trait bounds of `docs/schema-inference.md` section 13.
+//! trait bounds.
 
 use proc_macro2::TokenStream;
 use quote::{

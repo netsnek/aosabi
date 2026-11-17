@@ -3,7 +3,8 @@
  * aosabi-validate pass walk: the walk of the single pass over the tokens of
  * an executable document in the order of its grammar.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The grammar is that of an executable document,
+ * and each check answers a rule at the token that decides it.
  */
 
 //! The walk of the single pass.

@@ -3,7 +3,9 @@
  * aosabi-js context: the context of a request of the host in the engine and
  * the members of it the host calls.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The routes, the middleware and the context c of
+ * an app run in the real hono of the host, aosabi/pylon, and the engine keeps
+ * the context its own code runs a request of the host in.
  */
 
 //! The context of a request of the host.
@@ -341,8 +343,15 @@ impl HostStream {
 /// that says how its value is written, 0 for a value of the engine and
 /// [`crate::nodes::VIEW`] for a view record, and the value, or the byte of a
 /// throw completion and the thrown value.
+///
+/// A record the host opens a request with holds the head of that request,
+/// so the call keys the hashes of the thread before it decodes the record,
+/// [`crate::boot::seed_keys`].
 pub fn ctx(request: u32, len: u32) -> usize {
     let record = host::input(len);
+    // The randomness of the host comes through the input buffer, so the
+    // record is read first.
+    crate::boot::seed_keys();
     let mut reader = Reader::new(&record);
     let completion = match record.first().copied() {
         Some(op::OPEN) => crate::request::open(request, &record[1..]).map(Answered::Value),

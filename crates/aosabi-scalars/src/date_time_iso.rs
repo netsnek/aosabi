@@ -2,12 +2,15 @@
 /*
  * aosabi-scalars: the DateTimeISO scalar, which Aosabi binds as Date.
  *
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
+ * The file holds the name and the description of the scalar as they read.
  * The configuration spreads the DateTime configuration and replaces the
  * name, the description and serialize, so parseValue and parseLiteral are
  * the DateTime functions. Aosabi takes the three hooks and gives the scalar
  * its own name and description.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/scalars/iso-date/DateTimeISO.js, MIT.
  */
 
 //! The `DateTimeISO` scalar.

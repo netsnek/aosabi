@@ -1,9 +1,13 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT AND Apache-2.0
 /*
  * aosabi-core: the descriptors of the entries of graphql!, the object literal
  * of the roots of an application.
  *
- * No analogue on the reference side.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/mutation.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
+ *
+ * No analogue on the reference side for the descriptors.
  */
 
 //! The descriptors of the entries of `graphql!`.

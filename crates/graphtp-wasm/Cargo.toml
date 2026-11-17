@@ -5,7 +5,7 @@
 # never published, since the package carries its module as a build product.
 [package]
 name = "graphtp-wasm"
-version = "0.0.0"
+version.workspace = true
 description = "The wasm module of the npm package graphtp: the GraphTP/1 codec, its zlib profile and the Homa client role, with no import."
 edition.workspace = true
 rust-version.workspace = true
@@ -15,9 +15,8 @@ publish = false
 [lib]
 crate-type = ["cdylib"]
 
-# The owner's three crates and nothing else, so the module takes 0 outside
-# crates. The client role of graphtp-homa and of homa, with the features
-# docs/graphtp-fetch.md section 2.2 names.
+# Three crates of this workspace and nothing else, so the module takes 0 outside
+# crates. The client role of graphtp-homa and of homa.
 [dependencies]
 graphtp = { path = "../graphtp" }
 graphtp-homa = { path = "../graphtp-homa", default-features = false, features = ["client"] }
@@ -25,7 +24,8 @@ homa = { path = "../homa", default-features = false, features = ["client", "allo
 
 # The lints of the workspace table copied line for line, with unsafe_code at
 # deny in place of forbid, because a wasm export needs the unsafe attribute
-# #[unsafe(no_mangle)] and forbid admits no expectation.
+# #[unsafe(no_mangle)] and forbid admits no expectation. Each export line in
+# src/exports.rs carries its own #[expect(unsafe_code)] and no unsafe block.
 [lints.rust]
 unsafe_code = "deny"
 missing_docs = "warn"

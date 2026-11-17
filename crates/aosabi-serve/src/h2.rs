@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: HTTP/2 over the server of hyper and the fork of h2.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The HTTP/2 answers of the module are
+ * judged against the http2 module of Node through @hono/node-server.
  */
 
 //! `H2Config` and `serve_h2`.
@@ -19,7 +20,7 @@
 //! hyper's C11, and it is answered 405 with no body and the end of the stream
 //! before the adapter, as Node's compatibility layer does under
 //! `@hono/node-server`. HTTP/2 carries no quirk, so what differs from Node's
-//! `http2` server is a finding of `33_http2_tls`.
+//! `http2` server is a finding of the checks of HTTP/2 and TLS.
 
 use core::convert::Infallible;
 use std::rc::Rc;
@@ -85,9 +86,10 @@ impl H2Config {
     ///
     /// At most 100 concurrent streams, which Cloudflare's edge respects, a
     /// header list of at most 65,535 bytes, the `maxHeaderListSize` of Node's
-    /// HTTP/2 server, a stream window of 65,535 bytes and a connection window
-    /// of 1 MiB, a send buffer of 64 KiB per stream, and hyper's reset bounds,
-    /// 20 and 1,024.
+    /// HTTP/2 server, assumed until it is measured, a stream window of 65,535
+    /// bytes and a connection window of 1 MiB, a send buffer of 64 KiB per
+    /// stream, and hyper's reset bounds, 20 and 1,024. The values beside the
+    /// header list are assumed until their memory is measured.
     pub const LINUX: Self = Self {
         max_concurrent_streams: 100,
         max_header_list_size: 65_535,

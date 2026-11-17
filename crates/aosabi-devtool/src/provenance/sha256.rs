@@ -5,8 +5,8 @@
  *
  * No analogue in the reference. The hash function is SHA-256 of FIPS 180-4,
  * sections 4.1.2, 4.2.2, 5.1.1, 5.3.3 and 6.2, written from the standard.
- * tools/provenance/extract.py records each literal with the SHA-256 of
- * Python's hashlib, so the lock is the value this function has to meet.
+ * Each literal is recorded with the SHA-256 of Python's hashlib, so the lock
+ * is the value this function has to meet.
  */
 
 //! The SHA-256 of the provenance check.
@@ -15,9 +15,7 @@
 //! they were extracted. Both are public files of this repository and no
 //! secret enters the hash, so a hash that is fast or constant in time buys
 //! nothing here, and the function is the plain algorithm of the standard in
-//! safe code. `tests/notebooks/00_environment.ipynb`, section The hash of the
-//! provenance check, holds it to the examples NIST publishes and to hashlib
-//! over every length around the block boundaries.
+//! safe code.
 
 /// The round constants, the first 32 bits of the fractional parts of the
 /// cube roots of the first sixty four primes (FIPS 180-4 section 4.2.2).
@@ -135,7 +133,7 @@ pub fn digest(message: &[u8]) -> [u8; 32] {
 /// The simulator of `homa-sim` hashes every packet an end puts on its link as
 /// the packet leaves, and the fill of a message block by block, so it feeds
 /// the hash piece by piece. [`digest`] is the same hash over a message in one
-/// piece, which `tests/notebooks/00_environment.ipynb` holds to `hashlib`.
+/// piece.
 #[derive(Debug, Clone)]
 pub struct Sha256 {
     /// The hash value over the whole blocks taken so far.

@@ -2,7 +2,8 @@
 /*
  * aosabi-js plugin: the plugins of the app as plugins of the engine.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It holds the host plugin as a Plugin of
+ * aosabi-core, with its hooks over js_call.
  */
 
 //! The plugins of the app.
@@ -34,20 +35,22 @@
 //! that result that the payload handed crosses back as the error of the engine
 //! it stands for, so its bytes stay the engine's, and a result whose members
 //! the three members of a result hold no form for keeps them in their order.
-//! Any other hook of Envelop or Yoga a plugin holds fails the boot with its
-//! name, as `aosabi migrate` names it with its file and its line.
+//! The hook `onExecute` of the identity plugin of `aosabi/auth/plugin` is the
+//! map of the engine, [`map_forbidden_errors`] of `aosabi-auth`, which reads
+//! the `ForbiddenError` behind each error as the host holds it. Any other hook
+//! of Envelop or Yoga a plugin holds fails the boot with its name, as
+//! `aosabi migrate` names it with its file and its line.
 //!
 //! A hook that throws rejects the execution as a hook of Envelop rejects it, a
 //! done hook through the throw of its payload under the feature `host-hooks` of
 //! `aosabi-hooks`, and the engine reads the thrown value as the handler of Yoga
 //! reads a value that escapes the execution, so a `GraphQLError` and a
-//! `ServiceError` keep their message and their extensions. A done
-//! hook that answers a promise is awaited through the payload under the same
-//! feature, and a rejection rejects the execution the same way. The payload and
-//! the result a done hook leaves cross at any depth. Envelop also awaits a hook
-//! `onExecute` that answers a promise, which throws a `TypeError` at its call
-//! here, and a result set after the done hook settled takes no effect, each
-//! named in section 9 of `docs/ts1-surface.md`.
+//! `ServiceError` keep their message and their extensions. A done hook that
+//! answers a promise is awaited through the payload under the same feature, and
+//! a rejection rejects the execution the same way. The payload and the result a
+//! done hook leaves cross at any depth. Envelop also awaits a hook `onExecute`
+//! that answers a promise, which throws a `TypeError` at its call here, and a
+//! result set after the done hook settled takes no effect.
 
 #![forbid(unsafe_code)]
 

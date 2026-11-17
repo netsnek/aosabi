@@ -5,9 +5,9 @@
  *
  * No analogue in the reference. The parse is that of the event stream format
  * of the HTML standard, section 9.2.6, Interpreting an event stream, and the
- * mapping is docs/graphtp.md section 7, step 4: the bytes after "data: " of
- * each next event become a next entry, the complete event complete, and the
- * comments and pings of the stream are dropped.
+ * mapping is: the bytes after "data: " of each next event become a next
+ * entry, the complete event complete, and the comments and pings of the
+ * stream are dropped.
  */
 
 //! The reader of an event stream.

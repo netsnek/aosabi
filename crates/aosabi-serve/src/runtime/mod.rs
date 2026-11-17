@@ -3,8 +3,7 @@
  * aosabi-serve: the runtime, one executor on one thread over a reactor.
  *
  * No analogue on the reference side, where the event loop of Node runs the
- * server. Documentation/architecture.md section 14 asks for one thread, and
- * the runtime starts none.
+ * server. A served binary runs on one thread, and the runtime starts none.
  */
 
 //! The runtime of a served binary.

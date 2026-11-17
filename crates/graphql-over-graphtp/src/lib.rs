@@ -3,22 +3,20 @@
  * graphql-over-graphtp: the GraphTP listener, which serves an app's fetch over
  * Homa with the fixed fields of GraphTP and its streams.
  *
- * No analogue in the reference. The listener is the one of
- * docs/graphtp-in-aosabi.md section 3 over the server of the crate
- * graphtp-homa, a server of docs/graphtp.md section 7, and its two turns are
- * the surface the Homa track proposes to it.
+ * No analogue in the reference. The listener runs over the server of the crate
+ * graphtp-homa, and its two turns are the surface that server offers it.
  */
 
 //! The `GraphTP` listener.
 //!
 //! A [`Listener`] serves one Homa endpoint or one socket of Homa's kernel
 //! module through a fetch function of the app, with the bounds of its card. For
-//! each OPERATION it takes the five steps of `docs/graphtp.md` section 7: the
-//! server of `graphtp-homa` checks and decodes the request into the request
-//! buffer, the listener hands the app a POST with the fixed fields of
-//! [`fetch`], the app answers, and the listener opens a stream for an event
-//! stream or answers the status, the substatus and the body by the rules of
-//! step 4, which the server codes at >128 B into the answer buffer.
+//! each OPERATION it takes the five steps: the server of `graphtp-homa` checks
+//! and decodes the request into the request buffer, the listener hands the app
+//! a POST with the fixed fields of [`fetch`], the app answers, and the listener
+//! opens a stream for an event stream or answers the status, the substatus and
+//! the body by the rules, which the server codes at >128 B into the answer
+//! buffer.
 //!
 //! A driver calls [`Listener::turn_endpoint`] after each turn of its endpoint,
 //! or [`Listener::turn_rpcs`] after the readiness of a kernel socket, with the
@@ -37,9 +35,9 @@
 //! arena floor or 403.1 of a carrier's allowlist, reaches the listener as an
 //! answer with its status, its substatus, the answer type and an empty body,
 //! and the listener answers it with the two bytes of its code. The app names
-//! the answer type on such an answer, since step 4 reads an answer of class 4
-//! or 5 under another media type or none as the status alone, 403.0 in place of
-//! 403.1.
+//! the answer type on such an answer, since the listener reads an answer of
+//! class 4 or 5 under another media type or none as the status alone, 403.0
+//! in place of 403.1.
 //!
 //! A served build hands its listeners the fetch of its booted app, which the
 //! module `graphtp::served` of `aosabi-core` builds with its features `runtime`
@@ -52,10 +50,8 @@
 //! The crate builds with no standard library, needs an allocator and takes the
 //! crates `graphtp`, `graphtp-homa` and `homa` and no other, so a card with no
 //! standard library links it, and `aosabi-core` names it as its module
-//! `graphtp` under its feature `homa`. Its judges are the Jupyter notebooks of
-//! the carriers and of `GraphTP`, `tests/notebooks/25_carrier_unix.ipynb` and
-//! `tests/notebooks/32_graphtp_fetch.ipynb` among them, and there is no test in
-//! this crate, which is the rule of CONTRIBUTING.md section 3.
+//! `graphtp` under its feature `homa`. There is no test in this crate, which is
+//! the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 #![forbid(unsafe_code)]
@@ -436,7 +432,7 @@ impl<P: Copy + Eq> Work<P> {
     }
 
     /// Answers the exchange `exchange` for a whole answer of the app, by the
-    /// rules of step 4.
+    /// rules.
     fn settle(
         &mut self,
         exchange: Exchange<P>,

@@ -9,22 +9,37 @@
  * default, because the acceptance rule is byte equality and a fixed defect is a
  * byte difference.
  *
- * Q02 is retired and is never reused: it names the unmatched brace inside the
- * Voyager stylesheet, and Aosabi ships no Voyager stylesheet, so there is no
- * stray brace to reproduce. The quirks of Node and llhttp, Q18 to Q60, live
- * with the HTTP layer and its table in docs/byte-equality.md section 13.1. The
- * tenant null of the provider takes Q85, the next free id after Q83 and Q84.
+ * The register holds twenty one entries, among them the four of the
+ * subscriptions, the tenant null of the provider of Zitadel, the four quirks of
+ * Federation, and the Date argument of a typed delegation and the headers a
+ * redirect of a delegation carries to every hop, which the fixes of the audits
+ * register. An id names a quirk by what it is. One id is retired and is never
+ * reused, `VIEWER_STRAY_BRACE`: it names the unmatched brace inside the Voyager
+ * stylesheet, and Aosabi ships no Voyager stylesheet, so there is no stray
+ * brace to reproduce. The quirks of Node and llhttp live with the HTTP layer.
+ * NOT_PORTED holds 58 entries, among them the five parts of openid-client and
+ * oauth4webapi the two halves of zitadel.ts never turn on, the four of
+ * Federation, the executor every federation of a URL shares and the list a
+ * delegation stores for the field of a union, the transport of the Sentry
+ * plugin to a DSN on a port undici refuses, the RSA keys of a client assertion
+ * that ring 0.17.14 does not sign, the lookup of a host for every connection
+ * the fetch of Node opens, the five parts of the fetch of pylon pull that its
+ * client leaves out, the wait of the three issuer calls of openid-client beyond
+ * 30 seconds and the parse done hooks a failed text runs again.
  */
 
 //! The register of Pylon defects Aosabi reproduces on purpose.
 //!
 //! Reproducing a defect is the default, because the acceptance rule is byte
-//! equality and a fixed defect is a byte difference. [`NOT_PORTED`] carries the
-//! other direction, which is reference behaviour Aosabi deliberately leaves
-//! out, each with its reason.
+//! equality and a fixed defect is a byte difference. Every entry carries the
+//! file of the reference that decides it, most of them its line.
+//! [`NOT_PORTED`] carries the other direction, which is reference behaviour
+//! Aosabi deliberately leaves out, each with its reason.
 //!
 //! Byte equality with Pylon is a phase of the project, so an entry may carry
-//! the condition on which it drops and what Aosabi does then.
+//! the condition on which it drops and what Aosabi does then. Each of those
+//! drops once byte equality with Pylon is no longer the acceptance rule of its
+//! surface.
 
 #![no_std]
 
@@ -48,7 +63,7 @@ pub struct Quirk {
     pub id: &'static str,
     /// What the reference does, in one sentence.
     pub what: &'static str,
-    /// The reference path and line range that decides it, under.
+    /// The reference path and line range that decides it, relative to a checkout of Pylon.
     pub source: &'static str,
     /// How well the entry is established.
     pub evidence: Evidence,
@@ -57,165 +72,165 @@ pub struct Quirk {
     pub drops: Option<&'static str>,
 }
 
-/// The reproduced behaviour of the reference, in identifier order.
+/// The reproduced behaviour of the reference, in the order the register took it in.
 ///
 /// The length of this slice is the count the environment notebook checks.
 pub const QUIRKS: &[Quirk] = &[
     Quirk {
-        id: "Q01_DUPLICATE_PLUGIN_WRITEBACK",
+        id: "DUPLICATE_PLUGIN_WRITEBACK",
         what: "the configuration step writes the built plugin array back onto the configuration, so the four always on plugins appear twice in config.plugins after boot",
         source: "packages/pylon/src/app/pylon-handler.ts:185",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the boot report and of inspect, and then the boot leaves config.plugins as the application wrote it, so config_plugins_after_boot of the boot report lists each plugin once, while the arrays of each pass stay in their own fields",
+            "once byte equality with Pylon is no longer the acceptance rule of the boot report and of inspect, and then the boot leaves config.plugins as the application wrote it, so config_plugins_after_boot of the boot report lists each plugin once, while the arrays of each pass stay in their own fields",
         ),
     },
     Quirk {
-        id: "Q04_LANDING_VERSION_STRING",
-        what: "the landing page renders the Pylon package version, which is 2.9.5 at the reference commit",
+        id: "LANDING_VERSION_STRING",
+        what: "the landing page renders the Pylon package version, which is 2.9.5 at the reference commit. Aosabi has no landing page, a named divergence, so no answer carries the version",
         source: "packages/pylon/src/plugins/use-unhandled-route.ts:3",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q07_NO_DEPRECATED",
+        id: "NO_DEPRECATED",
         what: "there is no @deprecated support, the JSDoc tag folds into the description",
         source: "packages/pylon/src/cli/builder/schema/type-definition-builder.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q08_EMPTY_INPUT_PLACEHOLDER",
+        id: "EMPTY_INPUT_PLACEHOLDER",
         what: "an input object with no fields renders a single placeholder field named _ of type String",
         source: "packages/pylon/src/ir/sdl.ts:111",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q09_INPUT_UNION_FIRST_MEMBER",
+        id: "INPUT_UNION_FIRST_MEMBER",
         what: "a union in input position warns and collapses to its first member",
         source: "packages/pylon/src/cli/builder/schema/type-definition-builder.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q11_IN_CONTEXT_EM_DASH",
+        id: "IN_CONTEXT_EM_DASH",
         what: "the @inContext directive description carries the code point U+2014",
         source: "packages/pylon/src/core/in-context.ts:41",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q13_VIEWER_ALWAYS_ON",
-        what: "the viewer plugin slot survives graphiql: false and cannot be disabled, so it is always first in the array. Aosabi keeps the slot with the aoviewer plugin in it under its own key viewer: true alone, divergence D48, which keeps the array and the hook order equal under that key. The page that route serves is out of contract",
+        id: "VIEWER_ALWAYS_ON",
+        what: "the viewer plugin slot survives graphiql: false and cannot be disabled, so it is always first in the array. Aosabi has no viewer and leaves the slot empty, a named divergence, so the array lacks it and an unnamed plugin of the first pass stands one place lower",
         source: "packages/pylon/src/app/pylon-handler.ts:146-150",
         evidence: Evidence::Proven,
         drops: None,
     },
     Quirk {
-        id: "Q14_DESCRIPTION_VERBATIM",
+        id: "DESCRIPTION_VERBATIM",
         what: "descriptions are inserted with no escaping and no re-indentation",
         source: "packages/pylon/src/ir/sdl.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q15_INPUT_DESCRIPTION_FROM_TYPE",
+        id: "INPUT_DESCRIPTION_FROM_TYPE",
         what: "an input field description comes from the field's type symbol while an output field description comes from the property symbol",
         source: "packages/pylon/src/cli/builder/schema/type-definition-builder.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q16_UNLABELED_REST_DROPPED",
+        id: "UNLABELED_REST_DROPPED",
         what: "an unlabeled rest parameter warns and is dropped. Not expressible in Rust, kept so the register is complete",
         source: "packages/pylon/src/cli/builder/schema/schema-parser.ts",
         evidence: Evidence::Documented,
         drops: None,
     },
     Quirk {
-        id: "Q61_SUBSCRIPTION_OBJECT_PAYLOAD_PROJECTED",
+        id: "SUBSCRIPTION_OBJECT_PAYLOAD_PROJECTED",
         what: "the root resolver projects what a function returns onto the selected fields of an object return type, so a Repeater returned for an object typed subscription field becomes a plain object and the answer is the error Subscription field must return Async Iterable. Received: {}.",
         source: "packages/pylon/src/core/define-pylon.ts:278-288",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a returned Repeater is left unprojected, so an object typed payload streams",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a returned Repeater is left unprojected, so an object typed payload streams",
         ),
     },
     Quirk {
-        id: "Q62_IN_CONTEXT_NOT_ON_SUBSCRIPTION",
+        id: "IN_CONTEXT_NOT_ON_SUBSCRIPTION",
         what: "the plugin useInContext reads @inContext in onExecute alone, which a subscription never reaches, so the directive declared on SUBSCRIPTION sets no locale and no context for one",
         source: "packages/pylon/src/plugins/use-in-context.ts:19",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then @inContext applies to a subscription as to a query",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then @inContext applies to a subscription as to a query",
         ),
     },
     Quirk {
-        id: "Q63_ERROR_LOGGER_SILENT_ON_SUBSCRIPTION",
+        id: "ERROR_LOGGER_SILENT_ON_SUBSCRIPTION",
         what: "the plugin useGraphqlErrorLogger hooks onExecute alone, so an error of a subscription writes no graphql error line",
         source: "packages/pylon/src/plugins/use-graphql-error-logger.ts:14-37",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a subscription error writes the graphql error line",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a subscription error writes the graphql error line",
         ),
     },
     Quirk {
-        id: "Q64_PUBSUB_NULLISH_PAYLOAD_TAKES_ID",
+        id: "PUBSUB_NULLISH_PAYLOAD_TAKES_ID",
         what: "publish takes args[1] ?? args[0] ?? null as the payload, so a null payload published beside an id delivers the id itself as the payload",
         source: "node_modules/.pnpm/@graphql-yoga+subscription@5.0.5/node_modules/@graphql-yoga/subscription/cjs/create-pub-sub.js:13-14",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a null payload is published beside its id",
+            "once byte equality with Pylon is no longer the acceptance rule of subscriptions, and then a null payload is published beside its id",
         ),
     },
     Quirk {
-        id: "Q77_FEDERATION_INTROSPECTION_HEADERS",
+        id: "FEDERATION_INTROSPECTION_HEADERS",
         what: "the introspection request of a federation carries the headers its headers function answers for no context, so a function that forwards a header of the caller sends that header empty",
         source: "packages/pylon/src/core/gateway.ts:907-914 with node_modules/.pnpm/@graphql-tools+wrap@11.1.9_graphql@16.12.0/node_modules/@graphql-tools/wrap/dist/index.cjs:2342-2362",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the introspection request carries no field the headers function answers for no context",
+            "once byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the introspection request carries no field the headers function answers for no context",
         ),
     },
     Quirk {
-        id: "Q78_FEDERATION_REMOTE_ERROR_NO_LOCATIONS",
+        id: "FEDERATION_REMOTE_ERROR_NO_LOCATIONS",
         what: "a remote error reaches the client of the front with its message, its extensions and the front path and without locations, because the HTTP executor rebuilds it through createGraphQLError, and the GraphQLError of graphql 16 takes no locations from its options",
         source: "node_modules/.pnpm/@graphql-tools+executor-http@3.1.0_@types+node@20.19.33_graphql@16.12.0/node_modules/@graphql-tools/executor-http/dist/index.cjs:751-760 with node_modules/.pnpm/@graphql-tools+utils@11.0.0_graphql@16.12.0/node_modules/@graphql-tools/utils/cjs/errors.js:27-36 and node_modules/.pnpm/graphql@16.12.0/node_modules/graphql/error/GraphQLError.js:85-89 and :122-129",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then a remote error at the front carries the locations of the front's field, as a local error does",
+            "once byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then a remote error at the front carries the locations of the front's field, as a local error does",
         ),
     },
     Quirk {
-        id: "Q79_FEDERATION_FORCE_BEFORE_NEEDS",
+        id: "FEDERATION_FORCE_BEFORE_NEEDS",
         what: "the force transform runs before the needs transform, so an argument that needs.__args writes on a forced field reaches the remote, contrary to the comment of the reference beside the list",
         source: "packages/pylon/src/core/gateway.ts:916-932 with node_modules/.pnpm/@graphql-tools+delegate@12.0.9_graphql@16.12.0/node_modules/@graphql-tools/delegate/dist/index.cjs:1704-1740",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the force transform runs last among the request transforms, as the comment of the reference says, and a forced argument overrides one that needs wrote",
+            "once byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then the force transform runs last among the request transforms, as the comment of the reference says, and a forced argument overrides one that needs wrote",
         ),
     },
     Quirk {
-        id: "Q80_FEDERATION_STRICT_ROOT_TYPES",
+        id: "FEDERATION_STRICT_ROOT_TYPES",
         what: "a strict federation refuses every delegation unless it patches the root types, because the patch transform appends __typename to the root selection set as well and strict then meets the root type",
         source: "packages/pylon/src/core/gateway.ts:695-718 and :755-760",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then strict looks up a patch for the types below the root alone",
+            "once byte equality with Pylon is no longer the acceptance rule of the answers of a federation, and then strict looks up a patch for the types below the root alone",
         ),
     },
     Quirk {
-        id: "Q83_FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT",
+        id: "FEDERATION_DATE_ARGUMENT_EMPTY_OBJECT",
         what: "a Date argument of a delegation reaches the remote as the empty object {}, the value of its variable and an item or a member {} inside a list or an input object, because pylon pull types a remote Date argument as the global Date and astFromJSValue writes an object through Object.entries, which a Date answers with no entry, so a Pylon remote refuses the variable and the front answers that refusal at the delegated field",
         source: "packages/pylon/src/cli/pull/index.ts:29-35 and :55-68 with packages/pylon/src/core/gateway.ts:244-256 and :356-397",
         evidence: Evidence::Proven,
         drops: Some(
-            "on the owner's word that byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then a Date argument goes out as the text the bound Date scalar writes, its toISOString, and the remote answers data",
+            "once byte equality with Pylon is no longer the acceptance rule of the outbound requests of a federation, and then a Date argument goes out as the text the bound Date scalar writes, its toISOString, and the remote answers data",
         ),
     },
     Quirk {
-        id: "Q84_FEDERATION_REDIRECT_CARRIES_HEADERS",
+        id: "FEDERATION_REDIRECT_CARRIES_HEADERS",
         what: "a delegation that meets a redirect of the status 301, 302, 303, 307 or 308 sends its method, its body and every header of the request again to the location, the authorization a headers function forwards among them, to another origin as well and from https to http as well, and a 303 keeps the method POST, because the fetch of @whatwg-node/node-fetch 0.8.5 builds the next request from the old one",
         source: "node_modules/.pnpm/@whatwg-node+node-fetch@0.8.5/node_modules/@whatwg-node/node-fetch/cjs/fetchNodeHttp.js:84-100 with cjs/utils.js:52-54",
         evidence: Evidence::Proven,
@@ -226,11 +241,11 @@ pub const QUIRKS: &[Quirk] = &[
     // Lives in `zitadel_principal` of
     // `plugins/aosabi-auth-zitadel/src/zitadel_auth.rs` over the tenant of the
     // principal of `aosabi-auth-contract`, an `Option<PrincipalId>` whose
-    // `None` stands for a tenant `null` and for no tenant alike. Pinned by step
-    // 2 of 63_zitadel_auth, which counts the lines of `principal` it reads
-    // alike under this id.
+    // `None` stands for a tenant `null` and for no tenant alike. Pinned by a
+    // check of the login through Zitadel, which counts the lines of `principal`
+    // it reads alike under this id.
     Quirk {
-        id: "Q85_ZITADEL_TENANT_NULL_AS_ABSENT",
+        id: "ZITADEL_TENANT_NULL_AS_ABSENT",
         what: "the provider sets the tenant of the principal to the answer of the tenant mapper as it is, so a mapper that answers null, a value outside the type string | number | undefined its option declares, gives the principal the tenant null beside the tenant undefined of a mapper that answers nothing, which the readers of the tenant in Pylon read alike and a reader of an application can tell apart",
         source: "packages/pylon/src/auth/zitadel.ts:39-40 and :128",
         evidence: Evidence::Proven,
@@ -240,11 +255,13 @@ pub const QUIRKS: &[Quirk] = &[
     },
 ];
 
-/// They are recorded so that nothing reuses them and so that a reader who
-/// meets an id in another document finds out where it went.
+/// The identifiers that are retired, `VIEWER_STRAY_BRACE` with the `/viewer` decision.
+///
+/// They are recorded so that nothing reuses them, each with what it named and
+/// why it is retired.
 pub const RETIRED: &[(&str, &str)] = &[(
-    "Q02_VIEWER_STRAY_BRACE",
-    "the unmatched closing brace inside the Voyager stylesheet. Retired with docs/decisions/ADR-0009-aoviewer-owns-viewer.md, because Aosabi carries no Voyager text",
+    "VIEWER_STRAY_BRACE",
+    "the unmatched closing brace inside the Voyager stylesheet. Retired because Aosabi carries no Voyager text",
 )];
 
 /// One piece of reference behaviour Aosabi does not port, with its reason.
@@ -288,7 +305,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the GraphQL Voyager page served on /viewer",
-        reason: "aoviewer owns that route and Aosabi carries no Voyager text, see docs/decisions/ADR-0009-aoviewer-owns-viewer.md",
+        reason: "Aosabi has no viewer since 0.1.1 and answers the route as one no handler answers, a named divergence",
     },
     NotPorted {
         what: "the development hot swap seam that rebuilds the schema and the Yoga server in a running process, vendor/pylon/packages/pylon/src/app/pylon-handler.ts:353-361",
@@ -312,7 +329,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the coding gzip of compress(), the first entry of its list of codings, vendor/pylon/node_modules/.pnpm/hono@4.11.9/node_modules/hono/dist/middleware/compress/index.js:3, which Pylon answers wherever Accept-Encoding holds that name",
-        reason: "Aosabi codes no gzip by the owner's word of 2026-09-27, so compress() takes the list deflate alone and answers deflate or identity where Pylon answers gzip, with the body equal after decoding, the divergence D43 of docs/byte-equality.md and docs/decisions/ADR-0027-graphtp.md, section Amendment of 2026-09-27, no gzip",
+        reason: "Aosabi codes no gzip, so compress() takes the list deflate alone and answers deflate or identity where Pylon answers gzip, with the body equal after decoding, a named divergence",
     },
     NotPorted {
         what: "the option eventTarget of createPubSub, vendor/pylon/node_modules/.pnpm/@graphql-yoga+subscription@5.0.5/node_modules/@graphql-yoga/subscription/cjs/create-pub-sub.js:10",
@@ -424,7 +441,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the reading of the answer of the introspection by its member data alone, vendor/pylon/packages/pylon/src/cli/pull/index.ts:46-47, so the reference builds the schema of a usable data whatever the member errors beside it holds, null, an empty list or errors",
-        reason: "aosabi pull refuses an answer that carries the member errors, so an answer with a usable data and errors beside it pulls on the reference and fails on aosabi, while an answer without a usable data fails on both sides, in buildClientSchema on the reference, and the entry drops on the owner's word that pull reads data alone as the reference reads it",
+        reason: "aosabi pull refuses an answer that carries the member errors, so an answer with a usable data and errors beside it pulls on the reference and fails on aosabi, while an answer without a usable data fails on both sides, in buildClientSchema on the reference, and the entry drops once pull reads data alone as the reference reads it",
     },
     NotPorted {
         what: "the bounds the fetch of Node puts on the post of pylon pull, 10 seconds to connect, 300 seconds for the head and for each pause of the body, a head of at most the 16,384 bytes of http.maxHeaderSize and no bound on the body, vendor/pylon/node_modules/.pnpm/undici@7.22.0/node_modules/undici/lib/core/connect.js:53 and lib/dispatcher/client.js:64-70 and :253-254, the same code in the undici 7.18.2 that node v24.13.0 bundles for its fetch",
@@ -432,7 +449,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the content codings of the fetch of pylon pull, which asks for gzip and deflate in accept-encoding and decodes an answer coded with gzip, deflate, br or zstd, vendor/pylon/node_modules/.pnpm/undici@7.22.0/node_modules/undici/lib/web/fetch/index.js:1514-1518 and :2211-2234, the same code in the undici 7.18.2 that node v24.13.0 bundles for its fetch",
-        reason: "the http:// only client of aosabi-cli sends no accept-encoding and refuses an answer with a coding other than identity, so a remote that codes its answer all the same pulls on the reference and fails on aosabi, and the entry drops on the owner's word that the client of pull asks for and decodes the codings of the fetch of Node",
+        reason: "the http:// only client of aosabi-cli sends no accept-encoding and refuses an answer with a coding other than identity, so a remote that codes its answer all the same pulls on the reference and fails on aosabi, and the entry drops once the client of pull asks for and decodes the codings of the fetch of Node",
     },
     NotPorted {
         what: "the prompts of create-pylon and its flags -i, --no-install, -y and -pm, vendor/pylon/packages/create-pylon/src/index.ts:27-33 and :44-46, and its prompts at :66, :86, :112, :137, :156 and :181",
@@ -448,7 +465,7 @@ pub const NOT_PORTED: &[NotPorted] = &[
     },
     NotPorted {
         what: "the runtime and the React bindings of the query package, vendor/pylon/packages/pylon/src/query/runtime/ and vendor/pylon/packages/pylon/src/query/react/",
-        reason: "they run in the browser, and Aosabi ships no client, see docs/decisions/ADR-0016-server-only.md",
+        reason: "they run in the browser, and Aosabi ships no client",
     },
     NotPorted {
         what: "the four configuration file names pylon.config.ts, pylon.config.mts, pylon.config.js and pylon.config.mjs the build looks for, vendor/pylon/packages/pylon/src/cli/builder/bundler/build-config.ts:4-9",

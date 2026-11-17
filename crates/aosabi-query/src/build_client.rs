@@ -3,7 +3,7 @@
  * aosabi-query: the client step of the build, which writes the three client
  * files.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/build-client.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */
@@ -170,6 +170,9 @@ pub fn build_client(artifact_dir: &Path, schema_changed: bool) -> Result<BuiltCl
 
 /// Writes `new_content` to `path` unless the file already holds it, and
 /// answers whether it wrote.
+///
+/// A copy of `update_file_if_changed` of `aosabi-build`, so this crate does
+/// not depend on the build crate.
 fn update_file_if_changed(path: &Path, new_content: &str) -> io::Result<bool> {
     match fs::read(path) {
         Ok(current_content) if current_content == new_content.as_bytes() => return Ok(false),

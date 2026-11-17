@@ -2,11 +2,13 @@
 /*
  * aosabi-serve: the Fetch request built from the neutral request of aosabi-http.
  *
- * Derived from hono 1.19.9, dist/request.js, MIT.
- * Derived from hono 1.19.9, dist/server.js, MIT.
+ * The bundle server.js holds the same newRequest.
  *
- * It carries the quirks Q54_NODE_ADAPTER_URL, Q55_NODE_ADAPTER_HEADERS and
- * Q56_NODE_ADAPTER_BODY_METHODS of docs/byte-equality.md section 13.1.
+ * Derived from @hono/node-server 1.19.9, dist/request.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/server.js, MIT.
+ *
+ * It carries the quirks NODE_ADAPTER_URL, NODE_ADAPTER_HEADERS and
+ * NODE_ADAPTER_BODY_METHODS.
  */
 
 //! The request of the Node adapter.
@@ -88,14 +90,24 @@ pub fn latin1(bytes: &[u8]) -> String {
 /// is joined to the scheme and the host, which is refused when it is missing,
 /// the scheme of HTTP/2 when it is neither `http` nor `https`, and the host
 /// when the parsed hostname differs from it in length and from it with a
-/// trailing `:` and digits removed.
+/// trailing `:` and digits removed. A target whose part before the first `?` or
+/// `#` holds a `\` is refused on HTTP/1 and on HTTP/2 alike, where the URL
+/// standard reads it as a `/`, a named divergence.
 ///
 /// # Errors
 ///
-/// Returns [`RequestError`] with the message of the reference, or `Invalid
-/// URL` for a URL the parser refuses, which the listener answers with 400.
+/// Returns [`RequestError`] with the message of the reference, `Invalid URL`
+/// for a URL the parser refuses, or the refusal of a `\` in the path, which
+/// the listener answers with 400.
 pub fn request_url(incoming: &NodeIncoming) -> Result<String, RequestError> {
     let target = latin1(&incoming.raw_target);
+    if target
+        .split(['?', '#'])
+        .next()
+        .is_some_and(|path| path.contains('\\'))
+    {
+        return Err(RequestError::new("Backslash in the path of the target"));
+    }
     if !target.starts_with('/') && (target.starts_with("http://") || target.starts_with("https://"))
     {
         if incoming.http2 {
@@ -178,7 +190,7 @@ impl Stream for IncomingStream {
 /// A `GET` and a `HEAD` get no body whatever the wire carried, `TRACE` reads as
 /// its method with no body, as the adapter makes a `GET` whose method reads
 /// `TRACE`, and every other method reads the body as a stream, quirk
-/// `Q56_NODE_ADAPTER_BODY_METHODS`.
+/// `NODE_ADAPTER_BODY_METHODS`.
 ///
 /// # Errors
 ///

@@ -2,7 +2,10 @@
 /*
  * aosabi-macros: `#[derive(Aosabi)]` on an enum.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. An enum whose variants carry no data is
+ * the twin of a union of string literals, or of a TypeScript `enum`
+ * declaration under `#[aosabi(enum)]`, and one whose variants each carry a
+ * payload is the twin of a union of object types.
  */
 
 //! `#[derive(Aosabi)]` on an enum.

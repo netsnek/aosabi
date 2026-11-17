@@ -2,10 +2,10 @@
 """tests/capture/20_corpus: writes the committed corpus of the executor notebook.
 
 One file per schema and per mode holds the behaviour tables and the operations
-`tests/notebooks/20_execute.ipynb` sends to both sides. The generator is seeded
-and deterministic, so the committed file is a record of what one call produced
-and the notebook regenerates it and compares the bytes before it judges
-anything, which keeps a stale corpus and a defect of the executor apart.
+the notebook sends to both sides. The generator is seeded and deterministic, so
+the committed file is a record of what one call produced and the notebook
+regenerates it and compares the bytes before it judges anything, which keeps a
+stale corpus and a defect of the executor apart.
 
 The call that produced the committed files, from the repository root:
 

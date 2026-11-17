@@ -20,9 +20,10 @@ import { setInit } from "./toucan.js";
 // at the top of the configuration of the app, as the apps of the reference
 // call it, which the glue runs before the entry calls worker(), makes the
 // client of every instance of the engine the app boots, and the instances of
-// a boot keep the options it took. An option that is a function or holds
-// one, a beforeSend among them, throws, since the engine runs none of them,
-// and every other option takes no effect.
+// a boot keep the options it took. With enabled false the engine sets up no
+// client, so no event leaves, as the client of @sentry/node sends none then.
+// An option that is a function or holds one, a beforeSend among them, throws,
+// since the engine runs none of them, and every other option takes no effect.
 export function init(options = {}) {
   setInit(options);
 }

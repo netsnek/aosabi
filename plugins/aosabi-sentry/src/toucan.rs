@@ -2,7 +2,11 @@
 /*
  * aosabi-sentry: the Sentry client of one request.
  *
- * Derived from toucan-js 4.1.1, ., MIT.
+ * Derived from toucan-js 4.1.1, MIT.
+ *
+ * Derived from toucan-js 4.1.1, dist/index.cjs.js, MIT.
+ * Derived from @sentry/core 8.9.2, cjs/scope.js, MIT.
+ * Derived from @sentry/utils 8.9.2, cjs/eventbuilder.js, MIT.
  */
 
 //! `Toucan`, `ToucanOptions` and `RequestDataOptions`.
@@ -15,7 +19,10 @@
 //! and [`Toucan::capture_in`] stand for, and its captures of an error and of
 //! a message are those of the scope of `@sentry/core` 8.9.2. Its client adds
 //! the data of the request to an event through the integration `RequestData`,
-//! under the allowlists of [`RequestDataOptions`].
+//! under the allowlists of [`RequestDataOptions`], and under the rule of the
+//! request data of an event of the hub, which keeps no field that carries a
+//! credential or the address of the client and no parameter `token` or
+//! `variables` whatever the allowlists keep.
 //!
 //! A capture mints its event id first and sends only where the options name a
 //! DSN. A client with no DSN has no transport, so `sendEnvelope` drops the
@@ -49,6 +56,10 @@ use crate::{
         ClientOptions,
         Report,
         Scope, //
+    },
+    integrations::{
+        LEFT_OUT_PARAMETERS,
+        is_left_out_field, //
     },
 };
 
@@ -185,13 +196,24 @@ pub fn message_of(message: &str, level: Option<&str>) -> Report {
 /// none leaves the key out, cookies are left out with no list of cookies, and
 /// the query is left out with no list of parameters and is otherwise the kept
 /// parameters written again as a form query.
+///
+/// The rule of the request data of an event of the hub holds on top of the
+/// allowlists.
+///
+/// A field [`is_left_out_field`] names, one that carries a credential or the
+/// address of the client, stays out whatever the list of headers keeps.
+///
+/// The parameters [`LEFT_OUT_PARAMETERS`] stay out of the kept parameters, so
+/// the list `/(.*)/` of the middleware keeps every other one.
 fn event_request(request: &Request, options: &RequestDataOptions) -> JsObject {
     let mut data = JsObject::new();
     data.insert("method", request.method.as_ref());
     if let Some(allowed) = &options.allowed_headers {
         let mut headers = JsObject::new();
         for (name, value) in request.headers.borrow().entries() {
-            if name != "cookie" && allowed.iter().any(|one| one.eq_ignore_ascii_case(&name)) {
+            if !is_left_out_field(&name)
+                && allowed.iter().any(|one| one.eq_ignore_ascii_case(&name))
+            {
                 headers.insert(name.as_str(), value.as_str());
             }
         }
@@ -203,7 +225,9 @@ fn event_request(request: &Request, options: &RequestDataOptions) -> JsObject {
     data.insert("url", url);
     if options.allow_all_search_params {
         let query = search.strip_prefix('?').unwrap_or(search);
-        data.insert("query_string", serialize_params(&kept_params(query)));
+        let mut kept = kept_params(query);
+        kept.retain(|(name, _)| !LEFT_OUT_PARAMETERS.contains(&name.as_str()));
+        data.insert("query_string", serialize_params(&kept));
     }
     data
 }

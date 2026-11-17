@@ -29,7 +29,7 @@ specifier, ns.name, ns['name'], a qualified name ns.Name in a type, in typeof or
 import alias = ns.Name, or a key of an object binding pattern over a namespace, where a
 namespace is the binding of import * as ns, await import(), the first parameter of a function
 that import().then() is called with, or a binding whose initializer is a namespace. Each stop
-names its file, its line and what keeps it out, a milestone, a record, a state or a package, and
+names its file, its line and what keeps it out, a later release, a record, a state or a package, and
 then nothing is written. Where the nearest package.json of the app names a package pulled in by
 default as its own dependency and the table maps no specifier of it, such as pg, a specifier of it is kept
 and listed in the log in place of a stop. A use whose names the step cannot tell is kept and
@@ -47,7 +47,7 @@ object, while a second variable over such a variable and an assignment to a vari
 declaration are not read. A member of that name of any other object literal is kept and listed in
 the log.
 The flag --mark-unsupported of the harness rewrites a specifier of the subpaths db, db/plugin,
-queues, pages, pages/plugin, query and ir, which wait for M9, to
+queues, pages, pages/plugin, query and ir, which wait for a later release, to
 aosabi/unsupported/<subpath> in place of a stop. The flag --reverse restores every file the log
 names byte for byte and removes the log.
 
@@ -56,9 +56,10 @@ of src/ with the compiler options of its tsconfig.json, infers the schema of
 the default export of src/index.ts with infer.wasm over the checker of that program, transpiles
 every file of src/ and the configuration into .aosabi/, keeping every import, and writes the glue
 there, schema.graphql, schema.mjs, resolvers.js, ir.json, ir.mjs, server.mjs and worker.mjs, the
-entry of a Cloudflare Worker. It loads the configuration it transpiled. A source with a syntax
-error, a configuration that throws when it loads and a schema that forms no valid GraphQL schema
-fail the build before a file of the glue is written.`
+entry of a Cloudflare Worker. It loads the configuration it transpiled. It writes the schema to
+schema.graphql in the working directory as well, the file an app commits, where its text changed. A
+source with a syntax error, a configuration that throws when it loads and a schema that forms no
+valid GraphQL schema fail the build before a file of the glue or that schema is written.`
 
 /** Resolves to the exit code of the command line `args`. */
 async function run(args) {

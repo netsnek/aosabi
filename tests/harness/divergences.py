@@ -1,59 +1,89 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the named divergences of the side under test a comparison reads as the reference's answer.
 
-A named divergence of docs/byte-equality.md section 3 that changes the bytes of an answer of the side under test
-by a fixed rewrite is written here once, so a comparison asserts the side's own form and then reads the answer
-as the reference writes it, every other byte held to the reference.
+A named divergence that changes the bytes of an answer of the side under test by a fixed rewrite is written here
+once, so a comparison asserts the side's own form and then reads the answer as the reference writes it, every other
+byte held to the reference.
 
-  D52  the title and the default query of GraphiQL, `Aosabi Playground` in the
-       three places where the reference's page writes its own name
-  D55  the variables of the uploads a delegation forwards, `_aosabiUpload_<n>`
-       where the reference's federation writes its own prefix
-  D57  an answer of the function below the threshold of compress(), which
-       carries its Content-Length and goes out uncoded on every platform,
-       where the reference on a Worker and on Bun codes it
-  D58  a batch, which the function refuses as Yoga does with batching off,
-       where an instance of the reference that enables batching runs it
-  D59  no answer as multipart/mixed: the field accept of a 406 lists no
-       multipart/mixed, a client that accepts it alone gets that 406, and
-       one that accepts an event stream beside it and no JSON gets the
-       event stream
-  D72  the coding of the base pipeline of a Rust service, which codes no answer
-       where the compress() of the reference codes one
+  - The title and the default query of GraphiQL, `Aosabi Playground` in the three places where the reference's page
+    writes its own name, which meets no answer, as the side serves no page of GraphiQL since 0.1.1.
+  - The variables of the uploads a delegation forwards, `_aosabiUpload_<n>` where the reference's federation writes
+    its own prefix.
+  - An answer of the function below the threshold of compress(), which carries its Content-Length and goes out
+    uncoded on every platform, where the reference on a Worker and on Bun codes it.
+  - A batch, which the function refuses as Yoga does with batching off, where an instance of the reference that
+    enables batching runs it.
+  - No answer as multipart/mixed: the field accept of a 406 lists no multipart/mixed, a client that accepts it
+    alone gets that 406, and one that accepts an event stream beside it and no JSON gets the event stream.
+  - An unexpected error answered with its own message outside NODE_ENV=development, which the reference masks
+    there, read off the side's own answer.
+  - The coding of the base pipeline of a Rust service, which codes no answer where the compress() of the reference
+    codes one.
+  - The messages of the plugins of a Rust service, the dependency cycle and the failed setup, which name an
+    `Aosabi plugin` where the reference's name its own.
+  - The refusals of a build, the schema the glue refuses, the configuration that throws at its load, the entry it
+    cannot find and the entry with no default export, which name Aosabi and `aosabi.config` where the reference's
+    name Pylon and `pylon.config`.
+  - The cookies of the login of Zitadel, `aosabi-auth` and `aosabi_code_verifier` where the reference names
+    `pylon-auth` and `pylon_code_verifier`, the session cookie under the name the option `cookieName` of the app
+    gives where it gives one, and the session cookie of `useAuth` of the names of Pylon's canary with them.
+  - The typed client of aosabi-query, whose head names Aosabi and whose bundle names the regions of
+    `.aosabi/client/` where the reference's names `@getcronit/pylon/query` and `.pylon/client/`.
+  - The cap on the tokens of a request document, 120,008 or the value of the key `maxTokens` of the app, under
+    which a served engine parses every request, so a step hands the reference the budget `maxTokens` of the cap and
+    the reference answers what the side answers.
+  - The place of the current schema a build writes, `schema.graphql` in the folder of the project beside the copy
+    under the output folder, where the reference writes `.pylon/schema.graphql` alone.
+  - The type `text/ping`, which the csrf of a Rust service checks as it checks `text/plain`, so a comparison sends
+    the reference `text/plain` in its place.
+  - The field `Vary` of an answer `compress()` of a Rust service does not leave alone, which carries
+    `Accept-Encoding` after the names the route wrote, coded or not, where the reference's carries those names
+    alone, as the compress() of hono 4.13.16 writes it on the side ts.
+  - The preflight of `cors()` of a Rust service whose option `origin` is no `*`, which appends `Origin` to a `Vary`
+    a middleware before it set, where the reference's answers `Vary: Origin` alone, as the cors() of hono 4.13.16
+    does on the side ts.
 
-  D56  an answer of Yoga's default plugins outside the GraphQL endpoint, the
-       health check on a URL that ends in /health and the preflight of CORS
-       on another path, which the hono of the app answers on the side ts,
-       named only for a request target that `is_endpoint` rejects
-  D47  the landing page of an unknown route, on the side ts with no
-       `landingPage: true`
-  D48  the viewer of `GET /viewer`, on the side ts with no `viewer: true`
-  HV1  the field `Vary: Accept-Encoding` compress() of hono 4.13.14 sets on
-       every answer of a type it codes, coded or not, where 4.11.9 sets none,
-       which a middleware of an app that reads the fields of an answer after
-       compress() has run sees as well, the memo of transit-app among them
+The side ts runs an app over the real hono 4.13.16, the peer of the package
+aosabi, where Pylon pins hono 4.11.9, and the engine answers the GraphQL
+endpoint alone, so the module names the answers hono gives on that side where
+Pylon's answer came from Yoga outside the endpoint, from the landing page or
+from the viewer, and the changes of hono since 4.11.9:
 
-  D80  the answer of the plugin short of plugins-app, 418 and short, where
-       The reference loses it and answers 500 with {"error":"Internal Server Error"},
-       row QD-003 of the rated table
+  - `yoga-plugins`, an answer of Yoga's default plugins outside the GraphQL endpoint, the health check on a URL
+    that ends in /health and the preflight of CORS on another path, which the hono of the app answers on the side
+    ts, named only for a request target that `is_endpoint` rejects.
+  - `endpoint-ending`, the answer of the GraphQL endpoint to a request whose whole URL ends in the endpoint or in
+    the endpoint and a slash while its path is another, which the hono of the app answers on the side ts.
+  - `endpoint-slash`, the answer of the GraphQL endpoint to a request to the endpoint and a slash, which the hono
+    of the app answers on the side ts.
+  - `landing-plugin`, the landing page of an unknown route, which the side ts serves under no configuration.
+  - `graphiql-viewer`, the viewer of `GET /viewer`, which the side ts serves under no configuration.
+  - The field `Vary: Accept-Encoding` compress() of hono 4.13.16 sets on every answer of a type it codes, coded or
+    not, where 4.11.9 sets none, which a middleware of an app that reads the fields of an answer after compress()
+    has run sees as well, the memo of transit-app among them.
 
-and the changes of serveStatic of @hono/node-server 2.1.5, which an app on
-Node installs itself since step 2, against the 1.19.9 of the reference's lockfile:
+  - `kept-plugin-answer`, the answer of the plugin short of plugins-app, 418 and short, where the reference loses
+    it and answers 500 with {"error":"Internal Server Error"}.
 
-  HN1  a request of OPTIONS, which 2.1.5 hands to the next handler
-  HN2  a range 2.1.5 cannot satisfy, answered 416, and a suffix range,
-       answered with the last bytes of the file
+and the changes of serveStatic of @hono/node-server 2.1.6, which an app on
+Node installs itself, against the 1.19.9 of the reference's lockfile:
 
-The secure defaults of B2, D46 to D49 and D60, are the steps of
-`served_defaults`, one step per row of the rated table, at the end of the module,
-and the rules of the oracle of lane A for D46 to D49 and D57 to D60 close it in
-`ORACLE`.
+  - HN1, a request of OPTIONS, which 2.1.6 hands to the next handler.
+  - HN2, a range 2.1.6 cannot satisfy, answered 416, and a suffix range,
+    answered with the last bytes of the file.
+
+The file server of a Rust twin answers GET and HEAD alone:
+
+  - `static-method`, a request of another method, which serve_static of aosabi-http hands to the next handler, the
+    not found handler of hono where no route answers, where the reference answers OPTIONS with the file.
+
+The secure defaults and the divergences after them are the steps of `served_defaults`, one step each, at the end of
+the module, and the rules of the oracle close it in `ORACLE`.
 """
 
-# The module holds no `from __future__ import annotations`: the oracle of lane A loads it by its path under a
-# name of its own that sys.modules does not hold, and dataclasses reads a string annotation of a field through
-# the module of its class in sys.modules, which fails there, while Python 3.14 defers every annotation without
-# it (PEP 649).
+# The module holds no `from __future__ import annotations`: the oracle loads it by its path under a name of its own
+# that sys.modules does not hold, and dataclasses reads a string annotation of a field through the module of its
+# class in sys.modules, which fails there, while Python 3.14 defers every annotation without it (PEP 649).
 import dataclasses
 import json
 import re
@@ -61,7 +91,7 @@ import zlib
 from pathlib import Path
 from urllib.parse import parse_qs
 
-#: The name of the playground the side under test writes, divergence D52.
+#: The name of the playground the side under test wrote until 0.1.1.
 PLAYGROUND = b"Aosabi Playground"
 
 #: The name of the playground the reference writes.
@@ -69,14 +99,14 @@ PLAYGROUND_REFERENCE = b"Pylon Playground"
 
 
 def playground_body(body: bytes) -> bytes:
-    """Return the body `body` of the side under test with the playground of D52 named as the reference names it."""
+    """Return the body `body` of the side under test with the playground named as the reference names it."""
     return body.replace(PLAYGROUND, PLAYGROUND_REFERENCE)
 
 
 def playground_length(value: str, body: bytes) -> str:
     """Return the value `value` of content-length of the body `body` of the side under test as the reference's.
 
-    Each name of D52 in the body is one byte longer than the reference's.
+    Each name of the playground in the body is one byte longer than the reference's.
     """
     count = body.count(PLAYGROUND)
     if not count or not value.strip().isdigit():
@@ -85,7 +115,7 @@ def playground_length(value: str, body: bytes) -> str:
 
 
 def playground_answer(answer: dict | None) -> dict | None:
-    """Return an answer of the side under test, `{status, headers, body}`, with the playground of D52 as the reference's.
+    """Return an answer of the side under test, `{status, headers, body}`, with the playground as the reference's.
 
     The headers map a name in lower case to its values, and content-length
     takes the length of the body of the reference.
@@ -109,7 +139,7 @@ def playground_fields(fields: list, body: bytes) -> list:
 
 
 def playground_message(raw: bytes) -> bytes:
-    """Return the HTTP/1.1 message `raw` of the side under test with the playground of D52 named as the reference names it.
+    """Return the HTTP/1.1 message `raw` of the side under test with the playground named as the reference names it.
 
     The body follows the head whole, framed by content-length, which takes the
     length of the body of the reference. A message framed otherwise keeps its
@@ -133,17 +163,17 @@ def playground_message(raw: bytes) -> bytes:
 
 
 def playground_reasons(reference: bytes | None, side: bytes | None) -> list:
-    """Return why the body `side` of the side under test breaks D52 beside the body `reference` of the reference.
+    """Return why the body `side` of the side under test breaks the name of the playground beside the body `reference` of the reference.
 
     A page of the reference that names the reference's playground is answered on the
     side under test by a page that names Aosabi's.
     """
     if reference and PLAYGROUND_REFERENCE in reference and PLAYGROUND not in (side or b""):
-        return ["the page of GraphiQL names no Aosabi Playground, divergence D52"]
+        return ["the page of GraphiQL names no Aosabi Playground"]
     return []
 
 
-#: The prefix of the variable of an upload a delegation forwards on the side under test, divergence D55.
+#: The prefix of the variable of an upload a delegation forwards on the side under test.
 UPLOAD = "_aosabiUpload_"
 
 #: The prefix the federation of the reference writes.
@@ -151,17 +181,328 @@ UPLOAD_REFERENCE = "_pylonUpload_"
 
 
 def upload_text(text: str) -> str:
-    """Return the text `text` of the side under test with the variables of the uploads of D55 as the reference names them."""
+    """Return the text `text` of the side under test with the variables of the uploads as the reference names them."""
     return text.replace(UPLOAD, UPLOAD_REFERENCE)
 
 
-#: The codings the compress() of the reference writes, ENCODING_TYPES of hono 4.11.9, and x-gzip, the alias of
-#: gzip (RFC 9110 section 8.4.1.3).
+#: The name the messages of the plugins of a Rust service give a plugin, its dependency cycle and its failed setup.
+PLUGIN = "Aosabi plugin "
+
+#: The name the reference's messages give it.
+PLUGIN_REFERENCE = "Pylon plugin "
+
+
+def _plugin_names(text):
+    """Return the names of the plugins in the type of `text`, str or bytes, the side's first."""
+    if isinstance(text, bytes):
+        return PLUGIN.encode("ascii"), PLUGIN_REFERENCE.encode("ascii")
+    return PLUGIN, PLUGIN_REFERENCE
+
+
+def plugin_text(text):
+    """Return the text `text` of the side under test, str or bytes, with the plugins named as the reference names them."""
+    own, reference = _plugin_names(text)
+    return text.replace(own, reference)
+
+
+def plugin_reasons(reference, side) -> list:
+    """Return why the text `side` of the side under test breaks the messages of the plugins beside the text `reference` of the reference.
+
+    Each message in which the reference names a plugin after itself names it
+    an Aosabi plugin on the side under test, so the two texts hold the two
+    names as often, and the side holds no name of the reference.
+    """
+    if reference is None or side is None:
+        return []
+    own, theirs = _plugin_names(side)
+    expected = reference.count(_plugin_names(reference)[1])
+    if side.count(own) != expected or theirs in side:
+        return ["the side writes Aosabi plugin %d times and Pylon plugin %d times where the reference writes "
+                "Pylon plugin %d times" % (side.count(own), side.count(theirs), expected)]
+    return []
+
+
+#: The refusals of a build that name Aosabi since the release, each the text of the reference and the text of the
+#: side: the schema the glue refuses, which aosabi-build writes for `cargo aosabi build` and for `aosabi build`
+#: through infer.wasm, and the configuration that throws at its load, which `aosabi build` writes with a comma in
+#: place of the dash, and the entry `aosabi build` cannot find and the entry with no default export, which name the
+#: entrypoint and the class of Aosabi.
+BUILD_REFUSALS = (("Pylon generated an invalid GraphQL schema:", "Aosabi generated an invalid GraphQL schema:"),
+                  ("Failed to load pylon.config \u2014 aborting build", "Failed to load aosabi.config, aborting build"),
+                  ("Could not find index.ts (pylon entrypoint)", "Could not find index.ts (aosabi entrypoint)"),
+                  ("Pylon entry must `export default` the app (e.g. `export default new Pylon(...)`).",
+                   "Aosabi entry must `export default` the app (e.g. `export default new App(...)`)."))
+
+
+def build_refusal(text: str) -> str:
+    """Return the refusal `text` of the side under test with the texts that name Aosabi as the reference writes them."""
+    for reference, side in BUILD_REFUSALS:
+        text = text.replace(side, reference)
+    return text
+
+
+def build_refusal_reasons(reference: str | None, side: str | None) -> list:
+    """Return why the refusal `side` of the side under test breaks the refusals that name Aosabi beside the refusal `reference` of the reference.
+
+    Each such text the reference writes, the side writes in its own form.
+    """
+    return ["the side writes no %r where the reference writes %r" % (own, theirs)
+            for theirs, own in BUILD_REFUSALS if theirs in (reference or "") and own not in (side or "")]
+
+
+#: The cookies of the login of Zitadel that name Aosabi since the release, each the name of the reference and the
+#: name of the side: the session the identity reads, the callback sets and the logout deletes, and the verifier of
+#: PKCE the login sets and the callback reads. The generators of tests/gen write the names of the side, one case in
+#: the upper case form, while the goldens and the reference served live keep the names of the reference. Since
+#: 0.1.1 the option `cookie_name` of both halves, `cookieName` on the TypeScript side and in the options of
+#: `useAuth` of the names of Pylon's canary, names the session cookie of the side, which a run whose variant sets
+#: it reads through `login_cookies`, while the verifier keeps its name.
+LOGIN_COOKIES = (("pylon-auth", "aosabi-auth"), ("pylon_code_verifier", "aosabi_code_verifier"))
+
+#: A field of a head that sets a cookie, with the name of the cookie it sets.
+SET_COOKIE = re.compile(rb"(?im)^(set-cookie:[ \t]*)([^=\r\n;]*)(?==)")
+
+
+def login_cookies(session: str | None = None) -> tuple:
+    """Return the pairs of LOGIN_COOKIES of a run whose side names its session cookie `session`, the name the
+    option `cookieName` of its variant gives, or LOGIN_COOKIES for None and the name of Aosabi."""
+    if session is None or session == LOGIN_COOKIES[0][1]:
+        return LOGIN_COOKIES
+    return ((LOGIN_COOKIES[0][0], session),) + LOGIN_COOKIES[1:]
+
+
+def login_cookie(name: str, cookies: tuple = LOGIN_COOKIES) -> str:
+    """Return the name the reference gives the cookie `name` of the side under test, with the
+    pairs `cookies` of the run."""
+    for reference, side in cookies:
+        if name == side:
+            return reference
+    return name
+
+
+def login_cookie_request(raw: bytes, cookies: tuple = LOGIN_COOKIES) -> bytes:
+    """Return the request `raw` written for the side under test with the cookies of the login named as the reference
+    names them, in the lower and the upper case form and in the head alone, so a reference served live reads the
+    cookies it sets itself and the body keeps its length, with the pairs `cookies` of the run."""
+    head, separator, body = raw.partition(b"\r\n\r\n")
+    for reference, side in cookies:
+        for theirs, own in ((reference, side), (reference.upper(), side.upper())):
+            head = head.replace(own.encode("ascii"), theirs.encode("ascii"))
+    return head + separator + body
+
+
+def login_cookie_answer(data: bytes, cookies: tuple = LOGIN_COOKIES) -> bytes:
+    """Return the answer `data` of the side under test with each cookie of the login its head sets named as the reference
+    names it, every other byte as the side wrote it, with the pairs `cookies` of the run."""
+    head, separator, body = data.partition(b"\r\n\r\n")
+    names = {side.encode("ascii"): reference.encode("ascii") for reference, side in cookies}
+    head = SET_COOKIE.sub(lambda match: match.group(1) + names.get(match.group(2), match.group(2)), head)
+    return head + separator + body
+
+
+def login_cookie_reasons(data: bytes, cookies: tuple = LOGIN_COOKIES) -> list:
+    """Return why the answer `data` of the side under test breaks the names of the cookies, a cookie of the login it sets under the name
+    the reference gives it, where the side names each of them after Aosabi or as the pairs `cookies` of the run
+    name it."""
+    head = data.partition(b"\r\n\r\n")[0]
+    references = {reference.encode("ascii") for reference, side in cookies if reference != side}
+    return ["the side sets the cookie %s under the name of the reference" % name.decode("ascii")
+            for name in (match.group(2) for match in SET_COOKIE.finditer(head)) if name in references]
+
+
+def login_cookie_field(value: str, cookies: tuple = LOGIN_COOKIES) -> str:
+    """Return the value `value` of a `Set-Cookie` field of the side under test with the cookie of the login it sets named
+    as the reference names it, any other value as it is, with the pairs `cookies` of the run."""
+    name, mark, rest = value.partition("=")
+    return login_cookie(name, cookies) + mark + rest if mark else value
+
+
+def login_cookie_field_reasons(values: list, cookies: tuple = LOGIN_COOKIES) -> list:
+    """Return why the `Set-Cookie` values `values` of the side under test break the names of the cookies, as `login_cookie_reasons` reads
+    a whole answer."""
+    references = {reference for reference, side in cookies if reference != side}
+    return ["the side sets the cookie %s under the name of the reference" % value.split("=", 1)[0]
+            for value in values if value.split("=", 1)[0] in references]
+
+
+def login_cookie_text(text: str) -> str:
+    """Return the text `text` written for the side under test with the cookies of the login named as the reference names
+    them, in the lower and the upper case form, such as a request shape of tests/gen/zitadel.py, whose cookie the
+    reference reads under its own name."""
+    for reference, side in LOGIN_COOKIES:
+        for theirs, own in ((reference, side), (reference.upper(), side.upper())):
+            text = text.replace(own, theirs)
+    return text
+
+
+def login_cookie_outbound(records: list, cookies: tuple = LOGIN_COOKIES) -> list:
+    """Return the requests the side under test sent the issuer, each with the cookies of the login its body names
+    named as the reference names them, in the lower and the upper case form. The cases `z-40` to `z-45` send the
+    cookies of a request in two `Cookie` fields, and on some hosts the token that a side then sends the issuer
+    holds the name of a cookie of the login, so a side and the reference send there each its own name, every other
+    byte as the side sent it, with the pairs `cookies` of the run."""
+    out = []
+    for record in records:
+        body = record.get("body")
+        if body:
+            for reference, side in cookies:
+                for theirs, own in ((reference, side), (reference.upper(), side.upper())):
+                    body = body.replace(own, theirs)
+            record = dict(record, body=body)
+        out.append(record)
+    return out
+
+
+#: The texts of the typed client that name Aosabi since the release, each the text of the reference and the text of
+#: the side: the head of `index.ts` and of the bundled `index.js`, which names the generator, and the regions of
+#: the bundle, which name the client folder under the artifact directory.
+CLIENT_TEXTS = (("Generated by @getcronit/pylon/query.", "Generated by Aosabi."),
+                ("//#region .pylon/client/", "//#region .aosabi/client/"))
+
+
+def client_text(text: str) -> str:
+    """Return the client text `text` of the side under test with the texts that name Aosabi as the reference writes them."""
+    for reference, side in CLIENT_TEXTS:
+        text = text.replace(side, reference)
+    return text
+
+
+def client_text_reasons(reference: str | None, side: str | None) -> list:
+    """Return why the client text `side` of the side under test breaks the texts that name Aosabi beside the text `reference`.
+
+    Each such text the reference writes, the side writes in its own form as often.
+    """
+    return ["the side writes %r %d times where the reference writes %r %d times"
+            % (own, (side or "").count(own), theirs, (reference or "").count(theirs))
+            for theirs, own in CLIENT_TEXTS if (reference or "").count(theirs) != (side or "").count(own)]
+
+
+#: The cap on the tokens of a request document a served engine parses where the app sets none, `REQUEST_TOKENS` of
+#: crates/aosabi-lang/src/parser.rs.
+REQUEST_TOKENS = 120_008
+
+
+def request_parse_options(options: dict | None = None, max_tokens: int = REQUEST_TOKENS) -> dict:
+    """Return the parser options `options` with the budget under which the reference parses a request
+    document as a served engine of the side under test parses it under the cap `max_tokens`.
+
+    A document of more tokens than the cap answers on the side the syntax error the parser of the reference answers
+    under that budget, at the first token past it.
+    The cap is `REQUEST_TOKENS` where the app sets none and the value of its key `maxTokens`, `.max_tokens(..)` of the
+    chain of a Rust app, where it sets one.
+    """
+    return dict(options or {}, maxTokens=max_tokens)
+
+
+#: The tokens of the lexical grammar of GraphQL, the ignored ones first: the byte order mark, white space, line
+#: terminators, commas and comments, then a block string, a string, the spread, the other punctuators, a number and
+#: a name.
+TOKEN = re.compile(
+    r'''
+  (?P<ignored>[\ufeff\t \n\r,]+|\#[^\n\r]*)
+| (?P<block>"""(?:\\"""|[^"]|"(?!""))*""")
+| (?P<string>"(?:\\.|[^"\\\n\r])*")
+| (?P<spread>\.\.\.)
+| (?P<punctuator>[!$&()\:=@\[\]{|}])
+| (?P<number>-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)
+| (?P<name>[_A-Za-z][_0-9A-Za-z]*)
+''',
+    re.X | re.S,
+)
+
+
+def count_tokens(text: str) -> int | None:
+    """Return the tokens of `text` the parser of graphql-js counts against its option `maxTokens`, or None for a
+    text that holds a character outside the lexical grammar.
+
+    Every token the lexer hands the parser counts, the end of the source left out, while white space, commas and
+    comments are no token the lexer hands it.
+    """
+    position, count = 0, 0
+    while position < len(text):
+        found = TOKEN.match(text, position)
+        if found is None:
+            return None
+        if found.lastgroup != "ignored":
+            count += 1
+        position = found.end()
+    return count
+
+
+def listed_document(tokens: int, head: str = "query", directive: str = "") -> str:
+    """Return a request document of `tokens` tokens whose parse is linear and which validation rejects.
+
+    The operation `head` declares a variable it never uses, whose default value is a list of empty lists of two
+    tokens each, with one list `[1]` of three in front where the items hold an odd count, and `directive` stands on
+    the operation when given. Posted at the cap of a request and past it, such documents test that cap.
+    """
+    before = head + "($v: [[Int]] = ["
+    after = "])" + (" " + directive if directive else "") + " { __typename }"
+    pairs, odd = divmod(tokens - count_tokens(before + after), 2)
+    document = before + "[1]" * odd + "[]" * (pairs - odd) + after
+    assert count_tokens(document) == tokens, (tokens, count_tokens(document))
+    return document
+
+
+#: The place of the current schema a build writes since 0.1.1, each relative to the folder of the project: the
+#: reference writes the schema under its output folder alone, which the ignore file of its scaffold keeps out of
+#: git, and the side writes it to the folder of the project as well, the folder of Cargo.toml for
+#: `cargo aosabi build` and the folder of package.json for `aosabi build`, with the bytes of the copy under its
+#: output folder, which stays. No answer changes, so no comparison reads the file.
+SCHEMA_PLACE_REFERENCE = ".pylon/schema.graphql"
+SCHEMA_PLACE = "schema.graphql"
+
+
+def schema_place_reasons(project, copy) -> list:
+    """Return why the build of the project in the folder `project` does not write its schema there as it writes the copy `copy`.
+
+    A build that writes the copy under its output folder writes SCHEMA_PLACE in the folder of the
+    project with the same bytes.
+    """
+    place = Path(project) / SCHEMA_PLACE
+    if not place.is_file():
+        return ["the build writes no %s in the folder of the project" % SCHEMA_PLACE]
+    if not Path(copy).is_file():
+        return ["the build writes %s in the folder of the project and no copy %s"
+                % (SCHEMA_PLACE, Path(copy).name)]
+    if place.read_bytes() != Path(copy).read_bytes():
+        return ["%s in the folder of the project differs from the copy under the output folder"
+                % SCHEMA_PLACE]
+    return []
+
+
+#: The type of the ping of a link, which the csrf of a Rust service, an app's own `csrf(options)` and the default
+#: of the base pipeline, checks as it checks the types a form element sends, a named divergence.
+PING_TYPE = "text/ping"
+
+#: The type a comparison sends the reference in the place of `PING_TYPE`, which the check of the reference reads
+#: as a type a form element sends, so both sides check the request alike.
+PING_TYPE_REFERENCE = "text/plain"
+
+
+def ping_type(value: str) -> str:
+    """Return the `Content-Type` value `value` of a request as a comparison sends it the reference, the type
+    `PING_TYPE` at its start, in any case, written as `PING_TYPE_REFERENCE`, any other value as it is."""
+    if value[:len(PING_TYPE)].lower() == PING_TYPE:
+        return PING_TYPE_REFERENCE + value[len(PING_TYPE):]
+    return value
+
+
+def ping_type_case(case: dict) -> dict:
+    """Return a case `case` of the csrf middleware as a comparison sends it the reference, its `Content-Type` field
+    through `ping_type`, every other field as it is."""
+    headers = [[name, ping_type(value) if name.lower() == "content-type" else value]
+               for name, value in case["headers"]]
+    return dict(case, headers=headers)
+
+
+#: The codings the compress() of the reference writes, ENCODING_TYPES of hono 4.11.9, and x-gzip, the alias of gzip
+#: (RFC 9110 section 8.4.1.3).
 CODED = ("gzip", "x-gzip", "deflate")
 
 
 def served_coding(reference: str | None) -> str | None:
-    """Return the content-encoding the twin of a Rust service writes where the reference writes `reference`, divergence D72.
+    """Return the content-encoding the twin of a Rust service writes where the reference writes `reference`.
 
     The base pipeline of a Rust service codes no answer, so where the
     compress() of the reference coded the twin answers uncoded. Any other
@@ -229,8 +570,11 @@ def hono_not_found(answer) -> bool:
     return held == body or (held == b"" and _values(answer, "content-length") in ([], ["0"], [str(len(body))]))
 
 
+#: The path of the GraphQL endpoint of the reference's handler.
+ENDPOINT_PATH = "/graphql"
+
 #: The two endings of the GraphQL endpoint of the reference's handler, `/graphql` with and without its slash.
-ENDPOINT_ENDINGS = ("/graphql", "/graphql/")
+ENDPOINT_ENDINGS = (ENDPOINT_PATH, ENDPOINT_PATH + "/")
 
 
 def _path_of(target: str) -> str:
@@ -256,42 +600,52 @@ def _path_of(target: str) -> str:
 def is_endpoint(target: str) -> bool:
     """Return whether the request target `target` names the GraphQL endpoint, as `isEndpoint` tests its URL.
 
-    A target that ends in /graphql or /graphql/, or whose path is one of the two, which the engine answers on
-    the side ts with every method, while the hono of the app answers every other target.
+    A target whose path is /graphql, which the engine answers on the side ts with every method, while the hono of
+    the app answers every other target. A target whose path is /graphql/ names `endpoint-slash` in
+    `outside_endpoint`, and a target that merely ends in one of the two names `endpoint-ending` there.
     """
-    return target.endswith(ENDPOINT_ENDINGS) or _path_of(target) in ENDPOINT_ENDINGS
+    return _path_of(target) == ENDPOINT_PATH
 
 
 def outside_endpoint(reference, viewer: bool = False, target: str | None = None) -> str | None:
-    """`target` is the request target of the answer. A request with no target
-    names none. A request of the endpoint names D46 for the preflight of
+    """Return the name of the divergence the answer `reference` of Pylon stands for on the side ts, or None.
+
+    `target` is the request target of the answer. A request with no target
+    names none. A request of the endpoint names `cors-plugin` for the preflight of
     CORS of Yoga, status 204 and `content-length: 0`, since the engine
     answers no `OPTIONS` request and hands it on as an unhandled route,
     and names nothing else, since the engine answers every other request of
     the endpoint on the side ts. For a target that `is_endpoint` rejects,
-    D56 for the health check of Yoga, status 200, no body and the field
+    `yoga-plugins` for the health check of Yoga, status 200, no body and the field
     x-yoga-id, and for the preflight of CORS of Yoga outside the endpoint,
-    status 204 and `content-length: 0`, D47 for the landing page, read by its
-    title or, for an answer to HEAD, by its status and its type, and D48 for
-    the viewer, `viewer` true for a request of `GET /viewer`. The side ts
-    answers each with the not found handler of hono, `hono_not_found`.
+    status 204 and `content-length: 0`, `endpoint-slash` for the path of the
+    endpoint and a slash and `endpoint-ending` for a target that ends in the
+    endpoint, each of which Yoga answered as a request of the endpoint,
+    `landing-plugin` for the landing page, read by its title or, for an answer to
+    HEAD, by its status and its type, and `graphiql-viewer` for the viewer,
+    `viewer` true for a request of `GET /viewer`. The side ts answers each with
+    the not found handler of hono, `hono_not_found`.
     """
     if reference is None or target is None:
         return None
     preflight = reference.status == 204 and _values(reference, "content-length") == ["0"]
     if is_endpoint(target):
-        return "D46" if preflight else None
+        return "cors-plugin" if preflight else None
     body = body_of(reference)
     if reference.status == 200 and not body and _values(reference, HEALTH_FIELD):
-        return "D56"
+        return "yoga-plugins"
     if preflight:
-        return "D56"
+        return "yoga-plugins"
+    if _path_of(target) == ENDPOINT_PATH + "/":
+        return "endpoint-slash"
+    if target.endswith(ENDPOINT_ENDINGS):
+        return "endpoint-ending"
     if LANDING_REFERENCE_TITLE in body:
-        return "D47"
+        return "landing-plugin"
     if reference.status == 404 and not body and _values(reference, "content-type") == [LANDING_TYPE]:
-        return "D47"
+        return "landing-plugin"
     if viewer or VIEWER_TITLE in body:
-        return "D48"
+        return "graphiql-viewer"
     return None
 
 
@@ -303,7 +657,7 @@ KEPT_ANSWER = (418, b"short", "text/plain; charset=UTF-8")
 
 
 def kept_plugin_answer(reference, ours) -> str | None:
-    """Return D80 where the reference answers `reference`, the 500 of a lost answer, and the side `ours` the answer it keeps.
+    """Return `kept-plugin-answer` where the reference answers `reference`, the 500 of a lost answer, and the side `ours` the answer it keeps.
 
     The side ts hands hono the answer of a plugin's middleware behind middlewares that await the rest of the
     chain and return nothing, which the reference's dispatch loses. Only the answer of the plugin short, its status, its
@@ -315,20 +669,20 @@ def kept_plugin_answer(reference, ours) -> str | None:
     status, body, media = KEPT_ANSWER
     if ours.status != status or body_of(ours) != body or _values(ours, "content-type") != [media]:
         return None
-    return "D80"
+    return "kept-plugin-answer"
 
 
-#: The value hono 4.13.14 adds to the field Vary of an answer its compress() may code, change HV1.
+#: The value hono 4.13.16 adds to the field Vary of an answer its compress() may code.
 VARY_ENCODING = "Accept-Encoding"
 
 
 def hono_vary(side: list, reference: list) -> list:
-    """Return the values `side` of the field Vary of the side ts read as hono 4.11.9 writes them, change HV1.
+    """Return the values `side` of the field Vary of the side ts read as hono 4.11.9 writes them.
 
-    compress() of hono 4.13.14 sets `Vary: Accept-Encoding` on an answer whose type it codes, coded or not,
-    appending the name to a Vary that holds another, where compress() of 4.11.9 sets none. Where the values of
-    the reference name no Accept-Encoding, the name is taken out of the values of the side, a field of that one
-    name with it.
+    compress() of hono 4.13.16 sets `Vary: Accept-Encoding` on an answer whose type it codes, coded or not,
+    appending the name to a Vary that holds another, where compress() of 4.11.9 sets none. Where the values of the
+    reference name no Accept-Encoding, the name is taken out of the values of the side, a field of that one name
+    with it.
     """
     if any(VARY_ENCODING.lower() in value.lower() for value in reference):
         return side
@@ -356,14 +710,12 @@ def _memo_names(value: str) -> list:
 
 
 def hono_memo(side: list, reference: list) -> list:
-    """Return the values `side` of the field of the memo of transit-app read as hono 4.11.9 writes them, change HV1.
+    """Return the values `side` of the field of the memo of transit-app read as hono 4.11.9 writes them.
 
-    The memo writes the names of the fields of the c.res it kept after the
-    compress() of the base pipeline has run, which the module of the app
-    stands before, so compress() of hono 4.13.14 adds vary to those names
-    where 4.11.9 adds none. Where no value of the reference names vary, the
-    name is taken out of the names of each value of the side, and every other
-    byte of the value stays.
+    The memo writes the names of the fields of the c.res it kept after the compress() of the base pipeline has run,
+    which the module of the app stands before, so compress() of hono 4.13.16 adds vary to those names where 4.11.9
+    adds none. Where no value of the reference names vary, the name is taken out of the names of each value of the
+    side, and every other byte of the value stays.
     """
     if any("vary" in _memo_names(value) for value in reference):
         return side
@@ -382,10 +734,9 @@ def hono_memo(side: list, reference: list) -> list:
 def hono_headers(side: list, reference: list) -> tuple:
     """Return the header fields `side` of the side ts read as hono 4.11.9 writes them, and how many were read so.
 
-    Each field is a pair of its name and its value, `reference` the fields
-    of the answer of the reference. The values of Vary are read through
-    `hono_vary`, change HV1, and so is the list of names of the field of the
-    memo of transit-app, `MEMO_FIELD`, through `hono_memo`.
+    Each field is a pair of its name and its value, `reference` the fields of the answer of the reference. The
+    values of Vary are read through `hono_vary`, and so is the list of names of the field of the memo of
+    transit-app, `MEMO_FIELD`, through `hono_memo`.
     """
     reference_vary = [value for name, value in reference if name.lower() == "vary"]
     reference_memo = [value for name, value in reference if name.lower() == MEMO_FIELD]
@@ -410,14 +761,14 @@ UNSATISFIED_RANGE = re.compile(r"^bytes \*/\d+$")
 
 
 def node_server_change(method: str, headers, reference, side) -> str | None:
-    """Return the change of serveStatic of @hono/node-server 2.1.5 against 1.19.9 that the answer `side` shows, or None.
+    """Return the change of serveStatic of @hono/node-server 2.1.6 against 1.19.9 that the answer `side` shows, or None.
 
-    `method` and `headers`, pairs of a name and a value, are those of the request, `reference` the answer of
-    the reference and `side` the answer of the side ts. HN1 is a request of OPTIONS, which 1.19.9 answers 200 with the
-    type of the file and no body and 2.1.5 hands to the next handler, the not found handler of hono where no
-    route answers. HN2 is a range: one 2.1.5 cannot satisfy it answers 416 with `Content-Range: bytes */<size>`
-    and no body, where 1.19.9 fails with 500, and the suffix range `bytes=-<n>` it answers with the last n
-    bytes, where 1.19.9 answers the bytes 0 to n.
+    `method` and `headers`, pairs of a name and a value, are those of the request, `reference` the answer of the
+    reference and `side` the answer of the side ts. HN1 is a request of OPTIONS, which 1.19.9 answers 200 with the
+    type of the file and no body and 2.1.6 hands to the next handler, the not found handler of hono where no route
+    answers. HN2 is a range: one 2.1.6 cannot satisfy it answers 416 with `Content-Range: bytes */<size>` and no
+    body, where 1.19.9 fails with 500, and the suffix range `bytes=-<n>` it answers with the last n bytes, where
+    1.19.9 answers the bytes 0 to n.
     """
     if reference is None or side is None:
         return None
@@ -440,6 +791,16 @@ def node_server_change(method: str, headers, reference, side) -> str | None:
     return None
 
 
+def serve_static_method(method: str, reference, side) -> str | None:
+    """Return `static-method` where the answer `side` of a Rust twin to a request of `method` is hono's not found, or None.
+
+    `reference` is the answer of the reference to the same request.
+    """
+    if reference is None or side is None or method in ("GET", "HEAD"):
+        return None
+    return "static-method" if reference.status == 200 and hono_not_found(side) else None
+
+
 #: The threshold of compress(), the length below which an answer that carries its Content-Length stays uncoded.
 COMPRESS_THRESHOLD = 1024
 
@@ -447,17 +808,17 @@ COMPRESS_THRESHOLD = 1024
 GRAPHQL_TYPES = ("application/json", "application/graphql-response+json")
 
 
-def d57_names(named: list, ours, host) -> list:
-    """Return the names `named` of a served answer with those of divergence D57 named `D57`.
+def uncoded_names(named: list, ours, host) -> list:
+    """Return the names `named` of a served answer with those of an uncoded small answer named `uncoded-small`.
 
-    `named` are the differences `ts1.judge_served` names where the side under
+    `named` are the differences the judge of a served answer names where the side under
     test answers as the reference on Node and the reference on its host does not, each opening
     with its field, and `ours` and `host` are the answers of the side and of
     the reference's build on the host, answers of `http.py`. The function writes the
     Content-Length of every answer whose body is a string on every platform,
     so compress() leaves an answer below 1,024 bytes uncoded where the reference on a
     Worker and on Bun codes it, and the answer carries its length where
-    the reference's there carries none. A name is D57 when the side's answer is one of
+    the reference's there carries none. A name is `uncoded-small` when the side's answer is one of
     the regular processor and the field is its coding, none on the side and
     one on the host with a body below the threshold, or its length, the length
     of its body on the side and none on the host, or on an answer of HEAD, which
@@ -478,12 +839,12 @@ def d57_names(named: list, ours, host) -> list:
     for entry in named:
         field = entry.split(" ", 1)[0]
         if (field == "content-encoding" and uncoded) or (field == "content-length" and length):
-            entry = "D57 " + entry
+            entry = "uncoded-small " + entry
         labelled.append(entry)
     return labelled
 
 
-#: The instances of the in process capture whose reference enables batching, divergence D58.
+#: The instances of the in process capture whose reference enables batching.
 BATCHING_INSTANCES = ("batching", "secondBatchingLimit2", "secondBatchingTrue")
 
 #: The body of the refusal of a batch, which Yoga answers with batching off and the function to every batch.
@@ -491,7 +852,7 @@ BATCH_REFUSAL = b'{"errors":[{"message":"Batching is not supported.","extensions
 
 
 def batch_refused(instance: str, body) -> bool:
-    """Return whether the in process case of `instance` with the body `body` is a batch the function refuses, D58.
+    """Return whether the in process case of `instance` with the body `body` is a batch the function refuses.
 
     The reference runs a JSON array body as a batch on an instance that enables
     batching, and the function refuses every batch.
@@ -510,7 +871,7 @@ def batch_refusal() -> dict:
             "body": BATCH_REFUSAL}
 
 
-#: The media type of the processor that leaves the function, divergence D59.
+#: The media type of the processor that leaves the function.
 MULTIPART = "multipart/mixed"
 
 #: The media type of the processor of an event stream, which answers in place of multipart/mixed where the request accepts it.
@@ -540,7 +901,7 @@ SPEC_REFUSALS = ("POST body sent invalid JSON.", 'Invalid "params" in the reques
 
 
 def accept_without_multipart(value: str) -> str:
-    """Return the field accept of a 406 of the reference as the function writes it, without multipart/mixed, D59."""
+    """Return the field accept of a 406 of the reference as the function writes it, without multipart/mixed."""
     return ACCEPT_JOIN.join(item for item in value.split(ACCEPT_JOIN) if item != MULTIPART)
 
 
@@ -567,7 +928,7 @@ def media_types_in_order(accept) -> list:
 
 
 def accepts_event_stream(accept) -> bool:
-    """Return whether the Accept `accept` holds a media type that matches text/event-stream, D59.
+    """Return whether the Accept `accept` holds a media type that matches text/event-stream.
 
     Yoga matches a media type of the request against the type of a processor when each half of the request's is
     `*` or equal to the processor's.
@@ -581,7 +942,7 @@ def accepts_event_stream(accept) -> bool:
 
 
 def not_acceptable(accept) -> str:
-    """Return the field accept of the 406 the function answers a query asked for under the Accept `accept`, D59.
+    """Return the field accept of the 406 the function answers a query asked for under the Accept `accept`.
 
     Each processor offers its media types once per media type of the request,
     an event stream first and JSON after it, joined as Yoga joins them.
@@ -591,7 +952,7 @@ def not_acceptable(accept) -> str:
 
 
 def multipart_chunks(body: bytes) -> list:
-    """Return the JSON texts of the parts of a body of Yoga's processor of multipart/mixed, in order, D59.
+    """Return the JSON texts of the parts of a body of Yoga's processor of multipart/mixed, in order.
 
     The body opens with a line break and `---`, each part is a line break, its fields Content-Type and
     Content-Length, a blank line, the text of that length, a line break and `---`, and `--` with a line break
@@ -614,7 +975,7 @@ def multipart_chunks(body: bytes) -> list:
 
 
 def event_stream_body(chunks) -> bytes:
-    """Return the body Yoga's processor of an event stream writes for the results `chunks`, D59.
+    """Return the body Yoga's processor of an event stream writes for the results `chunks`.
 
     It opens with the ping `:` and a blank line, writes each result as the event `next` with its text as data,
     and ends with the event `complete`.
@@ -631,7 +992,7 @@ def spec_error(error) -> bool:
 
 
 def event_stream_status(status: int, chunks) -> int:
-    """Return the status of the event stream of the results `chunks` whose answer as multipart/mixed has `status`, D59.
+    """Return the status of the event stream of the results `chunks` whose answer as multipart/mixed has `status`.
 
     Yoga's processor of an event stream leaves the errors marked `spec` out of the status, which the processor
     of multipart/mixed counts. So a result whose every error is marked `spec` answers 200, and every other
@@ -649,7 +1010,7 @@ def event_stream_status(status: int, chunks) -> int:
 
 
 def accept_406(answer):
-    """Return the answer `answer` of the reference, an answer of `http.py`, with the field accept of a 406 without multipart/mixed, D59."""
+    """Return the answer `answer` of the reference, an answer of `http.py`, with the field accept of a 406 without multipart/mixed."""
     if answer is None or answer.status != 406:
         return answer
     lines = [(name, accept_without_multipart(value) if name.lower() == "accept" else value)
@@ -660,7 +1021,7 @@ def accept_406(answer):
 
 
 def served_event_stream(answer):
-    """Return the answer `answer` of the processor of multipart/mixed, an answer of `http.py`, as the event stream the function answers in its place, D59.
+    """Return the answer `answer` of the processor of multipart/mixed, an answer of `http.py`, as the event stream the function answers in its place.
 
     The status follows `event_stream_status`, the fields of Yoga's processor of
     multipart/mixed give way to those of its processor of an event stream,
@@ -677,7 +1038,7 @@ def served_event_stream(answer):
 
 
 def multipart_reasons(reference, ours, accept) -> list | None:
-    """Return why the answer `ours` breaks D59 where the reference answered `reference` as multipart/mixed, or None.
+    """Return why the answer `ours` is not the one of the function where the reference answered `reference` as multipart/mixed, or None.
 
     None is a reference answer that is no multipart answer, which the caller
     compares as before. Where the reference answered multipart/mixed and the
@@ -692,30 +1053,30 @@ def multipart_reasons(reference, ours, accept) -> list | None:
     if accepts_event_stream(accept):
         expected = served_event_stream(reference)
         if ours is None:
-            return ["no answer where the function answers an event stream, D59"]
+            return ["no answer where the function answers an event stream"]
         reasons = []
         if ours.status != expected.status:
-            reasons.append("status %d where the event stream of D59 answers %d" % (ours.status, expected.status))
+            reasons.append("status %d where the event stream of the function answers %d" % (ours.status, expected.status))
         if (ours.header("content-type") or "").split(";")[0].strip().lower() != EVENT_STREAM:
-            reasons.append("content-type %r where D59 answers %s" % (ours.header("content-type"), EVENT_STREAM))
+            reasons.append("content-type %r where the function answers %s" % (ours.header("content-type"), EVENT_STREAM))
         if ours.decoded != expected.decoded:
-            reasons.append("a body of %d bytes where the event stream of D59 holds %d: %r | %r"
+            reasons.append("a body of %d bytes where the event stream of the function holds %d: %r | %r"
                            % (len(ours.decoded), len(expected.decoded), ours.decoded[:120], expected.decoded[:120]))
         return reasons
     if ours is None:
-        return ["no answer where the function answers 406, D59"]
+        return ["no answer where the function answers 406"]
     reasons = []
     if ours.status != 406:
-        reasons.append("status %d where the function answers 406, D59" % ours.status)
+        reasons.append("status %d where the function answers 406" % ours.status)
     if ours.header("accept") != not_acceptable(accept):
-        reasons.append("accept %r where D59 lists %r" % (ours.header("accept"), not_acceptable(accept)))
+        reasons.append("accept %r where the function lists %r" % (ours.header("accept"), not_acceptable(accept)))
     if ours.decoded:
-        reasons.append("a body of %d bytes where the 406 of D59 has none" % len(ours.decoded))
+        reasons.append("a body of %d bytes where the 406 of the function has none" % len(ours.decoded))
     return reasons
 
 
-def served_d59(answer, accept):
-    """Return the answer `answer` of the reference served on Node, an answer of `http.py`, as the function answers it, D59.
+def served_without_multipart(answer, accept):
+    """Return the answer `answer` of the reference served on Node, an answer of `http.py`, as the function answers it.
 
     A 406 lists no multipart/mixed in its field accept. An answer of the
     processor of multipart/mixed becomes the event stream of
@@ -738,7 +1099,7 @@ def served_d59(answer, accept):
 
 
 def in_process_event_stream(expected: dict) -> dict:
-    """Return the recorded answer `expected` of the processor of multipart/mixed, `{status, status_text, headers, body}`, as the event stream the function answers in its place, D59.
+    """Return the recorded answer `expected` of the processor of multipart/mixed, `{status, status_text, headers, body}`, as the event stream the function answers in its place.
 
     The fields of Yoga's processor of an event stream come first in its order,
     and every field of the recorded answer that the processor of
@@ -757,8 +1118,8 @@ def in_process_event_stream(expected: dict) -> dict:
     return {"status": status, "status_text": status_text, "headers": headers, "body": event_stream_body(chunks)}
 
 
-def in_process_d59(request_headers: dict, expected: dict) -> dict:
-    """Return the recorded answer `expected` of an in process case, `{status, status_text, headers, body}`, as the function answers it, D59.
+def in_process_without_multipart(request_headers: dict, expected: dict) -> dict:
+    """Return the recorded answer `expected` of an in process case, `{status, status_text, headers, body}`, as the function answers it.
 
     A 406 lists no multipart/mixed in its field accept. An answer of the
     processor of multipart/mixed becomes the event stream of
@@ -782,19 +1143,22 @@ def in_process_d59(request_headers: dict, expected: dict) -> dict:
     return expected
 
 
-# A side under test answers only what its configuration turns on, and each row
-# of the rated table that brings one of those defaults is one step below, which
-# rewrites an answer of the reference into the answer of the side under test.
+# The secure defaults.
+#
+# A side under test answers only what its configuration turns on, and each of
+# those defaults is one step below, which rewrites an answer of the reference
+# into the answer of the side under test.
 # `served_defaults`, `golden_defaults` and `in_process_defaults` run the steps
 # in their order over the three forms of an answer the notebooks hold: an answer
 # of `http.py`, a recorded golden `{status, headers, body}` and a recorded answer
 # of the in process capture `{status, status_text, headers, body}`.
 
-#: The root of the tree whose landing template the steps read.
+#: The root of the tree whose sources the steps read, the landing page of the reference among them.
 ROOT = Path(__file__).resolve().parents[2]
 
-#: The keys of the variants of docs/harness.md section 8 that tests/sidecar/config-overlay.mjs spreads over
-#: the reference, with the twins of the fixtures that select them through AOSABI_CONFIG setting the same.
+#: The keys of the variants that the configuration overlay spreads over the reference, with the twins of the
+#: fixtures that select them through AOSABI_CONFIG setting the same but `cors`, `graphiql`, `viewer` and
+#: `landingPage`, keys Aosabi does not have, which the steps read as keys of the reference.
 OVERLAY_KEYS = {
     "graphiql_false": {"graphiql": False},
     "landing_false": {"landingPage": False},
@@ -802,54 +1166,144 @@ OVERLAY_KEYS = {
     "switches_on": {"landingPage": True, "graphiql": True, "multipart": True, "viewer": True},
     "cors_star": {"cors": {"origin": "https://*.example.invalid"}},
     "cors_list": {"cors": {"origin": ["https://a.example.invalid", "https://b.example.invalid"]}},
+    "tokens_low": {"maxTokens": 1000},
+    "tokens_high": {"maxTokens": 240_016},
+    "introspection_false": {"introspection": False},
+    "masked_errors_true": {"maskedErrors": True},
 }
 
-#: The keys the own configuration of a fixture sets on both sides.
+#: The keys the own configuration of a fixture sets on the reference, which the twin does not have, and the steps
+#: read as keys of the reference.
 FIXTURE_KEYS = {
     "blog-app": {"graphiql": False, "landingPage": False},
 }
 
 #: The keys the twin of a fixture sets beyond the reference's configuration, by fixture.
 TWIN_KEYS = {
-    # The twins that take uploads set `multipart: true`, D49.
+    # The twins that take uploads set `multipart: true`.
     "surface-app": {"multipart": True},
     "federation-catalogue-app": {"multipart": True},
     "federation-boundary-app": {"multipart": True},
     "docs-app": {"multipart": True},
 }
 
-#: The keys that reach the module of the side ts, the bytes of the boot record of crates/aosabi-js/src/boot.rs.
-TS_KEYS = ("graphiql", "landingPage")
+#: The keys the steps read on the side ts: `introspection`, `maskedErrors` and `maxTokens`, the bytes of the boot
+#: record of crates/aosabi-js/src/boot.rs, and `graphiql` and `landingPage`, which no side reads and the steps read
+#: as keys of the reference.
+TS_KEYS = ("graphiql", "landingPage", "maxTokens", "introspection", "maskedErrors")
 
-#: The keys of the instances of the in process capture, which set the option graphiql themselves and leave
-#: multipart and cors unset.
-IN_PROCESS_KEYS = {"graphiql": True}
+#: The keys of the instances of the in process capture, which leave multipart and cors unset.
+IN_PROCESS_KEYS = {}
 
-#: The keys a boot in process of the twin carries in step 7 of 60_plugins, one entry per row: the switches
-#: of the secure defaults that turn on a plugin the reference adds under every configuration, so the twin boots the
-#: plugins of the reference's boot.
-BOOT_KEYS = {
-    # D47: the landing page, which the reference adds unless the key is `false`.
-    "landing_page": True,
+#: The built in plugins of the reference that the side under test does not have: the viewer and the landing page.
+EMPTY_SLOTS = ("viewer", "landing")
 
-    # D48: the viewer, which the reference adds under every configuration.
-    "viewer": True,
-}
+#: The label of an unnamed plugin in the message of a failed setup, its index in the sorted list of the pass.
+UNNAMED = re.compile(r"(Pylon plugin #)(\d+)( \(unnamed\) failed during setup: )")
 
+#: The route of the viewer of the reference, which its setup registers.
+VIEWER_ROUTE = "/viewer"
+
+
+def slot_label(text: str, shift: int = 1) -> str:
+    """Return the message `text` of a failed setup with the index of its unnamed plugin lowered by `shift`.
+
+    The viewer opens the sorted list of the first pass of the reference,
+    so an unnamed plugin of that pass stands one place lower on the side under
+    test, which has no viewer.
+    """
+    return UNNAMED.sub(lambda m: "%s%d%s" % (m.group(1), int(m.group(2)) - shift, m.group(3)), text)
+
+
+def boot_slots(line: dict, description: dict, slots: tuple = EMPTY_SLOTS) -> dict:
+    """Return the answer `line` of the reference to a boot `description` of tests/gen/plugins.py as the side
+    under test answers it, with the built in plugins of `slots` out of the arrays, the sorted and the loaded
+    labels of its passes.
+
+    A failed setup of an unnamed plugin of the first pass names an index one
+    lower where the viewer is among `slots`, and one of the strategy `last`
+    fails in the second pass, whose sorted list holds no viewer.
+    """
+    def kept(label):
+        return not (isinstance(label, dict) and label.get("builtin") in slots)
+
+    if "passes" in line:
+        passes = [dict(one, array=[entry for entry in one["array"] if kept(entry[0])],
+                       sorted=[label for label in one["sorted"] if kept(label)],
+                       loaded=[label for label in one["loaded"] if kept(label)]) for one in line["passes"]]
+        return dict(line, passes=passes)
+    if "thrown" in line and "viewer" in slots:
+        thrower = next((row for row in description.get("plugins", [])
+                        if str(row.get("setup", "")).startswith("throw")), None)
+        if thrower is not None and thrower.get("strategy") != "last":
+            return dict(line, thrown=slot_label(line["thrown"]))
+    return line
+
+
+def boot_stream(stream: bytes, descriptions: list, slots: tuple = EMPTY_SLOTS) -> bytes:
+    """Return the answers `stream` of the reference to the boots `descriptions`, one JSON line each, with
+    `boot_slots` applied, a line it leaves as it is kept as its bytes."""
+    by_id = {description["id"]: description for description in descriptions}
+    lines = []
+    for text in stream.decode("utf-8").splitlines():
+        line = json.loads(text)
+        held = boot_slots(line, by_id.get(line.get("id"), {}), slots)
+        lines.append(text if held == line else json.dumps(held, ensure_ascii=False, separators=(",", ":")))
+    return "".join(text + "\n" for text in lines).encode("utf-8")
+
+
+def report_slots(report: dict, slots: tuple = EMPTY_SLOTS) -> dict:
+    """Return the boot report `report` of the reference as the side under test writes it, with the built in
+    plugins of `slots` out of the array written back and the route of the viewer out of its routes."""
+    after = [entry for entry in report.get("config_plugins_after_boot") or []
+             if not (isinstance(entry.get("label"), dict) and entry["label"].get("builtin") in slots)]
+    routes = report.get("routes") or []
+    if "viewer" in slots:
+        routes = [route for route in routes if not (route.get("method") == "GET" and route.get("path") == VIEWER_ROUTE)]
+    return dict(report, config_plugins_after_boot=after, routes=routes)
+
+
+def boot_keys(boot: dict) -> dict:
+    """Return a boot description `boot` of tests/gen/plugins.py as a boot of the twin takes it.
+
+    It carries `introspection: false` where it sets `graphiql: false`, the
+    key that adds on the twin the refusal the reference adds on
+    `graphiql: false`. The keys `graphiql` and `landing_page` leave it,
+    since the twin has neither.
+    """
+    keys = dict(boot)
+    if boot.get("graphiql") is False:
+        keys.setdefault("introspection", False)
+    keys.pop("graphiql", None)
+    keys.pop("landing_page", None)
+    return keys
+
+
+#: The key under which `keys_of` hands the steps the `NODE_ENV` the side under test serves under, which no
+#: configuration sets and which the variants pair with each variant.
+NODE_ENV_KEY = "nodeEnv"
 
 #: The key under which `keys_of` hands the steps the middleware cors() of the app of a fixture, its entries of
 #: `APP_CORS`, which is source of the app and no key of a configuration.
 APP_CORS_KEY = "appCors"
 
+#: The key under which `keys_of` hands the steps the prefixes the app of a fixture strips before it dispatches a
+#: request through the app again, its entries of `APP_PREFIXES`, which are source of the app and no key of a
+#: configuration.
+APP_PREFIX_KEY = "appPrefixes"
 
-def keys_of(fixture: str, variant: str, side: str = "rs") -> dict:
+
+def keys_of(fixture: str, variant: str, side: str = "rs", node_env: str | None = None) -> dict:
     """Return the keys of the configuration the side under test serves `fixture` under `variant` with.
 
     The keys of the fixture's own configuration and of the variant hold on both
     sides. The twin of the side rs adds the keys of `TWIN_KEYS`, and the module
     of the side ts reads the keys of `TS_KEYS` alone. The middleware cors() of
     hono that the app of the fixture puts before the routes of the function
-    holds on both sides, under `APP_CORS_KEY`.
+    holds on both sides, under `APP_CORS_KEY`, and so do the prefixes the app
+    strips before it dispatches a request through the app again, under
+    `APP_PREFIX_KEY`, and the `NODE_ENV` `node_env` the side serves under,
+    under `NODE_ENV_KEY`, where the caller names one other than `unset`.
     """
     keys = dict(FIXTURE_KEYS.get(fixture, {}))
     keys.update(OVERLAY_KEYS.get(variant, {}))
@@ -859,6 +1313,10 @@ def keys_of(fixture: str, variant: str, side: str = "rs") -> dict:
         keys.update(TWIN_KEYS.get(fixture, {}))
     if fixture in APP_CORS:
         keys[APP_CORS_KEY] = APP_CORS[fixture]
+    if fixture in APP_PREFIXES:
+        keys[APP_PREFIX_KEY] = APP_PREFIXES[fixture]
+    if node_env not in (None, "unset"):
+        keys[NODE_ENV_KEY] = node_env
     return keys
 
 
@@ -965,6 +1423,21 @@ APP_CORS = {
 }
 
 
+#: The prefixes the app of a fixture strips from a path before it dispatches the request through the app again, by
+#: fixture.
+APP_PREFIXES = {
+    "lines-catalogue-app": ("/catalogue-api",),
+}
+
+
+def app_target(ask: Ask, keys: dict) -> str:
+    """Return the target of `ask` as the app hands it to the function, without the prefix among `keys` it strips."""
+    for prefix in keys.get(APP_PREFIX_KEY, ()):
+        if ask.path.startswith(prefix + "/"):
+            return ask.target[len(prefix):]
+    return ask.target
+
+
 def app_cors(ask: Ask, keys: dict):
     """Return the middleware cors() of the app among `keys` that runs on `ask`, or `None`."""
     return next((entry for entry in keys.get(APP_CORS_KEY, ()) if entry.guards(ask.path)), None)
@@ -985,14 +1458,24 @@ CORS_VARY = ("Origin", "Access-Control-Request-Headers")
 TEXT_TYPE = "text/plain; charset=UTF-8"
 NOT_FOUND_BODY = b"404 Not Found"
 
-#: The version the landing page of the reference names, quirk Q04.
+#: The version the landing page of the reference names.
 LANDING_VERSION = "2.9.5"
+#: The source of the landing page of the reference and the text that opens its template.
+LANDING_SOURCE = Path("vendor") / "pylon" / "packages" / "pylon" / "src" / "plugins" / "use-unhandled-route.ts"
+LANDING_ANCHOR = "html`<!doctype html>"
 
 
 def landing_page() -> bytes:
-    """Return the landing page of the reference, the template of aosabi-landing with its version, and Q04."""
-    template = (ROOT / "plugins" / "aosabi-landing" / "src" / "landing.html.tmpl").read_text(encoding="utf-8")
-    return template.replace("${version}", LANDING_VERSION, 1).encode("utf-8")
+    """Return the landing page of the reference, the template of its source with its version.
+
+    The template is the raw slice between the backticks its anchor opens.
+    """
+    text = (ROOT / LANDING_SOURCE).read_text(encoding="utf-8")
+    opened = text.index("`", text.index(LANDING_ANCHOR)) + 1
+    closed = opened
+    while text[closed] != "`":
+        closed += 2 if text[closed] == "\\" else 1
+    return text[opened:closed].replace("${version}", LANDING_VERSION, 1).encode("utf-8")
 
 
 def is_cors_line(name: str, value: str) -> bool:
@@ -1054,19 +1537,20 @@ def is_multipart(ask: Ask) -> bool:
 
 
 def steps(reply: Reply, ask: Ask, keys: dict) -> Reply:
-    """Return the answer `reply` of the reference to `ask` as the side under test with `keys` answers it, D46 to D49 and D60."""
+    """Return the answer `reply` of the reference to `ask` as the side under test with `keys` answers it."""
     for step, _ in NAMED_STEPS:
         reply = step(reply, ask, keys)
     return reply
 
 
-def qd055(reply, ask, keys):
-    """QD-055, D46: a string option `origin` that holds a star is compared as text.
+def star_origin_as_text(reply, ask, keys):
+    """A string option `origin` that holds a star is compared as text.
 
     Yoga's `origin.includes('*')` echoes every origin for it with `Vary: Origin`, and the function as the row
-    leaves it answers the option itself in `Access-Control-Allow-Origin` and leaves `Origin` out of `vary`. In
-    the series `qd275` then gives a preflight the answer of a route no handler answers, and `qd021` takes every
-    field this step writes out of every other answer, since the engine answers no CORS.
+    leaves it answers the option itself in `Access-Control-Allow-Origin` and leaves `Origin` out of `vary`. In the
+    series `no_options_answer` then gives a preflight the answer of a route no handler answers, and
+    `no_cors_fields` takes every field this step writes out of every other answer, since the engine answers no
+    CORS.
     """
     cors = keys.get("cors")
     origin = cors.get("origin") if isinstance(cors, dict) else None
@@ -1087,12 +1571,11 @@ def qd055(reply, ask, keys):
     return dataclasses.replace(reply, lines=lines)
 
 
-def qd024(reply, ask, keys):
-    """QD-024, D46: an origin outside a list of two or more origins gets no `Access-Control-Allow-Origin`
-    and no credentials.
+def origin_outside_list(reply, ask, keys):
+    """An origin outside a list of two or more origins gets no `Access-Control-Allow-Origin` and no credentials.
 
-    Yoga answers it `null` with `Access-Control-Allow-Credentials: true`, the origin a sandboxed frame sends,
-    and an origin in the list keeps the answer the row leaves. In the series `qd021` then takes the fields of
+    Yoga answers it `null` with `Access-Control-Allow-Credentials: true`, the origin a sandboxed frame sends, and
+    an origin in the list keeps the answer the row leaves. In the series `no_cors_fields` then takes the fields of
     CORS out of every answer, since the engine answers no CORS.
     """
     cors = keys.get("cors")
@@ -1105,8 +1588,8 @@ def qd024(reply, ask, keys):
     return dataclasses.replace(reply, lines=[(name, value) for name, value in reply.lines if name.lower() not in dropped])
 
 
-def qd275(reply, ask, keys):
-    """QD-275, D46: the engine answers no `OPTIONS` request, which falls through to the web server.
+def no_options_answer(reply, ask, keys):
+    """The engine answers no `OPTIONS` request, which falls through to the web server.
 
     Yoga's CORS answers every one with 204 and `Content-Length: 0` on every path, and the function hands it on
     as an unhandled route, to the not found answer of the web server where it is served, the landing page where
@@ -1120,28 +1603,27 @@ def qd275(reply, ask, keys):
     return fallthrough(ask, keys.get("landingPage") is not False)
 
 
-def qd228(reply, ask, keys):
-    """QD-228, D48: the viewer only on `viewer: true`, a key the reference does not read.
+def no_viewer(reply, ask, keys):
+    """No viewer under any key.
 
     The reference serves its viewer at `/viewer` under every configuration, and the
-    function hands the route on as one no handler answers unless the key is
-    `true`.
+    function hands the route on as one no handler answers.
     """
-    if keys.get("viewer") is True or ask.path != "/viewer" or ask.method not in ("GET", "HEAD"):
+    if ask.path != "/viewer" or ask.method not in ("GET", "HEAD"):
         return reply
     if reply.status != 200:
         return reply
     return fallthrough(ask, keys.get("landingPage") is not False)
 
 
-def qd122(reply, ask, keys):
-    """QD-122, D48: the page of GraphiQL only on `graphiql: true`.
+def no_graphiql_page(reply, ask, keys):
+    """The function serves no page of GraphiQL under any key.
 
     Yoga serves it unless the key is `false`, and the function answers a request for it as one for a type it
     does not serve, the 406 of `not_acceptable` with no body, with the content type the adapter of Node gives it
     where that adapter writes it.
     """
-    if keys.get("graphiql") is True or reply.status != 200 or PLAYGROUND_REFERENCE not in reply.body:
+    if reply.status != 200 or PLAYGROUND_REFERENCE not in reply.body:
         return reply
     lines = [("accept", not_acceptable(ask.header("accept")))] + cors_lines(reply)
     if ask.served and ask.node:
@@ -1149,8 +1631,8 @@ def qd122(reply, ask, keys):
     return Reply(406, "Not Acceptable", lines, b"")
 
 
-def qd224(reply, ask, keys):
-    """QD-224, D49: a multipart body is read only on `multipart: true`.
+def multipart_on_key(reply, ask, keys):
+    """A multipart body is read only on `multipart: true`.
 
     Yoga reads one unless the key is `false`, and the function answers a multipart request that reaches its
     parsers as a body of a type no parser reads, 415 with no body, with the content type the adapter of Node
@@ -1225,8 +1707,8 @@ def without_engine_cors(reply: Reply, ask: Ask, entry: AppCors) -> Reply:
     return reply if lines == reply.lines else dataclasses.replace(reply, lines=lines)
 
 
-def qd021(reply, ask, keys):
-    """QD-021, D46: the answer without its fields of CORS, since the engine answers no CORS.
+def no_cors_fields(reply, ask, keys):
+    """The answer without its fields of CORS, since the engine answers no CORS.
 
     Every field `CORS_FIELDS` names leaves, and `vary` with them where it holds
     the names of CORS alone. On a path the app's own cors() of hono guards,
@@ -1239,36 +1721,20 @@ def qd021(reply, ask, keys):
     return without_engine_cors(reply, ask, entry)
 
 
-#: The title of the landing page of the reference and of the function, and the link of the favicon of the
-#: reference.
+#: The title of the landing page of the reference.
 LANDING_REFERENCE_TITLE = b"<title>Welcome to Pylon</title>"
-LANDING_TITLE = b"<title>Welcome to Aosabi</title>"
-LANDING_FAVICON = b'<link\nrel="icon"\nhref="https://pylon.cronit.io/favicon/favicon.ico"\n/>\n'
 
 
-def qd830(reply, ask, keys):
-    """QD-830, D60: the landing page names Aosabi and loads no favicon of a third party.
+def no_landing_page(reply, ask, keys):
+    """The function serves no landing page under any key.
 
-    The title names Aosabi where the reference's names its own, the link of the
-    favicon of the reference's host leaves, and a length the answer names follows
-    the body.
+    The reference serves it on a route no handler answers unless the key is
+    `false`, and the function hands the route to the not found answer of hono,
+    which carries the fields the middleware of the app set around the route,
+    as the landing page does, every field but those of its body and of the
+    connection.
     """
-    if not is_landing(reply) or LANDING_REFERENCE_TITLE not in reply.body:
-        return reply
-    body = reply.body.replace(LANDING_REFERENCE_TITLE, LANDING_TITLE, 1).replace(LANDING_FAVICON, b"", 1)
-    lines = [(name, str(len(body)) if name.lower() == "content-length" else value) for name, value in reply.lines]
-    return dataclasses.replace(reply, lines=lines, body=body)
-
-
-def qd680(reply, ask, keys):
-    """QD-680, D47: the landing page answers a route no handler answers only on `landingPage: true`.
-
-    The reference serves it unless the key is `false`, and the function hands the
-    route to the not found answer of hono otherwise, which carries the fields
-    the middleware of the app set around the route, as the landing page does,
-    every field but those of its body and of the connection.
-    """
-    if keys.get("landingPage") is True or not is_landing(reply):
+    if not is_landing(reply):
         return reply
     done = fallthrough(ask, False)
     kept = [(name, value) for name, value in reply.lines
@@ -1276,9 +1742,89 @@ def qd680(reply, ask, keys):
     return dataclasses.replace(done, lines=kept + done.lines) if kept else done
 
 
+def no_health_check(reply, ask, keys):
+    """The function answers no health check, which falls through to the web server.
+
+    Yoga's health check answers every method on a URL that ends in `/health` with 200, no body and `x-yoga-id`
+    before Pylon's routes run, and the function hands such a request on as an unhandled route, to the not found
+    answer of the web server where it is served and to the empty 404 of the unhandled route in process. An
+    `OPTIONS` request takes this line as well, since the health check answers it before Yoga's CORS.
+    """
+    if reply.status != 200 or reply.header(HEALTH_FIELD) is None:
+        return reply
+    if not ask.served:
+        return Reply(404, "Not Found", [("content-type", "text/plain;charset=UTF-8")], b"")
+    return fallthrough(ask, False)
+
+
+def endpoint_by_path(reply, ask, keys):
+    """The function matches its endpoint by its whole path.
+
+    Yoga runs a request whose whole URL ends in the endpoint or in the endpoint and a slash as one to the endpoint,
+    and the function hands such a request on as an unhandled route, to the not found answer of the web server where
+    it is served and to the empty 404 of the unhandled route in process. A request under a prefix the app strips
+    before it dispatches the request through the app again reaches the function with the target after the prefix,
+    which the step reads.
+    """
+    endpoint = keys.get("graphqlEndpoint") or "/graphql"
+    target = app_target(ask, keys)
+    if target.split("?")[0] in (endpoint, endpoint + "/") or not target.endswith((endpoint, endpoint + "/")):
+        return reply
+    if reply.status == 404:
+        return reply
+    if not ask.served:
+        return Reply(404, "Not Found", [("content-type", "text/plain;charset=UTF-8")], b"")
+    return fallthrough(ask, False)
+
+
+def endpoint_path_alone(reply: Reply, ask: Ask, keys: dict) -> Reply:
+    """The function takes the path of its endpoint alone for its endpoint.
+
+    Yoga runs a request to the endpoint and a slash as one to the endpoint, and the function hands it on as an
+    unhandled route, as the step `endpoint_by_path` hands on a URL that merely ends in the endpoint.
+    """
+    endpoint = keys.get("graphqlEndpoint") or "/graphql"
+    if app_target(ask, keys).split("?")[0] != endpoint + "/" or reply.status == 404:
+        return reply
+    if not ask.served:
+        return Reply(404, "Not Found", [("content-type", "text/plain;charset=UTF-8")], b"")
+    return fallthrough(ask, False)
+
+
+#: The refusal of the plugin `useDisableIntrospection`, which the handler of the reference adds on
+#: `graphiql: false`.
+INTROSPECTION_REFUSAL = b"GraphQL introspection has been disabled"
+
+#: The answer of the document `{__schema{queryType{name}}}` of family K, which the
+#: reference refuses with one error per field of introspection the document holds.
+INTROSPECTION_ANSWER = b'{"data":{"__schema":{"queryType":{"name":"Query"}}}}'
+
+
+def introspection_on_key(reply: Reply, ask: Ask, keys: dict) -> Reply:
+    """The function refuses introspection on `introspection: false` alone.
+
+    The handler of the reference adds the refusal on `graphiql: false`, and the function answers the document under
+    that key. The step holds the one document of the cases, which it knows by the two fields its refusal names, so
+    the refusal of any other document stays a difference of the comparison.
+    """
+    if not introspection_refused(keys):
+        return reply
+    if reply.body.count(INTROSPECTION_REFUSAL) != 2:
+        return reply
+    if b'\\"__schema\\"' not in reply.body or b'\\"queryType\\"' not in reply.body:
+        return reply
+    lines = [(name, str(len(INTROSPECTION_ANSWER)) if name.lower() == "content-length" else value)
+             for name, value in reply.lines]
+    return Reply(200, reply.reason if reply.status == 200 else "OK", lines, INTROSPECTION_ANSWER)
+
+
 #: The steps `steps` runs, in the order they rewrite an answer, each with the divergence its row names.
-NAMED_STEPS = ((qd055, "D46"), (qd024, "D46"), (qd275, "D46"), (qd228, "D48"), (qd122, "D48"),
-               (qd224, "D49"), (qd021, "D46"), (qd830, "D60"), (qd680, "D47"))
+NAMED_STEPS = ((star_origin_as_text, "cors-plugin"), (origin_outside_list, "cors-plugin"),
+               (no_options_answer, "cors-plugin"), (no_health_check, "no-health-check"),
+               (endpoint_by_path, "endpoint-ending"), (endpoint_path_alone, "endpoint-slash"),
+               (no_viewer, "graphiql-viewer"), (no_graphiql_page, "graphiql-viewer"),
+               (introspection_on_key, "introspection-key"), (multipart_on_key, "multipart"),
+               (no_cors_fields, "cors-plugin"), (no_landing_page, "landing-plugin"))
 
 
 def raw_message(status_line: str, lines: list, body: bytes, chunked: bool) -> bytes:
@@ -1306,9 +1852,8 @@ CONNECTION_FIELDS = ("date", "connection", "keep-alive", "transfer-encoding")
 def plain_body(answer) -> bytes:
     """Return the body of the answer `answer` of `http.py` with its codings undone.
 
-    A Worker's runtime gzips the gzip of compress() again, divergence D43, so
-    a body that is still a gzip member after the coding its field names is
-    undone once more.
+    A Worker's runtime gzips the gzip of compress() again, so a body that is still a gzip member after the coding
+    its field names is undone once more.
     """
     body = answer.decoded
     coding = next((value for name, value in answer.header_lines if name.lower() == "content-encoding"), "")
@@ -1340,7 +1885,7 @@ def host_length(lines: list, done: Reply, ask: Ask, answer) -> list:
 
 def served_defaults(answer, case, keys: dict, node: bool = True):
     """Return the answer `answer` of the reference to the case `case`, an answer of `http.py` and a case of
-    `gen/http.py` or an `Ask`, as the side under test with the keys `keys` answers it, D46 to D49 and D60.
+    `gen/http.py` or an `Ask`, as the side under test with the keys `keys` answers it.
 
     `node` fails for an answer of the reference served on Bun or on workerd,
     whose length `host_length` writes. An answer no step changes is returned
@@ -1409,7 +1954,7 @@ def view_defaults(view: tuple, request: bytes, keys: dict) -> tuple:
 
 def in_process_defaults(request: dict, expected: dict, keys: dict) -> dict:
     """Return the recorded answer `expected` of an in process case, `{status, status_text, headers, body}`, as the
-    function with the keys `keys` answers the request `request`, `{method, url, headers}`, D46 to D49.
+    function with the keys `keys` answers the request `request`, `{method, url, headers}`.
 
     An answer no step changes is returned as it is.
     """
@@ -1499,29 +2044,504 @@ def pairs_defaults(status: int, fields: list, body: bytes, ask: Ask, keys: dict)
     return done.status, [(name, value) for name, value in done.lines if name.lower() != "date"] + dated, done.body
 
 
-# The rules of the oracle of lane A, D46 to D49 and D57 to D60.
+# The mask of the reference outside `NODE_ENV=development`.
 #
-# The oracle of tests/notebooks/34_http_oracle.ipynb sends each request of its corpus to the pipeline of
-# 27d713a0 and to the tree under test, and lets a difference pass only through the rule of its name in `ORACLE`,
-# the rules applied in the order of their names, each a function of the request, the old answer and the new
-# answer as the rules before it left it, which answers the new answer written as the old pipeline writes it, or
-# None. The rules share one model. The old answer, read as a `Reply`, goes through the rewrites of the
-# divergences in the order the tree writes them, D58 and D59 of the function, the steps of the rows of B2 and
-# the coding of the host, which D57 changes on Bun and on workerd. The rule of a name holds where the new answer
-# is the old one through the rewrites of that name and of every name after it, and it answers the old one
-# through the rewrites of the names after it alone, so the rule of the last name a difference needs answers the
-# old answer itself. Each kind of request of the oracle holds its answer in a form of its own, and the rewrites
-# read and write each form as the oracle builds it: the answers of HTTP/1.1 of the kinds `http` and `yoga`, the
-# bytes of the kind `wire`, the three forms of the kind `h2`, the answers of the requests of a log, the front of
-# the federation and the answers of GraphTP.
+# Pylon puts `maskedErrors: false` before the spread of its configuration under
+# `NODE_ENV=development` alone, so outside development Yoga masks each
+# unexpected error of a result, and the side masks one only where the key
+# `maskedErrors` of its configuration turns the mask on. An answer of the
+# reference outside development so holds the masked form of each error the
+# side answers with its own message. The comparisons under development hold
+# that message to the reference's, so outside development the answer of the
+# side guides the rewrite: a masked error of the reference reads as the error
+# at the same place of the side's answer where that error is no masked error
+# and the reference's error is its masked form, and every other byte of the
+# reference's answer stays. Where the key turns the mask on, the mask of the
+# reference reads `NODE_ENV` and writes the original error with its stack
+# under `extensions.originalError` under development, and the side's mask
+# reads no `NODE_ENV` and writes none, so there a masked error of the reference
+# reads as the error at its place of the side's answer where that error is the
+# reference's without its original error.
 
-#: The names whose rules `ORACLE` holds, in the order the oracle applies them.
-ORACLE_NAMES = ("D46", "D47", "D48", "D49", "D57", "D58", "D59", "D60")
+#: The message and the code of a masked error, whose `unexpected` the result processor leaves out.
+MASKED_MESSAGE = "Unexpected error."
+MASKED_CODE = "INTERNAL_SERVER_ERROR"
+
+
+def mask_differs(keys: dict) -> bool:
+    """Return whether an answer of the reference reads off the answer of the side under test with the keys `keys`:
+    outside `NODE_ENV=development` with no key `maskedErrors`, where the reference masks an error the side
+    answers with its own message, and under development with the key on, where the mask of the reference writes the
+    original error that the side's mask leaves out."""
+    masks = keys.get("maskedErrors")
+    if keys.get(NODE_ENV_KEY) == "development":
+        return masks not in (None, False)
+    return masks is None
+
+
+def masked_error(error: dict) -> dict:
+    """Return the error `error` of a result as the mask writes it: the message of a masked error, the `locations`
+    and the `path` of `error`, and the code of a masked error alone among its extensions."""
+    masked = {"message": MASKED_MESSAGE}
+    for name in ("locations", "path"):
+        if name in error:
+            masked[name] = error[name]
+    masked["extensions"] = {"code": MASKED_CODE}
+    return masked
+
+
+def json_space(text: str, at: int) -> int:
+    """Return the index of the first character at or after `at` of `text` that is no white space of JSON."""
+    while at < len(text) and text[at] in " \t\n\r":
+        at += 1
+    return at
+
+
+def json_end(text: str, at: int) -> int:
+    """Return the index after the JSON value that starts at `at` of `text`, with no recursion."""
+    depth = 0
+    while True:
+        char = text[at]
+        if char == '"':
+            at += 1
+            while text[at] != '"':
+                at += 2 if text[at] == "\\" else 1
+            at += 1
+        elif char in "{[":
+            depth += 1
+            at += 1
+            continue
+        elif char in "}]":
+            depth -= 1
+            at += 1
+        elif char in ",: \t\n\r":
+            at += 1
+            continue
+        else:
+            while at < len(text) and text[at] not in ",:]} \t\n\r":
+                at += 1
+        if depth == 0:
+            return at
+
+
+def error_spans(text: str):
+    """Return the spans `(start, end)` of the entries of the member `errors` of the JSON object `text`, or None."""
+    at = json_space(text, 0)
+    if text[at:at + 1] != "{":
+        return None
+    at = json_space(text, at + 1)
+    while at < len(text) and text[at] == '"':
+        key_end = json_end(text, at)
+        key = json.loads(text[at:key_end])
+        at = json_space(text, json_space(text, key_end) + 1)
+        end = json_end(text, at)
+        if key == "errors":
+            if text[at] != "[":
+                return None
+            spans, inner = [], json_space(text, at + 1)
+            while text[inner] != "]":
+                item_end = json_end(text, inner)
+                spans.append((inner, item_end))
+                inner = json_space(text, item_end)
+                if text[inner] == ",":
+                    inner = json_space(text, inner + 1)
+            return spans
+        at = json_space(text, end)
+        if text[at:at + 1] == ",":
+            at = json_space(text, at + 1)
+    return None
+
+
+#: The members of an error the writer of a result writes, `toJSON` of `GraphQLError`, which hold no stack.
+ERROR_MEMBERS = ("message", "locations", "path", "extensions")
+
+
+def masked_error_reads(error: dict, side: dict) -> bool:
+    """Return whether the error `error` of a result of the reference reads as the error `side` at its place of the
+    side's result: a masked error where the side answers its own message, or a masked error that carries the
+    original error under `extensions.originalError` where the side's masked error carries none. The error of the
+    side holds no member but those of `ERROR_MEMBERS`, so no stack."""
+    if any(name not in ERROR_MEMBERS for name in side):
+        return False
+    if error == masked_error(error):
+        return side != masked_error(side) and masked_error(side) == error
+    extensions = error.get("extensions")
+    if not isinstance(extensions, dict) or "originalError" not in extensions:
+        return False
+    bare = dict(error, extensions={name: value for name, value in extensions.items() if name != "originalError"})
+    return bare == masked_error(bare) and side == bare
+
+
+def unmasked_result(result: bytes, guide: bytes) -> bytes:
+    """Return the GraphQL result `result` of the reference with each masked error read as the error at its place of
+    the result `guide` of the side under test.
+
+    An error reads so where `masked_error_reads` holds for it and the error at the
+    same place of `guide`, whose errors are as many. The error of the side is
+    written as the side wrote it, and every other byte of `result` stays.
+    """
+    try:
+        text = result.decode("utf-8", "surrogateescape")
+        spans = error_spans(text)
+        theirs = guide.decode("utf-8", "surrogateescape")
+        guides = error_spans(theirs)
+    except (ValueError, IndexError):
+        return result
+    if not spans or not guides or len(guides) != len(spans):
+        return result
+    out, last = [], 0
+    for (start, end), (side_start, side_end) in zip(spans, guides):
+        try:
+            error = json.loads(text[start:end])
+            side = json.loads(theirs[side_start:side_end])
+        except ValueError:
+            continue
+        if not isinstance(error, dict) or not isinstance(side, dict) or not masked_error_reads(error, side):
+            continue
+        out += [text[last:start], theirs[side_start:side_end]]
+        last = end
+    if not out:
+        return result
+    return ("".join(out) + text[last:]).encode("utf-8", "surrogateescape")
+
+
+#: The start of a line of an event stream that holds a result.
+DATA_LINE = b"data: {"
+
+
+def unmasked_event_stream(body: bytes, guide: bytes) -> bytes:
+    """Return the event stream `body` of the reference with each result read through `unmasked_result` beside the
+    result at the same place of the event stream `guide` of the side under test, where both hold as many."""
+    lines = body.split(b"\n")
+    places = [index for index, line in enumerate(lines) if line.startswith(DATA_LINE)]
+    ours = [line for line in guide.split(b"\n") if line.startswith(DATA_LINE)]
+    if not places or len(places) != len(ours):
+        return body
+    for index, side in zip(places, ours):
+        lines[index] = b"data: " + unmasked_result(lines[index][6:], side[6:])
+    return b"\n".join(lines)
+
+
+def unmasked_body(body: bytes, guide: bytes, content_type) -> bytes:
+    """Return the body `body` of an answer of the reference of the type `content_type` with each masked error read
+    as the error at its place of the body `guide` of the side under test, a GraphQL result or an event stream
+    of results."""
+    media = (content_type or "").split(";")[0].strip().lower()
+    if media == EVENT_STREAM:
+        return unmasked_event_stream(body, guide)
+    if media in GRAPHQL_TYPES:
+        return unmasked_result(body, guide)
+    return body
+
+
+def body_fields(lines: list, before: bytes, body: bytes, ask: Ask) -> list:
+    """Return the fields `lines` of an answer of the reference to `ask` whose body `before` becomes `body`.
+
+    A length the answer names moves by the bytes the body gains, so a length
+    a mask of the comparison left behind its body stays as far behind. The
+    coding follows compress() of the reference, which codes an answer of
+    1,024 bytes or more in the coding the request accepts and leaves a
+    shorter one uncoded with its length.
+    """
+    length = next((value for name, value in lines if name.lower() == "content-length"), None)
+    coding = next((value for name, value in lines if name.lower() == "content-encoding"), None)
+    grown = len(body) - len(before)
+    if length is not None and length.isdigit():
+        size = int(length) + grown
+        if size >= COMPRESS_THRESHOLD and compress_coding(ask) is not None:
+            kept = [(name, value) for name, value in lines if name.lower() != "content-length"]
+            return sorted_in(kept, ("content-encoding", compress_coding(ask)))
+        return [(name, str(size) if name.lower() == "content-length" else value) for name, value in lines]
+    if coding is not None and len(body) < COMPRESS_THRESHOLD:
+        kept = [(name, value) for name, value in lines if name.lower() != "content-encoding"]
+        return sorted_in(kept, ("content-length", str(len(body))))
+    return lines
+
+
+def sorted_in(lines: list, field: tuple) -> list:
+    """Return the fields `lines` with `field` at its place in the order of names the reference writes its fields in,
+    before the first field whose name sorts after its own."""
+    at = next((index for index, (name, _) in enumerate(lines) if name.lower() > field[0]), len(lines))
+    return lines[:at] + [field] + lines[at:]
+
+
+def unmasked_served(answer, guide, case, keys: dict):
+    """Return the answer `answer` of the reference, an answer of `http.py`, to the case `case` with each masked
+    error read as the error at its place of the answer `guide` of the side under test, under the keys `keys` of
+    the side.
+
+    An answer no error of which changes is returned as it is. A changed one
+    keeps every field of the reference but its length and its coding, which
+    `body_fields` gives, and its framing follows its length.
+    """
+    if answer is None or guide is None or case is None or not mask_differs(keys):
+        return answer
+    before = plain_body(answer)
+    body = unmasked_body(before, plain_body(guide), answer.header("content-type"))
+    if body == before:
+        return answer
+    return with_body(answer, Ask(case.method, case.target, list(case.headers)), before, body)
+
+
+def with_body(answer, ask: Ask, before: bytes, body: bytes):
+    """Return the answer `answer` of `http.py` to `ask` whose body `before` becomes `body`, its fields read by
+    `body_fields` and its framing following its length."""
+    lines = body_fields(list(answer.header_lines), before, body, ask)
+    own = [(name, value) for name, value in lines if name.lower() != "transfer-encoding"]
+    chunked = not any(name.lower() == "content-length" for name, _ in own) and ask.method != "HEAD"
+    coded = coded_body(body, next((value for name, value in own if name.lower() == "content-encoding"), None))
+    raw = raw_message(answer.status_line, own, coded, chunked)
+    header_lines = own + ([("Transfer-Encoding", "chunked")] if chunked else [])
+    return dataclasses.replace(answer, header_lines=header_lines, framing="chunked" if chunked else "content-length",
+                               wire_body=raw[raw.index(b"\r\n\r\n") + 4:], payload=coded, decoded=body, raw=raw)
+
+
+def unmasked_stream(stream, guide, ask: Ask, keys: dict):
+    """Return the read `stream` of the reference, an answer of `sse.py`, to `ask` with each masked error read as the
+    error at its place of the read `guide` of the side under test, under the keys `keys` of the side.
+
+    A read no error of which changes is returned as it is. An event stream
+    reads its frames through `unmasked_event_stream` and keeps its fields and its
+    framing, but for a length it names, as the answers of Bun to a request
+    that names identity do, which moves by the bytes the frames gain. An
+    answer that is no stream reads its body through `unmasked_body` and its fields
+    through `body_fields`.
+    """
+    if stream is None or guide is None or stream.status is None or not mask_differs(keys):
+        return stream
+    if stream.is_stream:
+        before = stream.text.encode("utf-8", "surrogateescape")
+        text = unmasked_event_stream(before, guide.text.encode("utf-8", "surrogateescape"))
+        if text == before:
+            return stream
+        frames, _ = split_event_frames(text.decode("utf-8", "surrogateescape"))
+        body = text + stream.body[len(before):] if stream.body.startswith(before) else stream.body
+        grown = len(text) - len(before)
+        lines = [(name, str(int(value) + grown) if name.lower() == "content-length" and value.isdigit() else value)
+                 for name, value in stream.header_lines]
+        return dataclasses.replace(stream, frames=frames, body=body, header_lines=lines,
+                                   headers={name.lower(): value for name, value in lines})
+    body = unmasked_body(stream.body, guide.body, stream.headers.get("content-type"))
+    if body == stream.body:
+        return stream
+    own = [(name, value) for name, value in body_fields(list(stream.header_lines), stream.body, body, ask)
+           if name.lower() != "transfer-encoding"]
+    chunked = not any(name.lower() == "content-length" for name, _ in own) and ask.method != "HEAD"
+    coded = coded_body(body, next((value for name, value in own if name.lower() == "content-encoding"), None))
+    raw = raw_message(stream.status_line, own, coded, chunked)
+    lines = own + ([("Transfer-Encoding", "chunked")] if chunked else [])
+    return dataclasses.replace(stream, header_lines=lines, headers={name.lower(): value for name, value in lines},
+                               framing="chunked" if chunked else "content-length", body=body,
+                               wire_body=raw[raw.index(b"\r\n\r\n") + 4:])
+
+
+def introspection_refused(keys: dict) -> bool:
+    """Return whether the reference refuses introspection that the side under test answers under the keys `keys`:
+    under `graphiql: false` with no key `introspection` of the value false."""
+    return keys.get("graphiql") is False and keys.get("introspection") is not False
+
+
+def introspection_refusal_result(result: bytes, guide: bytes, keys: dict) -> bytes:
+    """Return the GraphQL result `result` of the reference with its refusal of introspection read off the result
+    `guide` of the side under test, under the keys `keys` of the side.
+
+    The side under test answers a document of introspection under
+    `graphiql: false` as under a configuration without that key, so `guide`
+    stands for the answer where the reference refused every field of the
+    document and `guide` holds data and no error. Every other pair returns
+    `result` as it is, which stays a difference of the comparison.
+    """
+    if not introspection_refused(keys) or INTROSPECTION_REFUSAL not in result:
+        return result
+    try:
+        refused, ours = json.loads(result), json.loads(guide)
+    except ValueError:
+        return result
+    errors = refused.get("errors") if isinstance(refused, dict) else None
+    if not errors or "data" in refused or any(
+            INTROSPECTION_REFUSAL.decode() not in str(error.get("message")) for error in errors):
+        return result
+    if not isinstance(ours, dict) or "errors" in ours or not isinstance(ours.get("data"), dict):
+        return result
+    return guide
+
+
+def introspection_refusal_served(answer, guide, case, keys: dict):
+    """Return the answer `answer` of the reference, an answer of `http.py`, to the case `case` with its refusal of
+    introspection read off the answer `guide` of the side under test, under the keys `keys` of the side.
+
+    The step `introspection_on_key` knows the answer of one document, and the
+    operations of family O send other documents of introspection, whose answer
+    the refusal of the reference does not carry. Their bodies read through
+    `introspection_refusal_result`, and an answer whose body it reads takes the body of the
+    guide through `with_body`. Every other pair is returned as it is and stays
+    a difference of the comparison.
+    """
+    if answer is None or guide is None or case is None or not introspection_refused(keys):
+        return answer
+    before = plain_body(answer)
+    if INTROSPECTION_REFUSAL not in before:
+        return answer
+    body = introspection_refusal_result(before, plain_body(guide), keys)
+    if body == before:
+        return answer
+    return with_body(answer, Ask(case.method, case.target, list(case.headers)), before, body)
+
+
+def unmasked_message(answer: bytes, guide: bytes, request: bytes, keys: dict) -> bytes:
+    """Return the HTTP/1.1 answer `answer` of the reference to the HTTP/1.1 request `request` with each masked error
+    read as the error at its place of the HTTP/1.1 answer `guide` of the side under test, under the keys `keys`
+    of the side.
+
+    A message no error of which changes is returned as it is. A changed one
+    keeps every field of the reference in its order but its length and its
+    coding, which `body_fields` gives, and its body is chunked where it names
+    no length.
+    """
+    if not answer or not guide or not mask_differs(keys):
+        return answer
+    head, _, wire = answer.partition(b"\r\n\r\n")
+    lines = head.decode("latin-1").split("\r\n")
+    fields = [tuple(part.strip() for part in line.split(":", 1)) for line in lines[1:] if ":" in line]
+    guide_head, _, guide_wire = guide.partition(b"\r\n\r\n")
+    guide_fields = [tuple(part.strip() for part in line.split(":", 1))
+                    for line in guide_head.decode("latin-1").split("\r\n")[1:] if ":" in line]
+    try:
+        before = message_body(fields, wire)
+        ours = message_body(guide_fields, guide_wire)
+    except (ValueError, zlib.error):
+        return answer
+    content_type = next((value for name, value in fields if name.lower() == "content-type"), None)
+    body = unmasked_body(before, ours, content_type)
+    if body == before:
+        return answer
+    ask = ask_of_raw(request)
+    own = [(name, value) for name, value in body_fields(fields, before, body, ask)
+           if name.lower() != "transfer-encoding"]
+    chunked = not any(name.lower() == "content-length" for name, _ in own) and ask.method != "HEAD"
+    coded = coded_body(body, next((value for name, value in own if name.lower() == "content-encoding"), None))
+    return raw_message(lines[0], own, coded, chunked)
+
+
+#: A Sentry event id of an error as the masks of the comparison write it, and the characters they take off the id
+#: of 32 it stands for.
+EVENT_ID_MASKED = b'"sentryEventId":"<sentry-event-id>"'
+EVENT_ID_TAKEN = 32 - len(b"<sentry-event-id>")
+
+
+def named_length(body: bytes) -> int:
+    """Return the length the answer named for the body `body` the masks of the comparison wrote, each Sentry event
+    id read at the 32 characters it stands for."""
+    return len(body) + body.count(EVENT_ID_MASKED) * EVENT_ID_TAKEN
+
+
+def unmasked_form(form: dict, guide: dict) -> dict:
+    """Return the compared form `form` of an answer of the reference, `{status, headers, body}` with its fields by
+    lower case name and an event stream read as `frames` where it holds them, with each masked error read as the
+    error at its place of the compared form `guide` of the side under test, and a length it names following its
+    body.
+
+    The body comes back plain, as `oracle_plain` reads a coded one, since the
+    oracle compares a body after its coding is undone. The length moves by
+    the bytes the body gains as the answer wrote them, so an event id the
+    masks wrote shorter counts at its own length.
+    """
+    frames, ours = form.get("frames"), guide.get("frames")
+    if isinstance(frames, list) and isinstance(ours, list):
+        joined = unmasked_event_stream("".join(frames).encode("utf-8", "surrogateescape"),
+                                  "".join(ours).encode("utf-8", "surrogateescape"))
+        done, _ = split_event_frames(joined.decode("utf-8", "surrogateescape"))
+        return form if done == frames else dict(form, frames=done)
+    content_type = (form.get("headers", {}).get("content-type") or [None])[0]
+    before = oracle_plain(form)
+    body = unmasked_body(before, oracle_plain(guide), content_type)
+    if body == before:
+        return form
+    headers = dict(form.get("headers", {}))
+    if headers.get("content-length"):
+        grown = named_length(body) - named_length(before)
+        headers["content-length"] = [str(int(headers["content-length"][0]) + grown)]
+    return dict(form, headers=headers, body=body)
+
+
+def masked_count(body: bytes) -> int:
+    """Return how many errors of the GraphQL result `body` are masked errors, none for a body that is no result."""
+    try:
+        errors = json.loads(body.decode("utf-8", "surrogateescape")).get("errors")
+    except (ValueError, AttributeError):
+        return 0
+    if not isinstance(errors, list):
+        return 0
+    return sum(1 for error in errors if isinstance(error, dict) and error == masked_error(error))
+
+
+def unmasked_log(form: dict, guide: dict) -> dict:
+    """Return the compared form `form` of a log of the reference, its standard output, the answers of its requests
+    as `follow` and the first words of the lines of its standard error as `verdict`, with each masked error read as
+    the error at its place of the log `guide` of the side under test.
+
+    Each answer reads as `unmasked_form` reads it beside the answer at the same place of `guide`. The verdict loses
+    its last word ERR for each error so read, since the mask writes the original of an error it masks on standard
+    error in a line that opens with ERR, after the lines of the execution of the request, and the side masks none.
+    """
+    follow, ours = form.get("follow"), guide.get("follow")
+    if not isinstance(follow, list) or not isinstance(ours, list) or len(follow) != len(ours):
+        return form
+    out, read = [], 0
+    for entry, side in zip(follow, ours):
+        pair = isinstance(entry, list) and isinstance(side, list) and len(entry) == len(side) == 3
+        if not pair or entry[0] is None or side[0] is None:
+            out.append(entry)
+            continue
+        before = {"status": entry[0], "headers": entry[1], "body": entry[2]}
+        done = unmasked_form(before, {"status": side[0], "headers": side[1], "body": side[2]})
+        if done is before:
+            out.append(entry)
+            continue
+        read += max(0, masked_count(oracle_plain(before)) - masked_count(done["body"]))
+        out.append([done["status"], done["headers"], done["body"]])
+    if out == follow:
+        return form
+    verdict = form.get("verdict") or ""
+    words = verdict.split(" ") if verdict else []
+    for _ in range(read):
+        at = max((index for index, word in enumerate(words) if word == "ERR"), default=None)
+        if at is not None:
+            del words[at]
+    return dict(form, follow=out, verdict=" ".join(words))
+
+
+# The rules of the oracle.
+#
+# The oracle sends each request of its corpus to the old pipeline and to the tree under test, and lets a difference
+# pass only through the rule of its name in `ORACLE`, the rules applied in the order of their names, each a
+# function of the request, the old answer and the new answer as the rules before it left it, which answers the new
+# answer written as the old pipeline writes it, or None. The rules share one model. The old answer, read as a
+# `Reply`, goes through the rewrites of the divergences in the order the tree writes them, the batch the function
+# refuses and its answer without multipart/mixed, the steps of the rows of the secure defaults and the coding of
+# the host, which the uncoded small answer changes on Bun and on workerd. The rule of a name holds where the new
+# answer is the old one through the rewrites of that name and of every name after it, and it answers the old one
+# through the rewrites of the names after it alone, so the rule of the last name a difference needs answers the old
+# answer itself. Each kind of request of the oracle holds its answer in a form of its own, and the rewrites read
+# and write each form as the oracle builds it: the answers of HTTP/1.1 of the kinds `http` and `yoga`, the bytes of
+# the kind `wire`, the three forms of the kind `h2`, the answers of the requests of a log, the front of the
+# federation and the answers of GraphTP, and the rewrite `log_without_excerpts` reads the verdict of a log, the
+# first words of the lines of its standard error.
+
+#: The divergence of the log line, a thrown error on standard error as the first line of its stack with no
+#: excerpt of the source, whose rewrite `log_without_excerpts` reads the verdict of a log.
+STACK_LINE = "log-excerpts"
+
+#: The names whose rules `ORACLE` holds, in the order the oracle applies them, the order of the numbers of their
+#: divergences.
+ORACLE_NAMES = ("cors-plugin", "landing-plugin", "graphiql-viewer", "multipart", "uncoded-small", "batching",
+                "no-multipart-mixed", "no-health-check", "endpoint-ending", "endpoint-slash", "unmasked-error",
+                "introspection-key", STACK_LINE)
 
 #: The fields of a head the oracle never compares, `connection` aside, which only a stream keeps.
 ORACLE_IGNORED = ("date", "keep-alive", "server", "transfer-encoding")
 
-#: The body of the 405 the engine answers a request of HEAD with, whose length that answer carries on Bun, D57.
+#: The body of the 405 the engine answers a request of HEAD with, whose length that answer carries on Bun.
 METHOD_REFUSAL = (b'{"errors":[{"message":"GraphQL only supports GET and POST requests.",'
                   b'"extensions":{"code":"BAD_REQUEST"}}]}')
 
@@ -1558,11 +2578,12 @@ def oracle_keys(request: dict) -> dict:
     if request.get("kind") == "yoga":
         return dict(IN_PROCESS_KEYS)
     side = "rs" if request.get("side") == "rs" else "ts"
-    return keys_of(request.get("fixture") or "", request.get("variant") or "default", side)
+    return keys_of(request.get("fixture") or "", request.get("variant") or "default", side,
+                   request.get("node_env"))
 
 
 def oracle_plain(form: dict) -> bytes:
-    """Return the body of the compared form `form` with the second gzip of a Worker undone, D43."""
+    """Return the body of the compared form `form` with the second gzip of a Worker undone."""
     body = form.get("body") or b""
     coding = (form.get("headers", {}).get("content-encoding") or [""])[0].strip().lower()
     if coding == "gzip" and body[:2] == b"\x1f\x8b":
@@ -1647,11 +2668,10 @@ def split_event_frames(text: str) -> tuple:
 
 
 def host_coding(done: Reply, ask: Ask, side: str) -> Reply:
-    """Return `done`, an answer a step of B2 wrote as the reference's compress() codes it, as the host of `side` codes it.
+    """Return `done`, an answer a step of the secure defaults wrote as the reference's compress() codes it, as the host of `side` codes it.
 
-    The twin codes no gzip, so its compress() codes deflate where the request
-    names it and nothing otherwise, and writes the length of an answer it does
-    not code, D43, while Bun and workerd code as the reference.
+    The twin codes no gzip, so its compress() codes deflate where the request names it and nothing otherwise, and
+    writes the length of an answer it does not code, while Bun and workerd code as the reference.
     """
     coding = (done.header("content-encoding") or "").strip().lower()
     if side != "rs" or coding not in ("gzip", "deflate"):
@@ -1664,8 +2684,8 @@ def host_coding(done: Reply, ask: Ask, side: str) -> Reply:
     return dataclasses.replace(done, lines=lines + [("content-length", str(len(done.body)))])
 
 
-def d57_host(done: Reply, ask: Ask, side: str, written: bool) -> Reply:
-    """Return the answer `done` of the function on Bun or on workerd with its Content-Length, D57.
+def uncoded_host(done: Reply, ask: Ask, side: str, written: bool) -> Reply:
+    """Return the answer `done` of the function on Bun or on workerd with its Content-Length.
 
     The function writes the length of every answer whose body is a string, so compress() leaves an answer below
     1,024 bytes uncoded with that length where the reference's build codes it: a GraphQL answer, and every answer a
@@ -1692,9 +2712,9 @@ def d57_host(done: Reply, ask: Ask, side: str, written: bool) -> Reply:
     return dataclasses.replace(done, lines=lines + [("content-length", str(len(done.body)))])
 
 
-def d58_batch(reply: Reply, request: dict, ask: Ask) -> Reply:
+def refused_batch(reply: Reply, request: dict, ask: Ask) -> Reply:
     """Return the answer `reply` of an instance in process that runs batching to a batch as the function's refusal,
-    D58, under the type the answer of the instance negotiated."""
+    under the type the answer of the instance negotiated."""
     if request.get("kind") != "yoga" or not batch_refused(request.get("instance") or "",
                                                           (request.get("body") or b"").decode("utf-8", "replace")):
         return reply
@@ -1706,8 +2726,8 @@ def d58_batch(reply: Reply, request: dict, ask: Ask) -> Reply:
     return Reply(400, "Bad Request", lines, BATCH_REFUSAL)
 
 
-def d59_reply(reply: Reply, ask: Ask) -> Reply:
-    """Return the answer `reply` with no answer as multipart/mixed, D59.
+def without_multipart(reply: Reply, ask: Ask) -> Reply:
+    """Return the answer `reply` with no answer as multipart/mixed.
 
     An answer of the processor of multipart/mixed becomes the event stream of
     its parts where the request accepts an event stream and otherwise the 406
@@ -1746,16 +2766,16 @@ def oracle_subscription(ask: Ask) -> bool:
     return root is not None and not root.group(1).startswith("__")
 
 
-def oracle_qd122(reply, ask, keys):
-    """`qd122` for an answer of 27d713a0, whose page of GraphiQL names Aosabi already, D52.
+def oracle_no_graphiql_page(reply, ask, keys):
+    """`no_graphiql_page` for an answer of the old pipeline, whose page of GraphiQL names Aosabi already.
 
-    The 406 of a subscription lists the media types of an event stream alone, the one processor a subscription
-    has, where `qd122` writes the 406 of a query.
+    The 406 of a subscription lists the media types of an event stream alone, the one processor a subscription has,
+    where `no_graphiql_page` writes the 406 of a query.
     """
     probe = reply
     if PLAYGROUND in reply.body:
         probe = dataclasses.replace(reply, body=reply.body.replace(PLAYGROUND, PLAYGROUND_REFERENCE))
-    done = qd122(probe, ask, keys)
+    done = no_graphiql_page(probe, ask, keys)
     if done == probe:
         return reply
     if oracle_subscription(ask):
@@ -1766,8 +2786,8 @@ def oracle_qd122(reply, ask, keys):
     return done
 
 
-#: The steps of `NAMED_STEPS` as the rules run them on an answer of 27d713a0.
-ORACLE_STEPS = tuple((oracle_qd122 if step is qd122 else step, name) for step, name in NAMED_STEPS)
+#: The steps of `NAMED_STEPS` as the rules run them on an answer of the old pipeline.
+ORACLE_STEPS = tuple((oracle_no_graphiql_page if step is no_graphiql_page else step, name) for step, name in NAMED_STEPS)
 
 
 @dataclasses.dataclass
@@ -1779,13 +2799,14 @@ class OracleAnswer:
 
 def oracle_chain(reply: Reply, request: dict, ask: Ask, keys: dict, side: str, names) -> Reply:
     """Return the answer `reply` to `ask` on `side` through the rewrites of the divergences `names` in the order
-    the tree writes them: D58 and D59 of the function, the steps of B2 each coded by the host, the length Bun and
-    workerd frame a rewritten answer with, and D57."""
+    the tree writes them: the batch the function refuses, its answer without multipart/mixed, the steps of the
+    secure defaults each coded by the host, the length Bun and workerd frame a rewritten answer with, and the
+    uncoded small answer."""
     before = reply
-    if "D58" in names:
-        reply = d58_batch(reply, request, ask)
-    if "D59" in names:
-        reply = d59_reply(reply, ask)
+    if "batching" in names:
+        reply = refused_batch(reply, request, ask)
+    if "no-multipart-mixed" in names:
+        reply = without_multipart(reply, ask)
     for step, name in ORACLE_STEPS:
         if name in names:
             done = step(reply, ask, keys)
@@ -1794,16 +2815,23 @@ def oracle_chain(reply: Reply, request: dict, ask: Ask, keys: dict, side: str, n
     written = reply != before
     if written and side in ("bun", "workerd") and ask.served:
         reply = dataclasses.replace(reply, lines=host_length(reply.lines, reply, ask, OracleAnswer(before.lines)))
-    if "D57" in names:
-        reply = d57_host(reply, ask, side, written)
+    if "uncoded-small" in names:
+        reply = uncoded_host(reply, ask, side, written)
     return reply
 
 
-def oracle_served(old: dict, request: dict, names) -> dict | None:
-    """The rewrites of an answer of the kinds `http` and `yoga` and of an answer of HTTP/1.1 inside TLS."""
+def oracle_served(old: dict, request: dict, names, guide: dict | None = None) -> dict | None:
+    """The rewrites of an answer of the kinds `http` and `yoga` and of an answer of HTTP/1.1 inside TLS.
+
+    `unmasked_form` reads each masked error of the old answer as the error at its place of
+    the new answer `guide` before the rewrites of the function, since the
+    engine answers the error.
+    """
     ask = oracle_ask(request)
     if ask is None or old.get("status") is None:
         return None
+    if "unmasked-error" in names and guide is not None and mask_differs(oracle_keys(request)):
+        old = unmasked_form(old, guide)
     side = request.get("side") if request.get("kind") != "h2" else "rs"
     before = oracle_reply(old)
     done = oracle_chain(before, request, ask, oracle_keys(request), side, names)
@@ -1882,6 +2910,10 @@ def wire_bytes(data: bytes, request: dict, names, keys: dict) -> bytes:
             break
         status, reason, fields, wire, head_only, end = message
         reply = Reply(status, reason, fields, message_body(fields, wire) if wire else b"")
+        if head_only and status == 200 and reply.header(HEALTH_FIELD) is not None:
+            # The health check of the reference answers every method alike,
+            # with no body and no length, so its answer reads as one to GET.
+            head_only = False
         ask = wire_ask(reply, head_only)
         done = oracle_chain(reply, request, ask, keys, "rs", names)
         if done == reply:
@@ -1917,9 +2949,9 @@ def h2_requests_line(streams: dict) -> str:
 
 
 def oracle_h2_case(old: dict, request: dict, names) -> dict:
-    """The rewrites of a case of the frames of HTTP/2 of 33_http_hardening: the fields and the body of each
-    stream the server answered, in the record the oracle writes as JSON with its keys sorted, and the entry of
-    `unmet` that names the bodies."""
+    """The rewrites of a case of the frames of HTTP/2: the fields and the body of each stream the server
+    answered, in the record the oracle writes as JSON with its keys sorted, and the entry of `unmet` that
+    names the bodies."""
     judged = json.loads((old.get("body") or b"{}").decode("utf-8", "surrogateescape"))
     streams = judged.get("streams") if isinstance(judged, dict) else None
     if not isinstance(streams, dict):
@@ -1968,9 +3000,41 @@ def oracle_h2(old: dict, request: dict, names) -> dict | None:
                                            body=coded_body(done.body, done.header("content-encoding")))
 
 
+#: The first word of a line the logger of the old pipeline wrote below the message of a located error, its excerpt
+#: of the source per location: the name of the source, `GraphQL request`, a line number or a prefix padded with
+#: blanks.
+EXCERPT_WORD = re.compile(r"GraphQL|[0-9]+|")
+
+
+def log_without_excerpts(form: dict) -> dict:
+    """Return the compared form `form` of a log of the old pipeline with the excerpts of its errors gone.
+
+    The logger of the tree writes a thrown error as the first line of its
+    stack, one line that opens with ERR, where the logger of the old pipeline wrote
+    an excerpt of the source per location below a located error, so each
+    word of an excerpt line after a word ERR of the verdict leaves.
+    """
+    verdict = form.get("verdict")
+    if not verdict:
+        return form
+    out, inside = [], False
+    for word in verdict.split(" "):
+        if word == "ERR":
+            inside = True
+        elif inside and EXCERPT_WORD.fullmatch(word):
+            continue
+        else:
+            inside = False
+        out.append(word)
+    done = " ".join(out)
+    return form if done == verdict else dict(form, verdict=done)
+
+
 def oracle_log(old: dict, request: dict, names) -> dict:
-    """The rewrites of the answers of the requests of a log, each a request of GET the answer names as
-    `wire_ask` reads it."""
+    """The rewrites of a log: its verdict through `log_without_excerpts`, and the answers of its requests, each a
+    request of GET the answer names as `wire_ask` reads it."""
+    if STACK_LINE in names:
+        old = log_without_excerpts(old)
     follow = old.get("follow")
     if not isinstance(follow, list):
         return old
@@ -1988,10 +3052,10 @@ def oracle_log(old: dict, request: dict, names) -> dict:
 
 
 def oracle_front(old: dict, request: dict, names) -> dict:
-    """The rewrites of an answer of a front of the federation to an upload, D49: where the old front forwarded a
-    multipart body, the function of the new front refuses it and forwards nothing."""
+    """The rewrites of an answer of a front of the federation to an upload: where the old front forwarded a multipart
+    body, the function of the new front refuses it and forwards nothing."""
     upstream = old.get("upstream")
-    if "D49" not in names or not isinstance(upstream, dict) or old.get("status") is None:
+    if "multipart" not in names or not isinstance(upstream, dict) or old.get("status") is None:
         return old
     sent = [call for calls in upstream.values() for call in (calls or [])]
     if not any((value or "").startswith("multipart/form-data") for call in sent
@@ -2009,37 +3073,44 @@ def oracle_front(old: dict, request: dict, names) -> dict:
 
 
 def oracle_graphtp(old: dict, request: dict, names) -> dict:
-    """The rewrites of an answer of GraphTP to a batch, D58: the refusal of the function, status 400 with the
-    substatus 6, uncoded."""
+    """The rewrites of an answer of GraphTP to a batch: the refusal of the function, status 400 with the substatus 6,
+    uncoded."""
     body = (request.get("body") or b"").decode("utf-8", "replace")
-    if "D58" not in names or not batch_refused(request.get("instance") or "", body):
+    if "batching" not in names or not batch_refused(request.get("instance") or "", body):
         return old
     headers = dict(old.get("headers", {}), substatus=["6"], coding=["plain"])
     return dict(old, status=400, headers=headers, body=BATCH_REFUSAL)
 
 
-def oracle_rewrite(old: dict, request: dict, names) -> dict | None:
+def oracle_rewrite(old: dict, request: dict, names, guide: dict | None = None) -> dict | None:
     """Return the old answer `old` to the request `request` through the rewrites of the divergences `names`.
 
-    None stands for a request or an answer no rewrite reads.
+    None stands for a request or an answer no rewrite reads. The new answer
+    `guide` guides the reading of a masked error, and an answer of the kind `ingest`, an answer whose
+    run counts the envelopes of Sentry, reads as a served answer.
     """
     kind = request.get("kind")
-    rewrite = {"http": oracle_served, "yoga": oracle_served, "h2": oracle_h2, "wire": oracle_wire,
-               "log": oracle_log, "front": oracle_front, "graphtp": oracle_graphtp}.get(kind)
+    rewrite = {"http": oracle_served, "yoga": oracle_served, "ingest": oracle_served, "h2": oracle_h2,
+               "wire": oracle_wire, "log": oracle_log, "front": oracle_front,
+               "graphtp": oracle_graphtp}.get(kind)
     if rewrite is None:
         return None
     try:
+        if rewrite is oracle_served:
+            return oracle_served(old, request, names, guide)
+        if kind in ("front", "log") and "unmasked-error" in names and guide is not None and mask_differs(oracle_keys(request)):
+            old = unmasked_log(old, guide) if kind == "log" else unmasked_form(old, guide)
         return rewrite(old, request, names)
     except (ValueError, KeyError, IndexError, StopIteration, TypeError, AttributeError, zlib.error):
         return None
 
 
 def bun_refused_origin(request: dict, old: dict, new: dict) -> bool:
-    """Return whether the old answer is the 500 of the glue of Bun to an `Origin` outside ASCII, D46.
+    """Return whether the old answer is the 500 of the glue of Bun to an `Origin` outside ASCII.
 
-    The engine of 27d713a0 echoes the origin into a field, which Bun refuses
-    as a value outside ASCII, so the app's fetch rejects. The engine of the
-    tree answers no CORS, and the new answer carries no field of CORS.
+    The engine of the old pipeline echoes the origin into a field, which Bun
+    refuses as a value outside ASCII, so the app's fetch rejects. The engine of
+    the tree answers no CORS, and the new answer carries no field of CORS.
     """
     if request.get("side") != "bun" or old.get("status") != 500:
         return False
@@ -2055,13 +3126,13 @@ def bun_refused_origin(request: dict, old: dict, new: dict) -> bool:
 
 def oracle_rule(name: str):
     """Return the rule of `ORACLE` for the divergence `name`."""
-    later = tuple(entry for entry in ORACLE_NAMES if entry >= name)
+    later = ORACLE_NAMES[ORACLE_NAMES.index(name):]
 
     def rule(request: dict, old: dict, new: dict):
-        if name == "D46" and bun_refused_origin(request, old, new):
+        if name == "cors-plugin" and bun_refused_origin(request, old, new):
             return old
-        want = oracle_rewrite(old, request, later)
-        back = oracle_rewrite(old, request, later[1:])
+        want = oracle_rewrite(old, request, later, new)
+        back = oracle_rewrite(old, request, later[1:], new)
         if want is None or back is None:
             return None
         wanted, left = oracle_view(want, old), oracle_view(back, old)
@@ -2069,10 +3140,10 @@ def oracle_rule(name: str):
             return None
         return old if left == oracle_view(old, old) else back
 
-    rule.__name__ = rule.__qualname__ = "oracle_" + name
+    rule.__name__ = rule.__qualname__ = "oracle_" + name.replace("-", "_")
     rule.__doc__ = "The rule of the oracle for %s, `oracle_rule`." % name
     return rule
 
 
-#: The rules of the oracle of lane A for the divergences of this module, by name.
+#: The rules of the oracle for the divergences of this module, by name.
 ORACLE = {name: oracle_rule(name) for name in ORACLE_NAMES}

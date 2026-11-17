@@ -14,10 +14,10 @@
 //!   [`SINGLE_BOXES`] boxes of the graph and the split layout above. The
 //!   single layout writes every page into `API.md`, and the split layout
 //!   writes the home page as `README.md` and every other page under `md/`,
-//!   each file named by [󰀅](crate::render_markdown::page_path). The single
-//!   layout gives a type no neighbourhood diagram, since the overview shows
-//!   every type at that size, so it leaves the diagram blocks of a type page
-//!   out in every format.
+//!   each file named by [`page_path`](crate::render_markdown::page_path). The
+//!   single layout gives a type no neighbourhood diagram, since the overview
+//!   shows every type at that size, so it leaves the diagram blocks of a type
+//!   page out in every format.
 //! - **The pages.** The home page, the root pages in the order Query,
 //!   Mutation, Subscription, then per cluster in the order of the clustering
 //!   its page and the pages of its types, then the types no cluster holds in
@@ -32,7 +32,11 @@
 //!   `typ/81-scalars.typ`, `typ/82-unreachable.typ`, `typ/83-deprecated.typ`
 //!   and `typ/99-index.typ`, so the byte order of the paths is the order
 //!   `api.typ` includes them in. The cluster number counts from 1 with two
-//!   digits, or with as many as the count of the cluster chapters needs.
+//!   digits, or with as many as the count of the cluster chapters needs. The
+//!   device cards write `typ/05-device.typ` and
+//!   [`seal_tree`](super::seal_tree) takes it in, and
+//!   [`render_tree`](super::render_tree) writes `typ/90-changes.typ` with the
+//!   change log.
 //! - **The drawings.** One file per diagram a page draws and per theme,
 //!   `svg/overview.<theme>.svg`, `svg/type/<Name>.<theme>.svg`,
 //!   `svg/op/<root>.<field>.<theme>.svg` and `svg/cluster/<slug>.<theme>.svg`,
@@ -104,8 +108,7 @@ pub const SINGLE_BOXES: usize = 40;
 /// The types above which the index and the search file split by first letter.
 pub const LETTER_TYPES: u32 = 2000;
 
-/// The clusters a cluster map holds at most, as `docs/aoviewer.md` section 5.5
-/// derives it from the size cap.
+/// The clusters a cluster map holds at most, which the size cap derives.
 const MAP_BOXES: usize = 120;
 
 /// The fewest digits of the number of a cluster chapter.
@@ -730,7 +733,7 @@ impl<'a> Site<'a> {
         let clusters = self.clustering.clusters.len();
         if clusters > MAP_BOXES {
             self.notes.push(format!(
-                "The cluster map holds {clusters} clusters, more than the {MAP_BOXES} boxes docs/aoviewer.md section 5.5 bounds it to."
+                "The cluster map holds {clusters} clusters, more than its bound of {MAP_BOXES} boxes."
             ));
         }
     }

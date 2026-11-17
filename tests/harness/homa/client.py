@@ -1,17 +1,15 @@
 # SPDX-License-Identifier: MIT
 """The Homa engine of the notebooks, the compact form in Python, written from its design.
 
-The second engine of every Homa exchange of the track, sharing no code with the
+The second engine of every Homa exchange of the tests, sharing no code with the
 crate `homa`: the notebooks drive the crate's engine against this one in both
 directions, so a byte the Rust engine answers a Python request with and a byte
 the Python engine answers a Rust request with are judged against the bytes each
 side was asked to carry. It imports nothing outside the standard library and
 the references of this package, so `tests/pyproject.toml` gains no package.
 
-The rules are those of the Homa design note, first version, section 2.4, with
-the additions of its section 1.5, the report of `RPC_UNKNOWN` that
-`docs/graphtp.md` section 2.7 asks of Homa, and the values of a link of its
-section 3.1:
+The rules are these, with the report of `RPC_UNKNOWN` that GraphTP asks of Homa
+and the values of a link:
 
 - A message states its length in its first packet, a whole message of one
   packet carries a header of 6 bytes and a part of a longer one 14, and the
@@ -39,11 +37,17 @@ section 3.1:
   `rpc_timeout` is dead: every client RPC fails `PeerTimeout` and every server
   RPC is dropped.
 
-The full form of stage H4 runs the same engine with `form="full"` over a raw
-socket of IP protocol 146, which needs `CAP_NET_RAW` and so runs as root in a
-guest or in a namespace of its own, for the interop half of `29_homa_raw`
-against HomaModule and the crate. It follows the Network profile of the design
-note's second version, section 3.2, with the defaults of HomaModule at commit
+The engine carries both roles, a client with `request` and a server with a
+responder, over one of three transports, a `SOCK_SEQPACKET` socket whose every
+record is one packet, a stream socket in prefixed AoFrame and a pty in
+delimited AoFrame, each with a hook that drops, duplicates or damages a
+packet on its way out or in, which the notebooks and the loss shim of a later
+release use.
+
+The full form runs the same engine with `form="full"` over a raw socket of IP
+protocol 146, which needs `CAP_NET_RAW` and so runs as root in a guest or in a
+namespace of its own, for the interop runs against HomaModule and the crate. It
+follows the Network profile, with the defaults of HomaModule at commit
 50d65305: the ports of both ends in every packet, identifiers of 64 bits, a
 DATA header of 56 bytes, no LIMITS, since the full form has none and each end
 takes the other's limits from the profile, the scheduling all or nothing of
@@ -61,6 +65,7 @@ import os
 import random
 import select
 import socket
+import subprocess
 import time
 
 from . import aoframe, compact, full
@@ -1186,13 +1191,49 @@ def open_transport(form, target, max_packet, hook=None):
     raise ValueError("no transport is named %r" % form)
 
 
-def wait_for(path, timeout=10.0):
-    """Wait until a socket file exists at `path`."""
+def wait_for(path, timeout=10.0, process=None, log=None):
+    """Wait until a socket file exists at `path`.
+
+    With `process`, the server that binds the socket, the wait ends as soon as
+    that process has exited, and the error carries its exit code and the end
+    of its standard error, read from its pipe or from the file `log` where its
+    standard error goes to a file.
+    """
     deadline = time.monotonic() + timeout
     while not os.path.exists(path):
+        if process is not None and process.poll() is not None:
+            raise RuntimeError("no socket appeared at %s, its server exited with code %s: %s"
+                               % (path, process.returncode, stderr_tail(process, log)))
         if time.monotonic() > deadline:
             raise TimeoutError("no socket appeared at %s" % path)
         time.sleep(0.005)
+
+
+def stderr_tail(process, log=None, size=600):
+    """The last `size` characters of the standard error of the exited `process`.
+
+    They come from the file `log` when one is given and otherwise from the
+    pipe of the process, which this reads to its end. A later `communicate()`
+    of the caller answers the same text again.
+    """
+    if log is not None:
+        try:
+            with open(log, "rb") as fh:
+                fh.seek(0, os.SEEK_END)
+                fh.seek(max(0, fh.tell() - 4 * size))
+                text = fh.read().decode("utf-8", "replace")
+        except OSError as error:
+            return "its log %s cannot be read, %s" % (log, error)
+    elif process.stderr is not None:
+        try:
+            _, text = process.communicate(timeout=5.0)
+        except subprocess.TimeoutExpired:
+            return "its standard error is still open"
+        if isinstance(text, bytes):
+            text = text.decode("utf-8", "replace")
+    else:
+        return "its standard error is no pipe and no log was given"
+    return (text or "").strip()[-size:] or "its standard error is empty"
 
 
 def run_requests(engine, messages, window=4, timeout=60.0, patient=False, report_unknown=False,
@@ -1273,8 +1314,9 @@ class Server:
 
 class BaselineClient:
     """AoFrame alone: whole messages each in one prefixed frame, first in
-    first out, the baseline of ADR-0023, over a stream socket or over the
-    records of a `SOCK_SEQPACKET` socket of at most `max_packet` bytes each.
+    first out, the baseline Homa is measured against, over a stream socket or
+    over the records of a `SOCK_SEQPACKET` socket of at most `max_packet`
+    bytes each.
     """
 
     def __init__(self, form, path, max_packet, max_message):

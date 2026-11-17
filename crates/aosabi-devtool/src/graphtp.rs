@@ -6,10 +6,10 @@
  *
  * No analogue in the reference. The primitive is the notebooks' one door to the
  * codec, the status mapping, the stream bodies and the DEFLATE core of the crate
- * graphtp, and its requests follow the messages of docs/graphtp.md section 5, the
- * stream bodies of section 2.4 and the coding of section 3. The zlib wrapper of
- * HTTP in aosabi-http codes through that core, so the same door reaches it. The
- * same door reaches the substatus the port of Yoga decides beside the status.
+ * graphtp, and its requests follow Documentation/guides/graphtp.md for the
+ * messages, the stream bodies and the coding. The zlib wrapper of HTTP in
+ * aosabi-http codes through that core, so the same door reaches it. The same door
+ * reaches the substatus the port of Yoga decides beside the status.
  */
 
 //! The primitive `graphtp` of the seam.
@@ -29,7 +29,7 @@
 //!   answers `hex`, the head written through a sink, or null for a version or a
 //!   kind that has no value.
 //! - The operation `read-request-head {hex}` answers `head` with its four
-//!   fields, or `refused` with the code of the rule of section 5.3 the message
+//!   fields, or `refused` with the code of the rule the message
 //!   breaks.
 //! - The operation `answer-head {status, substatus}` answers `hex`, the head
 //!   written through a sink, or null for a status that has no byte.
@@ -37,10 +37,9 @@
 //!   of the head and the `coding` of the body after it, or `malformed` with the
 //!   reason the answer is malformed.
 //! - The operation `credential {hex, max_credential}` answers `credential`,
-//!   the bytes it accepts, or `refused` with the code of rule 6 or 7 of section
-//!   5.3.
+//!   the bytes it accepts, or `refused` with the code of the check it breaks.
 //! - The operation `registry {}` answers `codes`, the constants of the registry
-//!   of section 2.5 with their codes and names.
+//!   with their codes and names.
 //! - The operation `deflate {hex, window_bits, heads, tokens, buffer, chunk,
 //!   raw}` codes the plain bytes of `hex` through the streaming encoder and
 //!   answers `hex`, the coded bytes, and `scratch`, the bytes of the scratch.
@@ -56,7 +55,7 @@
 //!   with the code of the refusal and `error` with its reason. Raw DEFLATE data
 //!   answers `consumed` beside `hex`, and a refusal of it `error` alone.
 //! - The operation `check-header {cmf, flg}` answers `ok` for a zlib header of
-//!   the profile, or `refused` with the code of rule 9 of section 5.3.
+//!   the profile, or `refused` with the code of the check it breaks.
 //! - The operation `adler32 {hex}` answers `adler32`, the Adler-32 of the
 //!   bytes.
 //! - The operation `http-coding {coding, hex, window_bits, heads, tokens,
@@ -74,10 +73,10 @@
 //! - The operation `read-request {hex, max_credential, max_content}` answers
 //!   the request with its `kind`, and for an OPERATION its `credential`, the
 //!   `coding` it travelled in and its `content` decoded, and for a CANCEL its
-//!   `handle`, or `refused` with the code of the first of the 11 rules of
-//!   section 5.3 it breaks, rules 1 to 9 through `wire::decode_request` and
-//!   rules 10 and 11 through `wire::decode_content` under `max_content`. The
-//!   bounds default to 65,535 and 1 MiB.
+//!   `handle`, or `refused` with the code of the first of the 11 rules
+//!   it breaks, through `wire::decode_request` and
+//!   `wire::decode_content` under `max_content`. The bounds default to 65,535
+//!   and 1 MiB.
 //! - The operation `write-answer {status, substatus, body}` writes a whole
 //!   answer, its body coded at >128 B, and answers `hex`, or null for a
 //!   status that has no byte.
@@ -223,8 +222,8 @@ mod card {
 /// The name of the primitive.
 const NAME: &str = "graphtp";
 
-/// The milestone the primitive lands at, track B.
-const LANDS_AT: &str = "M12";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "graphtp";
 
 /// The operations the batch form answers, by the `op` that names each.
 const OPERATIONS: &Operations = &[
@@ -263,7 +262,7 @@ const DEFAULT_MAX_CONTENT: u64 = 1 << 20;
 /// none, 16 MiB.
 const DEFAULT_BOUND: u64 = 1 << 24;
 
-/// The constants of the registry of `docs/graphtp.md` section 2.5, by the name
+/// The constants of the registry of `Documentation/guides/graphtp.md`, by the name
 /// each carries in the crate.
 const REGISTRY: &[(&str, Code)] = &[
     ("OK", Code::OK),

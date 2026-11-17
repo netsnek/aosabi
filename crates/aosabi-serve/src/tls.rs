@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: TLS over rustls, offering h2 and http/1.1 through ALPN.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The file reads a certificate chain of any
+ * CA and its key from two files.
  */
 
 //! `TlsConfig` and `TlsStream`.
@@ -11,12 +12,15 @@
 //! intermediates after it, and a private key as PKCS#1, PKCS#8 or SEC1, RSA or
 //! ECDSA, both PEM files of any CA: a Cloudflare Origin CA certificate behind
 //! Cloudflare, or a public one such as the `fullchain.pem` and `privkey.pem`
-//! certbot writes for browsers that reach the card directly. The settings are
-//! TLS 1.3 alone with the cipher suites of the provider `ring`, no client
-//! certificates, one chain whatever SNI a client sends, and ALPN `h2` and
-//! `http/1.1`, so a client that offers ALPN with neither protocol is refused in
-//! the handshake with the alert `no_application_protocol` and one that offers
-//! none is served without it.
+//! certbot writes for browsers that reach the card directly. The serve step
+//! reads the two paths from `AOSABI_TLS_CERT` and `AOSABI_TLS_KEY` until the
+//! card file names them. The settings are TLS 1.3 alone with the cipher suites
+//! of the provider `ring`, no client certificates, one chain whatever SNI a
+//! client sends, and ALPN `h2` and `http/1.1`, so a client that offers ALPN with
+//! neither protocol is refused in the handshake with the alert
+//! `no_application_protocol` and one that offers none is served without it. The
+//! card speaks TLS 1.3 alone, so a client held at TLS 1.2 is refused in the
+//! handshake with the alert `protocol_version`.
 //!
 //! The stream runs a `rustls::ServerConnection` over a socket of the runtime,
 //! sans IO, through `read_tls`, `process_new_packets`, `reader`, `writer` and
@@ -80,7 +84,9 @@ pub const KEY_ENV: &str = "AOSABI_TLS_KEY";
 pub const ALPN: [&[u8]; 2] = [b"h2", b"http/1.1"];
 
 /// The time a handshake may take from the accept, the default `handshakeTimeout`
-/// of Node's TLS server, 120,000 ms.
+/// of Node's TLS server, 120,000 ms. Node arms it as the timeout of the TLS
+/// socket at its creation and clears it when the handshake ends, and no byte of
+/// the handshake is taken to arm it again.
 pub const HANDSHAKE_TIMEOUT: Duration = Duration::from_mins(2);
 
 /// The plaintext bytes one read takes at most.
@@ -400,8 +406,13 @@ impl<S: Socket + Unpin> hyper::rt::Write for TlsStream<S> {
 
     fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         let this = self.get_mut();
+        // The TLS bytes rustls holds go out first, an alert among them, and
+        // the error the connection met before answers after them.
+        if this.poll_flush_tls(cx)?.is_pending() {
+            return Poll::Pending;
+        }
         this.conn.writer().flush()?;
-        this.poll_flush_tls(cx)
+        Poll::Ready(Ok(()))
     }
 
     fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {

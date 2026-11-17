@@ -4,9 +4,11 @@
  * typescript, the import object aosabi_host whose every function answers one method of the
  * trait TypeSource of the crate aosabi-infer.
  *
- * A type, a symbol and a call signature cross as a handle of one table each, which hands out one
- * handle per object, so two handles are equal where the objects are, the identity of a Map key of
- * the inference.
+ * Each function makes the call of the checker that the method doc of
+ * crates/aosabi-infer/src/type_source.rs of the Aosabi repository names, on the program and the
+ * checker the step aosabi build made with the compiler options of Pylon's builder. A type, a symbol
+ * and a call signature cross as a handle of one table each, which hands out one handle per object,
+ * so two handles are equal where the objects are, the identity of a Map key of the inference.
  */
 
 import ts from 'typescript'

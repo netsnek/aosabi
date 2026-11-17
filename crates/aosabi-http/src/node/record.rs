@@ -2,23 +2,25 @@
 /*
  * aosabi-http: the record of the Node adapter over neutral lines.
  *
- * Derived from hono 1.19.9, dist/utils.js, MIT.
- * Derived from hono 1.19.9, dist/listener.js, MIT.
+ * The cached path writes Content-Length with capitals and the object path
+ * writes content-length in lower case.
  *
- * It carries the half of aosabi-http of the quirk Q49_NODE_ADAPTER_RECORD of
- * docs/byte-equality.md section 13.1.
+ * Derived from @hono/node-server 1.19.9, dist/utils.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
+ *
+ * It carries the half of aosabi-http of the quirk NODE_ADAPTER_RECORD.
  */
 
 //! The record of the Node adapter.
 //!
 //! The adapter hands `writeHead` a plain object, its record, and Node writes
 //! one line per key of that object in the order `Object.keys` gives, one line
-//! per element of an array value (N2 of the plan's version 2 draft). The
-//! adapter builds the record from the Fetch `Headers` of the answer in their
-//! iteration order, the names in lower case, sorted and combined, collects
-//! every `set-cookie` value apart and appends them after every other name,
-//! then appends `content-type: text/plain; charset=UTF-8` when no
-//! `content-type` was set (A1, quirk `Q49_NODE_ADAPTER_RECORD`). The cached
+//! per element of an array value. The adapter builds the record from the Fetch
+//! `Headers` of the answer in their iteration order, the names in lower case,
+//! sorted and combined, collects every `set-cookie` value apart and appends
+//! them after every other name, then appends
+//! `content-type: text/plain; charset=UTF-8` when no
+//! `content-type` was set (A1, quirk `NODE_ADAPTER_RECORD`). The cached
 //! path appends `Content-Length` with capitals and the object path
 //! `content-length` in lower case, each after the record (A2 and A4).
 //!

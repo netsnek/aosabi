@@ -2,11 +2,13 @@
 /*
  * aosabi-scalars: the error a scalar hook throws.
  *
- * The RangeError beside it is not from that file: it is the error V8 throws
- * from Date.prototype.toISOString, which the DateTimeISO serialize hook lets
+ * Derived from graphql-scalars 1.25.0, MIT.
+ *
+ * The RangeError of this file is the error V8 throws from
+ * Date.prototype.toISOString, which the DateTimeISO serialize hook lets
  * through untouched.
  *
- * Derived from graphql-scalars 1.25.0, ., MIT.
+ * Derived from graphql-scalars 1.25.0, esm/error.js, MIT.
  */
 
 //! The errors of the scalar hooks.
@@ -49,10 +51,10 @@ pub fn nodes_option(ast: &ValueNode) -> GraphQLErrorOptions {
 /// The `RangeError` V8 throws from `Date.prototype.toISOString`.
 ///
 /// ECMA-262 says only that a `RangeError` is thrown when the time value is
-/// not finite. The message text is V8's own, `Invalid time value`, and
-/// capture row C37 of docs/byte-equality.md pins it. The execution layer
-/// copies `message` into the located error it reports, so the display form is
-/// the message alone.
+/// not finite. The message text is V8's own, `Invalid time value`, and the
+/// recorded answers of the reference pin it. The execution layer copies
+/// `message` into the located error it reports, so the display form is the
+/// message alone.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RangeError {
     message: String,

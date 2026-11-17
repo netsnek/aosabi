@@ -3,7 +3,11 @@
  * aosabi-js abi: the exports of the module and of the native library, and the
  * one import block of the functions of the host.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The export lines take the pattern of a probe of
+ * the Worker, and the import block the form the probes of the option compiled
+ * under deny(unsafe_code), the two exceptions to the lint of unsafe. The native
+ * library takes the export lines as they are and the functions of the host as
+ * typed function pointers at boot in place of the import block.
  */
 
 //! The exports the wrapper calls and the functions of the host the engine

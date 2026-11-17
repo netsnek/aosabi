@@ -3,25 +3,39 @@
  * pylon.d.ts: the types of the entry aosabi/pylon of the package, Pylon's names and shapes under
  * Aosabi's own names for the names of lib/pylon.js.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, its source, Apache-2.0.
+ * Derived from Pylon 3.0.0-canary by Nico Schett, its source, Apache-2.0.
  * Changed by the Aosabi authors.
  *
- * Every declaration is Pylon's. This file re-exports the names lib/pylon.js exports and the types of
- * their shapes, and no other name, so a name whose engine item is missing stays undeclared here:
- * asyncContext, renderLine, jobLogLevel and IN_CONTEXT_SDL. The cookie helpers are hono's own, the
- * signed forms among them, which Pylon's root re-exports from hono/cookie. The declaration of
- * experimentalCreatePubSub is the one of Pylon's root, createPubSub of graphql-yoga, whose topics
- * the engine keeps in its own pub sub.
+ * Every declaration is Pylon's. The folder types/pylon/ holds the declaration files of Pylon's root as
+ * the declaration build of its package emits them at 2653a81, as Pylon's vendored literals, Apache-2.0,
+ * with the class Pylon named App and the configuration and its kin under Aosabi's own names, AppConfig
+ * among them. This file re-exports the names lib/pylon.js exports and the types of their shapes, and no
+ * other name, so a name whose engine item is missing stays undeclared here: asyncContext, renderLine,
+ * jobLogLevel and IN_CONTEXT_SDL. The cookie helpers are hono's own, the signed forms among them, which
+ * Pylon's root re-exports from hono/cookie. The gateway, createGateway, pass and passthrough with the
+ * types FieldPolicy and PatchPolicy, is declared with the declarations of types/pylon/core/gateway.d.ts,
+ * since its markers run over the federation of the engine. The declaration of experimentalCreatePubSub is
+ * the one of Pylon's root, createPubSub of graphql-yoga, whose topics the engine keeps in its own pub
+ * sub. The declarations import hono, graphql, graphql-yoga and the other packages Pylon depends on by
+ * their bare specifiers, as Pylon's declarations do: hono is the peer of the package, and the package
+ * names none of the others as a dependency, so the author mode judges how its checker reads them.
  *
  * The three names requireAuth, authMiddleware and useAuth of the root of Pylon's canary
  * 3.0.0-canary-20260206115650, which lib/canary.js exports for an app that build makes, are
  * declared at the end of this file in the package's own words after the declarations of the
  * canary's dist/plugins/use-auth/auth-require.d.ts and use-auth.d.ts, which no tree of Aosabi
- * vendors (docs/ts1-surface.md of the Aosabi repository, section 11).
+ * vendors. The options of useAuth take
+ * the key cookieName beside the canary's, the name of its session cookie.
+ *
+ * The configuration AppConfig is declared in this file as the AppConfig of types/pylon/core, which
+ * carries the keys introspection and maskedErrors of Aosabi in the place of the two keys of Pylon's pages
+ * for development, which no build of Aosabi serves, with the key maxTokens of Aosabi beside them, which
+ * lib/core.js writes into the boot record of the engine, and AppConfigFactory and defineConfig take that
+ * configuration, so an app sets the key in aosabi.config.ts under the checker.
  */
 
 import type { MiddlewareHandler } from 'hono'
-import type { Env, Plugin } from './types/pylon/core/index.js'
+import type { AppConfig as PylonAppConfig, Env, Plugin } from './types/pylon/core/index.js'
 
 export {
   App,
@@ -45,7 +59,6 @@ export {
   createLogger,
   useNodeServer,
   useSentry,
-  defineConfig,
   getCookie,
   getSignedCookie,
   setCookie,
@@ -57,14 +70,14 @@ export {
   passthrough,
 } from './types/pylon/core/index.js'
 
-// The names of graphql-yoga an app imports beside Pylon, which the root aosabi re-exports, where
-// aosabi migrate points the specifier graphql-yoga. The class Repeater comes from the declaration
-// file of @repeaterjs/repeater 3.0.6 under types/@repeaterjs/repeater/, which tools/provenance
-// writes as a vendored literal of @repeaterjs/repeater, MIT, so the checker of the step aosabi build
-// finds the type a subscription of an app annotates in a file whose name holds @repeaterjs, the test
-// of Pylon's inference for a stream, and the values createGraphQLError and createPubSub and the type
-// YogaInitialContext, the context Yoga hands a plugin, are re-exported from graphql-yoga by its bare
-// specifier, as the declarations of Pylon under types/pylon/ import it.
+// The names of graphql-yoga an app imports beside Pylon, which the root aosabi re-exports, where aosabi
+// migrate points the specifier graphql-yoga. The class Repeater comes from the declaration file of
+// @repeaterjs/repeater 3.0.6 under types/@repeaterjs/repeater/, a vendored literal of
+// @repeaterjs/repeater, MIT, so the checker of the step aosabi build finds the type a subscription of an
+// app annotates in a file whose name holds @repeaterjs, the test of Pylon's inference for a stream, and
+// the values createGraphQLError and createPubSub and the type YogaInitialContext, the context Yoga hands
+// a plugin, are re-exported from graphql-yoga by its bare specifier, as the declarations of Pylon under
+// types/pylon/ import it.
 export { Repeater } from './types/@repeaterjs/repeater/repeater.js'
 export { createGraphQLError, createPubSub } from 'graphql-yoga'
 export type { YogaInitialContext } from 'graphql-yoga'
@@ -91,14 +104,30 @@ export type {
   Role,
   PluginRole,
   Plugin,
-  AppConfig,
-  AppConfigFactory,
   ID,
   Int,
   Float,
   FieldPolicy,
   PatchPolicy,
 } from './types/pylon/core/index.js'
+
+/**
+ * The configuration of an app, the keys of the AppConfig of types/pylon/core and maxTokens, a key of
+ * Aosabi: the cap on the tokens of a request document, which every parse of a request document of
+ * the app takes, 120,008 where the configuration leaves it out. A document of more tokens answers
+ * the syntax error the parser of graphql-js answers under a maxTokens of the same value. The cap is a
+ * whole number from 0 to 4294967295, and any other value fails the boot of the app, null among them,
+ * since no value lifts the cap.
+ */
+export type AppConfig = PylonAppConfig & {
+  maxTokens?: number
+}
+
+/** A factory of the configuration, which may answer a promise of it. */
+export type AppConfigFactory = () => AppConfig | Promise<AppConfig>
+
+/** Answers the configuration or the factory of one as it is, for aosabi.config.ts. */
+export declare function defineConfig(config: AppConfig | AppConfigFactory): AppConfig | AppConfigFactory
 
 /** The checks of requireAuth and authMiddleware of Pylon's canary, the roles a user must hold one of. */
 export type AuthRequireChecks = {
@@ -114,5 +143,17 @@ export declare function requireAuth(checks?: AuthRequireChecks): {
   <T>(fn: T): T
 }
 
-/** The plugin of Pylon's canary that sets the auth state of a request and mounts the routes under `endpoint`. */
-export declare function useAuth(args: {issuer: string; endpoint?: string; keyPath?: string}): Plugin
+/**
+ * The plugin of Pylon's canary that sets the auth state of a request and mounts the routes under
+ * `endpoint`. The key `cookieName` names the session cookie its middleware reads and its logout deletes,
+ * `aosabi-auth` where the options name none or the empty name, as the options of aosabi/auth/zitadel name
+ * it. A name outside the token that RFC 6265 takes as a cookie name throws a TypeError that names the key
+ * when useAuth is called, and the logout deletes a name with the prefix `__Secure-` or `__Host-` with
+ * `Secure`.
+ */
+export declare function useAuth(args: {
+  issuer: string
+  endpoint?: string
+  keyPath?: string
+  cookieName?: string
+}): Plugin

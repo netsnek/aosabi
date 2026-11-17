@@ -5,10 +5,11 @@
  * The digits of step 5 come from the port of Ryu in number/shortest.rs and
  * number/table.rs, and an integer of at least 1 and below 2^53 in magnitude,
  * read from its bits, takes its own digits without Ryu. The notation of steps
- * 6 to 10 is a translation of ryu-js 1.0.3 src/pretty/mod.rs:55-121,
- * https://docs.rs/crate/ryu-js/1.0.3/source/src/pretty/mod.rs, the Rust
- * translation of Ryu by Ulf Adams, which carries the notice of Ryu under
- * Apache-2.0 OR BSL-1.0, reproduced in NOTICE section 4.
+ * 6 to 10 is a translation of ryu-js, the Rust translation of Ryu by Ulf
+ * Adams, which carries the notice of Ryu under Apache-2.0 OR BSL-1.0, given in
+ * the entry Ryu and ryu-js of NOTICE.
+ *
+ * Derived from ryu-js 1.0.3, src/pretty/mod.rs, Apache-2.0 OR BSL-1.0.
  */
 
 //! The number half of the byte contract.

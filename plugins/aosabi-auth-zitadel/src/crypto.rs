@@ -5,7 +5,9 @@
  * No analogue on the reference side, where the WebCrypto of Node signs with
  * RSASSA-PKCS1-v1_5 and SHA-256 and digests with SHA-256. The feature
  * host-crypto takes both from the host the crate runs in, the crypto of Bun or
- * of Cloudflare, through the functions the host installs, on any target.
+ * of Cloudflare, through the functions the host installs, on any target. Else
+ * on a target of cfg(unix) with the feature ring, a default, both run over
+ * ring, and elsewhere a call answers a thrown TypeError.
  */
 
 //! `sign_rs256`, `sha256`, `import_private_key`, the hidden `verify_rs256`,
@@ -64,7 +66,7 @@ use crate::oidc::errors::UnsupportedOperationError;
 
 /// The message every call answers on a target with no signer.
 #[cfg(not(all(unix, feature = "ring", not(feature = "host-crypto"))))]
-const NO_CRYPTO: &str = "crypto is not available on this card until M12";
+const NO_CRYPTO: &str = "crypto is not available on this card until a later release";
 
 /// The `CryptoKey` of a private RSA key for `RSASSA-PKCS1-v1_5` with SHA-256.
 #[cfg(all(unix, feature = "ring", not(feature = "host-crypto")))]
@@ -307,6 +309,8 @@ fn modulus_bits(der: &[u8]) -> Option<usize> {
 /// Answers the `TypeError` of rule 9, since this target has no signer.
 ///
 /// # Errors
+///
+/// Always returns the `TypeError` `crypto is not available on this card until a later release`.
 #[cfg(not(any(feature = "host-crypto", all(unix, feature = "ring"))))]
 pub(crate) fn import_private_key(_pem: &str) -> Result<PrivateKey, Thrown> {
     Err(Thrown::type_error(NO_CRYPTO))
@@ -367,9 +371,9 @@ pub(crate) fn sign_rs256(key: &PrivateKey, _data: &[u8]) -> Result<Vec<u8>, Oaut
 /// Verifies the RSASSA-PKCS1-v1_5 signature with SHA-256 `signature` of `data` with the public half
 /// of the PEM private key `pem`.
 ///
-/// It is hidden, for the devtool, whose primitive `zitadel` verifies the
-/// client assertion it signed before it masks it, as
-/// `tests/sidecar/zitadel.mjs` verifies the assertion of the reference.
+/// It is hidden, for the devtool, whose primitive `zitadel` verifies the client
+/// assertion it signed before it masks it, as the sidecar of Zitadel verifies
+/// the assertion of the reference.
 ///
 /// # Errors
 ///
@@ -394,6 +398,8 @@ pub fn verify_rs256(pem: &str, data: &[u8], signature: &[u8]) -> Result<bool, Th
 /// Answers the `TypeError` of rule 9, since this target has no verifier.
 ///
 /// # Errors
+///
+/// Always returns the `TypeError` `crypto is not available on this card until a later release`.
 #[cfg(not(all(unix, feature = "ring", not(feature = "host-crypto"))))]
 #[doc(hidden)]
 pub fn verify_rs256(_pem: &str, _data: &[u8], _signature: &[u8]) -> Result<bool, Thrown> {
@@ -421,6 +427,8 @@ pub(crate) fn sha256(data: &[u8]) -> Result<[u8; 32], Thrown> {
 /// Answers the `TypeError` of rule 9, since this target has no digest.
 ///
 /// # Errors
+///
+/// Always returns the `TypeError` `crypto is not available on this card until a later release`.
 #[cfg(not(any(feature = "host-crypto", all(unix, feature = "ring"))))]
 pub(crate) fn sha256(_data: &[u8]) -> Result<[u8; 32], Thrown> {
     Err(Thrown::type_error(NO_CRYPTO))

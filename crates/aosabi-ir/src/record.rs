@@ -3,7 +3,10 @@
  * aosabi-ir: the JavaScript object of the model, a map from a type name to a
  * value that keeps the key order a JavaScript object keeps.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. The type stands in for the
+ * `Record<string, T>` positions of the model, and its iteration order is
+ * OrdinaryOwnPropertyKeys,
+ * https://tc39.es/ecma262/#sec-ordinaryownpropertykeys.
  */
 
 //! The record of the model.

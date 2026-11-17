@@ -14,7 +14,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth",
  "aosabi-auth-contract",
@@ -31,16 +31,14 @@ dependencies = [
  "aosabi-hooks",
  "aosabi-http",
  "aosabi-json",
- "aosabi-landing",
  "aosabi-macros",
  "aosabi-sentry",
  "aosabi-serve",
- "aosabi-viewer",
 ]
 
 [[package]]
 name = "aosabi-auth"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth-contract",
  "aosabi-core",
@@ -51,14 +49,14 @@ dependencies = [
 
 [[package]]
 name = "aosabi-auth-contract"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
 ]
 
 [[package]]
 name = "aosabi-auth-zitadel"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth",
  "aosabi-auth-contract",
@@ -72,7 +70,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-build"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-codegen",
  "aosabi-core",
@@ -89,14 +87,14 @@ dependencies = [
 
 [[package]]
 name = "aosabi-cache"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
 ]
 
 [[package]]
 name = "aosabi-carrier-bluetooth"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-serve",
@@ -106,7 +104,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-carrier-lora"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "chacha20poly1305",
  "embedded-hal",
@@ -115,7 +113,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-carrier-network"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-serve",
@@ -125,7 +123,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-carrier-serial"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-serve",
@@ -135,7 +133,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-carrier-unix"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-serve",
@@ -143,7 +141,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-carrier-usb"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-serve",
@@ -153,7 +151,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-cli"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-build",
  "aosabi-ir",
@@ -166,7 +164,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-codegen"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -175,11 +173,11 @@ dependencies = [
 
 [[package]]
 name = "aosabi-compat"
-version = "0.0.0"
+version = "0.1.1"
 
 [[package]]
 name = "aosabi-core"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth-contract",
  "aosabi-execute",
@@ -197,7 +195,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-devtool"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth",
  "aosabi-auth-zitadel",
@@ -218,14 +216,12 @@ dependencies = [
  "aosabi-infer",
  "aosabi-ir",
  "aosabi-json",
- "aosabi-landing",
  "aosabi-lang",
  "aosabi-query",
  "aosabi-scalars",
  "aosabi-serve",
  "aosabi-type",
  "aosabi-validate",
- "aosabi-viewer",
  "aoviewer-core",
  "aoviewer-docs",
  "graphql-over-http",
@@ -236,7 +232,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-execute"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-kernel",
@@ -248,7 +244,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-federation"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-execute",
@@ -260,7 +256,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-fetch"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-http",
@@ -272,7 +268,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-hooks"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-execute",
  "aosabi-json",
@@ -283,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-http"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "graphtp",
@@ -291,7 +287,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-infer"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-ir",
@@ -300,7 +296,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-infer-wasm"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-build",
  "aosabi-infer",
@@ -309,14 +305,14 @@ dependencies = [
 
 [[package]]
 name = "aosabi-ir"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
 ]
 
 [[package]]
 name = "aosabi-js"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi",
  "aosabi-auth",
@@ -335,29 +331,21 @@ dependencies = [
 
 [[package]]
 name = "aosabi-json"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "homa",
 ]
 
 [[package]]
 name = "aosabi-kernel"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "homa",
 ]
 
 [[package]]
-name = "aosabi-landing"
-version = "0.0.0"
-dependencies = [
- "aosabi-core",
- "aosabi-http",
-]
-
-[[package]]
 name = "aosabi-lang"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "once_cell",
@@ -365,7 +353,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-macros"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-codegen",
  "proc-macro2",
@@ -375,7 +363,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-query"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
@@ -385,7 +373,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-scalars"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
@@ -393,7 +381,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-sentry"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-hooks",
@@ -404,7 +392,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-serve"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-http",
@@ -419,7 +407,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-type"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
@@ -428,7 +416,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-validate"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
@@ -436,20 +424,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "aosabi-viewer"
-version = "0.0.0"
-dependencies = [
- "aosabi-core",
- "aosabi-http",
-]
-
-[[package]]
 name = "aoviewer-core"
-version = "0.0.0"
+version = "0.1.1"
 
 [[package]]
 name = "aoviewer-docs"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-lang",
  "aosabi-type",
@@ -459,11 +439,11 @@ dependencies = [
 
 [[package]]
 name = "aoviewer-docs-pdf"
-version = "0.0.0"
+version = "0.1.1"
 
 [[package]]
 name = "aoviewer-wasm"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aoviewer-core",
 ]
@@ -607,7 +587,7 @@ dependencies = [
 
 [[package]]
 name = "graphql-over-graphtp"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "graphtp",
  "graphtp-homa",
@@ -616,7 +596,7 @@ dependencies = [
 
 [[package]]
 name = "graphql-over-http"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-cache",
  "aosabi-execute",
@@ -630,11 +610,11 @@ dependencies = [
 
 [[package]]
 name = "graphtp"
-version = "0.0.0"
+version = "0.1.1"
 
 [[package]]
 name = "graphtp-homa"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "graphtp",
  "homa",
@@ -642,7 +622,7 @@ dependencies = [
 
 [[package]]
 name = "graphtp-wasm"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "graphtp",
  "graphtp-homa",
@@ -659,7 +639,7 @@ dependencies = [
 
 [[package]]
 name = "homa"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "socket2",
 ]
@@ -782,9 +762,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.45"
+version = "0.23.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634"
+checksum = "48e13bd8c0e9365c43cfa5c9e8f9ad49d3c8444926c9aac819e0e4dc503c8fdf"
 dependencies = [
  "once_cell",
  "ring",
@@ -805,9 +785,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.15"
+version = "0.103.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2"
+checksum = "4443b1b6d39d7c663139942cc4558262562d2c84123bb6282ef177009ca8b281"
 dependencies = [
  "ring",
  "rustls-pki-types",
@@ -971,7 +951,7 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "xtask"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aoviewer-core",

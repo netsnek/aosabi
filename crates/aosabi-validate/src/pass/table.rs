@@ -3,7 +3,10 @@
  * aosabi-validate pass table: the field table of one schema, which the single
  * pass reads in place of the schema.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The rows hold what the rules read of a schema:
+ * the named types in the order of the type map, their fields, arguments, enum
+ * values, input fields and possible types, the directives and the three meta
+ * fields.
  */
 
 //! The field table of the single pass.

@@ -4,14 +4,15 @@
  *
  * Translation of the list require('http').METHODS of Node 24.13.0, the methods
  * of HTTP_METHOD_MAP of llhttp 9.3.0 that Node names. It holds the list of
- * quirk Q18 of docs/byte-equality.md section 13.1.
+ * the quirk LLHTTP_METHODS.
  */
-//! The 35 methods of Node 24.13.0 the Node parser accepts, quirk Q18.
+//! The 35 methods of Node 24.13.0 the Node parser accepts, quirk
+//! `LLHTTP_METHODS`.
 
 /// The names of `require('http').METHODS` of Node 24.13.0, in its order.
 ///
 /// A request whose method is not one of them, `PRI` among them, is refused
-/// with Node's fixed 400 (quirk Q18).
+/// with Node's fixed 400 (quirk `LLHTTP_METHODS`).
 pub const NODE_METHODS: &[&str] = &[
     "ACL",
     "BIND",

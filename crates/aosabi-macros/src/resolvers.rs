@@ -2,7 +2,8 @@
 /*
  * aosabi-macros: `#[aosabi::resolvers]`.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The methods of an `impl` block are the
+ * twin of the methods of a TypeScript class.
  */
 
 //! `#[aosabi::resolvers]`.

@@ -2,7 +2,12 @@
 """The harness guests: boots them under KVM from `target/guests/`, shares the
 tree, runs commands and collects their output.
 
-The host has neither `tc` nor `dummy_hcd`, which is why they run in a guest.
+The guests are three: guest A from the Fedora 43 cloud image for the emulated
+carriers, the namespaces with their queuing discipline, the helper and the
+crate's kernel module, guest B from the same image for the user space engine,
+and guest C on the koji kernel 6.17.8-300.fc43 with HomaModule at 50d65305 as
+the reference, each with 2 GiB and 2 cores, and at most three at once. The
+host has neither `tc` nor `dummy_hcd`, which is why they run in a guest.
 
 Every file a guest boots from or installs is pinned in
 `tests/guests/guests.lock` by its URL, its SHA-256 and its size, fetched into
@@ -36,8 +41,8 @@ Commands run through the QEMU guest agent over a Unix socket under
 with a writable exchange directory at `/mnt/xfer`, so no guest takes a port
 of the host. The first network interface is QEMU's user mode network, which
 reaches the Fedora repositories, and a `Hub` joins guests on a private
-Ethernet segment over Unix datagram sockets, the bridge the interop halves of
-`29_homa_raw` and `29_homa_kmod` run on.
+Ethernet segment over Unix datagram sockets, the bridge of the interop runs
+between guests.
 
 The host tools are the host's own where it has them, and otherwise the pinned
 packages of the lock unpacked into `target/guests/tools/`, so nothing is
@@ -77,7 +82,7 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..paths import find_root
+from ..paths import find_root, socket_dir
 
 ROOT = find_root(Path(__file__).resolve().parent)
 GUESTS = ROOT / "tests" / "guests"
@@ -92,15 +97,19 @@ MEMORY_MIB = 2048
 CPUS = 2
 MAX_RUNNING = 3
 
-# 0 runs QEMU in the cgroup of its caller.
+# The CPU weight of the scope of the user's systemd that QEMU runs in, against
+# the weight 100 of every other unit of the session, so the work of other
+# checkouts on a shared machine takes less of the time of the guest's two
+# cores, which a guest whose numbers are times needs. 0 runs QEMU in the
+# cgroup of its caller.
 CPU_WEIGHT = 10000
 
 # Whether QEMU runs on the cores of the highest capacity alone where the
 # machine has cores of two kinds, as the performance and efficiency cores of
 # Apple silicon, whose capacities the kernel reads as 1024 and 485 on the
 # development machine. A guest core that the host moves to an efficiency core
-# runs at about half its speed, which moves the share of a load point of
-# 29_homa_raw.
+# runs at about half its speed, which moves the share of a load point of the
+# runs over raw IP.
 FAST_CORES_ONLY = True
 
 # The label of the read only disk that carries a guest's pinned artifacts and
@@ -124,6 +133,8 @@ CHUNK = 1 << 20
 # `peer_roots`. False makes a worktree fetch and provision on its own.
 SHARE_PEERS = True
 
+# The ioctl that makes a file share the extents of another on Linux,
+# _IOW(0x94, 9, int).
 FICLONE = 0x40049409
 
 
@@ -242,6 +253,11 @@ def peer_roots() -> list:
     """Return the roots of the other worktrees of the repository this tree
     belongs to, the main checkout among them, read from the git metadata
     without running git, or an empty list where `SHARE_PEERS` is false.
+
+    A linked worktree's `.git` is a file that names its directory under
+    `<common>/worktrees/`, whose file `commondir` names the common directory,
+    and each directory under `<common>/worktrees/` holds in `gitdir` the path
+    of the `.git` file of its worktree.
     """
     if not SHARE_PEERS:
         return []
@@ -595,8 +611,9 @@ class Hub:
 
     def __init__(self, name="bridge"):
         self.name = name
-        self.dir = HUBS / name
-        self.dir.mkdir(parents=True, exist_ok=True)
+        # The folder of the hub's socket, or a short one of socket_dir when a
+        # long checkout root leaves no room for the socket's name in it.
+        self.dir = socket_dir(HUBS / name, len("hub.sock"))
         self.path = self.dir / "hub.sock"
         self.path.unlink(missing_ok=True)
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
@@ -668,6 +685,8 @@ class Guest:
         self.hubs = tuple(hubs)
         self.log = log
         self.dir = STATE / name
+        # The folder of the guest's sockets, set when it starts.
+        self.sockets = None
         self.proc = None
         self.slot = None
         self.agent = None
@@ -849,8 +868,12 @@ class Guest:
         qemu = tools(self.log)
         self.slot = Slot()
         (self.dir / "xfer").mkdir(parents=True, exist_ok=True)
-        for name in ("qga.sock", "qemu.pid"):
-            (self.dir / name).unlink(missing_ok=True)
+        # The sockets sit in the guest's folder, or in a short one of
+        # socket_dir when a long checkout root leaves no room for their names.
+        self.sockets = socket_dir(self.dir, max([len("qga.sock")]
+                                                + [len("hub-%s.sock" % hub.name) for hub in self.hubs]))
+        (self.sockets / "qga.sock").unlink(missing_ok=True)
+        (self.dir / "qemu.pid").unlink(missing_ok=True)
         index = sorted(definitions()).index(self.name) + 1
         argv = [qemu.qemu, "-name", "homa-" + self.name,
                 "-machine", "virt,accel=kvm,gic-version=3", "-cpu", "host",
@@ -865,7 +888,7 @@ class Guest:
                 "-device", "virtio-rng-pci,rng=rng0",
                 "-virtfs", "local,path=%s,mount_tag=tree,security_model=none,readonly=on" % ROOT,
                 "-virtfs", "local,path=xfer,mount_tag=xfer,security_model=none",
-                "-chardev", "socket,path=qga.sock,server=on,wait=off,id=qga0",
+                "-chardev", "socket,path=%s,server=on,wait=off,id=qga0" % (self.sockets / "qga.sock"),
                 "-device", "virtio-serial-pci",
                 "-device", "virtserialport,chardev=qga0,name=" + AGENT_PORT]
         for label, directory in ((SEED_LABEL, seed), (ARTIFACTS_LABEL, artifacts)):
@@ -877,7 +900,7 @@ class Guest:
         for number, hub in enumerate(self.hubs):
             # The hub answers each guest at the address its datagrams come
             # from, so the guest's socket takes an absolute path.
-            local = self.dir / ("hub-%s.sock" % hub.name)
+            local = self.sockets / ("hub-%s.sock" % hub.name)
             local.unlink(missing_ok=True)
             hub.attach(local)
             argv += ["-netdev", "dgram,id=hub%d,local.type=unix,local.path=%s,remote.type=unix,remote.path=%s"
@@ -908,7 +931,7 @@ class Guest:
                 raise GuestFailed("guest %s: no answer of its agent within %.0f s, see %s"
                                   % (self.name, BOOT_TIMEOUT, self.dir / "console.log"))
             try:
-                self.agent = Agent(self.dir / "qga.sock", timeout=5.0)
+                self.agent = Agent(self.sockets / "qga.sock", timeout=5.0)
                 self.agent.call("guest-ping")
                 if provisioning:
                     probe = self.run("test -e /run/homa-guest-ready", timeout=30, check=False)
@@ -1040,8 +1063,9 @@ class Guest:
     # Shutting down.
 
     def _stop(self):
-        for hub in self.hubs:
-            hub.detach(self.dir / ("hub-%s.sock" % hub.name))
+        if self.sockets is not None:
+            for hub in self.hubs:
+                hub.detach(self.sockets / ("hub-%s.sock" % hub.name))
         if self.proc is not None:
             if self.proc.poll() is None and self.agent is not None:
                 try:

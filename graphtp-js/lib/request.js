@@ -2,6 +2,8 @@
 /*
  * graphtp lib/request: what the function does with a request, the URL test and its repair, the
  * key of a link, the method, the content type, the fields and the content of a GET.
+ *
+ * The rules are the first five, over the schemes.
  */
 
 /** The schemes of GraphTP, each with the carrier its link opens. */

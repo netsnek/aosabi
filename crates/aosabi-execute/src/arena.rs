@@ -3,7 +3,9 @@
  * aosabi-execute arena: the answer of one execution as nodes, entries and bytes.
  *
  * No analogue in the reference, whose result is a tree of JavaScript objects
- * that JSON.stringify walks once the execution settled.
+ * that JSON.stringify walks once the execution settled. The bytes the writer
+ * of this module appends are those of JSON.stringify,
+ * https://tc39.es/ecma262/#sec-json.stringify.
  */
 
 //! The arena of the answer of one execution.
@@ -103,12 +105,12 @@ const NEGATIVE_ZERO: u64 = (-0.0_f64).to_bits();
 const BYTES_PER_NODE: usize = 4;
 
 /// The most bytes the vectors a thread keeps between executions hold in all,
-/// 256 KiB in a Worker, the default of for a module of `wasm32`.
+/// 256 KiB in a module of `wasm32`.
 #[cfg(target_family = "wasm")]
 pub const KEPT_BYTES: usize = 256 * 1024;
 
 /// The most bytes the vectors a thread keeps between executions hold in all, 1
-/// MiB natively, the default of.
+/// MiB natively.
 #[cfg(not(target_family = "wasm"))]
 pub const KEPT_BYTES: usize = 1024 * 1024;
 

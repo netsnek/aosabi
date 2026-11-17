@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "aosabi"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth",
  "aosabi-auth-contract",
@@ -13,15 +13,13 @@ dependencies = [
  "aosabi-hooks",
  "aosabi-http",
  "aosabi-json",
- "aosabi-landing",
  "aosabi-macros",
  "aosabi-serve",
- "aosabi-viewer",
 ]
 
 [[package]]
 name = "aosabi-auth"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth-contract",
  "aosabi-core",
@@ -32,21 +30,21 @@ dependencies = [
 
 [[package]]
 name = "aosabi-auth-contract"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
 ]
 
 [[package]]
 name = "aosabi-cache"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
 ]
 
 [[package]]
 name = "aosabi-carrier-unix"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-serve",
@@ -54,7 +52,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-codegen"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -63,7 +61,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-core"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-auth-contract",
  "aosabi-execute",
@@ -80,7 +78,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-execute"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-kernel",
@@ -92,7 +90,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-hooks"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-execute",
  "aosabi-json",
@@ -103,7 +101,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-http"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "graphtp",
@@ -111,26 +109,18 @@ dependencies = [
 
 [[package]]
 name = "aosabi-json"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "homa",
 ]
 
 [[package]]
 name = "aosabi-kernel"
-version = "0.0.0"
-
-[[package]]
-name = "aosabi-landing"
-version = "0.0.0"
-dependencies = [
- "aosabi-core",
- "aosabi-http",
-]
+version = "0.1.1"
 
 [[package]]
 name = "aosabi-lang"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "once_cell",
@@ -138,7 +128,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-macros"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-codegen",
  "proc-macro2",
@@ -148,7 +138,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-scalars"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
@@ -156,7 +146,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-serve"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-core",
  "aosabi-http",
@@ -170,7 +160,7 @@ dependencies = [
 
 [[package]]
 name = "aosabi-type"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
@@ -179,19 +169,11 @@ dependencies = [
 
 [[package]]
 name = "aosabi-validate"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-json",
  "aosabi-lang",
  "aosabi-type",
-]
-
-[[package]]
-name = "aosabi-viewer"
-version = "0.0.0"
-dependencies = [
- "aosabi-core",
- "aosabi-http",
 ]
 
 [[package]]
@@ -225,7 +207,7 @@ dependencies = [
 
 [[package]]
 name = "graphql-over-http"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "aosabi-cache",
  "aosabi-execute",
@@ -239,11 +221,11 @@ dependencies = [
 
 [[package]]
 name = "graphtp"
-version = "0.0.0"
+version = "0.1.1"
 
 [[package]]
 name = "homa"
-version = "0.0.0"
+version = "0.1.1"
 
 [[package]]
 name = "http"

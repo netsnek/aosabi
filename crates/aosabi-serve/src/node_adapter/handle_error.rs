@@ -3,10 +3,9 @@
  * aosabi-serve: the answers of the Node adapter to a request it cannot build,
  * a fetch that rejects and a head Node refuses.
  *
- * Derived from hono 1.19.9, dist/listener.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/listener.js, MIT.
  *
- * It carries the half of the adapter of the quirk Q59_NODE_RECORD_CHECK_500
- * of docs/byte-equality.md section 13.1.
+ * It carries the half of the adapter of the quirk NODE_RECORD_CHECK_500.
  */
 
 //! `handleRequestError`, `handleFetchError` and `handleResponseError`.
@@ -14,12 +13,12 @@
 //! A request the adapter cannot build is answered with 400 and a fetch that
 //! rejects with 500, or 504 for a `TimeoutError`, each with a null body, which
 //! the listener writes on its object path with the default `content-type`
-//! and chunked framing on HTTP/1.1 (A3 and A6 of the plan's version 2 draft).
+//! and chunked framing on HTTP/1.1.
 //! A record that Node's `writeHead` refuses is answered as
 //! `handleResponseError` answers: the error on standard error, the status 500
 //! with the reason the failed call left, `Content-Type: text/plain`, the body
 //! `Error: <message>` and the end of the connection (N14, quirk
-//! `Q59_NODE_RECORD_CHECK_500`).
+//! `NODE_RECORD_CHECK_500`).
 
 use aosabi_http::{
     fetch::response::Response,
@@ -55,7 +54,7 @@ pub fn handle_fetch_error(error_name: &str) -> Response {
 /// The error goes to standard error as `console.error` writes it,
 /// `writeHead(500, { "Content-Type": "text/plain" })` keeps the reason the
 /// failed call of the first `status` set, `end` writes `Error: ` and `message`
-/// as a string, and the socket is destroyed, quirk `Q59_NODE_RECORD_CHECK_500`.
+/// as a string, and the socket is destroyed, quirk `NODE_RECORD_CHECK_500`.
 #[must_use]
 pub fn handle_response_error(message: &str, status: u16) -> NodeOutgoing {
     eprintln!("TypeError: {message}");

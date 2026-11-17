@@ -290,6 +290,9 @@ impl Schema {
     }
 
     /// Returns the cached result of `validateSchema`, if there is one.
+    ///
+    /// This is `__validationErrors`, which is an empty list for a schema
+    /// built with `assumeValid` and absent until validation runs.
     #[must_use]
     pub fn validation_errors(&self) -> Option<&[GraphQLError]> {
         self.validation_errors.get().map(Vec::as_slice)

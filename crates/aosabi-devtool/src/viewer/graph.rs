@@ -2,19 +2,21 @@
 /*
  * aosabi-devtool viewer graph: the operation graph, the type graph of an input
  * in the canonical form of the Voyager goldens.
+ *
+ * The capture of Voyager's own getTypeGraph writes the same form.
  */
 
 //! The `graph` operation.
 //!
 //! The request `{input, options, root}` answers `form`, the text
-//! [󰀂](aoviewer_core::graph::Graph::voyager_form) writes for the schema built
-//! under the transforms of the option string `options`, from the root `root`,
-//! `query`, `mutation` or `subscription`, the query root when the request
-//! names none. The four option sets of SV0 are option strings of the routes,
-//! such as `relay=0&nodes=composite&descdep=0`.
+//! [`Graph::voyager_form`](aoviewer_core::graph::Graph::voyager_form) writes
+//! for the schema built under the transforms of the option string `options`,
+//! from the root `root`, `query`, `mutation` or `subscription`, the query root
+//! when the request names none. The four option sets of SV0 are option strings
+//! of the routes, such as `relay=0&nodes=composite&descdep=0`.
 //!
 //! Beside the form it answers `relay`, the Relay detection that the same
-//! capture judges and step 5 of `51_viewer_core` counts: `connections` and
+//! capture judges and a check of the viewer core counts: `connections` and
 //! `edges`, the connection and edge types of the collapsed fields, `types`,
 //! every type the collapse found, removed or kept, and `candidates`, every
 //! other type whose name ends in `Connection` or `Edge` after at least one

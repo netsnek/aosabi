@@ -16,6 +16,8 @@
 pub mod pretty;
 pub mod registry;
 
+// The file keeps the name of core/logger.ts, which puts a module
+// logger inside the module logger.
 #[expect(
     clippy::module_inception,
     reason = "the file keeps the name of core/logger.ts, which it translates"

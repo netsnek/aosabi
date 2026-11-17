@@ -17,9 +17,9 @@ frames of a big endian `u32` length that counts the op and the body, then a
                                 failure of the helper itself
     5 ABORT    to the helper    id u64
 
-The notebook `29_homa_raw` drives the helper through this module with no
-capability of its own, which is the question the helper answers. It shares
-no code with the crate and imports nothing outside the standard library.
+A notebook drives the helper through this module with no capability of its
+own, which is the question the helper answers. It shares no code with the
+crate and imports nothing outside the standard library.
 """
 
 from __future__ import annotations

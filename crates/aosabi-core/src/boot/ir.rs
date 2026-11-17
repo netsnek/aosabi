@@ -2,21 +2,24 @@
 /*
  * aosabi-core boot ir: the part of the build model a boot reads.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/ir.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett, packages/pylon/src/ir/ir.ts,
  * Apache-2.0. Changed by the Aosabi authors.
+ *
+ * This file holds the types of the build model and the reader of its JSON text.
  */
 
 //! [`Ir`], the part of the build model a boot reads.
 //!
-//! The build infers its model from the TypeScript source, prints the SDL
-//! from it and writes the type resolver of every union and interface from it. A
-//! boot reads four parts of the JSON text of that model: the object types with
-//! their fields and the interfaces they implement, the interfaces with their
-//! fields, the unions with their members, and the root operations with the
-//! names of their arguments in order. A field is required where the type at the
-//! end of its chain of lists is not nullable, which is the `isRequired` of the
-//! parser the type resolvers read, since the model writes that flag on the leaf
-//! of a list.
+//! The build infers its model from the TypeScript source, prints the SDL from
+//! it and writes the type resolver of every union and interface from it. A boot
+//! reads four parts of the JSON text of that model: the object types with their
+//! fields and the interfaces they implement, the interfaces with their fields,
+//! the unions with their members, and the root operations with the names of
+//! their arguments in order. A field is required where the type at the end of
+//! its chain of lists is not nullable, which is the `isRequired` of the parser
+//! the type resolvers read, since the model writes that flag on the leaf of a
+//! list. The entities of the database layer are not built yet, so a boot reads
+//! none.
 
 use aosabi_json::{
     JsObject,

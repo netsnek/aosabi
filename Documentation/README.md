@@ -17,6 +17,8 @@ the same revision, and every measured number names the notebook that measured it
 ## Guides
 
 - [guides/rust.md](guides/rust.md) writes a service in plain Rust.
+- [guides/embedding.md](guides/embedding.md) links the engine and the roots of an app into the
+  program of a host, such as a module of WebAssembly that a Web Worker of a page runs.
 - [guides/typescript.md](guides/typescript.md) builds and serves a TypeScript app on Bun and on
   Cloudflare Workers.
 - [guides/graphtp.md](guides/graphtp.md) describes GraphTP, the protocol for links where HTTP does
@@ -24,7 +26,10 @@ the same revision, and every measured number names the notebook that measured it
 - [guides/embedded.md](guides/embedded.md) says what runs on small Linux devices and on boards
   without an operating system.
 - [guides/security.md](guides/security.md) lists the security defaults with the code that sets them.
+- [guides/hardening.md](guides/hardening.md) lists the steps by which a service hardens itself for
+  production, each with its default and its line on the Rust layer and in the TypeScript layer.
 - [guides/pylon.md](guides/pylon.md) covers compatibility with Pylon v3 through `aosabi/pylon`.
+- [guides/upgrading.md](guides/upgrading.md) says what a service changes to move to a new release.
 - [guides/conformance.md](guides/conformance.md) shows how the test suite holds the engine to
   graphql-js.
 

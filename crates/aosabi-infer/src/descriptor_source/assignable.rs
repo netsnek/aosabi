@@ -3,7 +3,8 @@
  * aosabi-infer: the structural comparison of two types of a descriptor graph,
  * which decides whether two types of one name share that name.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. The comparison stands in for
+ * `checker.isTypeAssignableTo`, which the inference runs in both directions.
  */
 
 //! The assignability of the descriptor source.

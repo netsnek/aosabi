@@ -4,8 +4,7 @@
  * table describes, over the promise type of aosabi-execute.
  *
  * No analogue in the reference. The node side makes the same values with real
- * promises, and the rules both sides follow are those of
- * tests/sidecar/execute.md.
+ * promises, and both sides follow the same rules.
  */
 
 //! The interpreter of a behaviour table.
@@ -31,7 +30,8 @@
 //! The four kinds of the subscriptions follow rule 6 of the grammar. A
 //! `repeater` makes a `Repeater` of aosabi-execute, whose executor runs its
 //! steps on the first `next`, so the value of a push is made when its step
-//! runs. A `pubsub_topic` subscribes on the pub sub of the request, and a
+//! runs. A `pubsub_topic` subscribes on the pub sub of the request and hands
+//! the context in place to the watch of the operation `revisions`, and a
 //! `pubsub_publish` makes its key and its payload in that order, publishes
 //! them, and makes its `then` after the publish. A step of a repeater records
 //! no trace event of its own.
@@ -81,6 +81,7 @@ use crate::execute::{
     clock::WallClock,
     pub_sub::{
         Frozen,
+        note_subscriber,
         request_pub_sub, //
     },
     table::{
@@ -227,6 +228,7 @@ fn make(spec: &Spec, frame: Frame<'_>) -> Result<Value, Value> {
                 None => None,
             };
             let stream: Rc<dyn ObjectLike> = request_pub_sub().subscribe_value(name, key);
+            note_subscriber();
             Ok(Value::Object(stream))
         }
         SpecKind::PubSubPublish {

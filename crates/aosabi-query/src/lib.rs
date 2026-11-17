@@ -1,15 +1,11 @@
-// SPDX-License-Identifier: MIT AND Apache-2.0
+// SPDX-License-Identifier: MIT
 /*
  * aosabi-query: the TypeScript client a build emits.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/query/build/ and
- * packages/pylon/src/cli/builder/build-client.ts, Apache-2.0.
- * Changed by the Aosabi authors.
- *
  * This file holds the module list and the re-exports. The files index_ts.tmpl
  * and index_js.segments beside these modules are no modules. They are the
- * literals client_index_template and client_index_js_segments, written by
- * tools/provenance and by nothing else.
+ * literals client_index_template and client_index_js_segments, pinned byte
+ * for byte.
  */
 
 //! The TypeScript client a build emits.

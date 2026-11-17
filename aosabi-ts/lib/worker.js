@@ -4,6 +4,10 @@
  * of a Cloudflare Worker over an app on the module core.wasm.
  *
  * The Worker serves the default export of the glue of a build, an app of hono.
+ * It is the web standard fetch handler with no HTTP code and no deflate code of
+ * its own, where compress() of hono in Pylon's base pipeline codes a body
+ * through the CompressionStream of the platform, lib/pylon.js, where Pylon's
+ * Worker answer is coded.
  */
 
 // Wrangler bundles this module with the app and uploads core.wasm as a module
@@ -26,10 +30,9 @@ import { App } from "./pylon.js";
 const HOST = Symbol.for("aosabi.host");
 
 // The module of the hand over of strings through the JS String Builtins of
-// V8 rides on core.wasm, round JSSTRING: workerd compiles it with the builtins
-// js-string where the Worker carries the compatibility flag
-// wasm_esm_integration_builtins, and lib/core.js takes TextEncoder and
-// TextDecoder where it cannot instantiate it.
+// V8 rides on core.wasm: workerd compiles it with the builtins js-string where
+// the Worker carries the compatibility flag wasm_esm_integration_builtins, and
+// lib/core.js takes TextEncoder and TextDecoder where it cannot instantiate it.
 module[STRINGS] = strings;
 
 App[HOST]({ module });
@@ -53,7 +56,10 @@ export function worker(app, { ir, mode, read } = {}) {
   };
 }
 
-// It reads the app at its first request, so the app boots there.
+// The fetch handler of a Worker over the app the glue exposes as
+// globalThis.__AOSABI_APP__ and the IR it exposes as globalThis.__AOSABI_IR__,
+// the glue of aosabi build, as the default export a Wrangler entry
+// names. It reads the app at its first request, so the app boots there.
 let served = null;
 
 export default {

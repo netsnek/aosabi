@@ -25,16 +25,17 @@
 //!   of the operation for a root field and the route of a type with the
 //!   member selected for every other member.
 //! - The link is the path of the Markdown file inside the tree with the
-//!   anchor of the name, from [󰀀](crate::render_markdown::page_path) and
-//!   [󰀁](crate::id::Anchors), and `null` when the tree writes no Markdown. A
-//!   member of a Relay wrapper links the row of its wrapper, the one anchor
-//!   the Relay page writes for it.
+//!   anchor of the name, from
+//!   [`page_path`](crate::render_markdown::page_path) and
+//!   [`Anchors`](crate::id::Anchors), and `null` when the tree writes no
+//!   Markdown. A member of a Relay wrapper links the row of its wrapper, the
+//!   one anchor the Relay page writes for it.
 //!
 //! Every entry is one line, so a difference of two files reads line by line,
 //! and the JSON is the same document with or without the line feeds. Every
 //! string is written as `JSON.stringify` writes it.
 //!
-//! Above [󰀀](super::LETTER_TYPES) types the entries move to
+//! Above [`LETTER_TYPES`](super::LETTER_TYPES) types the entries move to
 //! `search-index/<letter>.json`, one file per first letter of a name in the
 //! same shape, and `search-index.json` lists the parts as
 //! `{"version":1,"parts":[[letter,path,entries],...]}`.

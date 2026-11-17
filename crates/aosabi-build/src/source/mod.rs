@@ -8,10 +8,13 @@
 
 //! The reader of a plain Rust crate.
 //!
-//! This module is the first part of that path. [`read`] parses the crate with
-//! `syn` 2.0.106, the version the Linux kernel carries, on the build host,
-//! with the library of every path dependency the manifests name, strips it as
-//! rustc strips it for the build, and keeps what the source states:
+//! A Rust application holds no attribute, derive or macro of Aosabi, so the
+//! builder derives the schema from the plain source of the crate as it derives
+//! it from plain TypeScript. This module is the first part of that path.
+//! [`read`] parses the crate with `syn` 2.0.106, the version the Linux kernel
+//! carries, on the build host, with the library of every path dependency the
+//! manifests name, strips it as rustc strips it for the build, and keeps what
+//! the source states:
 //!
 //! | Module | Reads |
 //! | --- | --- |
@@ -34,11 +37,7 @@
 //! The reader is a feature of the crate, `source`, so `syn` stays out of every
 //! build that leaves the feature off, the build script of every application
 //! and every wasm build among them. It ships in no artifact, and it adds no
-//! `unsafe`. The judging notebook is
-//! `tests/notebooks/12_authoring_parity.ipynb`, which runs it through the
-//! primitive `source` of `aosabi-devtool` over its builder cells under
-//! `tests/fixtures/rs/c6/builder/`, over every twin and every case of the
-//! builder corpus, and over the names of the goldens.
+//! `unsafe`.
 
 mod cfg;
 mod copy;

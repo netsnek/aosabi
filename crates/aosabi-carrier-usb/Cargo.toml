@@ -1,12 +1,12 @@
-# The carrier USB of layer 4, one carrier and one crate as Documentation/architecture.md
-# section 4.3 asks. It carries compact Homa packets over USB bulk, one packet a transfer
-# through a vendor interface of FunctionFS, and over USB serial, delimited AoFrame on
-# the tty of the ACM function, gives the values of the links as functions a device card
-# fills, and serves GraphTP(Homa) on the gadget of a Linux card through the GraphTP
+# The carrier USB of layer 4, one carrier and one crate. It carries compact
+# Homa packets over USB bulk, one packet a transfer through a vendor interface
+# of FunctionFS, and over USB serial, delimited AoFrame on the tty of the ACM
+# function, gives the values of the links as functions a device card fills,
+# and serves GraphTP(Homa) on the gadget of a Linux card through the GraphTP
 # listener as a local task of the runtime of aosabi-serve.
 [package]
 name = "aosabi-carrier-usb"
-version = "0.0.0"
+version.workspace = true
 description = "The carrier USB: compact Homa packets over USB bulk through FunctionFS and over USB serial, and GraphTP(Homa) on the gadget of a Linux card."
 edition.workspace = true
 rust-version.workspace = true
@@ -35,6 +35,8 @@ linux = [
 bulk = []
 # USB serial, the tty of the ACM function in delimited AoFrame.
 serial = ["homa/stream-delimited"]
+# The bare metal binding of USB serial on a card's byte stream, which arrives
+# with device cards.
 bare = []
 
 [dependencies]

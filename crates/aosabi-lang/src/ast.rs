@@ -16,7 +16,10 @@
 //!
 //! Six shapes of the reference read differently in Rust.
 //!
-//! - A [`Token`] links to its neighbours through `prev` and `next`.
+//! - A [`Token`] links to its neighbours through `prev` and `next`. Two owned
+//!   links would make a cycle, so a token holds a [`TokenId`] into the
+//!   [`TokenArena`] the lexer fills, and the lexer sets both links as the
+//!   reference does.
 //! - The `value` of a token is a string in the reference. A token here names
 //!   the value of a name, a number, a comment and a string without an escape
 //!   by its span through a [`TokenValue`]. It owns the value of a string with
@@ -405,6 +408,8 @@ pub enum OperationTypeNode {
 
 impl OperationTypeNode {
     /// Returns the string the reference assigns to this operation.
+    ///
+    /// The strings are the keywords the printer writes.
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
@@ -837,6 +842,9 @@ pub struct ArgumentNode {
 }
 
 /// An argument whose value is constant.
+///
+/// The reference declares `ConstArgumentNode` with the same kind and the same
+/// shape, so it is the same type here.
 pub type ConstArgumentNode = ArgumentNode;
 
 /* Fragments */
@@ -912,8 +920,9 @@ node_union! {
 
 /// A value with no variable in it.
 ///
-/// It is the same type here, and the parser's `isConst` flag is what keeps the
-/// variable out.
+/// The reference declares `ConstValueNode` as the members of [`ValueNode`]
+/// minus the variable, and produces one by casting. It is the same type here,
+/// and the parser's `isConst` flag is what keeps the variable out.
 pub type ConstValueNode = ValueNode;
 
 /// An integer value, kept as the digits of the source.
@@ -994,6 +1003,9 @@ pub struct ListValueNode {
 }
 
 /// A list value with no variable in it.
+///
+/// The reference declares `ConstListValueNode` with the same kind and the same
+/// shape, so it is the same type here.
 pub type ConstListValueNode = ListValueNode;
 
 /// An object value.
@@ -1008,6 +1020,9 @@ pub struct ObjectValueNode {
 }
 
 /// An object value with no variable in it.
+///
+/// The reference declares `ConstObjectValueNode` with the same kind and the
+/// same shape, so it is the same type here.
 pub type ConstObjectValueNode = ObjectValueNode;
 
 /// A field of an object value.
@@ -1024,6 +1039,9 @@ pub struct ObjectFieldNode {
 }
 
 /// A field of an object value with no variable in it.
+///
+/// The reference declares `ConstObjectFieldNode` with the same kind and the
+/// same shape, so it is the same type here.
 pub type ConstObjectFieldNode = ObjectFieldNode;
 
 /* Directives */
@@ -1042,6 +1060,9 @@ pub struct DirectiveNode {
 }
 
 /// A directive whose arguments are constant.
+///
+/// The reference declares `ConstDirectiveNode` with the same kind and the same
+/// shape, so it is the same type here.
 pub type ConstDirectiveNode = DirectiveNode;
 
 /* Type Reference */
@@ -1059,6 +1080,10 @@ node_union! {
 
 node_union! {
     /// A type reference that a non null wrapper may wrap.
+    ///
+    /// The reference writes this union inline as the `type` of
+    /// `NonNullTypeNode`, which is how it keeps a non null type from wrapping
+    /// another one.
     NullableTypeNode, into [TypeNode, AstNode] {
         NamedType(NamedTypeNode) => NamedType,
         ListType(ListTypeNode) => ListType,

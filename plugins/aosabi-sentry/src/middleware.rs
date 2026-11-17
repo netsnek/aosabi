@@ -3,7 +3,7 @@
  * aosabi-sentry: the middleware of @hono/sentry, which reports the error of a
  * route.
  *
- * Derived from hono 1.2.2, dist/index.js, MIT.
+ * Derived from @hono/sentry 1.2.2, dist/index.js, MIT.
  */
 
 //! `sentry`, `get_sentry` and the context variable `sentry`.
@@ -13,9 +13,12 @@
 //! overridden by its options, with the request data allowing the header
 //! `user-agent` and every search parameter, sets it as the variable `sentry`,
 //! awaits the rest of the chain and captures `c.error` when the chain set one.
-//! Hono sets `c.error` before it calls its error handler, and only for a
-//! thrown `Error`, so the middleware reports the error of a route whose answer
-//! the error handler wrote.
+//! The request data of its events keeps no parameter `token` or `variables`
+//! and no field that carries a credential or the address of the client, the
+//! rule of the request data of an event of the hub. Hono sets `c.error` before
+//! it calls its error handler, and only for a thrown `Error`, so the
+//! middleware reports the error of a route whose answer the error handler
+//! wrote.
 //!
 //! On the Node adapter the environment of the context is the adapter pair,
 //! which holds no variable, so an environment DSN reaches the middleware only

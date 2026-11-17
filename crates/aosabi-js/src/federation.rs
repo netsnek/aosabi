@@ -2,8 +2,13 @@
 /*
  * aosabi-js federation: the federations of the app over aosabi-federation.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
+ *
+ * The class of a configured federation with its delegate, for the markers
+ * createGateway, pass and passthrough of the entry aosabi, over the crate
+ * aosabi-federation, whose gateway holds the messages of the delegate.
  */
 
 //! The federations of the app.

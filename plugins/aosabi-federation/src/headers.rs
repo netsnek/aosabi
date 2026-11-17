@@ -2,8 +2,12 @@
 /*
  * aosabi-federation: the headers a configured federation sends to its remote.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
+ *
+ * The executor of the gateway spreads the headers, and the map keeps the key
+ * order of JavaScript.
  */
 
 //! The headers of a configured federation, [`Headers`], the function that
@@ -24,7 +28,7 @@
 //! the introspection of the remote schema, whose request carries no context,
 //! so a function that forwards a header of the caller sends that header
 //! empty to the introspection. `aosabi-compat` registers that as
-//! `Q77_FEDERATION_INTROSPECTION_HEADERS`.
+//! `FEDERATION_INTROSPECTION_HEADERS`.
 //!
 //! Under the feature `host-headers`, which only the builds of the
 //! TypeScript option take, `HostHeaders` is the headers function of the

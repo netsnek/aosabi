@@ -82,8 +82,7 @@ Beside the layers stand the crates of the protocol and of the TypeScript layer.
   `aoviewer-docs` and `aoviewer-wasm` lay out and write the reference documentation of a schema.
 
 The optional crates under [plugins/](../plugins/) are the plugins a service names by feature:
-authentication with its contract, the OpenID Connect login through Zitadel, Sentry and federation,
-beside two pages, the route `/viewer` and the landing page of an unhandled route.
+authentication with its contract, the OpenID Connect login through Zitadel, Sentry and federation.
 
 ## 3. One engine, two languages
 
@@ -94,11 +93,11 @@ schema in `aosabi-ir`, which every artifact of a build is written from, and the 
 
 - A Rust service is plain Rust, and the builder of `aosabi-build` reads its source on the build
   host, follows its modules from the crate root, finds the entry and the types it registers, and
-  answers the inference through `TypeSource`. `cargo aosabi build` then writes `schema.graphql` and
-  the other artifacts under `target/aosabi/`, and builds the server over a generated copy of the
-  crate that holds the glue between the types and the executor. The author's files stay as they are,
-  and a diagnostic names the author's file and line. [guides/rust.md](guides/rust.md) shows the
-  forms.
+  answers the inference through `TypeSource`. `cargo aosabi build` then writes `schema.graphql`
+  beside the manifest and, with the other artifacts, under `target/aosabi/`, and builds the server
+  over a generated copy of the crate that holds the glue between the types and the executor. The
+  author's files stay as they are, and a diagnostic names the author's file and line.
+  [guides/rust.md](guides/rust.md) shows the forms.
 - A TypeScript app runs on the same engine. The package `aosabi` carries the engine as `core.wasm`
   with a wrapper of plain ES modules, and its platform packages carry the native library for Bun on
   Linux. The dev package `aosabi-build` infers the schema with the TypeScript checker itself through

@@ -4,8 +4,7 @@
  * collates them.
  *
  * No analogue in the reference. That call is real collation rather than byte
- * order, so the primitive is judged over name pairs against node, and the
- * judging notebook is tests/notebooks/15_sdl_printer.ipynb.
+ * order, so the primitive is judged over name pairs against node.
  */
 
 //! The `collate` primitive of the seam.

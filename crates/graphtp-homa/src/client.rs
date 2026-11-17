@@ -108,7 +108,7 @@ pub struct Config {
 /// Why the client writes no request.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
-    /// The credential breaks rule 6 or 7 of `docs/graphtp.md` section 5.3,
+    /// The credential breaks rule 6 or 7 of `Documentation/guides/graphtp.md`,
     /// with its code.
     Credential(Code),
     /// The count of `seq` is unknown until the answer of the CANCEL of handle

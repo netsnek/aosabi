@@ -29,7 +29,7 @@
 //! [`Repeater::new`] itself with the error of the native layer, so a task is
 //! the repeater of the engine and its frames are the frames of the engine.
 //! The executor is a closure that answers a future,
-//! `|push, stop| async move {..}`, the form of the plan's row, or an async
+//! `|push, stop| async move {..}`, the form of the table above, or an async
 //! closure, `async move |push, stop| {..}`, and rustc infers `push` and
 //! `stop` from the bound of [`task`] in both forms. The executor runs on the
 //! first `next`, as the executor of the reference does, and `push` and
@@ -54,6 +54,9 @@
 //! stream and waits for the first `next`, once with a waker that does nothing
 //! when the field subscribes, and from the first `next` on on the agent of
 //! the stream.
+//!
+//! A stream the engine makes is read by the engine through its repeater, so
+//! polled from Rust it answers no item and ends.
 
 use core::{
     future::{

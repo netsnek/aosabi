@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-hooks: the helpers over a single result and a stream of results.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/utils.js, MIT.
  */
 
 //! The helpers over a single result and a stream of results.

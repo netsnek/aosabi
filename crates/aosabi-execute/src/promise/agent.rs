@@ -11,11 +11,14 @@
 //!
 //! An agent of ECMA-262 is one thread of execution with its job queues.
 //! [`Agent`] is that for one request: the queue of promise jobs, the timer
-//! wheel, the spawned futures, the ambient hooks and the trace. A clone is the
-//! same agent.
+//! wheel, the spawned futures, the ambient hooks, the hook of the events of a
+//! subscription and the trace. A clone is the same agent.
 //!
-//! Every other build of the crate holds none of its fields and none of its
-//! paths.
+//! Behind the feature `host-queue`, which the module of the npm package
+//! `aosabi`, `crates/aosabi-js`, and the core probe of the TypeScript option
+//! enable, a host that runs the microtask queue of the app takes the queue of
+//! an agent and runs each job as one microtask of its own. Every other build
+//! of the crate holds none of its fields and none of its paths.
 
 use alloc::{
     boxed::Box,
@@ -33,7 +36,10 @@ use core::{
 };
 
 use crate::promise::{
-    ambient::AmbientHooks,
+    ambient::{
+        AmbientHooks,
+        EventHook, //
+    },
     future::{
         Tasks,
         WakeSet, //
@@ -71,6 +77,8 @@ pub(super) struct AgentInner {
     pub(super) wake_set: Arc<WakeSet>,
     /// The hooks that carry ambient state across an await.
     pub(super) ambient_hooks: RefCell<Option<AmbientHooks>>,
+    /// The hook that runs at the start of the execution of each event of a subscription.
+    pub(super) event_hook: RefCell<Option<EventHook>>,
     /// The recorded events.
     pub(super) trace: RefCell<Vec<TraceEvent>>,
     /// The clock of the host, which the timers read under [`TimerMode::Host`].
@@ -151,7 +159,7 @@ pub enum TimerMode {
 ///
 /// The names hold for the serve layer of the Linux cards, whose runtime
 /// implements the trait over its heap of deadlines, and for the hosts of later
-/// milestones. The time is in milliseconds, so a timer of the agent waits for
+/// releases. The time is in milliseconds, so a timer of the agent waits for
 /// the milliseconds of its delay.
 pub trait HostClock {
     /// Returns the milliseconds of a monotonic clock of the host.
@@ -250,6 +258,7 @@ impl Agent {
             tasks: RefCell::new(Tasks::new()),
             wake_set: Arc::new(WakeSet::new()),
             ambient_hooks: RefCell::new(None),
+            event_hook: RefCell::new(None),
             trace: RefCell::new(Vec::new()),
             host_clock: RefCell::new(None),
             #[cfg(feature = "host-queue")]

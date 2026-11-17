@@ -3,9 +3,11 @@
  * aosabi-cli: the generated workspace under the target directory, with its
  * server and inspect packages.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * The workspace is the boot entry of an app, which the author never edits.
  */
 
 //! The generated workspace.
@@ -15,19 +17,26 @@
 //! under `<target_dir>/aosabi/`, the directory the artifacts of the build script
 //! already use, with two members:
 //!
-//! - The lean link acts on the release build, which the command runs with
-//!   `-C panic=abort` and `--target`, and links a dev build as before. The
-//!   package names the facade with the features of its card, `serve`,
-//!   `unix-socket`, `deflate` and `linux` for the cards that serve on Linux.
+//! - `server`, the package `<name>-server`, whose build script calls the lean
+//!   link of its Linux card and writes the schema with
+//!   `aosabi_build::emit_from` over the entry of the service, and whose main is
+//!   the one call `aosabi::serve_app` with the configuration the app carries,
+//!   or `aosabi::serve` with the configuration of `aosabi.config.rs` for a
+//!   project that holds that file, a form retired for application code that the
+//!   hidden feature `mirror` of the facade alone keeps. The lean link acts on
+//!   the release build, which the command runs with `-C panic=abort` and
+//!   `--target`, and links a dev build as before. The package names the facade
+//!   with the features of its card, `serve`, `unix-socket`, `deflate` and
+//!   `linux` for the cards that serve on Linux.
 //! - `inspect`, the package `<name>-inspect`, whose main is the one call
 //!   `aosabi_build::inspect_from`, the runner `aosabi inspect` reads the
 //!   model with, which validates nothing, so it answers for a schema the
 //!   build script of `server` refuses.
 //!
 //! The root of the workspace carries the release profile of the Aosabi
-//! workspace and the size profile of ADR-0025, since cargo reads the
-//! profiles of the root of a workspace alone and the service is a path
-//! dependency of it. The application's own `build.rs`, the one call
+//! workspace and the size profile for the smallest binary, since cargo
+//! reads the profiles of the root of a workspace alone and the service is
+//! a path dependency of it. The application's own `build.rs`, the one call
 //! `aosabi_build::declarations_main()`, stays in the application and runs
 //! when cargo compiles it, so no second one is written here.
 //!
@@ -54,8 +63,15 @@
 //! generated module, which hands the app the glue of its parts. The runner of
 //! `inspect` reads the source path through `aosabi_build::inspect_source_from`.
 //! A plain crate names no build side, so both packages name `aosabi-build` from
-//! where the facade comes: the package beside a path facade, or the version or
-//! the commit of the facade.
+//! where the facade comes: the package beside a path facade, or the repository
+//! of the facade by its reference. Aosabi is released through its repository
+//! alone, and the loader refuses a facade of a registry, `AO-C0108`, so no
+//! generated manifest names the facade or the build side by a version.
+//!
+//! A git dependency is named by the reference the manifest of the project names
+//! it by, a tag, a branch, a revision or none for the default branch, so the
+//! derived lock carries the source of the lock of the project as the same text,
+//! and a pin by tag passes its check.
 //!
 //! `Flavour::Verify` writes the same workspace under
 //! `<target_dir>/aosabi-verify/` with the packages `<name>-verify` and
@@ -87,6 +103,7 @@ use crate::{
         CopyFacts,
         CopySource,
         DepSource,
+        GitReference,
         Project, //
     },
     report::CliError, //
@@ -132,8 +149,8 @@ pub fn glue_in_copy(root: &Path) -> PathBuf {
 /// `server-legacy` and `docker`.
 pub const LINUX_FEATURES: &[&str] = &["serve", "unix-socket", "deflate", "linux"];
 
-/// The release profile of the Aosabi workspace and the size profile of
-/// ADR-0025, as every twin carries them.
+/// The release profile of the Aosabi workspace and the size profile for the
+/// smallest binary, as every twin carries them.
 const PROFILES: &str = "[profile.release]
 lto = \"fat\"
 codegen-units = 1
@@ -377,8 +394,8 @@ pub fn write_source_copy(
 }
 
 /// Returns the source of `aosabi-build` for a plain crate, which names no
-/// build side: the package beside a path facade, or the version or the
-/// commit of the facade.
+/// build side: the package beside a path facade, or the repository of the
+/// facade by its reference.
 ///
 /// # Errors
 ///
@@ -397,12 +414,9 @@ fn build_side_of_facade(project: &Project) -> Result<DepSource, CliError> {
                 .ok_or_else(|| codes::not_a_service(&project.name, true))?;
             DepSource::Path(side)
         }
-        DepSource::Registry { version } => DepSource::Registry {
-            version: version.clone(),
-        },
-        DepSource::Git { url, rev } => DepSource::Git {
+        DepSource::Git { url, reference } => DepSource::Git {
             url: url.clone(),
-            rev: rev.clone(),
+            reference: reference.clone(),
         },
     })
 }
@@ -627,13 +641,7 @@ fn dependency_line(dependency: &CopyDependency, dir: &Path) -> Result<String, Cl
             }
             spec
         }
-        CopySource::Git { url, reference } => {
-            let mut spec = format!("git = {}", toml_string(url));
-            if let Some((key, value)) = reference.as_deref().and_then(|r| r.split_once('=')) {
-                let _ = write!(spec, ", {key} = {}", toml_string(value));
-            }
-            spec
-        }
+        CopySource::Git { url, reference } => git_spec(url, reference),
     }];
     if dependency.package != dependency.key {
         parts.push(format!("package = {}", toml_string(&dependency.package)));
@@ -854,13 +862,20 @@ pub fn spec(source: &DepSource, dir: &Path) -> Result<String, CliError> {
         DepSource::Path(path) => {
             format!("path = {}", toml_string(&utf8(&relative_path(dir, path))?))
         }
-        DepSource::Registry { version } => {
-            format!("version = {}", toml_string(&format!("={version}")))
-        }
-        DepSource::Git { url, rev } => {
-            format!("git = {}, rev = {}", toml_string(url), toml_string(rev))
-        }
+        DepSource::Git { url, reference } => git_spec(url, reference),
     })
+}
+
+/// Returns the specification of a dependency of the repository `url` inside
+/// an inline table, named by `reference` as the manifest of the project
+/// names it, so cargo takes it from the source the lock of the project pins,
+/// as [`GitReference`] says.
+fn git_spec(url: &str, reference: &GitReference) -> String {
+    let mut spec = format!("git = {}", toml_string(url));
+    if let Some((key, value)) = reference.key_value() {
+        let _ = write!(spec, ", {key} = {}", toml_string(value));
+    }
+    spec
 }
 
 /// Returns `path` as UTF-8 text.

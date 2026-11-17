@@ -3,82 +3,87 @@
  * aosabi-js value: the objects, functions and promises of the host as values
  * of the engine.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The stand ins go over the trait shapes of
+ * aosabi-execute, with a bound on the depth.
  */
 
 //! The values of the host as values of the engine.
 //!
 //! A JavaScript object stays on the host and stands in the engine as a
-//! [`JsObject`], an [`ObjectLike`] whose reads are imports. A function stands
-//! as a [`JsFunction`], a [`Function`] of the engine whose call hands `js_call`
-//! the arguments the engine has already put in the order of the schema. A
-//! promise stands as a [`JsPromise`], a promise of the engine whose resolving
-//! functions it keeps, waited for once and settled through the export `settle`
-//! in the microtask of the host the settlement runs in. A primitive, a `Date`
-//! and an array cross inline, an array that holds a thenable as the promise of
-//! all its items. A bigint and a symbol, which the engine holds no value of and
-//! which step 1 of `wrapResolver` passes on as they are, cross as one
-//! tag with a byte of their kind and the text `String` answers for them, which
-//! the module reads by the [`Position`] the value stands at in the schema. The
-//! answer of a call stands at the return type of the field the call resolves,
-//! which the resolve info of the call names, an item of a list at the item
-//! type, a member of an object of an object type at the type of its field, and
-//! the value a promise fulfils with at the place of the promise. At a leaf of
-//! `ID` or `GID`, whose `serialize` answers `String(value)`, the module reads
-//! the text, and an array there as the array `String` joins, a `TypeError` when
-//! a symbol stands among its items, as the join throws on a symbol. At any
-//! other place it reads a [`foreign`] stand in, a function whose every call
-//! answers another stand in. A function is the one value of the engine that the
-//! executor takes for no null and that the writer of JSON leaves out of an
-//! object and writes as `null` in a list, as `JSON.stringify` treats a symbol,
-//! and every scalar the engine specifies or binds but `ID`, `GID` and
-//! `JSON` answers it at a leaf as graphql-js answers a bigint and a symbol, so
-//! a bigint and a symbol answer so at a leaf, an item of a list among
-//! them, and as the whole value of `JSONObject`, and a symbol answers its
-//! JSON inside a value of the scalars `JSONObject`, `JSON` and `Any` and as the
-//! whole value of `Any`. A value of the engine crosses to the host as a record,
-//! the arguments of a call through [`push_arguments`] and every other value
-//! through [`host::encode`], so the host sees plain objects, arrays and dates.
+//! [`JsObject`], an [`ObjectLike`] whose reads are imports. A function stands as
+//! a [`JsFunction`], a [`Function`] of the engine whose call hands `js_call` the
+//! arguments the engine has already put in the order of the schema. A promise
+//! stands as a [`JsPromise`], a promise of the engine whose resolving functions
+//! it keeps, waited for once and settled through the export `settle` in the
+//! microtask of the host the settlement runs in. A primitive, a `Date` and an
+//! array cross inline, an array that holds a thenable as the promise of all its
+//! items. A bigint and a symbol, which the engine holds no value of and which
+//! step 1 of `wrapResolver` passes on as they are, cross as one tag with a byte
+//! of their kind and the text `String` answers for them, which the module reads
+//! by the [`Position`] the value stands at in the schema. The answer of a call
+//! stands at the return type of the field the call resolves, which the resolve
+//! info of the call names, an item of a list at the item type, a member of an
+//! object of an object type at the type of its field, and the value a promise
+//! fulfils with at the place of the promise. At a leaf of `ID` or `GID`, whose
+//! `serialize` answers `String(value)`, the module reads the text, and an array
+//! there as the array `String` joins, a `TypeError` when a symbol stands among
+//! its items, as the join throws on a symbol. At any other place it reads a
+//! [`foreign`] stand in, a function whose every call answers another stand in. A
+//! function is the one value of the engine that the executor takes for no null
+//! and that the writer of JSON leaves out of an object and writes as `null` in a
+//! list, as `JSON.stringify` treats a symbol, and every scalar the engine
+//! specifies or binds but `ID`, `GID` and `JSON` answers it at a leaf as
+//! graphql-js answers a bigint and a symbol, so a bigint and a symbol answer so
+//! at a leaf, an item of a list among them, and as the whole value of
+//! `JSONObject`, and a symbol answers its JSON inside a value of the scalars
+//! `JSONObject`, `JSON` and `Any` and as the whole value of `Any`. The shapes
+//! still open answer otherwise for a reason no record of the boundary can remove:
+//! a bigint that reaches the writer of JSON, where `JSON.stringify` throws, and a
+//! symbol as the whole value of the scalar `JSON`. A value of the engine crosses
+//! to the host as a record, the arguments of a call through [`push_arguments`]
+//! and every other value through [`host::encode`], so the host sees plain
+//! objects, arrays and dates.
 //!
 //! The host meets a thenable while it walks a value it answers, as step 3 of
-//! `wrapResolver` meets it, and calls its `then` there, before it reads
-//! the next item. A promise of the realm of the host that the walk answers as
-//! the value takes the two callbacks that call the export `settle`, the form of
-//! the plan. Any other thenable takes the call of `wrapResolver` with one callback, which
-//! answers what `wrapResolver` answers for the value it receives. For a
-//! thenable it calls that `then` at once, inside the callback, with one
-//! callback of the same form and answers what that `then` answers. A promise of
-//! the realm of the host that the walk meets as an item of a list, or that a
-//! callback receives, takes the `then` of `Promise` itself with the
-//! callback of `wrapResolver` and a second callback, since no code of the app sees the count of
-//! the arguments of that `then`, so a field that waits on the promise it
-//! derives settles in the job that promise rejects in. The host maps an array
-//! as step 4 maps it, the array the walk meets and the one the callback
-//! receives, each item and each nested array the same way, so the `then` of a
-//! thenable item runs while the walk runs, and it answers the mapped array, or
-//! a promise of the host of all its items when one of them is a thenable, which
-//! the host makes with the steps of `Promise.all` and owns, so a field that
-//! waits on it settles in its job. A primitive and a `Date` come back as they
-//! are, as steps 1 and 2 answer them, and so does any other object, since the
-//! projection of the engine reads its members, as step 6 reads them there,
-//! through [`ObjectLike::read`] in the count and the order of the
-//! projection of `wrapResolver`. What the outer `then` answers is the value that crosses, and a
-//! promise of the host when that value is a thenable, which the host settles in
-//! the job the field of `wrapResolver` settles in wherever it can tell that job: a late call
-//! of the callback settles it with what the callback answers, at once or as the
-//! promise of the app adopts it, and a thenable of the app that the host adopts
-//! settles it through resolving functions of the host. A late call that code of
-//! the app makes inside an import, a resolver the engine calls among them,
-//! rides on the answer of that import, and the settlement takes effect as the
-//! import returns, in the job of that call. Its reactions, the step 3 the
-//! engine applies to the promise among them, run at once there, and the jobs
-//! they enqueue wait for the microtask the host reserves at the call, where V8
-//! queues the consumer of `wrapResolver`, and which calls the export `resume`. A settlement
-//! through the resolving functions the host handed a thenable it adopts runs
-//! the jobs those reactions enqueue at once as well, inside an import or in the
-//! microtask of the export `settle`, since the async function of a root
+//! `wrapResolver` meets it, and calls its `then` there, before it reads the next
+//! item. A promise of the realm of the host that the walk answers as the value
+//! takes the two callbacks that call the export `settle`. Any other thenable
+//! takes the call of `wrapResolver` with one callback, which answers what
+//! `wrapResolver` answers for the value it receives. For a thenable it calls that
+//! `then` at once, inside the callback, with one callback of the same form and
+//! answers what that `then` answers. A promise of the realm of the host that the
+//! walk meets as an item of a list, or that a callback receives, takes the `then`
+//! of `Promise` itself with the callback of `wrapResolver` and a second callback,
+//! since no code of the app sees the count of the arguments of that `then`, so a
+//! field that waits on the promise it derives settles in the job that promise
+//! rejects in. The host maps an array as step 4 maps it, the array the walk meets
+//! and the one the callback receives, each item and each nested array the same
+//! way, so the `then` of a thenable item runs while the walk runs, and it answers
+//! the mapped array, or a promise of the host of all its items when one of them
+//! is a thenable, which the host makes with the steps of `Promise.all` and owns,
+//! so a field that waits on it settles in its job. A primitive and a `Date` come
+//! back as they are, as steps 1 and 2 answer them, and so does any other object,
+//! since the projection of the engine reads its members, as step 6 reads them
+//! there, through [`ObjectLike::read`] in the count and the order of the
+//! projection of `wrapResolver`. What the outer `then` answers is the value that
+//! crosses, and a promise of the host when that value is a thenable, which the
+//! host settles in the job the field of `wrapResolver` settles in wherever it can
+//! tell that job: a late call of the callback settles it with what the callback
+//! answers, at once or as the promise of the app adopts it, and a thenable of the
+//! app that the host adopts settles it through resolving functions of the host. A
+//! late call that code of the app makes inside an import, a resolver the engine
+//! calls among them, rides on the answer of that import, and the settlement takes
+//! effect as the import returns, in the job of that call. Its reactions, the step
+//! 3 the engine applies to the promise among them, run at once there, and the
+//! jobs they enqueue wait for the microtask the host reserves at the call, where
+//! V8 queues the consumer of `wrapResolver`, and which calls the export `resume`.
+//! A settlement through the resolving functions the host handed a thenable it
+//! adopts runs the jobs those reactions enqueue at once as well, inside an import
+//! or in the microtask of the export `settle`, since the async function of a root
 //! hands that thenable its own resolving functions and reacts on the settlement
-//! itself. So the record holds a promise of the host whose `then` has run, and
+//! itself. The shapes still open settle one job off the field of `wrapResolver`
+//! or answer another value, each for a reason no wrapper over the boundary can
+//! remove. So the record holds a promise of the host whose `then` has run, and
 //! the module notes a [`JsPromise`] for it and calls no import.
 //!
 //! The host answers every read and every call with a completion: the byte
@@ -138,26 +143,29 @@
 //! record, the bound the host keeps as well, so neither side follows a deep
 //! or cyclic value without end.
 //!
-//! The classes of the wrapper stamp a brand the host reports. The host reads an
-//! error in one of three forms, by the place the module met it. A thrown error,
-//! one a call threw, a promise rejected with or a field answered, is read while
-//! the execution runs as the executor reads it there, in
-//! `locatedError` of graphql-js and of its utilities and in the handler of each
-//! place the error reaches, whose levels the module hands the host from the
-//! place it met the error up to the field of the root: its `path`, its
-//! `coordinate` for a path that is an array, and else its `message`, `nodes`,
-//! `source` and `positions`, the locations of its blame, its `extensions` once
-//! more when they are an object and its `stack` once more when it is true, then
-//! the member `CRITICAL_ERROR` of its extensions at each place that may hold
-//! null, and for a path that is an array its `path` and `coordinate` at each
-//! handler above the first and its `errors` at the root. The handler of a field
-//! takes an `AggregateError` apart, so it crosses with the errors of it that
-//! handler handles, each read in turn, up to the first the handler throws on,
-//! and an item of it that is no error crosses as the error `coerceError` makes
-//! of it. The host keeps a record of each thrown error, and the error of the
-//! engine holds a [`Deferred`] in place of its original error or of the Rust
-//! value behind it, so [`finish`] makes the reads Yoga makes at the end of the
-//! request once the execution has ended: the original error as
+//! An error of the host crosses as its handle, and the module reads it through
+//! the import `js_error` into the [`ErrorObject`] a throw of a Rust app of the
+//! same class makes, so the masking of `graphql-over-http` and the map of
+//! `aosabi-auth` see the classes an app tells apart with `instanceof`. The
+//! classes of the wrapper stamp a brand the host reports. The host reads an error
+//! in one of three forms, by the place the module met it. A thrown error, one a
+//! call threw, a promise rejected with or a field answered, is read while the
+//! execution runs as the executor reads it there, in `locatedError` of graphql-js
+//! and of its utilities and in the handler of each place the error reaches, whose
+//! levels the module hands the host from the place it met the error up to the
+//! field of the root: its `path`, its `coordinate` for a path that is an array,
+//! and else its `message`, `nodes`, `source` and `positions`, the locations of
+//! its blame, its `extensions` once more when they are an object and its `stack`
+//! once more when it is true, then the member `CRITICAL_ERROR` of its extensions
+//! at each place that may hold null, and for a path that is an array its `path`
+//! and `coordinate` at each handler above the first and its `errors` at the root.
+//! The handler of a field takes an `AggregateError` apart, so it crosses with the
+//! errors of it that handler handles, each read in turn, up to the first the
+//! handler throws on, and an item of it that is no error crosses as the error
+//! `coerceError` makes of it. The host keeps a record of each thrown error, and
+//! the error of the engine holds a [`Deferred`] in place of its original error or
+//! of the Rust value behind it, so [`finish`] makes the reads Yoga makes at the
+//! end of the request once the execution has ended: the original error as
 //! `isOriginalGraphQLError` reads it, which tells whether the mask keeps the
 //! error, and then the reads of the mask or of the writer of the result, which
 //! makes every error of the result anew from its message, its path, its
@@ -473,6 +481,9 @@ thread_local! {
     /// Whether a plugin of the app maps a `ForbiddenError`, the identity
     /// plugin of `aosabi/auth/plugin`.
     static IDENTITY: Cell<bool> = const { Cell::new(false) };
+    /// Whether the mask of Yoga reads the errors of a result, off unless the
+    /// key `maskedErrors` of the configuration turns it on.
+    static MASKS: Cell<bool> = const { Cell::new(false) };
 }
 
 /// Sets the read mode the boot record names, the projection when `project`
@@ -486,6 +497,15 @@ pub fn set_project(project: bool) {
 /// feature of the error at the end of the execution in place of the mask.
 pub fn set_identity_map(on: bool) {
     IDENTITY.set(on);
+}
+
+/// Sets whether the mask of Yoga reads the errors of a result, `true` where the
+/// key `maskedErrors` of the configuration turns the mask on, so the reads at the
+/// end of the execution are otherwise those of the writer of the result alone.
+/// Pylon masks outside `NODE_ENV=development`, and the module masks where the key
+/// says so alone, a named divergence.
+pub fn set_masks(on: bool) {
+    MASKS.set(on);
 }
 
 /// The place a value of the host stands at in the schema, which tells the
@@ -763,7 +783,7 @@ impl Place<'_> {
             Self::Original => return vec![ORIGINAL],
             Self::Pulled | Self::Rejected(Position::Pulled) => return vec![PULLED],
             Self::Hook | Self::Rejected(Position::Hook) => {
-                return vec![HOOK, u8::from(masks_errors())];
+                return vec![HOOK, u8::from(MASKS.get())];
             }
             Self::Thrown => Position::field().levels(),
             Self::Rejected(position) => position.levels(),
@@ -772,7 +792,7 @@ impl Place<'_> {
                 position @ Position::Typed { .. } => position.levels(),
                 Position::Unknown => return vec![HELD],
                 Position::Pulled => return vec![PULLED],
-                Position::Hook => return vec![HOOK, u8::from(masks_errors())],
+                Position::Hook => return vec![HOOK, u8::from(MASKS.get())],
             },
         };
         let mut record = Vec::with_capacity(5 + levels.len());
@@ -2002,13 +2022,6 @@ fn read_hook(reader: &mut Reader<'_>, depth: usize) -> Option<Value> {
     })
 }
 
-/// Returns whether the mask of Yoga reads a value that escapes the execution,
-/// which the handler of `aosabi-core` turns off where `NODE_ENV` is
-/// `development`.
-fn masks_errors() -> bool {
-    aosabi_core::app::env_alias::var("NODE_ENV").as_deref() != Some("development")
-}
-
 /// The name of the class `ForbiddenError`, which the executor reads
 /// no name of and the error of the engine takes from its brand.
 const FORBIDDEN_NAME: &str = "ForbiddenError";
@@ -2068,8 +2081,9 @@ impl Deferred {
 /// the errors of the result. A `GraphQLError` first takes its original error
 /// in the form [`END`], read as `isOriginalGraphQLError` of Yoga reads it,
 /// which tells whether the mask keeps the error, and an error of any other
-/// class is masked. Then the form [`FINAL`] makes the reads of the mask or of
-/// the writer of the result, as [`Final::apply`] gives them to the error.
+/// class is masked, where the mask reads the result at all, [`set_masks`].
+/// Then the form [`FINAL`] makes the reads of the mask or of the writer of
+/// the result, as [`Final::apply`] gives them to the error.
 pub fn finish(errors: &mut [GraphQLError]) {
     if errors.is_empty() {
         return;
@@ -2109,7 +2123,7 @@ fn finish_all(errors: &mut [GraphQLError]) {
             }
             continue;
         }
-        let masked = deferred.brand != Brand::GraphQL || !is_original(error);
+        let masked = MASKS.get() && (deferred.brand != Brand::GraphQL || !is_original(error));
         let read = read_end(&deferred, &[FINAL, u8::from(masked)], |reader| {
             read_final(reader, &deferred, masked)
         });
@@ -2901,8 +2915,9 @@ fn skip(reader: &mut Reader<'_>, depth: usize) -> Option<()> {
 }
 
 /// Traps on purpose when `text` is the marker [`TRAP`], in a build with the
-/// feature `trap` alone, the test build of `13_ts1_boundary`, section 9,
-/// which judges that the host never calls a trapped instance again.
+/// feature `trap` alone, the test build with which the checks of the
+/// boundary of the TypeScript option judge that the host never calls a
+/// trapped instance again.
 #[cfg(feature = "trap")]
 fn trap_at(text: &JsString) {
     if text.as_str() == Some(TRAP) {

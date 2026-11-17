@@ -11,14 +11,19 @@
 //! The ambient state of a running agent.
 //!
 //! Two things are ambient. The first is the agent itself. A free function
-//! such as [󰀀](crate::promise::sleep) takes no agent, so the agent that runs
-//! pushes itself on a stack of the thread for as long as it runs, and
+//! such as [`sleep`](crate::promise::sleep) takes no agent, so the agent that
+//! runs pushes itself on a stack of the thread for as long as it runs, and
 //! [`Agent::current`] reads the top. The second is the state of the layer
 //! above, the context and the resolve info of a request in a store that
 //! follows an async function across every await. The layer above keeps that
-//! store in a cell of its own and hands the
-//! agent two hooks. [`Agent::spawn`] captures the store once, and every poll
-//! of the spawned future runs with the captured store in place.
+//! store in a cell of its own and hands the agent two hooks. [`Agent::spawn`]
+//! captures the store once, and every poll of the spawned future runs with
+//! the captured store in place.
+//!
+//! Beside them the layer above hands the agent the hook of the events of a
+//! subscription, [`Agent::set_event_hook`], which the subscription entry runs
+//! at the start of the execution of each event. It reads no store, so it runs
+//! also where no state of the layer above is in place.
 
 use core::{
     any::Any,
@@ -33,6 +38,9 @@ pub type AmbientCapture = Rc<dyn Fn() -> Option<Rc<dyn Any>>>;
 
 /// Puts the given ambient state in place and returns what was in place before.
 pub type AmbientRestore = Rc<dyn Fn(Option<Rc<dyn Any>>) -> Option<Rc<dyn Any>>>;
+
+/// Runs at the start of the execution of each event of a subscription, see [`Agent::set_event_hook`].
+pub type EventHook = Rc<dyn Fn()>;
 
 /// The two hooks of [`Agent::set_ambient_hooks`].
 #[derive(Clone)]
@@ -138,5 +146,27 @@ impl Agent {
     pub(super) fn swap_ambient(&self, state: Option<Rc<dyn Any>>) -> Option<Rc<dyn Any>> {
         let hooks = self.0.ambient_hooks.borrow().clone()?;
         (hooks.restore)(state)
+    }
+
+    /// Sets the hook that runs at the start of the execution of each event of
+    /// a subscription on this agent, in place of the one set before.
+    ///
+    /// The subscription entry [`subscribe`](crate::subscribe()) runs it once
+    /// per event of the source stream, before the operation runs over the
+    /// payload of that event, so the layer above ties what it noted of an
+    /// event to the execution of that event.
+    pub fn set_event_hook(&self, hook: EventHook) {
+        *self.0.event_hook.borrow_mut() = Some(hook);
+    }
+
+    /// Runs the hook [`Agent::set_event_hook`] set, if there is one.
+    ///
+    /// The cell is read before the hook runs, so a hook that sets another
+    /// meets no borrow.
+    pub(crate) fn start_event(&self) {
+        let hook = self.0.event_hook.borrow().clone();
+        if let Some(hook) = hook {
+            hook();
+        }
     }
 }

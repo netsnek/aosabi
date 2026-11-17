@@ -2,7 +2,8 @@
 /*
  * aosabi-macros: `#[derive(Aosabi)]` on a struct.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. A struct is the twin of a TypeScript
+ * class.
  */
 
 //! `#[derive(Aosabi)]` on a struct.

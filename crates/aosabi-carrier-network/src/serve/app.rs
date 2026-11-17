@@ -5,8 +5,9 @@
  *
  * No analogue on the reference side. A call runs straight through the hooks
  * and the engine of the booted app with the fixed fields of
- * docs/graphtp-in-aosabi.md section 2.1 as its request, so one GraphQL server
- * answers both protocols.
+ * Documentation/guides/graphtp.md as its request, so one GraphQL server
+ * answers both protocols. The function is the fetch of a carrier of
+ * aosabi_core::graphtp::served, which the device carriers call as well.
  */
 
 //! The fetch of the booted app.

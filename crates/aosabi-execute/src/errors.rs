@@ -2,6 +2,9 @@
 /*
  * aosabi-execute errors: the GraphQLError constructor of the utilities and the located error.
  *
+ * It leaves out the branch of an original error that looks like an error and
+ * the member coordinate.
+ *
  * Derived from @graphql-tools/utils 11.0.0, cjs/errors.js, MIT.
  */
 
@@ -108,7 +111,9 @@ pub fn create_graphql_error(
 
 /// Returns the `GraphQLError` of `raw_error` that blames `nodes` and carries `path`.
 ///
-/// A `GraphQLError` that already carries a path comes back as it is.
+/// A `GraphQLError` that already carries a path comes back as it is. The
+/// `toError` of graphql-js runs on a value that is no error, which the
+/// executor never hands over, because [`coerce_error`] runs first.
 #[must_use]
 pub fn located_error(raw_error: Value, nodes: &FieldNodes, path: Vec<PathSegment>) -> GraphQLError {
     let nodes = nodes

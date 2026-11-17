@@ -9,7 +9,7 @@
 # list it, so it ships nothing. The one command that builds it, from the
 # repository root:
 #
-#   ~/.cargo/bin/cargo build --release --manifest-path tests/fixtures/rs/wasm-client-probe/Cargo.toml --target wasm32-unknown-unknown
+#   cargo build --release --manifest-path tests/fixtures/rs/wasm-client-probe/Cargo.toml --target wasm32-unknown-unknown
 
 [workspace]
 resolver = "3"

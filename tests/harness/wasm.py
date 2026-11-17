@@ -5,10 +5,14 @@ the seam under the committed module.
 The raw bytes and the gzip bytes of the module are read against their gates,
 and the same call of the seam runs natively and under the module.
 
-The seam is `aosabi-devtool viewer`, whose operations answer the batch form,
-one JSON request line in and one JSON answer line out, and whose flag
-`--wasm PATH` answers through the exports of the module in place of the linked
-core, so one request file judges the shipped bytes.
+The seam is `aosabi-devtool viewer`, whose operations answer the batch form, one
+JSON request line in and one JSON answer line out, and whose flag `--wasm PATH`
+answers through the exports of the module in place of the linked core, so one
+request file judges the shipped bytes.
+
+The second to last section reads the raw and the gzip bytes of any file as two
+named fields and the memory of a workerd process that serves a guest, and the last
+section the sequential latency of a served side, both for the TypeScript gate.
 """
 
 from __future__ import annotations
@@ -78,14 +82,13 @@ class Size:
 def gzip_bytes(data: bytes, level: int = GZIP_LEVEL) -> bytes:
     """Returns `data` in the gzip container at `level` through Python's zlib.
 
-    The window bits `GZIP_WINDOW_BITS` select the gzip header, which zlib
-    writes with no file name and a zero time, so the header adds no variable
-    bytes and, on one zlib build, the length depends on the input and the
-    level. The build is a third input: the committed
-    tests/fixtures/viewer/presets/github.json of 863,156 bytes at level 9
-    gives 37,143 bytes through Python's zlib 1.3.1.zlib-ng and 36,944 bytes
-    through the zlib 1.3.1-470d3a2 of node v24.13.0, which is why `Size.line`
-    prints the version beside the gate.
+    The window bits `GZIP_WINDOW_BITS` select the gzip header, which zlib writes
+    with no file name and a zero time, so the header adds no variable bytes and,
+    on one zlib build, the length depends on the input and the level. The build is
+    a third input: the committed preset of 863,156 bytes at level 9 gives 37,143
+    bytes through Python's zlib 1.3.1.zlib-ng and 36,944 bytes through the zlib
+    1.3.1-470d3a2 of node v24.13.0, which is why `Size.line` prints the version
+    beside the gate.
     """
     compressor = zlib.compressobj(level, zlib.DEFLATED, GZIP_WINDOW_BITS)
     return compressor.compress(data) + compressor.flush()
@@ -190,8 +193,12 @@ def smoke(devtool) -> dict:
 
 # The memory and the size of a workerd guest.
 #
-# The functions above stay as they are, and procs.py is untouched.
+# The functions below read the bytes of a module and the memory of a workerd
+# process that serves one. The functions above stay as they are, and procs.py is
+# untouched.
 
+# The fields of /proc/<pid>/status the gate reads, the resident set and its high
+# water mark, which the kernel writes in kB, units of 1024 bytes.
 STATUS_FIELDS = ("VmRSS", "VmHWM")
 STATUS_UNIT = 1024
 
@@ -292,8 +299,9 @@ def buffer_byte_lengths(port: int, host: str = "127.0.0.1", timeout_s: float = 1
 
 # The sequential latency of a served side.
 #
-# The client runs as a process of its own, so the timing of the kernel of the
-# notebook adds nothing.
+# The rows of the latency are timed with the client load.mjs of a speed run. The
+# client runs as a process of its own, so the timing of the kernel of the notebook
+# adds nothing.
 
 # The marker of a DISTINCT body, where the client writes its counter.
 DISTINCT_MARK = "@@@@@@@"

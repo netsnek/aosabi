@@ -5,11 +5,11 @@
 # facade, so a Worker build and the default ESP32-C3 build link none of it.
 [package]
 name = "aosabi-serve"
-version = "0.0.0"
+version.workspace = true
 description = "The engine of Aosabi: serve_with, the node server plugin, the runtime of one thread, the TCP listener, the protocol selection, the node handler and the Node adapter of @hono/node-server 1.19.9, with TLS and HTTP/2 behind features of the Linux cards."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 
@@ -39,8 +39,8 @@ aosabi-core = { path = "../aosabi-core" }
 # layer whose Fetch types the adapter answers as Node fills them.
 aosabi-http = { path = "../aosabi-http", default-features = false, features = ["messages", "node", "node-server"] }
 # The one writer of JSON bytes, which writes the boot report of the harness,
-# and the function seed of its feature std, which the boot keys the hashes of
-# its thread with (src/serve.rs, seed_keys).
+# and the function seed of its feature std, through which the boot keys the
+# hashes of its thread (src/serve.rs, aosabi_core::random::seed_keys).
 aosabi-json = { path = "../aosabi-json", features = ["std"] }
 # The forks vendored the kernel way under third_party/rust/, reached by path.
 # Hyper serves HTTP/1.1 with the Node parity of its layer B and std without
@@ -52,11 +52,12 @@ http-body = { path = "../../third_party/rust/http-body", default-features = fals
 # The buffers of hyper's public interface, kept and pinned, whose requirement
 # names the version the register reviewed as its floor.
 bytes = { version = "1.12.1", default-features = false, features = ["std"] }
-# The TLS library behind the feature tls, under reason 3.1 of
-# docs/decisions/ADR-0024-dependencies.md. The requirement names the version the
-# register reviewed as its floor, and the default features are off, so the
-# provider is ring and not aws-lc-rs and no logging crate enters.
-rustls = { version = "0.23.45", optional = true, default-features = false, features = ["std", "ring"] }
+# The TLS library behind the feature tls, under a reason that admits a crate.
+# The requirement names the version the register reviewed as its floor, and the
+# default features are off, so the provider is ring and not aws-lc-rs and no
+# logging crate enters. The feature tls12 stays off, since the card speaks TLS
+# 1.3 alone.
+rustls = { version = "0.23.46", optional = true, default-features = false, features = ["std", "ring"] }
 
 # The one outside crate of a Linux card, behind the feature linux and for a
 # Linux target alone, so a build without the feature or for another target
@@ -66,9 +67,8 @@ rustls = { version = "0.23.45", optional = true, default-features = false, featu
 rustix = { version = "1.1.5", optional = true, default-features = false, features = ["std", "event", "net"] }
 
 # The runtime with one timer beyond the 32 bit range of a wait, which accepts
-# one connection, the probe of the timeout of the epoll reactor that
-# tests/notebooks/08_card_builds.ipynb builds for the host with each backend
-# of rustix and for the player and runs, and which ships in no artifact.
+# one connection, the probe of the timeout of the epoll reactor, which ships in
+# no artifact.
 [[example]]
 name = "far_timer"
 path = "examples/far_timer.rs"

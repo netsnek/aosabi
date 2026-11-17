@@ -3,13 +3,12 @@
  * aosabi-carrier-lora ledger: the airtime ledger that keeps a radio inside
  * the duty cycle of its band.
  *
- * The ledger is that of the Homa design note, second version, homa/design.md
- * section 6.3, lines 1810 to 1868: the air of one transmitter in 61 buckets of
- * one minute, a packet admitted only while the last 61 buckets plus the packet
- * stay within the duty cycle's share of an hour, and 90 percent of the budget
- * for DATA, so the control packets still leave when a long response has used
- * its share. The duty cycles are 10 percent in the band 869.4 to 869.65 MHz
- * and 1 percent in the band 868.0 to 868.6 MHz.
+ * The ledger keeps the air of one transmitter in 61 buckets of one minute,
+ * admits a packet only while the last 61 buckets plus the packet stay within
+ * the duty cycle's share of an hour, and gives DATA 90 percent of the budget,
+ * so the control packets still leave when a long response has used its share.
+ * The duty cycles are 10 percent in the band 869.4 to 869.65 MHz and 1
+ * percent in the band 868.0 to 868.6 MHz.
  */
 
 //! The airtime ledger.

@@ -17,19 +17,18 @@
 //! The two files agree when they hold the same types that are no `__` type,
 //! each of the same kind, with the same fields and input fields, each of the
 //! same type expression, and the same arguments by name, each of the same type
-//! expression, which are the four things the plan names for the check. Every
-//! comparison goes by name, so order is not compared. Neither are descriptions,
-//! which the reading of a block string changes, nor default values,
-//! deprecations, enum values, union members, interfaces or directives, among
-//! which the served schema adds the `@inContext` directive that `ir.json` never
-//! holds. A scalar of the specification that the served schema holds and
-//! `ir.json` does not list is no difference either, because graphql-js adds
-//! `String` and `Boolean` to every schema for its introspection types and takes
-//! each of the five from the specification where a field names it undeclared.
-//! The first path that differs is refused with `AO-D0005`: the served types in
-//! schema order, each with its fields in schema order and each field with its
-//! type expression and its arguments, and then the types `ir.json` alone holds,
-//! in its order.
+//! expression, which are the four things the check compares. Every comparison
+//! goes by name, so order is not compared. Neither are descriptions, which the
+//! reading of a block string changes, nor default values, deprecations, enum
+//! values, union members, interfaces or directives, among which the served
+//! schema adds the `@inContext` directive that `ir.json` never holds. A scalar
+//! of the specification that the served schema holds and `ir.json` does not
+//! list is no difference either, because graphql-js adds `String` and `Boolean`
+//! to every schema for its introspection types and takes each of the five from
+//! the specification where a field names it undeclared. The first path that
+//! differs is refused with `AO-D0005`: the served types in schema order, each
+//! with its fields in schema order and each field with its type expression and
+//! its arguments, and then the types `ir.json` alone holds, in its order.
 //!
 //! Then every argument description `ir.json` carries is set into the model with
 //! [`Builder::set_arg_description`], because the printer of the reference

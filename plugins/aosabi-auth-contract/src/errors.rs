@@ -3,19 +3,20 @@
  * aosabi-auth-contract: the error an application throws when a caller lacks a
  * permission.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/errors.ts,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/errors.ts and packages/pylon/src/auth/authz.ts,
  * Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `ForbiddenError`.
 //!
-//! The one authorization error of Aosabi, thrown by a capability gate and by
-//! the row policies and feature gates of the ORM, so there is one class
-//! everywhere. It carries the code `FORBIDDEN`, the status 403 and, for the
-//! denial of a feature gate, the feature. The module names no crate but
-//! `core`, `alloc` and the JSON values of `aosabi-json`, as the reference
-//! module imports nothing, so a data layer names the error without the web
-//! framework. `aosabi-core` converts it into the value a resolver throws.
+//! Aosabi denies every authorization with this one error, whether a
+//! capability gate, a row policy or a feature gate of the ORM denies it. It
+//! carries the code `FORBIDDEN`, the status 403 and, for the denial of a
+//! feature gate, the feature. The module names no crate but `core`, `alloc`
+//! and the JSON values of `aosabi-json`, as the reference module imports
+//! nothing, so a data layer names the error without the web framework.
+//! `aosabi-core` converts it into the value a resolver throws.
 //!
 //! The message is a JavaScript string and the feature any value, as the
 //! constructor of the reference takes them, so an error a host of the

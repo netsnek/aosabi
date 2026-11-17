@@ -4,10 +4,8 @@
  * documents, the patch of a result, the merge of a result, the delegation, the
  * stripping of ignored characters and the body of a request.
  *
- * No analogue in the reference. It is the Rust half of
- * tests/sidecar/federation.mjs and of the operation strip of
- * tests/sidecar/graphql-js.mjs, whose protocol tests/sidecar/federation.md
- * writes.
+ * No analogue in the reference. It is the Rust half of the federation sidecar
+ * and of the operation strip of the graphql-js sidecar.
  */
 
 //! The primitive `federation` of the seam.
@@ -175,8 +173,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "federation";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M10";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "federation";
 
 /// The operations of the primitive.
 const OPERATIONS: &Operations = &[
@@ -1648,6 +1646,7 @@ mod delegation {
         JsObject,
         JsValue, //
     };
+    use aosabi_lang::parser::REQUEST_TOKENS;
     use aosabi_serve::runtime::Runtime;
 
     use super::{
@@ -2179,7 +2178,7 @@ mod delegation {
         answered
     }
 
-    /// Answers a delegation outside a resolver, refusal R09 of `90_federation`.
+    /// Answers a delegation outside a resolver, which Federation refuses.
     ///
     /// The federation's `delegate` is called once inside the context of the
     /// request with no resolve info in place, and its promise is driven on
@@ -2259,6 +2258,7 @@ mod delegation {
             schema,
             root_value: Arc::new(|| Value::Undefined),
             leaf_serializers: Some(Arc::clone(core.leaf_serializers())),
+            max_tokens: REQUEST_TOKENS,
         };
         let document = require(request, OP, "document")?;
         let variables = match request.get("variables") {

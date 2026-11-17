@@ -5,8 +5,8 @@
  * build throws.
  *
  * The constant text of the message is the extracted literal
- * crates/aosabi-build/src/schema_invalid_message.rs, which tools/provenance
- * writes and this file only reads.
+ * crates/aosabi-build/src/schema_invalid_message.rs, whose bytes are pinned
+ * and which this file only reads.
  */
 
 //! The `validate-schema` primitive of the seam.
@@ -74,11 +74,17 @@ use crate::{
 const NAME: &str = "validate-schema";
 
 /// The constant segments of the message, in the order the source carries them.
+///
+/// The extractor concatenates the quoted strings of the reference, which are
+/// the opening line with its newline, the one newline the bullets are joined
+/// by, and the advisory paragraph with the blank line in front of it.
 const SEGMENTS: &str = include_str!("../../aosabi-build/src/schema_invalid_message.rs");
 
 /// The text in front of the message of one error.
 ///
-/// The extractor pins quoted strings only, so the template is carried here.
+/// It is two spaces, U+2022 and one space, the constant part of a template
+/// literal of the reference. The extractor pins quoted strings only, so the
+/// template is carried here.
 const BULLET: &str = "  \u{2022} ";
 
 /// The command line of the `validate-schema` primitive.
@@ -216,7 +222,9 @@ fn fold_schema_errors(type_defs: impl Into<Source>, options: BuildSchemaOptions)
 
 /// Returns the text the build throws over `errors`, which holds at least one entry.
 ///
-/// Every constant byte comes from the extracted literal.
+/// The text is the opening line, one bullet per entry joined by the separator,
+/// then the advisory paragraph. Every constant byte comes from the extracted
+/// literal.
 ///
 /// # Errors
 ///

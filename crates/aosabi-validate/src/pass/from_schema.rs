@@ -3,7 +3,9 @@
  * aosabi-validate pass from_schema: the field table of the single pass built
  * from a schema of the type layer, with the handles of its custom scalars.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The rows read the schema through the type
+ * layer, and the handles ask a custom scalar the question of
+ * `isValidValueNode`.
  */
 
 //! The table of the single pass built from a schema, the boot form.

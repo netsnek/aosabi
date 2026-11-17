@@ -2,7 +2,7 @@
 /*
  * graphql-over-http: the refusal of every introspection field but __typename.
  *
- * Derived from graphql-yoga 2.19.0, cjs/index.js, MIT.
+ * Derived from @graphql-yoga/plugin-disable-introspection 2.19.0, cjs/index.js, MIT.
  * Derived from graphql-js 16.12.0, src/validation/rules/custom/NoSchemaIntrospectionCustomRule.ts, MIT.
  */
 
@@ -10,13 +10,15 @@
 //!
 //! The plugin marks every request in `onRequestParse` and adds the rule
 //! `NoSchemaIntrospectionCustomRule` to the validation of a marked request,
-//! which the app installs when its config sets `graphiql: false`. The rule
-//! reports every field whose type is an introspection type, so `__schema`
-//! and `__type` are refused once per field and `__typename`, a `String!`,
-//! stays allowed. The refusal is a validation error, so the HTTP validation
-//! error plugin stamps it. The object of the reference carries the two hooks
-//! and no other key, so the plugin answers `onValidate` and `onRequestParse`
-//! as its hooks, the members the boot report lists for it.
+//! which the handler of Pylon installs when its config sets
+//! `graphiql: false` and Aosabi on `introspection: false` alone, a named
+//! divergence. The rule reports every field whose type is an introspection
+//! type, so `__schema` and `__type` are refused once per field and
+//! `__typename`, a `String!`, stays allowed. The refusal is a validation
+//! error, so the HTTP validation error plugin stamps it. The object of the
+//! reference carries the two hooks and no other key, so the plugin answers
+//! `onValidate` and `onRequestParse` as its hooks, the members the boot
+//! report lists for it.
 
 use core::cell::RefCell;
 use std::rc::{

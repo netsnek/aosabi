@@ -2,7 +2,8 @@
 /*
  * aosabi-macros: `#[aosabi::scalar]`.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. A scalar newtype is the twin of a type
+ * the scalar table of the inference names.
  */
 
 //! `#[aosabi::scalar]`.
@@ -10,7 +11,7 @@
 //! The documentation comment of the newtype is the documentation of its type
 //! and never the description of the `scalar` line, which the printer writes
 //! bare. It reaches the schema as the description of a non null input field
-//! typed by the scalar, quirk `Q15`.
+//! typed by the scalar, quirk `INPUT_DESCRIPTION_FROM_TYPE`.
 
 use proc_macro2::TokenStream;
 use quote::quote;

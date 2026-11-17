@@ -4,7 +4,7 @@
  *
  * One member of it per topic.
  *
- * Derived from graphql-yoga 5.0.5, typings/create-pub-sub.d.ts, MIT.
+ * Derived from @graphql-yoga/subscription 5.0.5, typings/create-pub-sub.d.ts, MIT.
  */
 
 //! The typed topic of the pub sub.

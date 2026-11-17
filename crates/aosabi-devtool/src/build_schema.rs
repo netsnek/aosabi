@@ -4,8 +4,7 @@
  * buildSchema of graphql-js throws.
  *
  * No analogue in the reference. The crates under test are aosabi-type and the
- * SDL rules of aosabi-validate, and the judging notebook is
- * tests/notebooks/02_language.ipynb.
+ * SDL rules of aosabi-validate.
  */
 
 //! The `build-schema` primitive of the seam.

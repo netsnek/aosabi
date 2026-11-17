@@ -3,7 +3,8 @@
  * aosabi-core cache_budget: the budget of the request cache of each card.
  *
  * No analogue in the reference, whose cache holds 1,024 documents with no bound
- * in bytes.
+ * in bytes. The numbers are defaults, and a change of them changes this file and
+ * no other.
  */
 
 //! The budget of the request cache of each card.
@@ -30,19 +31,17 @@
 //! | `test-graphtp` | the budget of `server`, the card it stands in for | | |
 //! | `esp32c3-devkitm1` | none, the card links no facade | | |
 //!
-//! A server runs one runtime on one thread, so the runtime keeps the budget of
-//! the process, and a build with more runtimes splits it evenly over them, since
-//! each keeps its own cache.
+//! Every number is a share of the memory of the card, and the entries are Yoga's
+//! bound. A server runs one runtime on one thread, so the runtime keeps the
+//! budget of the process, and a build with more runtimes splits it evenly over
+//! them, since each keeps its own cache.
 //!
 //! The served path learns its card by its target until the generated package of a
 //! card passes the budget: [`TARGET`] is the budget of the player on
 //! `target_arch = "mips"`, of the Worker on `target_family = "wasm"` and of the
 //! server on every other target. The cards `server`, `server-legacy`, `docker`
 //! and the player name the same features of the facade, so no feature tells them
-//! apart. `tests/notebooks/38_card_limits.ipynb` prints every budget of [`CARDS`]
-//! with the entries it admits for each document of the corpus, and
-//! `tests/notebooks/08_card_builds.ipynb` builds the player with the plugin and
-//! its budget.
+//! apart.
 
 use graphql_over_http::{
     CacheBudget,

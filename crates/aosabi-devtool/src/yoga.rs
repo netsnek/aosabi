@@ -4,7 +4,9 @@
  * to the Yoga of graphql-over-http in process, with no socket and no base
  * pipeline.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the Rust half of the in process capture
+ * rows. The flag --graphtp serves the same instances over GraphTP(Homa) on
+ * Unix Sockets.
  */
 
 //! The primitive `yoga` of the seam.
@@ -35,16 +37,21 @@
 //! function, such as a hit of the request cache or a text that does not parse,
 //! counts nothing. The flag `--parser-and-validation-cache off` leaves the
 //! request cache of Yoga out of the nine capture instances, and `on` keeps it
-//! as Yoga installs it. Without either flag every instance is the one of
-//! [`instances`] and every response line is the one above.
+//! as Yoga installs it. The flag `--max-tokens COUNT` sets the cap on the
+//! tokens of a request document of every instance, which the key `maxTokens`
+//! of an app sets, a whole number from 0 to 4,294,967,295, and
+//! `REQUEST_TOKENS` of `aosabi-lang` where the command line names none.
+//! Without these flags every instance is the one of [`instances`] and every
+//! response line is the one above.
 //!
 //! The flag `--graphtp DIR` serves every instance over `GraphTP(Homa)` in
 //! place of a file of request lines: each instance booted as an app, its fetch
 //! behind the `GraphTP` listener of `aosabi-core` on a `SOCK_SEQPACKET` socket
 //! and a stream socket of prefixed `AoFrame` in `DIR`, until the file
 //! `DIR/stop` stands and every connection has closed, and one line of what it
-//! served. The flag needs the Unix Socket transports of `homa`, which build on
-//! Linux alone, and refuses elsewhere.
+//! served, each instance under the cap of `--max-tokens` where the command
+//! line names one. The flag needs the Unix Socket transports of `homa`, which
+//! build on Linux alone, and refuses elsewhere.
 
 pub mod base64;
 pub mod capture_schema;
@@ -59,6 +66,7 @@ pub mod serve;
 pub mod serve {
     use std::path::Path;
 
+    use super::instances::Switches;
     use crate::seam::{
         Answer,
         Failure, //
@@ -70,7 +78,7 @@ pub mod serve {
     /// # Errors
     ///
     /// Always returns [`Failure::Usage`].
-    pub fn serve(_dir: &Path) -> Result<Answer, Failure> {
+    pub fn serve(_dir: &Path, _switches: Switches) -> Result<Answer, Failure> {
         Err(Failure::Usage(String::from(
             "--graphtp needs the Unix Socket transports of homa, which build on Linux alone",
         )))
@@ -132,8 +140,8 @@ use self::instances::{
 /// The name of the primitive.
 const NAME: &str = "yoga";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M5";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "http";
 
 /// The origin a URL given as a path is completed with.
 const ORIGIN: &str = "http://localhost";
@@ -179,6 +187,14 @@ const CACHE: Opt = Opt::choice(
     &CACHE_SWITCH,
 );
 
+/// The option that sets the cap on the tokens of a request document of
+/// every instance.
+const MAX_TOKENS: Opt = Opt::number(
+    "max-tokens",
+    "COUNT",
+    "Parse every request document of every instance under this cap on its tokens, the key maxTokens of an app",
+);
+
 /// The values of `--parser-and-validation-cache`, in the order of the help.
 const CACHE_SWITCH: [Choice; 2] = [
     Choice {
@@ -193,7 +209,14 @@ const CACHE_SWITCH: [Choice; 2] = [
 
 /// The command line of the `yoga` primitive.
 pub static GRAMMAR: Grammar = Grammar {
-    options: &[cli::SMOKE, cli::REQUESTS, GRAPHTP, SINGLE_PASS, CACHE],
+    options: &[
+        cli::SMOKE,
+        cli::REQUESTS,
+        GRAPHTP,
+        SINGLE_PASS,
+        CACHE,
+        MAX_TOKENS,
+    ],
     positional: None,
     conflicts: &[(
         "graphtp",
@@ -212,20 +235,29 @@ pub struct YogaArgs {
     graphtp: Option<PathBuf>,
     /// The choices the command line lays over every instance.
     switches: Switches,
+    /// The cap of `--max-tokens` as the command line names it.
+    max_tokens: Option<f64>,
 }
 
 impl YogaArgs {
     /// Reads the arguments `matches` holds for [`GRAMMAR`].
-    pub fn read(matches: &Matches) -> Self {
-        Self {
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`cli::Refusal`] when the value of `--max-tokens` is no
+    /// number.
+    pub fn read(matches: &Matches) -> Result<Self, cli::Refusal> {
+        Ok(Self {
             smoke: matches.flag("smoke"),
             requests: matches.path("requests"),
             graphtp: matches.path("graphtp"),
             switches: Switches {
                 single_pass: switch(matches, "single-pass"),
                 cache: switch(matches, "parser-and-validation-cache"),
+                max_tokens: None,
             },
-        }
+            max_tokens: matches.number("max-tokens")?,
+        })
     }
 }
 
@@ -243,13 +275,48 @@ pub fn run(args: &YogaArgs) -> ExitCode {
     if args.smoke {
         return seam::smoke_at(NAME, LANDS_AT);
     }
+    let switches = match cap(args.max_tokens) {
+        Ok(max_tokens) => Switches {
+            max_tokens,
+            ..args.switches
+        },
+        Err(failure) => return seam::finish(NAME, Err(failure)),
+    };
     if let Some(dir) = args.graphtp.as_deref() {
-        return seam::finish(NAME, serve::serve(dir));
+        return seam::finish(NAME, serve::serve(dir, switches));
     }
     let outcome = seam::required(args.requests.as_deref(), "--requests")
         .and_then(seam::read_bytes)
-        .and_then(|bytes| answer_all(&bytes, args.switches));
+        .and_then(|bytes| answer_all(&bytes, switches));
     seam::finish(NAME, outcome)
+}
+
+/// Returns the cap of `--max-tokens`, `None` where the command line names
+/// none.
+///
+/// # Errors
+///
+/// Returns [`Failure::Usage`] when the cap is no whole number from 0 to
+/// 4,294,967,295.
+fn cap(max_tokens: Option<f64>) -> Result<Option<u32>, Failure> {
+    let Some(cap) = max_tokens else {
+        return Ok(None);
+    };
+    let whole = cap.fract() == 0.0 && (0.0..=f64::from(u32::MAX)).contains(&cap);
+    if !whole {
+        return Err(Failure::Usage(String::from(
+            "--max-tokens takes a whole number from 0 to 4294967295",
+        )));
+    }
+    // The value is whole and inside the range of u32, which the test above
+    // holds, so the cast neither truncates nor wraps.
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        reason = "the cap is whole and inside the range of u32"
+    )]
+    let cap = cap as u32;
+    Ok(Some(cap))
 }
 
 /// Answers every request line of `bytes` through the instances of `switches`.

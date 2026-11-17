@@ -2,8 +2,9 @@
 /*
  * aosabi-core: the boot of an app, the loader and the plugin order.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
- * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/app/pylon-handler.ts and
+ * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */
 
@@ -11,21 +12,21 @@
 //!
 //! One pass of the boot installs the base pipeline and mounts the child tree
 //! of the target, applies `config.logger` and builds the plugin list. The list
-//! opens with the viewer when `viewer` is `true`, divergence D48. The error
-//! logger, the in context plugin and the configured plugins follow. The
-//! landing plugin comes next when `landingPage` is `true`, divergence D47, and
-//! the introspection refusal when `graphiql` is `false`. The pass filters the
-//! list by the strategy of the pass, writing `'first'` onto a plugin that
-//! states none, and by the run role, loads the survivors in the order of their
-//! dependencies with each setup awaited in turn, writes the built list back
-//! onto `config.plugins`, which is quirk `Q01_DUPLICATE_PLUGIN_WRITEBACK`, and
-//! stores the configuration on the target. The loader labels a failed setup
-//! with the name of the plugin or its index in the sorted list and keeps the
-//! cause, and pushes a plugin's middleware after its own setup returned.
+//! opens with the error logger, the in context plugin and the configured
+//! plugins, where Pylon opens it with its viewer, a named divergence. The
+//! introspection refusal comes next when `introspection` is `false`, a named
+//! divergence, where Pylon closes the list with its landing page, which Aosabi
+//! does not have, a named divergence. The pass filters the list by the
+//! strategy of the pass, writing `'first'` onto a plugin that states none, and
+//! by the run role, loads the survivors in the order of their dependencies
+//! with each setup awaited in turn, writes the built list back onto
+//! `config.plugins`, which is quirk `DUPLICATE_PLUGIN_WRITEBACK`, and stores
+//! the configuration on the target. The loader labels a failed setup with the
+//! name of the plugin or its index in the sorted list and keeps the cause, and
+//! pushes a plugin's middleware after its own setup returned.
 //!
-//! The built in plugins of the first slot and of the landing page live in the
-//! crates `aosabi-viewer` and `aosabi-landing`, which depend on this crate,
-//! so a pass takes their constructors as [`Builtins`], which the facade fills.
+//! A pass takes the plugin its host puts before every plugin of a pass as
+//! [`Builtins`], which the facade fills with none for an app of Rust.
 //!
 //! [`boot`] is the sequence the generated server entry runs: the first pass,
 //! the GraphQL handler mounted with a pathless `use`, and the pass of the
@@ -39,8 +40,8 @@
 //! array written back after the last pass. A plugin of the records is labelled
 //! by its identity, its index in `config.plugins` as the boot found it, or for
 //! an always on plugin its role and the pass that created it, because a name
-//! may be shared or absent and the write back of `Q01` repeats the always on
-//! plugins.
+//! may be shared or absent and the write back of `DUPLICATE_PLUGIN_WRITEBACK`
+//! repeats the always on plugins.
 
 use core::fmt;
 use std::rc::Rc;
@@ -81,7 +82,7 @@ use crate::{
     },
 };
 
-/// The constructors of the built in plugins whose crates depend on this one.
+/// The plugins a host hands every pass of its boot.
 #[derive(Clone, Copy)]
 pub struct Builtins {
     /// A plugin of the host that stands before every plugin of a pass, `None`
@@ -91,10 +92,6 @@ pub struct Builtins {
     /// TypeScript service reads them. It takes no label in the records of the
     /// boot.
     pub first: Option<fn() -> Rc<dyn Plugin>>,
-    /// `useViewer()`, the first slot of the list.
-    pub viewer: fn() -> Rc<dyn Plugin>,
-    /// `useUnhandledRoute()`, the landing page.
-    pub unhandled_route: fn() -> Rc<dyn Plugin>,
 }
 
 /// The options of a pass, `{pluginsStrategy}`.
@@ -107,14 +104,10 @@ pub struct ExecuteConfigArgs {
 /// An always on plugin, the role its label in the records of the boot names.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Builtin {
-    /// `useViewer()`, the first slot.
-    Viewer,
     /// `useGraphqlErrorLogger()`.
     GraphqlErrorLogger,
     /// `useInContext()`.
     InContext,
-    /// `useUnhandledRoute()`, the landing page.
-    Landing,
     /// `useDisableIntrospection()`.
     DisableIntrospection,
 }
@@ -124,10 +117,8 @@ impl Builtin {
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
-            Self::Viewer => "viewer",
             Self::GraphqlErrorLogger => "graphql-error-logger",
             Self::InContext => "in-context",
-            Self::Landing => "landing",
             Self::DisableIntrospection => "disable-introspection",
         }
     }
@@ -352,11 +343,6 @@ pub async fn execute_config(
         // Always on: `@inContext` is part of the schema.
         (PluginSlot::new(use_in_context()), Builtin::InContext),
     ];
-    // The viewer opens the list on `viewer: true` alone, the named divergence
-    // D48.
-    if config.viewer == Some(true) {
-        created.insert(0, (PluginSlot::new((builtins.viewer)()), Builtin::Viewer));
-    }
     let mut plugins: Vec<PluginSlot> = builtins
         .first
         .map(|first| PluginSlot::new(first()))
@@ -367,14 +353,9 @@ pub async fn execute_config(
         plugins.extend(configured.slots().iter().cloned());
     }
 
-    // The landing page only on `landingPage: true`, the named divergence D47.
-    if config.landing_page == Some(true) {
-        let slot = PluginSlot::new((builtins.unhandled_route)());
-        plugins.push(slot.clone());
-        created.push((slot, Builtin::Landing));
-    }
-
-    if config.graphiql == Some(false) {
+    // The refusal of introspection on `introspection: false` alone, a named
+    // divergence, where Pylon installs it on `graphiql: false`.
+    if config.introspection == Some(false) {
         // `useDisableIntrospection() as Plugin`, which states no member beyond those of Yoga.
         let slot = PluginSlot::new(from_http(use_disable_introspection()));
         plugins.push(slot.clone());

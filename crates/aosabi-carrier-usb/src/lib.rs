@@ -22,10 +22,10 @@
 //! | --- | --- |
 //! | `profile` | `Speed`, `bulk_profile`, `serial_profile` and `needs_zlp`, core only |
 //! | `linux` | `Bulk`, `GadgetTty`, `serve_bulk`, `serve_serial`, the relay of an endpoint and `driver`, under the feature `linux` with `bulk` and `serial` |
-//! | `bare` |  |
+//! | `bare` | the binding of USB serial on a card's byte stream under the feature `bare`, which arrives with device cards |
 //!
 //! There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3. The judging notebook is `tests/notebooks/27_carrier_usb.ipynb`.
+//! section 3.
 
 #![no_std]
 #![forbid(unsafe_code)]

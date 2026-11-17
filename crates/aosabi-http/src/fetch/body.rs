@@ -12,9 +12,9 @@
 //!
 //! The adapter of `@hono/node-server` tells a body by its JavaScript type: a
 //! primitive string, a `Uint8Array` and a stream are kept by its lightweight
-//! `Response`, while a `String` object, which the `html` template makes, is not
-//! (A4 and A5 of the plan's version 2 draft). [`Body`] carries that type, and
-//! every other reading takes the bytes of the body whatever its variant.
+//! `Response`, while a `String` object, which the `html` template makes, is
+//! not. [`Body`] carries that type, and every other reading takes the bytes
+//! of the body whatever its variant.
 //!
 //! A stream is shared by the objects that hold it, as a `ReadableStream` is
 //! shared by two responses one of which was made from the other, so a clone of

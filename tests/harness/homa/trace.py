@@ -47,18 +47,17 @@ A host writes the decisions a packet caused before the row of that packet,
 since the devtool reads them after the engine took it, so `fabric` moves the
 row of the packet ahead of them before it checks.
 
-The rules checked are those of the Homa design note, first version, sections
-1.4 and 2.4, with the FIFO share of a point to point link by count: the
-sender sends the message with the fewest bytes left outside its FIFO share, a
-receiver grants to one message at each decision, the one with the fewest
-bytes not yet received or the oldest on a turn of the FIFO share, and a
-receiver keeps the bytes it granted and did not receive within `window` at
-every packet it takes and every GRANT it sends. A receiver grants only while
-the bytes it expects stay within `max_incoming`, so `grants` holds the bytes
-it expects, unscheduled or granted and not received, to that bound at every
-GRANT, and counts apart the rows at which they exceed it at all, since the
-unscheduled bytes of a message that starts arrive with no GRANT. A notebook
-that holds the bound at every row asserts that count to be 0.
+The rules checked are these, with the FIFO share of a point to point link by
+count: the sender sends the message with the fewest bytes left outside its
+FIFO share, a receiver grants to one message at each decision, the one with
+the fewest bytes not yet received or the oldest on a turn of the FIFO share,
+and a receiver keeps the bytes it granted and did not receive within `window`
+at every packet it takes and every GRANT it sends. A receiver grants only
+while the bytes it expects stay within `max_incoming`, so `grants` holds the
+bytes it expects, unscheduled or granted and not received, to that bound at
+every GRANT, and counts apart the rows at which they exceed it at all, since
+the unscheduled bytes of a message that starts arrive with no GRANT. A
+notebook that holds the bound at every row asserts that count to be 0.
 """
 
 import json
@@ -265,11 +264,11 @@ def grant_order(rows: list, unsched: dict, fifo_every: dict, all_or_nothing: boo
     The scheduler of a downlink grants to one message at each decision, the
     one with the fewest bytes not yet received, ties to the older, or the
     oldest on a turn of the FIFO share. On a point to point link every
-    receiver has one sender, so this is the plan's check of at most one
-    granted message per sender, read per decision. A receiver decides after
-    every DATA packet it takes and sends the GRANT when its link is ready, so
-    a GRANT must name a message that SRPT or the FIFO share named at some
-    DATA packet the receiver took since the last GRANT of that message.
+    receiver has one sender, so this is the check of at most one granted
+    message per sender, read per decision. A receiver decides after every
+    DATA packet it takes and sends the GRANT when its link is ready, so a
+    GRANT must name a message that SRPT or the FIFO share named at some DATA
+    packet the receiver took since the last GRANT of that message.
 
     The trace does not say which decision was a turn of the share, so the
     share is checked by its count, as `srpt` checks the share of the sender.
@@ -538,8 +537,8 @@ def fabric(rows: list, levels: int, max_incoming: int, unsched: int, homa_grant_
 
     - Every decision the grant scheduler of a host took at one packet or one
       timer grants to at most one message a sender outside the FIFO share,
-      which is the plan's check of 0 grants to more than one message per
-      sender, read per decision.
+      which is the check of 0 grants to more than one message per sender,
+      read per decision.
     - The level of every decision equals `homa_grant_priority(rank, active,
       max_sched)` with the highest scheduled level of `levels`, and the
       priority of every GRANT a host sent equals the level of the last

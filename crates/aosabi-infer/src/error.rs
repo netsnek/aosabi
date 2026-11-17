@@ -34,7 +34,8 @@ pub enum InferError {
     ///
     /// The text of that `TypeError` is the engine's. No vendored file holds
     /// it and it is outside the byte contract, so the variant carries the
-    /// reason and no message.
+    /// reason and no message. A member read from `undefined` throws a
+    /// `TypeError`.
     ///
     /// [to-object]: https://tc39.es/ecma262/#sec-toobject
     ReadOfUndefined {

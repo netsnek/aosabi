@@ -16,7 +16,7 @@
 
 use core::cell::RefCell;
 
-/// The conventional names and the Aosabi name beside each, the table of section 6.2.
+/// The conventional names and the Aosabi name beside each.
 const ALIASES: [(&str, &str); 2] = [("PORT", "AOSABI_PORT"), ("NODE_ENV", "AOSABI_ENV")];
 
 thread_local! {

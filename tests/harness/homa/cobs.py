@@ -2,12 +2,16 @@
 """COBS, the byte stuffing of a delimited AoFrame, written from the paper.
 
 The reference of `tests/notebooks/04_aoframe.ipynb` for the COBS of the crate
-`homa`, sharing no code with it.
+`homa`, sharing no code with it. Consistent overhead byte stuffing cuts its
+input into blocks that end at a zero byte or after 254 bytes that are not
+zero, and writes each block as a code byte, one more than the count of its
+bytes, followed by those bytes, so the output holds no zero byte and grows by
+at most one byte in 254.
 
 The paper lets a block of 254 bytes that ends the input be followed by the
 code 1 of an empty block or by nothing. The encoder below writes nothing, the
-shorter ending, which is the reading of the crate that the track's close page
-records as reading 6, and the decoder reads both endings.
+shorter ending, which is the reading of the crate, and the decoder reads both
+endings.
 """
 
 

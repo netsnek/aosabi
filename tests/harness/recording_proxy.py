@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the recording proxy in front of one remote of a federation.
 
-A served pair of `tests/notebooks/90_federation.ipynb` puts one proxy in front
-of every remote on each side, and the front reaches its remote through it. The
-proxy records every request with its method, its target, its headers in wire
-order and its body, forwards it to the remote, records the remote's answer and
-answers the front. The outbound request of a federation is what row C87 records
-and what the notebook compares, so the proxy is the place both sides are seen
-from.
+A served pair puts one proxy in front of every remote on each side, and the
+front reaches its remote through it. The proxy records every request with its
+method, its target, its headers in wire order and its body, forwards it to the
+remote, records the remote's answer and answers the front. The outbound request
+of a federation is what the capture records and what the notebook compares, so
+the proxy is the place both sides are seen from.
 
 Two delegations a front sends at once reach the proxy over two connections, and
 either one can arrive first. The second of the two delegations of one document
@@ -35,10 +34,10 @@ A mode answers in place of the remote:
 | `fail_once` | refuses the first introspection and forwards every request after it, case gw4-12 and the retry of gw1-17 |
 | `hostile_<n>` | answers a data request with the n-th of the fifteen malformed responses, cases gw4-13 to gw4-27 |
 | `down` | binds nothing, so the port is closed, case gw1-17 |
-| `redirect_<status>` |  |
-| `nested_<n>` |  |
-| `deep_error_<n>` |  |
-| `intro_<kind>_<n>` |  |
+| `redirect_<status>` | answers every request with the status, one of the five a fetch follows, and the relative `location` of the path under `/redirected`, and forwards a request to such a path at the path it names, a redirecting remote |
+| `nested_<n>` | answers a data request of the product with its title nested in n arrays, a remote answer as deep as the reader admits for n up to 997 |
+| `deep_error_<n>` | answers as `nested_<n>` with an error of the remote whose path follows the title down its n arrays |
+| `intro_<kind>_<n>` | forwards the introspection and answers the remote's schema with the crafted part `kind` of size n added |
 
 The introspection a federation sends first is forwarded in every mode but
 `fail_once`, `down`, `redirect_<status>` and `intro_<kind>_<n>`, so a mode
@@ -58,7 +57,9 @@ of graphql-js refuses for its escape `\\q` and nests n lists after it,
 `types`, n object types no field names, `dunder`, an object type named `__Mine`
 that no field names, `location`, a directive with a location graphql-js 16.12.0
 does not know, and `empty`, an object type with no field, a schema that builds
-and that every delegation refuses.
+and that every delegation refuses. The fifteen malformed responses are those a
+hostile server answers the pull of a remote schema with, each written here as
+raw bytes, so the proxy serves them with no server of its own.
 
 The proxy uses `http.server` and `http.client` of the standard library and
 nothing else, binds the loopback on its own explicit port, never zero, and
@@ -138,7 +139,9 @@ def _head(status_line: str, headers, body: bytes = b"", length: bool = True) -> 
 
 
 def hostile_responses() -> list:
-    """An entry of `None` closes the connection before a byte of the head. The
+    """The fifteen malformed responses, raw bytes, in the order of their numbers.
+
+    An entry of `None` closes the connection before a byte of the head. The
     body over 16 MiB is 16 MiB and 1 byte of valid JSON, so its length is the
     only thing wrong with it.
     """

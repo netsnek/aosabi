@@ -37,14 +37,13 @@
 // children at their base paths, the routes the setups of the plugins register
 // and the GraphQL handler of the glue. The engine in core.wasm, or the native
 // library of the engine on Bun, answers the GraphQL endpoint and the execute
-// hooks of the plugins, and the routes of the plugins of the engine: the viewer
-// where the configuration asks for it with viewer true, the landing page with
-// landingPage true and the login of Zitadel. A host hands the app its engine,
-// aosabi/worker on a Worker and aosabi/bun on Bun, and the core boots at the
-// first request, or where aosabi/worker boots it in the global scope of a
-// Worker before that request (lib/early.js), from the SDL, the graphql object
-// and the type resolvers the glue of Pylon's build hands handler(), the
-// configuration of executeConfig and the IR the host hands.
+// hooks of the plugins, and the routes of the plugins of the engine, the login
+// of Zitadel. A host hands the app its engine, aosabi/worker on a Worker and
+// aosabi/bun on Bun, and the core boots at the first request, or where
+// aosabi/worker boots it in the global scope of a Worker before that request
+// (lib/early.js), from the SDL, the graphql object and the type resolvers the
+// glue of Pylon's build hands handler(), the configuration of executeConfig and
+// the IR the host hands.
 //
 // The context c of a request is the c of hono, which getContext() answers
 // through the store the bind of the async context puts in place, and the
@@ -67,6 +66,8 @@ export { ServiceError };
 export { deleteCookie, getCookie, getSignedCookie, setCookie, setSignedCookie } from "hono/cookie";
 export { authMiddleware, requireAuth, useAuth } from "./canary.js";
 
+// The federation, createGateway, pass and passthrough of Pylon's root, whose
+// delegations run in the federation of the engine, aosabi-ts/lib/federation.js.
 export { createGateway, pass, passthrough } from "./federation.js";
 
 // Pylon exports createPubSub of graphql-yoga as experimentalCreatePubSub, whose
@@ -206,14 +207,14 @@ function variablesOf(env) {
   return { ...(globalThis.process?.env ?? {}), ...bindingsOf(env) };
 }
 
-// Returns whether the URL `url` names the GraphQL endpoint, the test of the
-// unhandled route of Yoga with the endpoint /graphql that Pylon's handler sets:
-// a URL or a path that ends in /graphql or /graphql/. The engine answers each
-// such request with every method, and the hono of the app every other one.
+// Returns whether the URL `url` names the GraphQL endpoint, by its whole path:
+// the path /graphql, where the test of the unhandled route of Yoga with the
+// endpoint /graphql that Pylon's handler sets also passes the path /graphql/, a
+// named divergence, and a URL that ends in either, a named divergence. The
+// engine answers each request of that path with every method, and the hono of
+// the app every other one.
 function isEndpoint(url) {
-  if (url.endsWith("/graphql") || url.endsWith("/graphql/")) return true;
-  const path = new URL(url).pathname;
-  return path === "/graphql" || path === "/graphql/";
+  return new URL(url).pathname === "/graphql";
 }
 
 // The class Pylon of app/index.ts:140, under Aosabi's name, a Hono of the real
@@ -334,16 +335,15 @@ export class App extends Hono {
       });
     }));
 
-    // The middleware of the plugins in their order, each around the rest of
-    // the chain. A middleware that returns nothing once the rest of the
-    // chain has answered with a Response hands that Response on, so the
-    // answer of a later middleware reaches hono behind middlewares that
-    // await the rest and return nothing, where Pylon's dispatch loses it and
-    // hono answers 500 with the records of the error logger, divergence D80
-    // of docs/byte-equality.md of the Aosabi repository (row QD-003 of the
-    // rated table). A middleware that returns a value hands hono that value,
-    // and one that returns nothing over a rest that has not answered or has
-    // answered no Response hands on nothing, each as on Pylon.
+    // The middleware of the plugins in their order, each around the rest of the
+    // chain. A middleware that returns nothing once the rest of the chain has
+    // answered with a Response hands that Response on, so the answer of a later
+    // middleware reaches hono behind middlewares that await the rest and return
+    // nothing, where Pylon's dispatch loses it and hono answers 500 with the
+    // records of the error logger, a named divergence. A middleware that
+    // returns a value hands hono that value, and one that returns nothing over
+    // a rest that has not answered or has answered no Response hands on
+    // nothing, each as on Pylon.
     this.use("*", (c, next) => {
       const dispatch = (i) => {
         const middleware = this.pluginsMiddleware[i];
@@ -548,18 +548,17 @@ function topoSortPlugins(plugins) {
 }
 
 // The built in plugins of the boot of Pylon in their place of the list of
-// pylon-handler.ts:153-170, before and after the configured ones: the viewer,
-// the error logger and the in context plugin, and the landing page and the
-// refusal of introspection where the configuration asks for them. The
-// engine runs the hooks of each, and the routes of the viewer and of the
-// landing page answer on the engine where the configuration switches them on
-// with viewer true and landingPage true, the sides ts of D48 and D47 of
-// docs/byte-equality.md of the Aosabi repository.
+// pylon-handler.ts:153-170, before and after the configured ones: the error
+// logger and the in context plugin, and the refusal of introspection where the
+// configuration asks for it, with no viewer, which opens the list of Pylon, and
+// no landing page, which closes it, named divergences. Each holds hooks of the
+// engine alone, which the engine runs.
 function builtins(config) {
-  const before = [{ builtin: "viewer" }, { builtin: "errors" }, { builtin: "in-context", name: "in-context" }];
+  const before = [{ builtin: "errors" }, { builtin: "in-context", name: "in-context" }];
   const after = [];
-  if (config?.landingPage ?? true) after.push({ builtin: "landing" });
-  if (config?.graphiql === false) after.push({ builtin: "introspection" });
+  // The refusal of introspection on introspection false alone, a named
+  // divergence, where Pylon's handler installs it on graphiql false.
+  if (config?.introspection === false) after.push({ builtin: "introspection" });
   return [before, after];
 }
 
@@ -612,10 +611,7 @@ async function runPass(config, args, target) {
   });
   const sentries = (config?.plugins ?? []).filter((plugin) => plugin.marker === "useSentry");
   for (const [index, plugin] of topoSortPlugins(pass).entries()) {
-    if (plugin.builtin !== undefined) {
-      builtinSetup(plugin.builtin, config, target);
-      continue;
-    }
+    if (plugin.builtin !== undefined) continue;
     if (plugin.marker !== undefined) {
       markerSetup(plugin, sentries.indexOf(plugin), target);
       continue;
@@ -630,17 +626,6 @@ async function runPass(config, args, target) {
     if (plugin.middleware) target.pluginsMiddleware.push(plugin.middleware);
   }
   target.config = config;
-}
-
-// Registers what the built in plugin `kind` of the boot of Pylon registers on
-// `target` in its setup where the configuration `config` switches it on: the
-// route /viewer of useViewer with viewer true and the not found handler of
-// useUnhandledRoute with landingPage true, each answered by the engine, while
-// the error logger, the in context plugin and the refusal of introspection hold
-// hooks of the engine alone.
-function builtinSetup(kind, config, target) {
-  if (kind === "viewer" && config?.viewer === true) target.get("/viewer", (c) => answerEngine(target, c));
-  if (kind === "landing" && config?.landingPage === true) target.notFound((c) => answerEngine(target, c));
 }
 
 // Runs the setup of the marker `plugin` of the engine on `target`: the
@@ -677,7 +662,7 @@ function sentryMiddleware(target, index) {
 }
 
 // Answers the request of `c` on the app of the engine of `target`, a route
-// of a plugin of the engine or its not found handler, and returns its
+// of a plugin of the engine, and returns its
 // response over the prepared header fields of c, with its body in the form
 // the engine wrote it, the string or the bytes of a whole body, `bodyOf`, as
 // the route of Pylon the route of the engine stands for answers the body of
@@ -744,8 +729,8 @@ function serveNode(target, options) {
 // X-Pylon-Version where the version global is set, and answers the response of
 // the engine over the prepared header fields of c. Every other request goes on
 // to the routes of the app, where Pylon's Yoga answers the plugins of its
-// server on any path, its health check and its preflight among them, divergence
-// D56 of docs/byte-equality.md of the Aosabi repository.
+// server on any path, its health check and its preflight among them, a named
+// divergence.
 export const handler = (options, target = app) => {
   target[HANDLER] = options;
   return async (c, next) => {
@@ -810,7 +795,7 @@ export const getLocale = () => getInContext().locale;
 // selected below it, each its name, its nodes and its type, the one object of
 // the call, as the views of lib/nodes.js answer them over what the engine
 // holds, the nodes of the document among them, while the schema does not
-// cross, which docs/ts1-surface.md of the Aosabi repository names.
+// cross.
 export const getResolveInfo = () => {
   const store = context.getStore();
   if (!store?.info) throw new Error("Resolve info is not available");
@@ -959,16 +944,15 @@ const FIELD = { VALUE: 0, TEXT: 1 };
 // Error.prototype.toString answers for that name and that message in place of a
 // stack that is a string, as the engine writes the stack of an error on every
 // host. The frames of a stack name the source files of the app and of its
-// packages, so no record of the side carries them, divergence D83 of
-// docs/byte-equality.md of the Aosabi repository (row QD-272 of the rated
-// table). The line is the text before the first frame of a stack V8 formats for
-// the error itself, with its name and its message as they were at the first
-// read of the stack. A stack the error took from another error, as a
-// GraphQLError holds the stack of its originalError, the case copied of D83, or
-// a stack first read before the name or the message of its error changed,
-// begins with another text, which Pylon's record keeps and the side's does not.
-// A stack that is no string stays as the error holds it, so a record leaves out
-// the stack of an error that holds none, as Pylon's does.
+// packages, so no record of the side carries them, a named divergence. The line
+// is the text before the first frame of a stack V8 formats for the error
+// itself, with its name and its message as they were at the first read of the
+// stack. A stack the error took from another error, as a GraphQLError holds the
+// stack of its originalError, or a stack first read before the name or the
+// message of its error changed, begins with another text, which Pylon's record
+// keeps and the side's does not. A stack that is no string stays as the error
+// holds it, so a record leaves out the stack of an error that holds none, as
+// Pylon's does.
 function normalError(error) {
   const name = error.name;
   const message = error.message;
@@ -1081,15 +1065,15 @@ function pin(at) {
 // below that level returns before its message, its bindings and its fields are
 // read, as the emit of Pylon returns at its gate before it builds the record.
 // The second writes the record with the bindings of the host spread before its
-// fields. The engine builds a record as {time, level, msg..bindings..fields},
-// so the bindings of its own logger, then those of the host and then the fields
-// give the keys of Pylon's record in Pylon's order, the bindings of a child
-// spread after those of its parent. The bindings of child() and createLogger()
-// stay on the side of the host as Pylon keeps them, the spread child() makes at
-// its call and the object createLogger() is handed, unread, so they reach the
-// engine only as the fields of a record the logger writes, and a binding the
-// JSON of the host cannot write throws only there, as the sink of Pylon throws
-// it.
+// fields. The engine builds a record as {time, level, msg, ...bindings,
+// ...fields}, so the bindings of its own logger, then those of the host and
+// then the fields give the keys of Pylon's record in Pylon's order, the
+// bindings of a child spread after those of its parent. The bindings of child()
+// and createLogger() stay on the side of the host as Pylon keeps them, the
+// spread child() makes at its call and the object createLogger() is handed,
+// unread, so they reach the engine only as the fields of a record the logger
+// writes, and a binding the JSON of the host cannot write throws only there, as
+// the sink of Pylon throws it.
 function makeLogger(resolve) {
   const emit = (level) => (msg, fields) => {
     const at = pin(resolve());

@@ -2,11 +2,10 @@
 """The compact wire form of Homa, version 0, written from its design.
 
 The reference of `tests/notebooks/03_homa_packets.ipynb` for
-`homa::wire::Compact`, sharing no code with it. The layouts are those of the
-Homa design note, first version, section 2.3, which its second version keeps
-for every carrier but Network. The order in which a decoder checks a packet,
-and so which error it names first, is reading 5 of the track's close page,
-which the note leaves open.
+`homa::wire::Compact`, sharing no code with it. The layouts are those of
+version 0, the same for every carrier but Network. The design leaves open the
+order in which a decoder checks a packet, and so which error it names first,
+and this reference takes the order of the crate.
 
 A packet is a dictionary whose `type` names it and whose other keys are the
 fields of the packet as the devtool writes them: `DATA` with `id`,

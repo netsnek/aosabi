@@ -4,12 +4,12 @@
  * aosabi-core served over a real Unix Socket, and the bounds of the cards the
  * listener holds.
  *
- * No analogue in the reference. The card is the harness server the plan of the
- * GraphTP track names for the card test-graphtp until card builds exist: the
- * listener built with the feature homa of aosabi-core, a SOCK_SEQPACKET socket
- * and, under AOSABI_UNIX_STREAM=<path>, a stream socket of the prefixed framing
- * beside it. Its service is the harness's own, which a notebook drives through
- * the member extensions.harness of each request.
+ * No analogue in the reference. The card is the harness server that stands in
+ * for the card test-graphtp until card builds exist: the listener built with
+ * the feature homa of aosabi-core, a SOCK_SEQPACKET socket and, under
+ * AOSABI_UNIX_STREAM=<path>, a stream socket of the prefixed framing beside it.
+ * Its service is the harness's own, which a notebook drives through the member
+ * extensions.harness of each request.
  */
 
 //! The card `test-graphtp` and the bounds of the cards.
@@ -53,7 +53,7 @@
 //! after `fail_after` events. A request with no such member is answered by its
 //! query: `subscription{tick}` with a stream of two results, `mutation{pause}`
 //! with `{"data":{"pause":true}}` and every other query with
-//! `{"data":{"ok":true}}`, the calls of `docs/graphtp.md` section 6.2. The
+//! `{"data":{"ok":true}}`. The
 //! clock is the wall clock of this process, and a turn that finds nothing to do
 //! sleeps until the next deadline of an engine, at most `idle_us`.
 
@@ -355,7 +355,7 @@ fn query_of(content: &[u8]) -> Option<String> {
 }
 
 /// Answers a request with no member `extensions.harness` by its query: the
-/// two calls of `docs/graphtp.md` section 6.2, `subscription{tick}` with a
+/// two calls, `subscription{tick}` with a
 /// stream of two results 100 milliseconds apart and `mutation{pause}` with
 /// `{"data":{"pause":true}}`, and every other query with
 /// `{"data":{"ok":true}}`.

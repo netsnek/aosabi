@@ -3,7 +3,8 @@
  * aosabi-js outbound: the outbound fetch and the crypto of the host.
  *
  * No analogue in the reference, whose openid-client calls the global fetch and
- * the WebCrypto of its runtime.
+ * the WebCrypto of its runtime. The module and the native library link no
+ * crypto stack and no client of their own and take both from the host.
  */
 
 //! The outbound fetch and the crypto of the host.

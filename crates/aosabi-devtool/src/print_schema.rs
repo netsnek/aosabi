@@ -3,9 +3,7 @@
  * aosabi-devtool print-schema: prints the schema of an SDL text the way
  * printSchema of graphql-js prints it.
  *
- * No analogue in the reference. The crate under test is aosabi-type, and the
- * judging notebook is tests/notebooks/02_language.ipynb, which compares the
- * bytes against a node sidecar running the pinned graphql-js.
+ * No analogue in the reference. The crate under test is aosabi-type.
  */
 
 //! The `print-schema` primitive of the seam.

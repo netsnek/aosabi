@@ -2,8 +2,6 @@
 /*
  * aosabi-cli: the environment names the command line reads and the table of
  * their conventional aliases.
- *
- * The names and the aliases are those of docs/cli-and-targets.md section 6.2.
  */
 
 //! The environment and its aliases.
@@ -21,10 +19,9 @@
 //! resolved. When the command line sets one name of a pair for a child, it sets
 //! both, so the child reads the same value under either name.
 //!
-//! The table is the one of section 6.2, as the table of `aosabi-core`
-//! carries it. The command line adds two variables of its own,
-//! [`CONTAINER_ENGINE`] and the switch `AOSABI_STD` of [`crate::std_source`],
-//! and nothing else.
+//! The table is the one that `aosabi-core` carries. The command line adds two
+//! variables of its own, [`CONTAINER_ENGINE`] and the switch `AOSABI_STD` of
+//! [`crate::std_source`], and nothing else.
 
 use std::{
     cell::RefCell,

@@ -3,13 +3,13 @@
  * aosabi-build: the validation that runs before a build writes a byte, and
  * the message of a schema that fails it.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
  * The constant text of the message is the extracted literal
- * schema_invalid_message.rs beside this file, which tools/provenance writes
- * and this file only reads.
+ * schema_invalid_message.rs beside this file, whose bytes are pinned and which
+ * this file only reads.
  */
 
 //! The validation that runs before a build writes a byte.
@@ -33,6 +33,9 @@ use aosabi_lang::{
 };
 use aosabi_type::BuildSchemaOptions;
 
+/// The constant text of the message, the quoted strings of the reference in
+/// the order its source carries them.
+///
 /// The extractor concatenates them, so the text is the opening line with its
 /// newline, the one newline the bullets are joined by, and the advisory
 /// paragraph with the blank line in front of it.
@@ -40,7 +43,9 @@ const LITERAL: &str = include_str!("schema_invalid_message.rs");
 
 /// The text in front of the message of one error.
 ///
-/// The extractor pins quoted strings only, so the template is carried here.
+/// It is two spaces, U+2022 and one space, the constant part of a template
+/// literal of the reference. The extractor pins quoted strings only, so the
+/// template is carried here.
 const BULLET: &str = "  \u{2022} ";
 
 /// The three segments of [`LITERAL`].
@@ -131,9 +136,11 @@ fn fold_schema_errors(type_defs: &str) -> Vec<JsString> {
 
 /// Returns the message of the `Error` the reference throws over `messages`.
 ///
-/// `messages` holds the `message` of every entry, and the reference builds the
-/// text only for a list that is not empty. Every constant byte except the
-/// bullet prefix comes from the extracted literal.
+/// The message is the opening line, one bullet per entry joined by the
+/// separator, then the advisory paragraph. `messages` holds the `message` of
+/// every entry, and the reference builds the text only for a list that is not
+/// empty. Every constant byte except the bullet prefix comes from the
+/// extracted literal.
 #[must_use]
 pub fn schema_invalid_message(messages: &[JsString]) -> JsString {
     let bullets: Vec<JsString> = messages.iter().map(bullet).collect();

@@ -2,7 +2,7 @@
 /*
  * aosabi-serve: the TCP listener of a served binary.
  *
- * Derived from hono 1.19.9, dist/server.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/server.js, MIT.
  */
 
 //! `TcpListen`.
@@ -12,7 +12,9 @@
 //! address, and with no connection cap. The listener here binds the port on
 //! every address, IPv6 with IPv4 beside it and IPv4 alone where the host has
 //! no IPv6, and runs every accepted socket as a local task through
-//! `serve_accepted`, which selects the protocol.
+//! `serve_accepted`, which selects the protocol. A socket past
+//! [`MAX_CONNECTIONS`] open connections is closed at once, which no fixture
+//! reaches.
 
 use core::{
     cell::Cell,
@@ -45,7 +47,7 @@ use aosabi_core::{
     Listen, //
 };
 
-/// The open connections one listener holds at most, the default.
+/// The open connections one listener holds at most.
 pub const MAX_CONNECTIONS: usize = 4_096;
 
 /// How long the loop waits after an accept that failed.

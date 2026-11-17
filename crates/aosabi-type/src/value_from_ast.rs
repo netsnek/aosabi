@@ -214,7 +214,7 @@ fn is_exactly_one_non_null_key(coerced_obj: &JsObject) -> bool {
 
 /// Maps the fields of an object literal by name.
 ///
-/// Derived from graphql-js 16.12.0, src/utilities/valueFromAST.ts, MIT.
+/// Derived from graphql-js 16.12.0, src/jsutils/keyMap.ts, MIT.
 fn key_map(fields: &[ObjectFieldNode]) -> ObjMap<&ObjectFieldNode> {
     let mut result = ObjMap::default();
     for field in fields {

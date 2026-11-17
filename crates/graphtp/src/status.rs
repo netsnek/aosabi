@@ -13,8 +13,7 @@
 //!
 //! The status byte is `64 * (status div 100 - 2) + status mod 100`, so the 256
 //! bytes are the statuses 200 to 263, 300 to 363, 400 to 463 and 500 to 563,
-//! and every byte is a status. The notebook `tests/notebooks/24_graphtp.ipynb`
-//! reads all 256 bytes and every registered code.
+//! and every byte is a status.
 
 use core::fmt;
 
@@ -224,8 +223,10 @@ impl fmt::Display for Substatus {
 
 /// A status with its substatus, written `status.substatus`, such as `400.2`.
 ///
-/// A code whose substatus is 0 is any `status.0`, and its name is the reason
-/// phrase of its status.
+/// The constants are the rows of the registry of
+/// `Documentation/guides/graphtp.md`, whose rows marked Proposed are taken as
+/// proposed. A code whose substatus is 0 is any `status.0`, and its name is the
+/// reason phrase of its status.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Code {
     /// The HTTP status.
@@ -260,7 +261,7 @@ impl Code {
     pub const QUERY_TOO_COMPLEX: Code = Code::of(Status::BAD_REQUEST, 5);
     /// 400.6 Invalid Request Body: the content is not a GraphQL request.
     pub const INVALID_REQUEST_BODY: Code = Code::of(Status::BAD_REQUEST, 6);
-    /// 400.7 Malformed Message: the message breaks a rule of section 5.3.
+    /// 400.7 Malformed Message: the message breaks a rule.
     pub const MALFORMED_MESSAGE: Code = Code::of(Status::BAD_REQUEST, 7);
     /// 400.8 Bad Coding: the zlib header fails its FCHECK, the zlib stream
     /// does not decode, its Adler-32 fails or a byte follows it.
@@ -346,8 +347,7 @@ impl Code {
     }
 
     /// Tells whether the registry gives the code to the server alone with a
-    /// nonzero substatus, G alone in the column Who of `docs/graphtp.md`
-    /// section 2.5.
+    /// nonzero substatus, G alone in the column Who.
     ///
     /// Such a code is a refusal of the server with an empty body, or 200.3,
     /// whose body is the head of a stream, so any other of them with a body is

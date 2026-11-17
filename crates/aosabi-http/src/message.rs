@@ -19,10 +19,9 @@
 //! Socket), which is why a request names its scheme and whether it came over
 //! HTTP/2.
 //!
-//! A header value is one byte per character, the Latin-1 form Node reads a
-//! head in, and [`FirstWrite`] names the path of the answer that fixes how a
-//! value is written back (N13 of the plan's version 2 draft, quirk
-//! `Q58_NODE_ENCODING_FIRST_WRITE` of `docs/byte-equality.md` section 13.1).
+//! A header value is one byte per character, the Latin-1 form Node reads a head
+//! in, and [`FirstWrite`] names the path of the answer that fixes how a value
+//! is written back.
 
 use alloc::{
     borrow::Cow,

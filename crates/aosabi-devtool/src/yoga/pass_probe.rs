@@ -4,7 +4,8 @@
  * the engine of the single pass, the gate of the document and the gate of
  * the schema.
  *
- * No analogue in the reference, which has no single pass.
+ * No analogue in the reference, which has no single pass. The instances are
+ * passReplace and passInvalidSchema.
  */
 
 //! The probe instances of the single pass.

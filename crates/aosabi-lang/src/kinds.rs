@@ -127,6 +127,8 @@ pub enum Kind {
 
 impl Kind {
     /// Returns the string the reference assigns to this kind.
+    ///
+    /// The strings are what `node.kind` holds in a JavaScript tree.
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
@@ -245,6 +247,8 @@ pub enum TokenKind {
 
 impl TokenKind {
     /// Returns the string the reference assigns to this token kind.
+    ///
+    /// The strings are what a syntax error prints when it names a token.
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {

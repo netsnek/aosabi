@@ -2,11 +2,10 @@
 /*
  * aosabi-core: the runtime logger.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/logger.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/logger.ts, Apache-2.0. Changed by the Aosabi authors.
  *
- * The environment is read through the alias table of docs/cli-and-targets.md
- * section 6.2.
+ * The environment is read through the alias table of `crate::app::env_alias`.
  */
 
 //! The runtime logger.
@@ -27,8 +26,8 @@
 //! after that turn. So the records of a process before its loop first turns
 //! carry no time and every later one carries `HH:MM:SS.mmm` in front, but for
 //! a later record of the request that wrote the first record, which is pretty
-//! within the turn. That is the quirk the plan proposes as
-//! `Q17_FIRST_PRETTY_RECORD_UNTIMED`.
+//! within the turn. That is a quirk the register does not hold yet,
+//! `FIRST_PRETTY_RECORD_UNTIMED`.
 //!
 //! [`logger`] is a `const fn`, so a module keeps its tagged logger in a
 //! `static`, and the logger resolves the scoped logger on every call, as the
@@ -600,14 +599,18 @@ type FirstRecord = Option<(u64, Option<JsValue>)>;
 /// resolves it from the file system only when its event loop turns, so every
 /// record before that turn is the fallback line and every record after it is
 /// pretty. The sink reads the turns the runtime notes,
-/// [󰀄](crate::clock::turns), and a process that runs no runtime notes none, so
-/// its sink stays on the fallback line. A later record of the request whose
-/// record started the import, the one that carries the same `requestId`, is
-/// pretty within the turn as well, since the chain of the request in the
-/// reference outlasts the import, so the access line of the first request of a
-/// fresh process carries the time while the record of its error before it
-/// carries none. The two modes of the reference write the same terminal line
-/// here, because a Rust process has no inspector to send the record to.
+/// [`turns`](crate::clock::turns), and a process that runs no runtime notes
+/// none, so its sink stays on the fallback line. A sink made later in the
+/// process, which `configureLogger` makes for each pass, is taken to wait for
+/// a turn as well, since the reference imports a module it has loaded once
+/// from its cache and the boot logs show the first record of such a sink
+/// alone. A later record of the request whose record started the import, the
+/// one that carries the same `requestId`, is pretty within the turn as well,
+/// since the chain of the request in the reference outlasts the import, so the
+/// access line of the first request of a fresh process carries the time while
+/// the record of its error before it carries none. The two modes of the
+/// reference write the same terminal line here, because a Rust process has no
+/// inspector to send the record to.
 fn lazy_dev_sink() -> LogSink {
     let first: Rc<RefCell<FirstRecord>> = Rc::new(RefCell::new(None));
     let fallback = line_sink();

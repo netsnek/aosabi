@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: the plugin type of Yoga with the payload of every hook.
  *
- * Derived from graphql-yoga 5.18.0, cjs/plugins/types.js, MIT.
+ * A plugin of Yoga carried over reads the same.
+ *
+ * Derived from graphql-yoga 5.18.0, typings/plugins/types.d.ts, MIT.
  */
 
 //! `HttpPlugin` and the payloads of its hooks.
@@ -273,8 +275,12 @@ pub trait HttpPlugin: HookPlugin + ServerAdapterPlugin {
     /// Returns the names of the hooks the plugin object of the reference carries.
     ///
     /// A hook is a key the object holds, `key in plugin`, and the names come
-    /// in the order of envelop, the server adapter and Yoga of
-    /// `docs/plugins.md` sections 3.1 to 3.3. The default is none.
+    /// in the order of envelop, the server adapter and Yoga.
+    /// A plugin of Yoga that joins the
+    /// plugin array of the reference carries none of the members the
+    /// reference adds, the cast `plugin as Plugin`, so these names are its
+    /// members, which the boot report lists. A plugin translated by hand
+    /// names the keys of the object it translates. The default is none.
     fn hooks(&self) -> Vec<&'static str> {
         Vec::new()
     }

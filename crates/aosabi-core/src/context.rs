@@ -2,8 +2,12 @@
 /*
  * aosabi-core context: the request context and the ambient cell it lives in.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/context.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/context.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
+ *
+ * The two AsyncLocalStorage instances of the reference, the one of this file
+ * and the one of the resolve info, share the one ambient cell of this file.
  */
 
 //! The request context.
@@ -23,6 +27,11 @@
 //! [`get_context`] replaces the environment of the context with the one of
 //! the runtime before it answers, the process on Node and the bindings of the
 //! platform on workerd, as `getContext` does with `env(ctx)`.
+//!
+//! The head of the request is plain data, so a carrier that is no HTTP
+//! connection, GraphTP(Homa) among them, builds the same context from its
+//! own head, and a resolver reads the caller the same way whatever the
+//! protocol.
 
 use core::{
     any::Any,

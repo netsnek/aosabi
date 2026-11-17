@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: the non blocking sockets of the runtime.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The sockets wrap those of the standard
+ * library.
  */
 
 //! `TcpListener`, `TcpStream`, `UnixListener` and `UnixStream`.

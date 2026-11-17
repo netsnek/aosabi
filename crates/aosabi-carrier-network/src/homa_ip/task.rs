@@ -5,7 +5,8 @@
  * its requests, over the clock, the timer and the reactor of the runtime of
  * aosabi-serve.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The device carriers hold the same task
+ * over the compact form, and one copy may move into a shared crate.
  */
 
 //! The task of the driver of Network.

@@ -9,6 +9,10 @@
  * slot where the group holds another empty slot and records every entry again
  * where the group is full. A map of at most SMALL entries keeps no table, and
  * allocates no group until it holds more entries or reserves room for more.
+ *
+ * Derived from hashbrown 0.17.1, src/control/group/generic.rs, MIT.
+ * Derived from hashbrown 0.17.1, src/control/tag.rs, MIT.
+ * Derived from hashbrown 0.17.1, src/raw.rs, MIT.
  */
 
 //! The index table of [`super::IndexMap`].
@@ -134,15 +138,14 @@ const SWEEP: usize = 128;
 /// A map that has held no more than `SMALL` entries and reserved room for no
 /// more is [`Table::Small`] and compares keys, on every target, and the groups
 /// record the entries of a map that has held more. Twelve is the count the map
-/// family of check 9 of `tests/notebooks/20_exec_asm.ipynb` reads. Natively a
-/// hit or a miss of a key in a map of 9 and 12 keys takes 8.63 and 10.70 ns by
-/// the scan against 13.34 and 13.07 ns through groups, and a build with a hit
-/// and a miss per key 28.84 and 32.01 ns per lookup against 31.00 and 31.35
-/// ns, while a scan of 20 keys takes 17.75 ns against 13.43 ns. In the Worker
-/// module under V8 a lookup in a map of 9 and 12 keys takes 8.09 and 9.37 ns
-/// by the scan against 47.65 and 47.84 ns through groups at opt-level z and
-/// 7.95 and 9.65 ns against 19.05 and 18.95 ns at opt-level 3. At five to
-/// eight keys the run of `tests/notebooks/01_json_writer.ipynb` with
+/// family of the assembly check reads. Natively a hit or a miss of a key in a
+/// map of 9 and 12 keys takes 8.63 and 10.70 ns by the scan against 13.34 and
+/// 13.07 ns through groups, and a build with a hit and a miss per key 28.84
+/// and 32.01 ns per lookup against 31.00 and 31.35 ns, while a scan of 20 keys
+/// takes 17.75 ns against 13.43 ns. In the Worker module under V8 a lookup in
+/// a map of 9 and 12 keys takes 8.09 and 9.37 ns by the scan against 47.65 and
+/// 47.84 ns through groups at opt-level z and 7.95 and 9.65 ns against 19.05
+/// and 18.95 ns at opt-level 3. At five to eight keys a run with
 /// `map_measure_limits` and the counts 0, 4, 8, 12 and 16 reads a build by the
 /// scan in 0.481 and 0.486 times the time of groups with the fixed and the
 /// keyed hasher and a hit in 0.580 and 0.474 times.
@@ -389,10 +392,8 @@ impl Groups {
     ///
     /// This is the rebuild of [`Groups::remove`], whose groups held one entry
     /// more and keep their count. A removal from a full group records every
-    /// entry, which the rows of `shift_remove` time in
-    /// `tests/notebooks/01_json_writer.ipynb`, section The cost of the
-    /// insertion ordered map. A record through [`Hashes`] adds a call through
-    /// the object and a copy for every [`CHUNK`] entries to that time, so this
+    /// entry. A record through [`Hashes`] adds a call through the object and a
+    /// copy for every [`CHUNK`] entries to the cost of the removal, so this
     /// reads each hash in place from a generic iterator and is made for every
     /// type of key and value whose map removes a key. A growth records
     /// through [`Groups::rebuild`].

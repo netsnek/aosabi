@@ -13,11 +13,13 @@
 //!
 //! [`viewer_assets`] builds `aoviewer-wasm` into `target/xtask/`, strips the
 //! module through [`wasm_strip::strip`] and renders `assets.lock` through
-//! [`lock::render`]. Under `--check` it writes both under `target/xtask/` with
-//! the same names and compares the committed files with them, the module first.
-//! When one differs, it names every source whose SHA-256 in the committed lock
-//! is not the one of the tree, which is what the lock records the sources for.
-//! The sources are the files git tracks under [`SOURCES`], so beside the two
+//! [`lock::render`]. Without `--check` it writes both under
+//! `crates/aoviewer-page/`, which holds no crate and receives these bytes
+//! alone. Under `--check` it writes both under `target/xtask/` with the same
+//! names and compares the committed files with them, the module first. When one
+//! differs, it names every source whose SHA-256 in the committed lock is not
+//! the one of the tree, which is what the lock records the sources for. The
+//! sources are the files git tracks under [`SOURCES`], so beside the two
 //! packages the root manifest with `[profile.wasm]`, `Cargo.lock`,
 //! `rust-toolchain.toml` and the cargo configuration of the repository are
 //! sources too, and a change of one of them names its file.
@@ -41,12 +43,13 @@
 //! removes a temporary file that a stopped run left and nobody touched for
 //! [`STALE`].
 //!
-//! Cargo keeps `RUSTFLAGS` out of `-C metadata`, and out of the unit id as well
-//! when one flag remaps, so the source sides may differ from host to host. The
-//! flags travel as `CARGO_ENCODED_RUSTFLAGS`, the form of `RUSTFLAGS` that
-//! keeps a path with a space one argument and that wins over a `RUSTFLAGS` of
-//! the caller. The build also runs without the variables of [`CLEARED`], which
-//! set a value of a profile, incremental compilation, the compiler, its
+//! The remap gives the repository root and the cargo home fixed target sides of
+//! one form. Cargo keeps `RUSTFLAGS` out of `-C metadata`, and out of the unit
+//! id as well when one flag remaps, so the source sides may differ from host to
+//! host. The flags travel as `CARGO_ENCODED_RUSTFLAGS`, the form of `RUSTFLAGS`
+//! that keeps a path with a space one argument and that wins over a `RUSTFLAGS`
+//! of the caller. The build also runs without the variables of [`CLEARED`],
+//! which set a value of a profile, incremental compilation, the compiler, its
 //! wrappers or a setting of the target. A cargo configuration file that the
 //! build would read and the lock does not record, one in a directory above the
 //! root or in the cargo home, or one of the root that git does not track, stops
@@ -118,8 +121,7 @@ const PAGE_DIR: &str = "crates/aoviewer-page";
 /// The module under the directory of the products.
 const MODULE: &str = "assets/aoviewer.wasm";
 
-/// The lock under the directory of the products, beside `assets/`, where
-/// `NOTICE` section 3 names it.
+/// The lock under the directory of the products, beside `assets/`.
 const LOCK: &str = "assets.lock";
 
 /// The target directory of every build, which a check also writes its

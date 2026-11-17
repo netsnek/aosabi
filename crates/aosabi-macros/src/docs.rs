@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-macros: the documentation of a described item, read from its doc
- * attributes by the rule of docs/authoring.md section 29.5.
+ * attributes.
  */
 
 //! The documentation of a described item.

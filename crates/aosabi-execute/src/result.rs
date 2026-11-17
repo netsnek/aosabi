@@ -260,10 +260,10 @@ impl ExecutionResult {
     ///
     /// The key order is `errors` when there is an error, `data` when the key
     /// is present, then `extensions`, which is the order `buildResponse`
-    /// writes the first two in (docs/byte-equality.md row D14). Each error is
-    /// the object of `GraphQLError.toJSON`, whose key order is `message`,
-    /// `locations`, `path`, `extensions` (row D15). The data of an answer is
-    /// a tree built for the object, and any other data is a copy.
+    /// writes the first two in. Each error is the object of
+    /// `GraphQLError.toJSON`, whose key order is `message`, `locations`,
+    /// `path`, `extensions`. The data of an answer is a tree built for the
+    /// object, and any other data is a copy.
     ///
     /// With the feature `host-results` a result a host set with members of
     /// its own writes them in their order instead, its errors where they are

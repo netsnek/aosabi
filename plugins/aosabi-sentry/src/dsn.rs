@@ -2,7 +2,13 @@
 /*
  * aosabi-sentry: the DSN of a Sentry project and the endpoint it names.
  *
- * No analogue file on the reference side.
+ * The format is that of
+ * https://develop.sentry.dev/sdk/overview/#parsing-the-dsn, read as the parser
+ * of @sentry/utils 8.9.2 that Toucan links reads it, and the endpoint as
+ * @sentry/core 8.9.2 writes it.
+ *
+ * Derived from @sentry/utils 8.9.2, cjs/dsn.js, MIT.
+ * Derived from @sentry/core 8.9.2, cjs/api.js, MIT.
  */
 
 //! `Dsn` and the envelope endpoint with its authentication in the query.

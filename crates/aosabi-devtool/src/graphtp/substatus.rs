@@ -4,7 +4,10 @@
  * result of graphql-over-http makes of a result, with the substatus of GraphTP the
  * port decides beside the status.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The operation hands the processor a result as a
+ * phase of Yoga hands it one, so a notebook judges the substatus where the port
+ * decides it, apart from the Yoga instances of the flag --graphtp that yoga.rs
+ * serves.
  */
 
 //! The operation `substatus` of the primitive `graphtp`.

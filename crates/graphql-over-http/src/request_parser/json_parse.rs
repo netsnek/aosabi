@@ -3,7 +3,8 @@
  * graphql-over-http: JSON.parse as the V8 of Node 24.13.0 answers it, with the
  * messages of its SyntaxError.
  *
- * Derived from node v24.13.0, deps/v8/src/json/json-parser.cc, MIT.
+ * Derived from V8 13.6, src/json/json-parser.cc, BSD-3-Clause.
+ * Derived from V8 13.6, src/common/message-template.h, BSD-3-Clause.
  */
 
 //! `json_parse`, `JSON.parse(text)` with V8's refusals.

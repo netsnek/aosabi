@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT AND Apache-2.0
-// Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/authz.ts,
-// Apache-2.0. Changed by the Aosabi authors.
+/*
+ * aosabi-auth: the capability gates on the principal of a request and the
+ * plugin that binds it.
+ *
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/authz.ts, Apache-2.0. Changed by the Aosabi authors.
+ */
 
 //! `get_principal`, `authorize`, `require_role`, `use_identity` and the
 //! forbidden mapping.

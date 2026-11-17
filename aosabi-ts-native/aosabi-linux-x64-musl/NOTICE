@@ -1,0 +1,217 @@
+aosabi-linux-x64-musl
+Copyright (c) 2026 Florian Kleber
+
+The npm package aosabi-linux-x64-musl is a part of Aosabi,
+https://github.com/netsnek/aosabi, and is licensed under the MIT License. This
+file names the work of others that the package carries or derives code or data
+from, with the license of each. It adds attribution and no condition to the
+license of the package. The texts of the licenses are those of LICENSE for MIT,
+LICENSE-APACHE for Apache-2.0, LICENSE-BSD-3-Clause for BSD-3-Clause,
+LICENSE-BSL-1.0 for BSL-1.0 and LICENSE-Unicode-3.0 for Unicode-3.0, beside this
+file.
+
+The package ships libaosabi.so, which is built from the crate aosabi-js of the
+Aosabi repository and the crates it links, so it carries the work of the
+projects below that those crates carry. Each file of those crates names its
+license in its SPDX line there.
+
+Each entry names the project, the packages and versions Aosabi follows, the
+license under which Aosabi takes the work, and the copyright lines of the
+project's license file, or the authors its manifest names where that file holds
+none. Where a project offers a choice of licenses, the entry names the one
+Aosabi takes and, after Offered, the choice the project offers.
+
+
+Pylon
+=====
+
+Project: Pylon
+URL: https://github.com/getcronit/pylon
+Packages: @getcronit/pylon 3.0.0-canary, create-pylon 1.1.4,
+  @getcronit/pylon-dev 2.0.0-canary-20260206115650
+License: Apache-2.0
+Copyright 2024 Nico Schett
+
+The code of Pylon that this package carries was written by Nico Schett, as git
+blame of Pylon's history reads it. The package carries it in its builds,
+compiled from Rust translated from Pylon's code. Every file of Aosabi that
+carries code added to Pylon on or after 2024-05-29, the day Pylon took the
+Apache License 2.0, names Apache-2.0 in its SPDX line, as MIT AND Apache-2.0
+where Aosabi's own code is mixed in, credits Nico Schett and Pylon in its header
+and says that the Aosabi authors changed it.
+
+Pylon ships the NOTICE file below, reproduced as it reads at the commit Aosabi
+follows:
+
+    Pylon
+    Copyright 2024 Nico Schett <nico.schett@cronit.io>
+
+    This product includes software developed at
+    cronit (https://www.cronit.io/).
+
+
+Other projects
+==============
+
+Project: Ada
+URL: https://github.com/ada-url/ada
+Packages: ada 3.3.0
+License: MIT
+Offered: Apache-2.0 OR MIT
+Copyright 2023 Yagiz Nizipli and Daniel Lemire
+
+Project: Envelop
+URL: https://github.com/graphql-hive/envelop
+Packages: @envelop/core 5.5.1, @envelop/types 5.2.1, @envelop/sentry 8.0.0
+License: MIT
+Copyright (c) 2020 Dotan Simha
+
+Project: extract-files
+URL: https://github.com/jaydenseric/extract-files
+Packages: extract-files 13.0.0
+License: MIT
+Copyright Jayden Seric
+
+Project: GraphQL Hive Gateway
+URL: https://github.com/graphql-hive/gateway
+Packages: @graphql-tools/delegate 12.0.9, @graphql-tools/wrap 11.1.9,
+  @graphql-tools/executor-http 3.1.0, @graphql-tools/executor-common 1.0.6
+License: MIT
+Copyright (c) 2024 The Guild
+
+Project: GraphQL Scalars
+URL: https://github.com/Urigo/graphql-scalars
+Packages: graphql-scalars 1.25.0
+License: MIT
+Copyright (c) 2020 The Guild
+Copyright (c) 2017, Dirk-Jan Rutten
+
+Project: GraphQL Tools
+URL: https://github.com/ardatan/graphql-tools
+Packages: @graphql-tools/utils 11.0.0, @graphql-tools/executor 1.5.1,
+  @graphql-tools/schema 10.0.31, cross-inspect 1.0.1
+License: MIT
+Copyright (c) 2020 The Guild, Inc.
+
+Project: GraphQL Yoga
+URL: https://github.com/graphql-hive/graphql-yoga
+Packages: graphql-yoga 5.18.0, @graphql-yoga/subscription 5.0.5,
+  @graphql-yoga/logger 2.0.1, @graphql-yoga/plugin-disable-introspection 2.19.0
+License: MIT
+Copyright (c) 2018-2020 Graphcool
+Copyright (c) 2020-2021 Prisma
+Copyright (c) 2021- The Guild
+
+Project: graphql-js
+URL: https://github.com/graphql/graphql-js
+Packages: graphql 16.12.0
+License: MIT
+Copyright (c) GraphQL Contributors
+
+Project: hashbrown
+URL: https://github.com/rust-lang/hashbrown
+Packages: hashbrown 0.17.1
+License: MIT
+Offered: MIT OR Apache-2.0
+Copyright (c) 2016 Amanieu d'Antras
+
+Project: Hono
+URL: https://github.com/honojs/hono
+Packages: hono 4.11.9
+License: MIT
+Copyright (c) 2021 - present, Yusuke Wada and Hono contributors
+
+Project: Hono third party middleware
+URL: https://github.com/honojs/middleware
+Packages: @hono/sentry 1.2.2
+License: MIT
+Copyright (c) 2022 - present, Yusuke Wada and Hono contributors
+
+Project: Node.js
+URL: https://github.com/nodejs/node
+Packages: node 24.13.0
+License: MIT
+Copyright Node.js contributors. All rights reserved.
+Copyright Joyent, Inc. and other Node contributors. All rights reserved.
+
+Project: Node.js Adapter for Hono
+URL: https://github.com/honojs/node-server
+Packages: @hono/node-server 1.19.9
+License: MIT
+Copyright (c) 2022 - present, Yusuke Wada and Hono contributors
+
+Project: oauth4webapi
+URL: https://github.com/panva/oauth4webapi
+Packages: oauth4webapi 3.8.4
+License: MIT
+Copyright (c) 2022 Filip Skokan
+
+Project: once_cell
+URL: https://github.com/matklad/once_cell
+Packages: once_cell 1.21.4
+License: MIT
+Offered: MIT OR Apache-2.0
+Authors: Aleksey Kladov
+
+Project: openid-client
+URL: https://github.com/panva/openid-client
+Packages: openid-client 6.8.2
+License: MIT
+Copyright (c) 2016 Filip Skokan
+
+Project: Repeater
+URL: https://github.com/repeaterjs/repeater
+Packages: @repeaterjs/repeater 3.0.6
+License: MIT
+Copyright 2019 Brian Kim
+
+Project: Ryu and ryu-js
+URL: https://github.com/boa-dev/ryu-js
+Packages: ryu-js 1.0.3
+License: BSL-1.0
+Offered: Apache-2.0 OR BSL-1.0
+Copyright 2018 Ulf Adams
+
+Project: Sentry SDK for JavaScript
+URL: https://github.com/getsentry/sentry-javascript
+Packages: @sentry/node 8.55.0, @sentry/core 8.9.2 and 8.55.0 and 10.38.0,
+  @sentry/utils 8.9.2
+License: MIT
+Copyright (c) 2019-2024 Functional Software, Inc. dba Sentry
+
+Project: toucan-js
+URL: https://github.com/robertcepa/toucan-js
+Packages: toucan-js 4.1.1
+License: MIT
+Copyright (c) 2022 Robert Cepa
+
+Project: TypeScript
+URL: https://github.com/microsoft/TypeScript
+Packages: typescript 5.9.3
+License: Apache-2.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+Project: undici
+URL: https://github.com/nodejs/undici
+Packages: undici 7.18.2
+License: MIT
+Copyright (c) Matteo Collina and Undici contributors
+
+Project: Unicode Character Database
+URL: https://www.unicode.org/
+Packages: UCD and UTS 46 16.0.0
+License: Unicode-3.0
+Copyright © 1991-2024 Unicode, Inc.
+
+Project: V8
+URL: https://chromium.googlesource.com/v8/v8
+Packages: V8 13.6
+License: BSD-3-Clause
+Copyright 2014, the V8 project authors. All rights reserved.
+
+Project: whatwg-node
+URL: https://github.com/ardatan/whatwg-node
+Packages: @whatwg-node/server 0.10.18, @whatwg-node/node-fetch 0.8.5,
+  @whatwg-node/fetch 0.10.13, @whatwg-node/promise-helpers 1.3.2
+License: MIT
+Copyright (c) 2023 Arda TANRIKULU

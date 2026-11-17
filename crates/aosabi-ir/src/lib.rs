@@ -2,10 +2,11 @@
 /*
  * aosabi-ir: the intermediate representation and its SDL printer.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/ir/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/ir/index.ts, Apache-2.0. Changed by the Aosabi authors.
  *
  * This file holds the module list and the names the crate exports at its root.
+ * The root re-exports a part of the names of index.ts, some of them renamed.
  */
 
 //! The intermediate representation of Aosabi.
@@ -14,8 +15,7 @@
 //! sits between the inference and every generated artifact. The inference
 //! fills it, the printer projects it to the text of `schema.graphql`, and its
 //! JSON form is `ir.json`. The printer is a literal translation, because the
-//! exit number of the milestone is byte equality of that text with the text
-//! the reference writes.
+//! goal is byte equality of that text with the text the reference writes.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |
@@ -31,8 +31,11 @@
 //!
 //! `index.ts` of the reference exports four more files, `merge.ts`, `diff.ts`,
 //! `ddl.ts` and `dialect.ts`. None of them is translated and none has a stub.
-//! The helpers `tableSpecOf`, `pgIdent`, `joinTableName` and `joinColumn` and
-//! the migration types `TableSpec`, `TableColumn`, `PhysicalTable`,
+//! They land with the database layer, because the only caller of `mergeIR`, of
+//! `collapseInterfaceTwins` and of the two prune passes is the `contributeIR`
+//! branch of the builder, and no mapper exists before that release. The
+//! helpers `tableSpecOf`, `pgIdent`, `joinTableName` and `joinColumn` and the
+//! migration types `TableSpec`, `TableColumn`, `PhysicalTable`,
 //! `PhysicalSchema` and `ForeignKeyChange` of `ir.ts:87-225` land with them.
 //!
 //! # The shape of the port
@@ -47,8 +50,7 @@
 //! The crate builds with no standard library and needs an allocator. The `std`
 //! feature is the configuration symbol of a host build and gates nothing
 //! today. There is no test in this crate, which is the rule of CONTRIBUTING.md
-//! section 3, and the judging notebook is
-//! `tests/notebooks/15_sdl_printer.ipynb`.
+//! section 3.
 
 #![no_std]
 

@@ -4,7 +4,8 @@
  * pass, which compares the fields of one response key with a record of the
  * pairs it compared.
  *
- * No analogue of the file in the reference.
+ * No analogue of the file in the reference. It follows the graphql-js algorithm
+ * over the field plan of the walk in place of the syntax tree.
  */
 
 //! The rule for overlapping fields of the single pass.
@@ -25,10 +26,10 @@
 //! Fibonacci hash of the entry. It grows to keep a quarter of its slots
 //! empty, so a probe ends at an empty slot within the entries it holds.
 //!
-//! The crossings where a comparison of names turns from pairs to sorted
-//! lists, 8 arguments or input fields, 16 fields of one selection set and 64
-//! pairs of two sets, are those of SP1's `pass.rs`, the source the plan names
-//! for this file.
+//! The crossings where a comparison of names turns from pairs to sorted lists,
+//! 8 arguments or input fields, 16 fields of one selection set and 64 pairs of
+//! two sets, are those of the `pass.rs` of the prototype of the single pass,
+//! the source of this file.
 
 use alloc::vec::Vec;
 use core::{

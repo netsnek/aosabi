@@ -12,50 +12,51 @@ function, a Bluetooth channel, a Unix Socket and an IP network.
 
 ## What the crate holds
 
-The crate grows in stages, H0 to H7, and the table names the stage at which each part lands. A
-module whose part has not landed is a file that holds its header and the lines of its submodules
-alone.
+| Module | Holds |
+| --- | --- |
+| The root | The types every engine module shares, the traits `PeerPort`, `Carrier`, `Rpcs` and `Read`, the storage and the endpoint with its data centre mechanisms |
+| `wire` | The two wire forms: the compact form, version 0, for point to point links, and the full form of `homa_wire.h` for Network |
+| `table`, `heap` | Open addressing over caller owned buckets with a keyed SipHash-1-3, and binary heaps over caller owned items |
+| `siphash` | SipHash-1-3, the keyed hash of `table`, public so that another table hashes with the same one |
+| `stream` | AoFrame, the framing of one packet on a byte stream, delimited with COBS and CRC-32C or prefixed with a four byte length |
+| `grant`, `pacer`, `prio` | The grant scheduler, the pacers and the priority machinery |
+| `sim` | The loopback, lossy, baseline, fabric and radio simulators, behind the feature `sim` and never in a served build |
+| `unix`, `ip` | The Unix Socket transports and the IP driver over raw IP of protocol 146, the `IPPROTO_HOMA` of HomaModule, Linux only, behind their features |
+| The binary `homa-raw` | The helper, the client role of the Network profile for a program in any language, Linux only, built only with the feature `helper` |
 
-| Module | Holds | Lands at |
-| --- | --- | --- |
-| The root | The types every engine module shares, the traits `PeerPort`, `Carrier`, `Rpcs` and `Read`, the storage and the endpoint | H0, H1 the data centre mechanisms of the endpoint |
-| `wire` | The two wire forms: the compact form, version 0 of the first version of the Homa design note, for point to point links, and the full form of `homa_wire.h` for Network | H0 the compact form, H1 the full form |
-| `table`, `heap` | Open addressing over caller owned buckets with a keyed SipHash-1-3, and binary heaps over caller owned items | H0 |
-| `siphash` | SipHash-1-3, the keyed hash of `table`, public so that another table hashes with the same one | H0 |
-| `stream` | AoFrame, the framing of one packet on a byte stream, delimited with COBS and CRC-32C or prefixed with a four byte length | H0 |
-| `grant`, `pacer`, `prio` | The grant scheduler, the pacers and the priority machinery | H0 the grant scheduler and the readiness of the pacer, H1 the rate and budget pacers and `prio` |
-| `sim` | The loopback, lossy, baseline, fabric and radio simulators, behind the feature `sim` and never in a served build | H0 the loopback, lossy and baseline simulators, H1 the fabric, H6 the radio |
-| `unix`, `ip`, `ksock` | The Unix Socket transports, the IP driver over raw IP of protocol 146, the `IPPROTO_HOMA` of HomaModule, and the client of the socket of the crate's kernel module, Linux only, behind their features | H2 `unix`, H4 `ip`, H5 `ksock` |
-| `abi` | The socket interface of the crate's kernel module, which `ksock` and the module share, compiled in every build on every target | H5 |
+The crate does not hold its kernel module yet, a Rust for Linux module under `kernel/`, or the
+client of that module's socket. So `ksock`, the client behind the feature `kernel-socket`, and
+`abi`, the socket interface the client and the kernel module share, compiled in every build on every
+target, are files that hold their header alone, and the feature `kernel-socket` is declared ahead of
+its code.
 
 The crate is `no_std`, allocation is optional, the roles `client` and `server` are features, and
 `#![forbid(unsafe_code)]` holds in every build cargo makes. The engine keeps edition 2021 and rustc
 1.85 and uses no floating point and no atomic type, so the same files build on an RV32IMC core
-without atomics and, from stage H5, as a Rust for Linux kernel module under `kernel/`.
+without atomics and, later, as a Rust for Linux kernel module under `kernel/`.
 
 ## The full form and HomaModule
 
 The full form is `homa_wire.h` of [HomaModule] at commit `50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3`,
 the pin every capture of the full form is judged against. It was checked against the head of `main`
-twice, against `bfef3bcf114dc2c230d87d39cdd3fd24b1a21ce1`, read and nine commits later, and against
-`1c59d7b65b4cf2640be94c368f1c43cd45479dc1`, read and sixteen commits later, and neither head changes
-`homa_wire.h`. The pin moves only by a change that runs `05_homa_wire_full` and the notebooks of
-the raw socket and of HomaModule against the new commit.
+twice, against `bfef3bcf114dc2c230d87d39cdd3fd24b1a21ce1`, nine commits later, and against
+`1c59d7b65b4cf2640be94c368f1c43cd45479dc1`, sixteen commits later, and neither head changes
+`homa_wire.h`. The pin moves only by a change that runs `05_homa_wire_full` and the notebooks of the
+raw socket and of HomaModule against the new commit.
 
 ## Where the facts come from
 
-The Homa design note, in a first version `homa/design-v1.md` and a second `homa/design.md`, is the
-design the crate follows, and it lives in a design folder outside this repository.
+The design the crate follows lives outside this repository, so what the crate takes from it is
+assumed.
 
 ## How the crate is judged
 
-The crate carries no test in Rust. Jupyter notebooks judge it, each from the stage of the part it
-judges, through a command line seam against references in Python that share no code with the
-crate: `03_homa_packets` and `04_aoframe` for the byte formats, `21_homa_loopback` and
-`22_homa_lossy` for the engine, `23_homa_budget` for the budget of every target,
-`05_homa_wire_full` and `29_homa_fabric` for the full form and the data centre mechanisms, and two
-notebooks of the project that run outside this repository, over the raw socket and over
-HomaModule, for Network.
+The crate carries no test in Rust. Jupyter notebooks judge it through a command line seam against
+references in Python that share no code with the crate: `03_homa_packets` and `04_aoframe` for the
+byte formats, `21_homa_loopback` and `22_homa_lossy` for the engine, `23_homa_budget` for the budget
+of every target, `05_homa_wire_full` and `29_homa_fabric` for the full form and the data centre
+mechanisms, and two notebooks of the project that run outside this repository, over the raw socket
+and over HomaModule, for Network.
 
 ## Scope
 

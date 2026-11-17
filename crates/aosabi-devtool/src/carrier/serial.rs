@@ -6,8 +6,7 @@
  * No analogue in the reference. The terminal is one slave of the pair that
  * tests/harness/homa/pty.py creates and puts in raw mode, which the driver
  * opens by its path through std::fs::File, so the devtool calls no openpty
- * and holds no unsafe. The judging notebook is
- * tests/notebooks/26_carrier_serial.ipynb.
+ * and holds no unsafe.
  */
 
 //! Serial Line behind the primitive `carrier`.

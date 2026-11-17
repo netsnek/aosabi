@@ -2,16 +2,12 @@
 /*
  * homa pacer: readiness, the rate pacer and the budget pacer.
  *
- * Readiness is the pacer of the first version of the Homa design note,
- * homa/design-v1.md section 1.4, lines 179 to 281, with the length of the
- * packet that its second version adds, homa/design.md section 3.7, lines 621
- * to 640, and the FIFO share of a link by count of its first version, section
- * 1.4. The rate pacer is the first half of HomaModule's pacer, its estimate of
- * when the link has sent everything and its short messages that skip the wait,
- * homa_qdisc.c lines 14 to 60 and 242 to 246 at
+ * Readiness is a pacer that weighs the length of the packet, with the FIFO
+ * share of a link by count. The rate pacer is the first half of HomaModule's
+ * pacer, its estimate of when the link has sent everything and its short
+ * messages that skip the wait, homa_qdisc.c lines 14 to 60 and 242 to 246 at
  * https://github.com/PlatformLab/HomaModule/tree/50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3,
- * read, and the budget pacer is the airtime ledger of the second version,
- * sections 3.7 and 6.3, lines 621 to 640 and 1810 to 1868.
+ * read, and the budget pacer is an airtime ledger.
  */
 
 //! The pacers of the engine.

@@ -3,7 +3,8 @@
  * aosabi-js zitadel: the Zitadel layer of the app over aosabi-auth-zitadel.
  *
  * No analogue in the reference, whose subpath auth/zitadel runs openid-client
- * in the process of the app.
+ * in the process of the app. It is the layer aosabi/auth/zitadel, with
+ * zitadelPrincipal, zitadelAuth and zitadelLogin as markers over the crate.
  */
 
 //! The Zitadel layer of the app.
@@ -16,29 +17,31 @@
 //! hono of the host before the request reaches the engine. A provider of the
 //! reference holds no state beyond its options and its bootstrap is one per
 //! issuer, so the engine keeps one [`ZitadelAuth`] of `aosabi-auth-zitadel` per
-//! issuer and key path, made at the first call of the pair. It answers every
-//! provider of the app with those options in any order the app makes and calls
-//! them, a provider the app makes per request adds none, and the one bootstrap
-//! per issuer of the crate holds, so the key of the first call of
-//! an issuer signs for every provider of it, quirk `Q10-3`. The engine runs
-//! [`ZitadelAuth::claims`] over the context of the request beside the answer of
-//! the request, in the drives of its head and of its body: the token of the
-//! header, the query or the cookie `aosabi-auth`, the discovery, the
-//! introspection and the user info through the `fetch` of the host and the
-//! client assertion signed by its crypto. The wrapper makes the promise of the
-//! call before it calls, under a number of its own that the record carries, the
-//! call answers at once, and the import `js_next` settles that promise with the
-//! claims, `undefined` for a request the provider answers no principal for, or
-//! with the thrown value. A call the app makes outside every drive of the
-//! request, from a microtask of its own, drives the request at once, so its
-//! claims start there. The wrapper then maps the claims with `zitadelPrincipal`
-//! of the reference and the mappers of the app, functions of the host no
-//! function pointer of the crate holds.
+//! issuer, key path and name of the session cookie, made at the first call of
+//! the three. It answers every provider of the app with those options in any
+//! order the app makes and calls them, a provider the app makes per request
+//! adds none, and the one bootstrap per issuer of the crate holds, so the key
+//! of the first call of an issuer signs for every provider of it. The engine
+//! runs [`ZitadelAuth::claims`] over the context of the request beside the
+//! answer of the request, in the drives of its head and of its body: the token
+//! of the header, the query or the session cookie, `aosabi-auth` or the name of
+//! the option `cookieName`, the discovery, the introspection and the user info
+//! through the `fetch` of the host and the client assertion signed by its
+//! crypto. The wrapper makes the promise of the call before it calls, under a
+//! number of its own that the record carries, the call answers at once, and the
+//! import `js_next` settles that promise with the claims, `undefined` for a
+//! request the provider answers no principal for, or with the thrown value. A
+//! call the app makes outside every drive of the request, from a microtask of
+//! its own, drives the request at once, so its claims start there. The wrapper
+//! then maps the claims with `zitadelPrincipal` of the reference and the
+//! mappers of the app, functions of the host no function pointer of the crate
+//! holds.
 //!
 //! The marker `zitadelLogin` of the configuration becomes the plugin
-//! [`zitadel_login`] of the crate with the issuer, the key path and the
-//! endpoint of its options, whose setup registers the three routes of the
-//! login in the place the sort of the plugins gives it.
+//! [`zitadel_login`] of the crate with the issuer, the key path, the
+//! endpoint and the name of the session cookie of its options, whose setup
+//! registers the three routes of the login in the place the sort of the
+//! plugins gives it.
 
 #![forbid(unsafe_code)]
 
@@ -73,62 +76,68 @@ use crate::{
 };
 
 /// The member of the export `ctx` that asks for the claims of the request,
-/// after the issuer of the provider, its key path and the number of the
-/// promise of the wrapper the claims settle.
+/// after the issuer of the provider, its key path, the name of its session
+/// cookie and the number of the promise of the wrapper the claims settle.
 pub const CLAIMS: u8 = 33;
 
-/// One provider of the engine, made at the first call of its issuer and its
-/// key path.
+/// One provider of the engine, made at the first call of its issuer, its key
+/// path and the name of its session cookie.
 struct Provider {
     /// The issuer.
     issuer: String,
     /// The key path, none where the record names none.
     key_path: Option<String>,
+    /// The name of the session cookie, none where the record names none.
+    cookie_name: Option<String>,
     /// The provider of the crate.
     auth: Rc<ZitadelAuth>,
 }
 
 // An `unsafe` cell would skip each borrow flag.
 thread_local! {
-    /// The providers of the engine, one per issuer and key path, in the order
-    /// of their first calls.
+    /// The providers of the engine, one per issuer, key path and name of the
+    /// session cookie, in the order of their first calls.
     static PROVIDERS: RefCell<Vec<Provider>> = const { RefCell::new(Vec::new()) };
 }
 
-/// Returns the provider of the engine for `issuer` and `key_path`, made at
-/// the first call of the pair.
+/// Returns the provider of the engine for `issuer`, `key_path` and
+/// `cookie_name`, made at the first call of the three.
 ///
-/// The list holds one entry per pair the app has called, so a provider the
+/// The list holds one entry per three the app has called, so a provider the
 /// app makes per request adds none, and a call finds or makes its entry
 /// whatever the order of the calls, also in a module the host instantiates
 /// anew after a trap, whose list starts empty while the providers of the app
 /// stay.
-fn provider(issuer: &str, key_path: Option<&str>) -> Rc<ZitadelAuth> {
+fn provider(issuer: &str, key_path: Option<&str>, cookie_name: Option<&str>) -> Rc<ZitadelAuth> {
     PROVIDERS.with_borrow_mut(|providers| {
-        if let Some(found) = providers
-            .iter()
-            .find(|provider| provider.issuer == issuer && provider.key_path.as_deref() == key_path)
-        {
+        if let Some(found) = providers.iter().find(|provider| {
+            provider.issuer == issuer
+                && provider.key_path.as_deref() == key_path
+                && provider.cookie_name.as_deref() == cookie_name
+        }) {
             return Rc::clone(&found.auth);
         }
         let auth = Rc::new(zitadel_auth(ZitadelAuthOptions {
             issuer: String::from(issuer),
             key_path: key_path.map(String::from),
+            cookie_name: cookie_name.map(String::from),
             ..ZitadelAuthOptions::default()
         }));
         providers.push(Provider {
             issuer: String::from(issuer),
             key_path: key_path.map(String::from),
+            cookie_name: cookie_name.map(String::from),
             auth: Rc::clone(&auth),
         });
         auth
     })
 }
 
-/// Starts the claims of the request of `c` for the provider of the issuer
-/// and the key path the record at the cursor of `reader` names, which the
-/// import `js_next` hands the promise of the number the record names, and
-/// answers `undefined`, or `None` for a broken record.
+/// Starts the claims of the request of `c` for the provider of the issuer,
+/// the key path and the name of the session cookie the record at the cursor
+/// of `reader` names, which the import `js_next` hands the promise of the
+/// number the record names, and answers `undefined`, or `None` for a broken
+/// record.
 // Out of line, so a request compiles the read of the claims of the Zitadel layer where it makes
 // one.
 #[inline(never)]
@@ -138,8 +147,12 @@ pub fn start(request: u32, c: &Context, reader: &mut Reader<'_>) -> Option<Resul
         0 => None,
         _ => Some(reader.text()?),
     };
+    let cookie_name = match reader.byte()? {
+        0 => None,
+        _ => Some(reader.text()?),
+    };
     let next = reader.word()?;
-    let auth = provider(issuer, key_path);
+    let auth = provider(issuer, key_path, cookie_name);
     let context = c.clone();
     request::spawn(
         request,
@@ -176,8 +189,8 @@ fn value_of(claims: Option<&aosabi_auth_zitadel::zitadel_auth::Claims>) -> Value
 }
 
 /// Returns the plugin of the marker `zitadelLogin` over the options `options`,
-/// a plain object of the configuration with its issuer, its key path and its
-/// endpoint, each a string or absent.
+/// a plain object of the configuration with its issuer, its key path, its
+/// endpoint and the name of its session cookie, each a string or absent.
 pub fn login(options: &JsValue) -> PluginSlot {
     let text = |key: &str| match options {
         JsValue::Object(object) => match object.get(key) {
@@ -191,6 +204,7 @@ pub fn login(options: &JsValue) -> PluginSlot {
             issuer: text("issuer").unwrap_or_default(),
             key_path: text("keyPath"),
             endpoint: text("endpoint"),
+            cookie_name: text("cookieName"),
         })
         .into_plugin(),
     )

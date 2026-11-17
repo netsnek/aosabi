@@ -5,7 +5,7 @@
  *
  * No analogue in the reference. The environment notebook smokes every sub
  * command of the seam with one cell, so every primitive answers one shape,
- * which names the sub command, whether it is implemented and the milestone it
+ * which names the sub command, whether it is implemented and the area it
  * lands at.
  */
 
@@ -17,9 +17,7 @@
 //! sub command. A primitive that answers its operations carries
 //! `"implemented":true`, which every primitive of the seam carries. A sub
 //! command that answers `--smoke` alone carries `"implemented":false` and the
-//! milestone it lands at, and the cell of the seam in
-//! `tests/notebooks/00_environment.ipynb` holds such a sub command to exit 64
-//! on any other call.
+//! area it lands at, and such a sub command exits 64 on any other call.
 
 use aosabi_json::{
     JsObject,

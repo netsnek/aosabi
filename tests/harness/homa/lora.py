@@ -3,10 +3,9 @@
 
 The reference of `tests/notebooks/06_lora_frame.ipynb` and
 `tests/notebooks/29_carrier_lora.ipynb` for `aosabi-carrier-lora`, sharing no
-code with it, written from the Homa design note, second version, sections 6.2
-to 6.7, with the formula of the time on air of the SX1261/2 datasheet,
-revision 1.2, section 6.1.4, which that note reads, and the AEAD of
-`chacha.py`.
+code with it, written from the rules of the carrier, with the formula of the
+time on air of the SX1261/2 datasheet, revision 1.2, section 6.1.4, and the
+AEAD of `chacha.py`.
 
 The frame is a byte of the link, the sender's counter in four bytes big
 endian, the compact Homa packet sealed with ChaCha20-Poly1305 and the tag of
@@ -45,7 +44,7 @@ DUTY_PERMILLE = {"P": 100, "M": 10}
 """The duty cycle of the band P, 869.4 to 869.65 MHz, and of the band M, 868.0 to 868.6 MHz."""
 
 LONGEST_TRANSMISSION_NS = {"P": 36_000_000_000, "M": 3_600_000_000}
-"""The advisory longest single transmission of each band, the note's section 6.3."""
+"""The advisory longest single transmission of each band."""
 
 
 def time_on_air(sf: int, length: int, bandwidth_hz: int = 125_000, coding_rate: int = 1) -> int:
@@ -82,6 +81,11 @@ def max_frame(band: str, sf: int) -> int:
 
 def longest_response(band: str, sf: int) -> int:
     """Return the longest response of a card's link, from the rules that fix it.
+
+    It is 8,192 bytes at SF7 to SF9 in the band P, and elsewhere at most 2,048
+    bytes whose full packets and last packet take at most a quarter of the
+    hour's air of the band, each full packet carrying its packet less the 14
+    bytes of the header of a part.
     """
     if band == "P" and sf <= 9:
         return 8192
@@ -171,9 +175,8 @@ def open_all(key: bytes, link: int, direction: str, frames: list) -> list:
 def boots(uses: list, block: int = 1024) -> list:
     """Return, for each boot, the first counter and the store's bound after it.
 
-    A boot starts at the bound the store holds and reserves one block past
-    it, and a use past the reserved block reserves the next one, the rule of
-    the note's section 6.5.
+    A boot starts at the bound the store holds and reserves one block past it,
+    and a use past the reserved block reserves the next one.
     """
     stored = 0
     out = []

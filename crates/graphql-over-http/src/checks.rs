@@ -3,6 +3,11 @@
  * graphql-over-http: the request checks of the function.
  *
  * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-check-method-for-graphql.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-check-graphql-query-params.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-limit-batching.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-prevent-mutation-via-get.js, MIT.
+ * Derived from graphql-yoga 5.18.0, cjs/plugins/request-validation/use-http-validation-error.js, MIT.
  */
 
 //! The request checks.
@@ -24,8 +29,8 @@
 //! - [`single_operation`] refuses every batch with `Batching is not supported.`,
 //!   status 400 and code `BAD_REQUEST`, after the done hooks of the request parse
 //!   of the app, which is Yoga's refusal with batching off. The function holds no
-//!   batching, the named divergence D58 of `docs/byte-equality.md` section 3, so
-//!   the option `batching` that raises the limit has no reading.
+//!   batching, a named divergence, so the option `batching` that raises the limit
+//!   has no reading.
 //!
 //! Two stand in the hook layer, at the places of their plugins in Yoga's
 //! list, since they act on the parse and the validation that the hook layer

@@ -1,15 +1,15 @@
-# It binds the principal of a request through the identity plugin and gates
-# a call on it. It names no crate outside the workspace and sits behind no
-# feature of the facade, because every service imports the auth root
-# without an install and the linker keeps none of it when a service calls
+# The auth root. It binds the principal of a request through the identity
+# plugin and gates a call on it. It names no crate outside the workspace and
+# sits behind no feature of the facade, because every service imports the auth
+# root without an install and the linker keeps none of it when a service calls
 # none of it.
 [package]
 name = "aosabi-auth"
-version = "0.0.0"
+version.workspace = true
 description = "The auth root of Aosabi: the identity plugin, get_principal, authorize, require_role and the mapping of a forbidden error."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

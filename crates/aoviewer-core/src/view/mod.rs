@@ -121,8 +121,7 @@ const OTHER_NAME: &str = "other";
 /// The mark of a node that a table of one view does not hold.
 const NONE: u32 = u32::MAX;
 
-/// The four levels of `docs/aoviewer.md` section 3.6: chip, link, full and
-/// focus.
+/// The four levels of a box: chip, link, full and focus.
 ///
 /// A level says what a box draws, and the representation changes with it and
 /// not only the scale.
@@ -269,8 +268,8 @@ pub enum Chip {
     },
 }
 
-/// A reduction of a view over the budget of a page, in the fixed order of
-/// `docs/documentation-generator.md` section 6.2.
+/// A reduction of a view over the budget of a page. The reductions apply in
+/// the order of the variants.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Reduction {
     /// Interface implementers folded into one group box.
@@ -471,10 +470,9 @@ impl View {
         ))
     }
 
-    /// Returns the same view under the page budget, reduced in the fixed
-    /// order of docs/documentation-generator.md section 6.2, split into
-    /// numbered parts last, or empty with its reason
-    /// (docs/documentation-generator.md section 6.1).
+    /// Returns the same view under the page budget, reduced in the order of
+    /// the variants of [`Reduction`], split into numbered parts last, or empty
+    /// with its reason.
     ///
     /// A type with fewer than two neighbours, counted over the edges `leaf`
     /// keeps and the boxes `hideRoot` keeps, answers one empty view with

@@ -2,8 +2,8 @@
 /*
  * aosabi-js: the build script that gives the module core.wasm its stack.
  *
- * No analogue in the reference. It is the stack the Worker glue of the
- * gateway card takes in tests/fixtures/rs/gateway-worker-probe/build.rs.
+ * No analogue in the reference. It is the stack the Worker glue of the gateway
+ * card takes.
  */
 
 //! The build script of the module `core.wasm`.

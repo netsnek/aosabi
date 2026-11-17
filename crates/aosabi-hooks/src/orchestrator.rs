@@ -2,6 +2,8 @@
 /*
  * aosabi-hooks: the orchestrator, which runs the hooks of every plugin in
  * their order.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/orchestrator.js, MIT.
  */
 
 //! The orchestrator.
@@ -13,8 +15,7 @@
 //! and subscribe in the order of the list and the done hooks in the order they
 //! were returned. A parse error reaches every done hook of the parse and is
 //! thrown after them, and a failure of the context building passes every
-//! context error handler. Nothing sorts, which is ordering A of
-//! `docs/plugins.md` section 5.1.
+//! context error handler. Nothing sorts.
 //!
 //! Parse and validate answer at once, since no hook awaits inside them, and
 //! the context building answers a future, so a hook that awaits fits there.

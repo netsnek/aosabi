@@ -12,25 +12,38 @@
  * build-schema, validate-schema and natural-compare, one per operation of the
  * graphql-js oracle. The schema layer answers through one more, print-sdl,
  * because the printer of the intermediate representation is judged with no
- * inference in front of it. The crate homa answers through homa-packet,
- * homa-frame and homa-sim, one per byte level primitive of its wire forms, its
- * framing and its engine, and through homa-unix, its engine over a real Unix
- * Socket against a peer in another process, and through homa-ip, its engine and
- * the carrier Network over raw IP 146 between network namespaces. The carrier
- * LoRa answers through lora, its frame, its seal, its counters, its ledger and
- * its time on air. The case conversions of aosabi-json that keep the mappings to
- * ASCII alone answer through case. The subscriptions answer through two more,
- * pubsub and push: pubsub runs scripts of the pub sub and the repeater on one
- * agent, and push the hub of the kernel's publish primitive with no agent. The
- * loader of plugins answers through plugins, its sort, its role gate, both
- * passes of its boot and the mapping of a forbidden error. The primitives pull
- * and dotenv reach the command line, which the seam names on a Unix host alone.
- * The provider half of the Zitadel integration answers through zitadel, its
+ * inference in front of it. The shared core of aoviewer and of the documentation
+ * generator answers through one more, viewer. Federation answers through one
+ * more, federation. The crate homa answers through homa-packet, homa-frame and
+ * homa-sim, one per byte level primitive of its wire forms, its framing and its
+ * engine, and through homa-unix, its engine over a real Unix Socket against a
+ * peer in another process, and through homa-ip, its engine and the carrier
+ * Network over raw IP 146 between network namespaces. The carrier LoRa answers
+ * through lora, its frame, its seal, its counters, its ledger and its time on
+ * air. The case conversions of aosabi-json that keep the mappings to ASCII alone
+ * answer through case. The subscriptions answer through two more, pubsub and
+ * push: pubsub runs scripts of the pub sub and the repeater on one agent, and
+ * push the hub of the kernel's publish primitive with no agent. The loader of
+ * plugins answers through plugins, its sort, its role gate, both passes of its
+ * boot and the mapping of a forbidden error. The command line and the build
+ * answer through five more and one option: client-schema builds the client
+ * schema of an introspection result and writes the introspection query,
+ * app-model forms the canonical model of inspect, client writes the TypeScript
+ * client of a build, pull writes the Rust registry of a remote, dotenv parses a
+ * .env text, and json --space writes with the gap of JSON.stringify. The
+ * primitives pull and dotenv reach the command line, which the seam names on a
+ * Unix host alone, and so does git-source, the reader of the source of a
+ * dependency from a repository and the entry the generated workspace names it
+ * by. The provider half of the Zitadel integration answers through zitadel, its
  * principal, its token, its roles and its introspection body. The queue of an
  * agent that a host owns answers through host-queue, which a build with the
  * feature host-queue alone holds, so the default build and every primitive in it
  * run the agent without that queue. The single pass of aosabi-validate answers
- * through pass, its check, its static table and the dump of its table.
+ * through pass, its check, its static table and the dump of its table. The
+ * reader of the plain source of a crate, the first part of the source path,
+ * answers through source, its entry, its registrations, its reach and the names
+ * of the source path, and the build of its schema from the source, on every
+ * target but wasm32.
  */
 
 //! The Python seam of Aosabi.
@@ -66,6 +79,8 @@ mod collate;
 mod dotenv;
 mod execute;
 mod federation;
+#[cfg(unix)]
+mod git_source;
 mod graphtp;
 mod homa_frame;
 #[cfg(target_os = "linux")]
@@ -146,9 +161,7 @@ use crate::{
 /// The command line of the seam, one sub command per primitive.
 ///
 /// The about line of a command is the line the help of the program lists it
-/// with, and `tests/notebooks/00_environment.ipynb` reads the roster of the
-/// seam from that list, so it is part of the command line contract the
-/// notebooks see.
+/// with, so it is part of the command line contract.
 static PROGRAM: Program = Program {
     name: "aosabi-devtool",
     about: "The Python seam. One byte level primitive per sub command.",
@@ -254,7 +267,7 @@ static PROGRAM: Program = Program {
             name: "yoga",
             about: "Answer requests through the Yoga of the capture schemas in process",
             grammar: &yoga::GRAMMAR,
-            run: |matches| Ok(yoga::run(&YogaArgs::read(matches))),
+            run: |matches| Ok(yoga::run(&YogaArgs::read(matches)?)),
         },
         Command {
             name: "http",
@@ -370,6 +383,13 @@ static PROGRAM: Program = Program {
             grammar: &BATCH_GRAMMAR,
             run: |matches| Ok(dotenv::run(&BatchArgs::read(matches))),
         },
+        #[cfg(unix)]
+        Command {
+            name: "git-source",
+            about: "Read the source of a dependency from a repository the way the command line reads it",
+            grammar: &BATCH_GRAMMAR,
+            run: |matches| Ok(git_source::run(&BatchArgs::read(matches))),
+        },
         #[cfg(not(target_arch = "wasm32"))]
         Command {
             name: "source",
@@ -424,9 +444,9 @@ fn main() -> ExitCode {
     if let Some(code) = aosabi_carrier_usb::relay_from_env() {
         return code;
     }
-    // The devtool is a tool of the build host and part of no served binary, so
-    // the thread rule of Documentation/architecture.md section 14 does not reach it, and it
-    // needs a stack of STACK_SIZE for the deep documents of the corpus.
+    // The devtool is a tool of the build host and part of no served binary,
+    // outside the thread rule, and it needs a stack of STACK_SIZE for the deep
+    // documents of the corpus.
     #[expect(
         clippy::disallowed_methods,
         reason = "a tool of the build host that needs a 256 MiB stack for deep documents"

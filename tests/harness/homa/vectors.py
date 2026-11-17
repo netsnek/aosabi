@@ -1,18 +1,18 @@
 # SPDX-License-Identifier: MIT
-"""Fetches the published vectors of the Homa track from pinned URLs.
+"""Fetches the published test vectors of the Homa notebooks from pinned URLs.
 
-No vector of the track is typed by hand. This file fetches each text from its
-pinned URL, checks the SHA-256 the text had when it was read, parses the
-vectors out of it and writes them under `tests/capture/homa_vectors/`, where
-the notebooks read them. A text whose SHA-256 moved stops the write, so a
-changed source is seen before it changes a vector.
+No vector is typed by hand. This file fetches each text from its pinned URL,
+checks the SHA-256 the text had when it was read, parses the vectors out of
+it and writes them under `tests/capture/homa_vectors/`, where the notebooks
+read them. A text whose SHA-256 moved stops the write, so a changed source is
+seen before it changes a vector.
 
     tests/.venv/bin/python -m harness.homa.vectors
 
 run from `tests/`, or with `tests/` on `PYTHONPATH`, writes `crc32c.json`
 from RFC 3720 appendix B.4 and the check value of the CRC catalogue's entry
-CRC-32/ISCSI, and since stage H6 `chacha20poly1305.json` from the two vectors
-of AEAD_CHACHA20_POLY1305 of RFC 8439, section 2.8.2 and appendix A.5.
+CRC-32/ISCSI, and `chacha20poly1305.json` from the two vectors of
+AEAD_CHACHA20_POLY1305 of RFC 8439, section 2.8.2 and appendix A.5.
 """
 
 import hashlib

@@ -3,9 +3,15 @@
  * aosabi-serve: the boot the generated entry runs, and the serving of one
  * stream.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
+ *
+ * The server bootstrap and the worker bootstrap the build writes, in seven steps
+ * over the runtime and the Node connection, with the boot failure and the worker
+ * entry. The two bootstraps load the configuration and call it when it is a
+ * factory, run the first pass, the handler and the last pass, and for the worker
+ * both passes with no handler under a timer of 1 << 30 milliseconds.
  */
 
 //! `serve_with`, `serve_app_with` and `serve_stream`.
@@ -22,8 +28,11 @@
 //! configuration that throws at load. Under [`serve_with`] the configuration of
 //! the function is the one the boot runs, and a configuration the app carries
 //! beside it is left out, so a project that keeps `aosabi.config.rs` boots as it
-//! booted before the builder. Both run the seven steps of the old page of the
-//! plan, with the same exit codes:
+//! booted before the builder. That file and `aosabi::serve` of the facade are
+//! retired for `aosabi::serve_app`, and the hidden feature `mirror` of the
+//! facade keeps them for the twins that wait for the TypeScript judge alone, so
+//! [`serve_with`] boots those twins. Both run these seven steps, with the same
+//! exit codes:
 //!
 //! 1. **The arguments.** No argument serves, `--print-schema` and
 //!    `--requests PATH` are the harness modes of [`modes`], and
@@ -63,7 +72,14 @@
 //!    keeps its loop alive, and there is no graceful shutdown, since the
 //!    reference has none.
 //!
-//! Its plugins are gated by the role of the process, so `use_node_server` binds
+//! Under the run role `worker` the binary is the twin of the worker entry
+//! `.pylon/worker.mjs`, the same build in a different process: it runs both
+//! passes with no GraphQL handler mounted between them, starts no driver and
+//! binds no port, writes the boot report, and holds the runtime open with a
+//! timer of `1 << 30` milliseconds that it sets again whenever it fires, the
+//! twin of the referenced interval `setInterval(() => {}, 1 << 30)`, so the
+//! process ends on a signal alone, by the default action of the signal. Its
+//! plugins are gated by the role of the process, so `use_node_server` binds
 //! nothing there, and a listener a plugin of the role binds in its setup runs as
 //! in the server entry.
 //!
@@ -79,10 +95,6 @@ use core::{
 use std::{
     env,
     ffi::OsString,
-    hash::{
-        BuildHasher,
-        RandomState, //
-    },
     io,
     process::ExitCode,
     rc::Rc, //
@@ -443,7 +455,12 @@ fn run<S: Source>(
         return source.build_step(&runtime);
     }
     install_randomness(Box::new(DevUrandom));
-    seed_keys();
+    // The cache of parsed documents takes the key of this thread at the first
+    // text it hashes once the thread holds one, so the runtime thread holds a
+    // key from the randomness just installed before the first pass reads a
+    // request. On a Unix host the key never fails, since the standard library
+    // keys the thread where the device cannot be read.
+    let _ = random::seed_keys();
     install_clock(runtime.clock());
     if current_role() == Role::Worker {
         return runtime.block_on(boot_worker(source, parts));
@@ -453,28 +470,6 @@ fn run<S: Source>(
     }
     let clock: Rc<dyn HostClock> = runtime.clock();
     runtime.block_on(boot_and_serve(source, build, parts, clock))
-}
-
-/// Keys the keyed hashes of the runtime thread from the randomness of the host.
-///
-/// The cache of parsed documents hashes the text of a request with the state
-/// `aosabi_json::value::KeyState` takes when the cache is made, the key
-/// [`aosabi_json::value::seed`] stores for the thread or the fixed key, so the
-/// boot stores one before the first pass makes the cache. The key is sixteen
-/// bytes of the randomness the boot installed, and where that source cannot be
-/// read, two words the `RandomState` of the standard library hashes under the
-/// key it draws from the operating system, so the thread never keeps the fixed
-/// key. A thread keyed before keeps its key, which `seed` answers.
-fn seed_keys() {
-    let mut key = [0; 16];
-    if random::fill(&mut key).is_err() {
-        let state = RandomState::new();
-        let (low, high) = key.split_at_mut(8);
-        low.copy_from_slice(&state.hash_one(0_u8).to_le_bytes());
-        high.copy_from_slice(&state.hash_one(1_u8).to_le_bytes());
-    }
-    // A key stored on this thread before stays the key.
-    let _ = aosabi_json::value::seed(key);
 }
 
 /// Installs the capabilities `capabilities` names on the runtime thread.

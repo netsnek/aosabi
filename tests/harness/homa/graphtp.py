@@ -1,28 +1,26 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the codec of GraphTP/1 in Python, written apart from the crate.
 
-This module writes and reads every message of GraphTP/1 that the notebook
-24_graphtp compares the crate graphtp against: the status byte and its mapping,
-the registry of status and substatus with its names, the heads of a request and
-of an answer, the checks of the credential, the first byte rule of a body, the
-whole request with the 11 rules of refusal, the whole answer with its shapes, the
-stream bodies, and the test vectors of section 9.2. It codes and decodes with
-Python's zlib, which is C zlib, at wbits 12, a window of 4 KiB. It is written
-from docs/graphtp.md, sections 2.2, 2.4, 2.5, 3.2 to 3.4, 5.1 to 5.5 and 9.2, and
-from the IANA registry of HTTP status codes, and never from the source of the
-crate, so the notebook never judges the crate against itself.
+This module writes and reads every message of GraphTP/1 that a notebook compares
+the crate graphtp against: the status byte and its mapping, the registry of
+status and substatus with its names, the heads of a request and of an answer, the
+checks of the credential, the first byte rule of a body, the whole request with
+the 11 rules of refusal, the whole answer with its shapes, the stream bodies, and
+the test vectors. It codes and decodes with Python's zlib, which is C zlib, at
+wbits 12, a window of 4 KiB. It is written from the specification and from the
+IANA registry of HTTP status codes, and never from the source of the crate, so
+the notebook never judges the crate against itself.
 
 Every integer of a head is big endian. A refusal of a request raises
 `Refused` with the code a server answers, and an answer a client cannot read
 raises `Malformed` with its reason.
 
-The transport half carries the messages over Homa through the Python Homa engine
-tests/harness/homa/client.py of the homa track: `Client` sends each exchange as
-one Homa RPC, a PULL as a patient RPC, an OPERATION with the report of
-RPC_UNKNOWN unless its caller marks it repeatable, applies the stream answers in
-the order of `seq`, holds one that is ahead, and keeps the start rule, all from
-docs/graphtp.md sections 2.4, 2.7 and 4.1. The notebooks that judge the GraphTP
-listener run their server rows through it.
+The transport half carries the messages over Homa through the Python Homa
+engine tests/harness/homa/client.py: `Client` sends each exchange as one Homa
+RPC, a PULL as a patient RPC, an OPERATION with the report of RPC_UNKNOWN
+unless its caller marks it repeatable, applies the stream answers in the order
+of `seq`, holds one that is ahead, and keeps the start rule. The notebooks
+that judge the GraphTP listener run their server rows through it.
 """
 
 from __future__ import annotations
@@ -56,12 +54,18 @@ MAX_CREDENTIAL = 65535
 # of 4,096 bytes.
 WBITS = 12
 
+# The longest name of a socket `aosabi-devtool yoga --graphtp` binds,
+# `secondNoIntrospection.stream`. The devtool binds a socket for every instance
+# and stops at the first path past the bound of `sun_path`, so a folder of its
+# sockets leaves room for this name and not only for the instances a cell calls.
+YOGA_SOCKET_ROOM = len("secondNoIntrospection.stream")
+
 # The IANA registry of HTTP status codes, the rows of the classes 2 to 5 that are
 # assigned, with the description column verbatim. The file read is
 # https://www.iana.org/assignments/http-status-codes/http-status-codes-1.csv,
 # whose SHA-256 was
 # 4a9550d4b4ae49cf41cf9050cf9b56b0d6082ad1edfc0e2b09b07f251a36d7a4. Rows marked
-# Unassigned and ranges are left out, as docs/graphtp.md section 5.2 counts them.
+# Unassigned and ranges are left out.
 IANA_REASONS = {
     200: "OK",
     201: "Created",
@@ -124,7 +128,7 @@ IANA_REASONS = {
     511: "Network Authentication Required",
 }
 
-# The registry of status and substatus of docs/graphtp.md section 2.5, one row
+# The registry of status and substatus, one row
 # per code, as its name, who answers it and the state of the row. S is the
 # service, G the GraphTP server and L an intermediary. The row "Any other
 # status.0" is no code of its own and stands in `code_name` instead.
@@ -183,7 +187,7 @@ class Code:
         return code_name(self.status, self.substatus)
 
 
-# The codes a server refuses a request with by the rules of section 5.3.
+# The codes a server refuses a request with by the rules.
 MALFORMED_MESSAGE = Code(400, 7)
 HTTP_VERSION_NOT_SUPPORTED = Code(505, 0)
 NOT_IMPLEMENTED = Code(501, 0)
@@ -287,7 +291,7 @@ def write_request_head(version: int, kind: int, compressed: bool, credential_len
 
 
 def read_request_head(message: bytes) -> RequestHead:
-    """The head at the start of `message`, by rules 1 to 4 of section 5.3.
+    """The head at the start of `message`, by rules 1 to 4.
 
     The rules are checked in their order: at least 3 bytes, else 400.7, the
     version 01, else 505.0, a kind of 0 to 2, else 501.0, and the reserved bits
@@ -333,7 +337,7 @@ def read_answer_head(message: bytes) -> Code:
 
 
 def zlib_header(cmf: int, flg: int) -> bool:
-    """Whether `cmf` and `flg` are a zlib header of the profile of section 3.2.
+    """Whether `cmf` and `flg` are a zlib header of the profile.
 
     CM, the low four bits of CMF, is 8, CINFO, the high four, is 0 to 4, CMF
     times 256 plus FLG is a multiple of 31, and FDICT, bit 5 of FLG, is 0.
@@ -357,7 +361,7 @@ def coding_of(body: bytes) -> str:
 
 
 def check_credential(credential: bytes, bound: int | None = None) -> bytes:
-    """The credential when a server accepts it, by rules 6 and 7 of section 5.3.
+    """The credential when a server accepts it, by rules 6 and 7.
 
     A byte outside 0x20 to 0x7E refuses it with 400.7 first, since a credential
     is a JWT or another token in the form HTTP carries, then a length above
@@ -374,7 +378,7 @@ def check_credential(credential: bytes, bound: int | None = None) -> bytes:
 
 
 def server_only(code: Code) -> bool:
-    """Whether the registry of section 2.5 gives `code` to the server alone.
+    """Whether the registry gives `code` to the server alone.
 
     Such a code has G alone in the column of who answers and a nonzero substatus,
     and no answer of it but 200.3 carries a body.
@@ -419,7 +423,8 @@ def inflate(stream: bytes, bound: int) -> bytes:
     A stream that expands past the bound stops with 413.0 as soon as its plain
     bytes pass it, and a stream that does not decode before that, ends early,
     fails its Adler-32 or has bytes after it refuses with 400.8. The header is
-    checked before this call, by rule 9, and the bound is at least 1.
+    checked before this call, by the rule of its zlib header, and the bound is at
+    least 1.
 
     C zlib decodes with room for one byte past the bound. When it meets an error
     there, the error stands before or behind the byte that passes the bound, and
@@ -444,7 +449,7 @@ def inflate(stream: bytes, bound: int) -> bytes:
 
 
 def check_header(cmf: int, flg: int) -> None:
-    """Rule 9 of section 5.3 for the zlib header `cmf` and `flg`.
+    """The rule for the zlib header `cmf` and `flg`.
 
     FCHECK is read first, 400.8 when CMF times 256 plus FLG is no multiple of 31,
     then the fields, 415.1 for CM other than 8, CINFO above 4 or FDICT set.
@@ -486,7 +491,7 @@ def write_answer(status: int, substatus: int, body: bytes) -> bytes | None:
 
 
 def read_request(message: bytes, max_credential: int = MAX_CREDENTIAL, max_content: int = 1 << 20) -> dict:
-    """The request `message` as a server accepts it, by the 11 rules of section 5.3.
+    """The request `message` as a server accepts it, by the 11 rules.
 
     The rules are checked in their order, and the first one the message breaks
     raises `Refused` with its code: rules 1 to 4 on the head, 5 the credential
@@ -544,7 +549,7 @@ def read_answer(kind: int, message: bytes, bound: int = 1 << 24) -> dict:
     head or a batch. A body under a code the registry gives to the server alone,
     200.3 apart, under a code other than 200.0 on a PULL or a CANCEL, or on a
     kind of 3 to 7 is malformed, as is a coded body that does not decode and a
-    stream body that is no JSON of section 2.4.
+    stream body that is no JSON.
 
     The answer is a dict with `answer`, one of `result`, `opened`, `batch` and
     `refused`, the `code`, and for a body its `coding` and the decoded `body`,
@@ -594,8 +599,8 @@ def write_stream(entries: list, seq: int, handle: int | None = None) -> bytes:
 
     An entry is a tuple, ("next", handle, the bytes of a JSON value) or one of
     ("complete", handle), ("cancelled", handle) and ("aborted", handle). The keys
-    stand in the order of section 2.4 with no other key and no whitespace, and a
-    `next` value is embedded verbatim.
+    stand in the order with no other key and no whitespace, and a `next` value is
+    embedded verbatim.
     """
     parts = []
     for entry in entries:
@@ -752,8 +757,7 @@ def read_stream(body: bytes) -> tuple:
     return handle, seq, members["events"][0]
 
 
-# The credential of 71 bytes and the exchange {__typename} of the test vectors
-# of docs/graphtp.md section 9.2.
+# The credential of 71 bytes and the exchange {__typename} of the test vectors.
 VECTOR_TOKEN = b"Bearer x7Kq2mP9vR4tY8wZ1aB3cD5eF6gH0iJ2kL4mN6oP8qR0sT2uV4wX6yZ8aB0cD2eF"
 VECTOR_QUERY = b'{"query":"{__typename}"}'
 VECTOR_RESULT = b'{"data":{"__typename":"Query"}}'
@@ -764,7 +768,7 @@ VECTOR_CODED = (
 
 
 def test_vectors() -> list:
-    """The test vectors of section 9.2, written by this module.
+    """The test vectors, written by this module.
 
     Each vector is a dict with its `name`, its `kind` of request or answer, the
     `message` this module writes for it and what reading it gives, `request` or

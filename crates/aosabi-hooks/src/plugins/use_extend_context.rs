@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 /*
  * aosabi-hooks: the plugin that extends the context of every request.
+ *
+ * Derived from @envelop/core 5.5.1, cjs/plugins/use-extend-context.js, MIT.
  */
 
 //! `use_extend_context`.

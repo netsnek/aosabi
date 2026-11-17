@@ -40,8 +40,8 @@
 //!
 //! # The rules
 //!
-//! The plan of the timers states seven rules. This module implements rules 2, 6
-//! and 7, and [󰀀](crate::promise::timers) the other four.
+//! The timers follow seven rules. This module implements rules 2, 6 and 7, and
+//! [`timers`](crate::promise::timers) the other four.
 //!
 //! 2. When nothing is runnable and a timer is pending, the loop calls
 //!    [`HostClock::wake_at`] with the least deadline and returns `Pending`. A

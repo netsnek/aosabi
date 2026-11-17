@@ -5,7 +5,7 @@
  *
  * No analogue in the reference. The profile, its window and the memory it holds
  * are those of the specification, over RFC 1950, and the codes of its refusals
- * are those of rules 9 to 11 of section 5.3.
+ * are those of rules 9 to 11.
  */
 
 //! The zlib profile of GraphTP/1: the header check, the encoder at a window of
@@ -17,7 +17,7 @@
 //! 4,096 bytes and no preset dictionary, the DEFLATE data, and the Adler-32 of
 //! the plain bytes, with nothing after it. The encoder writes the header
 //! `0x48 0x89`, a window of 4 KiB and the level byte of the default, and the
-//! decoder refuses a stream by the rules 9 to 11 of section 5.3, each with its
+//! decoder refuses a stream by the rules 9 to 11, each with its
 //! [`Code`].
 
 use core::{
@@ -71,7 +71,7 @@ const BASE: u32 = 65_521;
 const NMAX: usize = 5552;
 
 /// Why a zlib stream of the profile was refused, each reason with the code of
-/// the rule of `docs/graphtp.md` section 5.3 it breaks.
+/// the rule it breaks.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Error {
     /// The plain bytes pass the decoded bound, or the room the caller gave
@@ -220,7 +220,7 @@ pub fn adler32(bytes: &[u8]) -> u32 {
 }
 
 /// The memory of a sender of the profile: the hash heads, the chains, the
-/// tokens and the buffer of plain bytes of `docs/graphtp.md` section 3.6, at a
+/// tokens and the buffer of plain bytes, at a
 /// window of at most 4 KiB.
 ///
 /// A scratch is made once and lent to one [`Encoder`] at a time, so a sender
@@ -307,7 +307,7 @@ impl<'a> Encoder<'a> {
 }
 
 /// The decoder of a zlib stream of the profile, with the decoded bound of
-/// rule 10 of `docs/graphtp.md` section 5.3.
+/// rule 10 of `Documentation/guides/graphtp.md`.
 ///
 /// A receiver of a whole message decodes into one buffer and needs no window,
 /// and a receiver that streams holds a window of 4,096 bytes and hands the

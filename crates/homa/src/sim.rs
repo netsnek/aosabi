@@ -2,12 +2,9 @@
 /*
  * homa sim: the simulators the notebooks drive, which no served build links.
  *
- * The simulators are those of the Homa design note, first version,
- * homa/design-v1.md section 2.5, lines 566 to 1088, the loopback, the lossy
- * link and the baseline of AoFrame alone, with the clock in nanoseconds of its
- * second version, homa/design.md section 7.8, lines 2784 to 2815. The
- * generator is xoshiro256** seeded through `SplitMix64`, as the authors of
- * both publish them.
+ * The simulators are the loopback, the lossy link and the baseline of AoFrame
+ * alone, with the clock in nanoseconds. The generator is xoshiro256** seeded
+ * through `SplitMix64`, as the authors of both publish them.
  */
 
 //! The simulated links, clock and generator of the notebooks.
@@ -17,7 +14,7 @@
 //! seeded [`Rng`], so one seed replays one run byte for byte. The links are
 //! [`Loopback`], a perfect link, [`Lossy`], a link with the faults of
 //! [`Faults`], and [`Baseline`], whole messages in one `AoFrame` each with no
-//! Homa, which is what ADR-0023 measures Homa against. [`Fabric`] is the rack
+//! Homa, the baseline Homa is measured against. [`Fabric`] is the rack
 //! of a data centre, hosts on one switch with priority queues, on which the
 //! mechanisms of Network act. [`Radio`] is `LoRa`, half duplex radios with a
 //! time on air, channel activity detection and collisions, which the carrier
@@ -185,7 +182,7 @@ pub(crate) const fn picked(seed: u64, key: u64, per_million: u32) -> bool {
     mix(seed.wrapping_add(GOLDEN) ^ key) % 1_000_000 < per_million as u64
 }
 
-/// How a simulated link moves packets, the first version's profile with
+/// How a simulated link moves packets, a profile with its times in
 /// nanoseconds.
 ///
 /// With `event` 0 the link sends continuously: a packet takes its bytes at

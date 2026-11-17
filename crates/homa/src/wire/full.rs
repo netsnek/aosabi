@@ -2,12 +2,11 @@
 /*
  * homa wire full: the layout of homa_wire.h at HomaModule commit 50d65305.
  *
- * The layout is that of homa_wire.h lines 93 to 490 at
+ * It follows the format of homa_wire.h lines 93 to 490, read at
  * https://github.com/PlatformLab/HomaModule/tree/50d65305aeef9b6ae5cf193a808c7e95f9b1dcb3,
- * read, with the rules of the Homa design note, second version,
- * homa/design.md section 3.3, lines 509 to 561: the fields HomaModule does
- * not use written as 0, doff set as HomaModule sets it, the incast mark in
- * bit 0 of the first pad byte of DATA, and FREEZE decoded and never written.
+ * with the fields HomaModule does not use written as 0, doff set as
+ * HomaModule sets it, the incast mark in bit 0 of the first pad byte of DATA,
+ * and FREEZE decoded and never written, and carries no code of HomaModule.
  */
 
 //! The full form.

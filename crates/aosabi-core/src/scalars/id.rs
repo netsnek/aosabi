@@ -3,7 +3,7 @@
  * aosabi-core scalars id: the bound `ID` scalar, which decodes a global id on
  * input.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/app/pylon-handler.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  */

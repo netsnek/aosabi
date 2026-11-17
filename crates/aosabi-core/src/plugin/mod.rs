@@ -2,8 +2,8 @@
 /*
  * aosabi-core: the plugin contract.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/index.ts, Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `Plugin`.
@@ -101,10 +101,9 @@ use crate::{
 ///
 /// The members of its own come in the order of their declaration at
 /// `core/index.ts:93-122`, then the hooks of envelop, of the server adapter
-/// and of Yoga in the order of `docs/plugins.md` sections 3.1 to 3.3, which is
-/// the order the reference half of the boot report lists them in. The boot
-/// writes a strategy onto every plugin, so `strategy` is no member and the
-/// boot report carries it as a field of its own.
+/// and of Yoga in the order the reference half of the boot report lists them
+/// in. The boot writes a strategy onto every plugin, so `strategy` is no
+/// member and the boot report carries it as a field of its own.
 pub const MEMBER_ORDER: [&str; 24] = [
     "name",
     "roles",
@@ -281,7 +280,7 @@ pub enum PluginSource {
 ///
 /// The reference writes `'first'` onto a plugin object that states no
 /// strategy and writes the built array back onto the configuration (quirk
-/// `Q01_DUPLICATE_PLUGIN_WRITEBACK`). The strategy lives in a cell a clone of
+/// `DUPLICATE_PLUGIN_WRITEBACK`). The strategy lives in a cell a clone of
 /// the slot shares, so the write of one pass is read by the next as the
 /// write on the object is.
 #[derive(Clone)]

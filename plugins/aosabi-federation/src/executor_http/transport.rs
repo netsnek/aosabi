@@ -3,7 +3,12 @@
  * aosabi-federation: the request of the HTTP executor as node:http writes it,
  * and the redirects the fetch of the executor follows.
  *
- * Derived from whatwg-node 0.8.5, cjs/fetchNodeHttp.js, MIT.
+ * The fetch of the reference hands node:http the request, whose headers go
+ * through setHeader, validateHeaderName and validateHeaderValue of
+ * lib/_http_outgoing.js of Node 24.13.0. The file writes the request as
+ * node:http writes it and follows its redirects.
+ *
+ * Derived from @whatwg-node/node-fetch 0.8.5, cjs/fetchNodeHttp.js, MIT.
  */
 
 //! The request the executor hands the network capability, and the

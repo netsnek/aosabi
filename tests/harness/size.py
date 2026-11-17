@@ -1,37 +1,40 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the families of a binary, read in Python.
 
-This module reads an ELF file, its program headers, its sections, its symbols
-and its relocations, and a wasm module, its sections, its code bodies and its
-name section. It demangles the names of Rust in the v0 scheme and in the legacy
-scheme. It decodes the aarch64 instructions `adrp` and `add` of `.text`, which
-name an address of the read only data, and `mov`, `bl`, `b` and `ret`, which
-carry a value to the call that takes it, and it decodes the bodies of a wasm
-module for their direct calls. Over those readers it attributes the bytes of a
-binary to crates, to the generic families of the standard library and of the
-map, to the code reachable only through a vtable or a function pointer, to
-`Debug`, to the float code of `core`, to the Unicode case tables, to the vtable
-slots of the validation rules, to the relocations by target, to the unwind
-tables and to the panic locations with their file names and the checks they
-belong to.
+The attribution of a binary runs without an LLVM tool. This module reads an ELF
+file, its program headers, its sections, its symbols and its relocations, and a
+wasm module, its sections, its code bodies and its name section. It demangles
+the names of Rust in the v0 scheme and in the legacy scheme. It decodes the
+aarch64 instructions `adrp` and `add` of `.text`, which name an address of the
+read only data, and `mov`, `bl`, `b` and `ret`, which carry a value to the call
+that takes it, and it decodes the bodies of a wasm module for their direct
+calls. Over those readers it attributes the bytes of a binary to crates, to the
+generic families of the standard library and of the map, to the code reachable
+only through a vtable or a function pointer, to `Debug`, to the float code of
+`core`, to the Unicode case tables, to the vtable slots of the validation rules,
+to the relocations by target, to the unwind tables and to the panic locations
+with their file names and the checks they belong to.
 
 The formats are the ELF specification of the System V ABI and its aarch64
 supplement, the WebAssembly core specification, section Binary Format, and the
-v0 symbol format of Rust. The notebook 17_framework_size builds each probe a
-second time with `-C symbol-mangling-version=v0` and `strip = "none"` for these
-readers, so every function has a name to read.
+v0 symbol format of Rust. A notebook builds each probe a second time with
+`-C symbol-mangling-version=v0` and `strip = "none"` for these readers, so every
+function has a name to read.
 
-`variant` builds one variant of a card with a set of the levers of
-tests/harness/toolchain.py, the port of the driver variant.sh of the facts of
-that plan, and `elf_buckets` and `wasm_buckets` bucket a build by the fixed
-costs Rust adds over C, the port of its driver buckets.py, with no LLVM tool.
-The ELF reader gives the symbols a file imports from its shared libraries with
-their versions, and the wasm reader the addresses its code names, by which
-`wasm_data_items` attributes the data section to the functions that read it, and
-the target features of a module.
+A second edition of the size measurements adds these measures. `variant` builds
+one variant of a card with a set of the levers of tests/harness/toolchain.py,
+the port of the driver variant.sh of the size measurements, and `elf_buckets`
+and `wasm_buckets` bucket a build by the fixed costs Rust adds over C, the port
+of its driver buckets.py, with no LLVM tool. The ELF reader gives the symbols a
+file imports from its shared libraries with their versions, and the wasm reader
+the addresses its code names, by which `wasm_data_items` attributes the data
+section to the functions that read it, and the target features of a module.
+`generic_families` and `host_candidates` read the named families of the
+functions of a binary and the candidates that the host of a Worker holds.
 
-`rom_script` reads the addresses a linker script of the ROM assigns,
-`absolute_symbols` the names such a script defines in a linked image,
+The routines a RISC-V image of the ESP32-C3 takes from the ROM of the chip are
+read here as well. `rom_script` reads the addresses a linker script of the ROM
+assigns, `absolute_symbols` the names such a script defines in a linked image,
 `riscv_targets` the targets of the direct calls and jumps of the code of the
 image, `archive_closure` the bytes an archive such as `compiler_builtins` would
 give a set of names through the relocations of its objects, and
@@ -1111,14 +1114,16 @@ def demangle(raw: str) -> str:
     return raw
 
 
-# The attribution. The one rule of the families that differs: a list of generic
-# arguments closes at its own `>` and never at the arrow `->`, and a `<` inside
-# a list opens a nested one, so `generic_family` gives one key to a family the
-# planning scripts split into several. The function `split_impl` ends a list the
-# same way and gives the subject and the trait of an impl. The crate of a
-# function differs in two narrow cases: `home_crate` gives an impl whose subject
-# has no first segment its trait's crate, and a name without a path the C
-# runtime and the entry.
+# The attribution. It follows the rules of an earlier measurement of the sizes,
+# so its rows compare with the numbers recorded there. The one rule of the
+# families that differs: a list of generic arguments closes at its own `>` and
+# never at the arrow `->`, and a `<` inside a list opens a nested one, so
+# `generic_family` gives one key to a family the scripts of that measurement
+# split into several. The function `split_impl` ends a list the same way and
+# gives the subject and the trait of an impl. The crate of a function differs in
+# two narrow cases: `home_crate` gives an impl whose subject has no first
+# segment its trait's crate, and a name without a path the C runtime and the
+# entry.
 
 WORKSPACE_CRATE = re.compile(r"\b(aosabi(?:_[a-z_]+)?|aoviewer_[a-z_]+|graphql_over_(?:http|graphtp)|in_context_app"
                              r"|errors_app[a-z_]*|size_(?:app|engine|facade|subset|hello)|graphtp|homa)\b")
@@ -1173,9 +1178,12 @@ def split_impl(name: str):
 def home_crate(name: str) -> str:
     """Return the crate whose source the function `name` comes from.
 
-    A name that is no path of Rust belongs to the runtime of Rust, to the
-    builtins of the compiler, to the machine outliner of LLVM, or to the C
-    runtime and the entry of the binary.
+    A plain path goes to its first segment and an impl `<T as Trait>::f` to
+    the crate of `T`, unless `T` is a primitive, where it goes to the crate
+    of `Trait`, as the attribution of the size measurement does. A name
+    that is no path of Rust belongs to the runtime of Rust, to the builtins
+    of the compiler, to the machine outliner of LLVM, or to the C runtime and
+    the entry of the binary.
     """
     if re.match(r"(__rust_|rust_eh_personality$|rust_begin_unwind$|rust_panic$)", name):
         return "std"
@@ -1247,10 +1255,10 @@ def item_path(name: str) -> str:
     return generic_family(name)
 
 
-# The families of generic code the plan names. A function may belong to more
-# than one. The vector of entries of a map hands the index table its hashes
-# through the trait `Hashes` of the table, so a method of that trait counts for
-# the table whatever the type that implements it.
+# The named families of generic code. A function may belong to more than one.
+# The vector of entries of a map hands the index table its hashes through the
+# trait `Hashes` of the table, so a method of that trait counts for the table
+# whatever the type that implements it.
 HASHES_METHOD = " as aosabi_json::map::table::Hashes>::"
 FAMILIES = (
     ("the map of aosabi-json",
@@ -1266,7 +1274,7 @@ FAMILIES = (
     ("closures", lambda name: "{closure#" in name or "{closure:" in name),
 )
 
-# The groups of code that decide no answer or that the plan weighs one by one.
+# The groups of code that decide no answer or that are weighed one by one.
 GROUPS = (
     ("Debug", lambda name: " as core::fmt::Debug>::fmt" in name),
     ("<&T as Debug>::fmt", lambda name: name.startswith("<&") and " as core::fmt::Debug>::fmt" in name),
@@ -1282,8 +1290,8 @@ GROUPS = (
         r"(core::unicode::(unicode_data::(?!conversions::)|printable::)|core::char::methods::)", name))),
 )
 
-# The symbols exit line 4 of the plan holds no v0 names build to, unless the
-# close page names the call that keeps them.
+# The symbols of case conversion and float formatting, which a build should hold
+# no v0 name of unless a named call keeps them.
 EXIT_FOUR = re.compile(r"^(<str>::to_(lower|upper)case|alloc::str::<impl str>::to_(lower|upper)case"
                        r"|core::unicode::unicode_data::conversions::|core::fmt::float::"
                        r"|core::num::flt2dec::)")
@@ -1395,6 +1403,11 @@ def _functions(pairs, top: int) -> dict:
 
 def a64_decode(word: int, pc: int):
     """Decode `word` at the address `pc` as one of the six instructions the attribution follows.
+
+    Returns `("adrp", rd, page)`, `("add", rd, rn, immediate)` for an add of an
+    immediate of 64 bits, `("mov", rd, rm)` for the move of one register of 64
+    bits to another, `("bl", target)`, `("b", target)` or `("ret",)`, and None
+    for every other instruction.
     """
     if word & 0x9F000000 == 0x90000000:
         immediate = ((word >> 5) & 0x7FFFF) << 2 | (word >> 29) & 3
@@ -1860,6 +1873,8 @@ def elf_families(path, top: int = 15) -> dict:
     return result
 
 
+# The kinds of the code reachable only through the table, as the size
+# measurement names them.
 TABLE_KINDS = ("validation rules and visitors", "closures, the resolvers, the hooks and the thunks",
                "formatting, Debug, Display and the fmt machinery", "drop glue", "other")
 
@@ -2068,8 +2083,8 @@ def wasm_buckets(path) -> dict:
 
 
 #: The linker script of the lean link of aosabi-build, which a notebook gives a
-#: link itself where the build script of a tree does not act, as the part x86 of
-#: 17_framework_size does for a target before its lean link takes it.
+#: link itself where the build script of a tree does not act, as on x86 for a
+#: target before its lean link takes it.
 DISCARD_UNWIND = ("SECTIONS {\n  /DISCARD/ : { *(.eh_frame) *(.eh_frame_hdr) *(.gcc_except_table*) }\n}\n"
                   "INSERT AFTER .text;\n")
 #: The words of a failed build that a download over the network explains, so a later try may pass.
@@ -2248,9 +2263,12 @@ def wasm_target_features(module: Wasm) -> list[str]:
     return found
 
 
+# The families of generic code.
 
-#: The named families of Z0, each as the count of its instances and their bytes.
-Z0_FAMILIES = (
+
+#: The named families of generic code, each as the count of its instances and
+#: their bytes.
+NAMED_FAMILIES = (
     ("GraphQLError::new", lambda name: generic_family(name) == "<aosabi_lang::error::GraphQLError>::new"),
     ("enter_for_kind", lambda name: generic_family(name) == "aosabi_lang::visitor::enter_for_kind"),
     ("leave_for_kind", lambda name: generic_family(name) == "aosabi_lang::visitor::leave_for_kind"),
@@ -2262,8 +2280,8 @@ Z0_FAMILIES = (
 )
 #: The crates of the symbolizer of std, whose instances of the stable sort the standard library makes.
 SYMBOLIZER = re.compile(r"(^|[<\s(&])(addr2line|gimli|object|miniz_oxide|rustc_demangle)::|backtrace")
-#: The candidates of the owner's note N2 that the host of a Worker holds, each
-#: as a pattern of a demangled name.
+#: The candidates that the host of a Worker holds, each as a pattern of a
+#: demangled name.
 HOST_CANDIDATES = (
     ("the number parse, dec2flt of core and the number readers of the workspace",
      re.compile(r"core::num::dec2flt|<f(32|64) as core::str::traits::FromStr>|aosabi_json::reader::\w*num"
@@ -2277,26 +2295,26 @@ HOST_CANDIDATES = (
                                             r"|iso_string|to_iso|Intl|DateTime")),
     ("new URL, aosabi_http::fetch::url", re.compile(r"aosabi_http::fetch::url")),
     ("the conversions between UTF-8 and UTF-16", re.compile(r"utf16|utf_16|Utf16|EncodeUtf16|DecodeUtf16")),
-    ("the crypto of M7b, ring, rsa, sha2 and the signer of aosabi-auth-zitadel",
+    ("the crypto of the login of Zitadel, ring, rsa, sha2 and the signer of aosabi-auth-zitadel",
      re.compile(r"(^|[<\s(&])(ring|rsa|sha2|hmac|untrusted)::|aosabi_auth_zitadel::crypto")),
 )
 
 
-def z0_families(pairs, top: int = 30) -> dict:
-    """Return the families of Z0 over the pairs `pairs` of a demangled name and a size.
+def generic_families(pairs, top: int = 30) -> dict:
+    """Return the families of generic code over the pairs `pairs` of a demangled name and a size.
 
     The thirty largest functions, the closures by the function they belong
     to, the closures of aosabi-execute by size, among them the bodies of its
     async fns, which a v0 name writes as a closure of the fn, the instances of
     the stable sort of core split into those made for a type of a workspace
     crate, those the standard library makes for its symbolizer and the rest,
-    and the named families of Z0_FAMILIES.
+    and the named families of NAMED_FAMILIES.
     """
     pairs = sorted(pairs, key=lambda pair: (-pair[1], pair[0]))
     parents = defaultdict(lambda: [0, 0])
     execute = []
     split = {"made for a workspace type": [0, 0], "made for the symbolizer of std": [0, 0], "other": [0, 0]}
-    named = {label: [0, 0] for label, _ in Z0_FAMILIES}
+    named = {label: [0, 0] for label, _ in NAMED_FAMILIES}
     for name, size in pairs:
         family = generic_family(name)
         if "{closure#" in family:
@@ -2310,7 +2328,7 @@ def z0_families(pairs, top: int = 30) -> dict:
                    else "made for a workspace type" if WORKSPACE_CRATE.search(name) else "other")
             split[key][0] += 1
             split[key][1] += size
-        for label, match in Z0_FAMILIES:
+        for label, match in NAMED_FAMILIES:
             if match(name):
                 named[label][0] += 1
                 named[label][1] += size
@@ -2363,6 +2381,8 @@ def section_sizes(path) -> Counter:
         sizes[section.name] += section.size
     return sizes
 
+
+# The routines of the ROM of the ESP32-C3.
 
 #: The section index of an absolute symbol.
 SHN_ABS = 0xFFF1

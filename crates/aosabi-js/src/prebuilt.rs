@@ -4,7 +4,8 @@
  * schema_record writes from the SDL and the IR of the build and the boot
  * reads where the host hands it in place of the IR.
  *
- * No analogue in the reference.
+ * No analogue in the reference. It is the host side of
+ * aosabi_core::boot::prebuilt.
  */
 
 //! The schema record of a build.

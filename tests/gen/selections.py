@@ -29,12 +29,12 @@ def selection_cases(
 
     With `exhaustive` every composite level of S3 carries every field it
     declares. Without it the fan out of a level is `fanout` fields drawn with
-    the seed, which is the covering array of `docs/harness.md` section 4.2.
-    S2 and S4 run in both cases, because that section asks the covering array
-    for every field at every depth it is reachable at and for every pair of
-    siblings together at least once. The number of pairs of a type grows with
-    the square of its fields and not with the depth, so both stay finite, and
-    a corpus over the budget is cut by a seeded sample that the manifest
+    the seed, which is the covering array.
+    S2 and S4 run in both cases, because the covering array holds every
+    field at every depth it is reachable at and every pair of siblings
+    together at least once. The number of pairs of a type grows with the
+    square of its fields and not with the depth, so both stay finite, and a
+    corpus over the budget is cut by a seeded sample that the manifest
     records rather than by a silent cap.
     """
     cases: list[Case] = []

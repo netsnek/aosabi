@@ -121,7 +121,10 @@ const MAX_MESSAGE: usize = 1_000_000;
 /// The bytes of one page of the engine, so that the 16 pages of a slot hold
 /// a message of [`MAX_MESSAGE`] bytes and no byte more.
 ///
-/// A longer request is refused as `TooLong` before a byte leaves.
+/// The full form carries no LIMITS, so the engine takes the longest message a
+/// peer accepts from its own pages, and an endpoint of Network is sized to
+/// the 1,000,000 bytes `HomaModule` assumes of every peer. A longer request
+/// is refused as `TooLong` before a byte leaves.
 const PAGE_LEN: u32 = 62_500;
 
 /// The bytes of the page pool, 16 MiB, which every connection of the port

@@ -1372,7 +1372,7 @@ pub(crate) fn type_arguments(path: &syn::Path) -> Vec<&Type> {
 /// the application on the builder may, and may borrow its receiver mutably
 /// through autoref, as `borrow_mut` of `BorrowMut` does, so the reader
 /// follows a chain through these calls alone.
-const BUILDER_METHODS: [&str; 29] = [
+const BUILDER_METHODS: [&str; 27] = [
     "query",
     "mutation",
     "subscription",
@@ -1394,14 +1394,12 @@ const BUILDER_METHODS: [&str; 29] = [
     "on_error",
     "compose",
     "plugin",
-    "graphiql",
-    "landing_page",
-    "viewer",
+    "introspection",
     "logger",
     "masked_errors",
     "graphql_endpoint",
-    "health_check_endpoint",
     "multipart",
+    "max_tokens",
 ];
 
 /// The deepest the walk of [`Reader::unseen`] follows the `use`s and the globs

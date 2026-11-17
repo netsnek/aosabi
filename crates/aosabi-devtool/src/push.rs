@@ -5,8 +5,7 @@
  *
  * No analogue in the reference. The crate under test is the publish module of
  * aosabi-kernel, reached through the re-export of aosabi-core, the model is
- * tests/harness/push_model.py, and the judging notebook is
- * tests/notebooks/40_pubsub.ipynb.
+ * tests/harness/push_model.py.
  */
 
 //! The `push` primitive of the seam.
@@ -103,8 +102,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "push";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M6";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "pubsub";
 
 /// The largest depth of a slot, a `u16`.
 const U16: u32 = 0xffff;
@@ -115,7 +114,7 @@ const U32: u32 = 0xffff_ffff;
 /// The largest count of slots and of publishes the op `time` takes.
 const TIME_BOUND: u32 = 1_000_000;
 
-/// The carriers of ADR-0023 in their order, by the name an op spells.
+/// The six carriers in their fixed order, by the name an op spells.
 const CARRIERS: [(&str, CarrierId); 6] = [
     ("network", CarrierId::NETWORK),
     ("unix_socket", CarrierId::UNIX_SOCKET),
@@ -523,7 +522,7 @@ fn text(op: &JsObject, key: &str) -> Result<String, String> {
 }
 
 /// Returns the integer field `key` of `op` from 0 to `bound`, the `_integer` of the model.
-fn integer(op: &JsObject, key: &str, bound: u32) -> Result<u32, String> {
+pub(crate) fn integer(op: &JsObject, key: &str, bound: u32) -> Result<u32, String> {
     let refusal = || format!("{key} is no integer from 0 to {bound}");
     let Some(JsValue::Number(value)) = op.get(key) else {
         return Err(refusal());

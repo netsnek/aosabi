@@ -40,7 +40,7 @@ pub struct Parts {
     pub version: Version,
     /// The value of `Authorization`, or `None` for none.
     ///
-    /// The builder checks it by rule 6 of `docs/graphtp.md` section 5.3 and by
+    /// The builder checks it by rule 6 of `Documentation/guides/graphtp.md` and by
     /// the length a head carries, and a writer checks it again through
     /// [`Credential::new`], since the field is public.
     pub credential: Option<Vec<u8>>,
@@ -159,7 +159,7 @@ impl Builder {
     /// Sets the credential, the value of `Authorization`, and an empty value
     /// sets none.
     ///
-    /// The value is checked by rule 6 of `docs/graphtp.md` section 5.3, every
+    /// The value is checked by rule 6 of `Documentation/guides/graphtp.md`, every
     /// byte `0x20` to `0x7E`, and by the 65,535 bytes a head carries, and a
     /// value that fails refuses the request [`Builder::body`] builds.
     #[must_use]

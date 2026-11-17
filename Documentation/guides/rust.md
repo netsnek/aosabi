@@ -13,12 +13,15 @@ built and served. The complete services under [examples/](../../examples/) build
 | `Cargo.toml` | The facade, and a second table of it for a Unix target |
 | `src/lib.rs` | The index, the crate root by cargo's default |
 | `src/` | Any modules the index declares |
+| `schema.graphql` | The schema the build writes beside the manifest, which a new project keeps in git |
 | `target/aosabi/` | What the build writes: `schema.graphql` and the server package |
 
-The command `aosabi new <dir>` writes such a project. Its manifest names the facade `aosabi` once
-under `[dependencies]`, and a second time under `[target.'cfg(unix)'.dependencies]` with the
-features of the cards that serve sockets, so a build for a Worker links no server. A service names
-no other crate of Aosabi.
+The command `aosabi new <dir> --aosabi-path <checkout>` writes such a project from a checkout of
+Aosabi. Its manifest names the facade `aosabi` by the path of that checkout once under
+`[dependencies]`, and a second time under `[target.'cfg(unix)'.dependencies]` with the features of
+the cards that serve sockets, so a build for a Worker links no server. A service names no other
+crate of Aosabi, and every command that loads a project refuses a crate of Aosabi named from a
+registry with `AO-C0108`.
 
 ## 2. The index and its entry
 
@@ -241,6 +244,11 @@ The methods are `get`, `post`, `put`, `delete`, `patch`, `options`, `all`, `on`,
 keyword of Rust. A middleware answers a response of its own, which ends the request, or what
 `next.run(c)` answers. `ForbiddenError` is the error of `aosabi::auth` that answers 403.
 
+The facade exports the middleware `cors(options)`, `compress()` and `body_limit(options)`, which
+`.middleware(path, ..)` registers as it registers a closure, and `csrf(options)`, which a plugin
+registers on the app of the engine. [hardening.md](hardening.md) shows each of them with the
+defaults of the base pipeline.
+
 ## 10. Plugins and options
 
 A plugin is one call of the chain, in the order a service lists them:
@@ -313,3 +321,11 @@ the glue as well.
 
 The types of a remote schema, which a delegation to another GraphQL service reads, are code a
 command writes: `aosabi pull <url>` writes them as a registry of the remote API.
+
+## 14. Embedding the engine in a program
+
+A host that links the app into its own program, such as a module of WebAssembly that a Web Worker of
+a page runs, boots the roots of the app with `aosabi::embed::Embedded::boot` and hands each request
+to `answer` as the JSON body a GraphQL request over HTTP carries, with no socket, no clock and no
+thread. [embedding.md](embedding.md) shows the build of such a host, what takes part in a request
+and a complete host.

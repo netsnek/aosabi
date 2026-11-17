@@ -4,10 +4,10 @@
 The base of the family is the argument document of family A with every literal
 of the target field moved into a variable, so that coercion runs over the
 variable path of the executor rather than over the literal path. The six
-classes of `docs/harness.md` section 4.1 follow: a missing variable, null for a
-non null variable, a wrong type, an unused variable, an undeclared variable and
-a default on the definition. The two classes the specified rules refuse travel
-twice, once with validation and once without it.
+classes follow: a missing variable, null for a non null variable, a wrong type,
+an unused variable, an undeclared variable and a default on the definition. The
+two classes the specified rules refuse travel twice, once with validation and
+once without it.
 """
 
 from __future__ import annotations

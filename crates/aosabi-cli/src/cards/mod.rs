@@ -2,19 +2,27 @@
 /*
  * aosabi-cli: the built in cards and their resolution.
  *
- * No analogue in the reference. The cards are the table of
- * docs/cli-and-targets.md section 5.0 as data. Each file of the directory says
- * what it holds.
+ * No analogue in the reference. Each file of the directory is one card and
+ * says what it holds.
  */
 
 //! The built in cards.
 //!
-//! With no `--device` and no card in `devices/`, the card is `server`.
+//! A build resolves a card file once device cards land, and until then
+//! [`resolve`] knows the built in cards of [`builtin::BUILTIN`] by name and
+//! nothing else. With no `--device` and no card in `devices/`, the card is
+//! `server`. A path ending in `.png`, a `<publisher>/<name>` id and, with no
+//! `--device`, a card in `devices/` refuse with `AO-C0201`, since the build
+//! reads a card file once device cards land, and a name of no built in card
+//! refuses with `AO-C0202`.
 //!
 //! [`Card`] carries what a build learns from its card: the class, the target
 //! and profile, every carrier with its protocols, the encoding, what it
 //! compiles, whether it serves and the set of its release build at the switch
-//! `AOSABI_STD` at `source`.
+//! `AOSABI_STD` at `source`. The enums [`Carrier`] and [`Protocol`] carry the
+//! six carriers and the three protocols, `LoRa` and GraphTP(Homa) among them,
+//! although no built in card names `LoRa` or links GraphTP(Homa) on Network,
+//! so a card that adds them fills a row and renames nothing.
 
 use std::path::Path;
 
@@ -28,10 +36,6 @@ use crate::{
 
 pub mod builtin;
 pub mod digests;
-
-/// The row of the device card track that reads a card file, an installed
-/// card and the folder `devices/` in a build.
-pub const CARD_FILE_ROW: &str = "DC5";
 
 /// The name of the card a build takes with no `--device`.
 pub const DEFAULT_CARD: &str = "server";
@@ -85,7 +89,7 @@ pub enum Profile {
     Release,
 }
 
-/// A carrier of ADR-0023.
+/// One of the six carriers.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Carrier {
     /// Network.
@@ -102,7 +106,7 @@ pub enum Carrier {
     LoRa,
 }
 
-/// A protocol of ADR-0023.
+/// One of the three protocols.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Protocol {
     /// HTTP(TCP).
@@ -163,7 +167,7 @@ impl Profile {
 }
 
 impl Carrier {
-    /// Returns the name of the carrier as ADR-0023 spells it.
+    /// Returns the proper name of the carrier, as the guides spell it.
     #[must_use]
     pub const fn name(self) -> &'static str {
         match self {
@@ -178,7 +182,7 @@ impl Carrier {
 }
 
 impl Protocol {
-    /// Returns the name of the protocol as ADR-0023 spells it.
+    /// Returns the name of the protocol, the layer below it in parentheses.
     #[must_use]
     pub const fn name(self) -> &'static str {
         match self {
@@ -209,7 +213,7 @@ impl Encoding {
 pub fn resolve(arg: Option<&str>, project: &Project) -> Result<&'static Card, CliError> {
     let Some(name) = arg else {
         if holds_a_card(project) {
-            return Err(codes::devices_folder(CARD_FILE_ROW));
+            return Err(codes::devices_folder());
         }
         return by_name(DEFAULT_CARD).ok_or_else(|| codes::no_builtin_card(DEFAULT_CARD));
     };
@@ -217,7 +221,7 @@ pub fn resolve(arg: Option<&str>, project: &Project) -> Result<&'static Card, Cl
         .extension()
         .is_some_and(|extension| extension.eq_ignore_ascii_case("png"));
     if picture || name.contains('/') {
-        return Err(codes::card_file(name, CARD_FILE_ROW));
+        return Err(codes::card_file(name));
     }
     by_name(name).ok_or_else(|| codes::no_builtin_card(name))
 }
@@ -228,8 +232,7 @@ pub fn by_name(name: &str) -> Option<&'static Card> {
     builtin::BUILTIN.iter().find(|card| card.name == name)
 }
 
-/// Returns whether `devices/` of `project` holds a file, a card the track
-/// installs.
+/// Returns whether `devices/` of `project` holds a file, an installed card.
 fn holds_a_card(project: &Project) -> bool {
     std::fs::read_dir(project.root.join(DEVICES_DIR)).is_ok_and(|entries| {
         entries

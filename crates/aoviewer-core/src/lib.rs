@@ -3,11 +3,11 @@
  * aoviewer-core: the shared core of aoviewer and of the documentation
  * generator.
  *
- * No file of the reference is translated here. aoviewer replaces the Voyager
- * page of the /viewer route.
- * The core answers what a route looks like under a set of options, as a page
- * model and a graph scene, and the viewer and the documents call the same
- * function.
+ * No file of the reference is translated here. aoviewer is the schema viewer
+ * of Aosabi in the place of the Voyager page the reference serves on its
+ * /viewer route, which no build of a service serves since 0.1.1. The core
+ * answers what a route looks like under a set of options, as a page model and
+ * a graph scene, and the viewer and the documents call the same function.
  */
 
 //! The shared core of aoviewer and of the documentation generator.
@@ -23,10 +23,8 @@
 //! carries no float, no hash container, no clock, no thread and no `unsafe`,
 //! and every loop runs under a cap named as a constant.
 //!
-//! The judging notebooks are `tests/notebooks/51_viewer_core.ipynb`,
-//! `tests/notebooks/75_docgen.ipynb` and `tests/notebooks/76_docs_pdf.ipynb`,
-//! which drive `aosabi-devtool viewer`. There is no test in this crate, which
-//! is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md
+//! section 3.
 
 #![no_std]
 

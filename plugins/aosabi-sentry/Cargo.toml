@@ -1,12 +1,12 @@
-# It sends an event through the network capability of aosabi-core and names no
-# crate outside the workspace.
+# The Sentry plugin. It sends an event through the network capability of
+# aosabi-core and names no crate outside the workspace.
 [package]
 name = "aosabi-sentry"
-version = "0.0.0"
+version.workspace = true
 description = "The Sentry plugin of Aosabi, useSentry: the plugin and its options, the @hono/sentry middleware, a minimal Sentry client and the envelope transport over the network capability."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 

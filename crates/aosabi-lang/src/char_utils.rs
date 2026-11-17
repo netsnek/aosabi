@@ -259,12 +259,12 @@ pub(crate) fn push_utf16(units: &mut Vec<u16>, wtf8: &[u8]) {
 ///
 /// This is `body.slice(start, end)` for the value of a token, where both ends
 /// stand on a character boundary, in a body that carries a lone surrogate,
-/// which [󰀁](crate::source::Source::slice) reads through here. Every reader
-/// that builds a token value steps over a surrogate pair as a whole and stops
-/// at a surrogate without its partner, so the slice holds no lone surrogate
-/// and is UTF-8, and the empty default of a failed decoding is never taken.
-/// Safe Rust makes a `&str` of such bytes only through the check of
-/// `core::str::from_utf8`, which a body of text does not need. A slice that
+/// which [`Source::slice`](crate::source::Source::slice) reads through here.
+/// Every reader that builds a token value steps over a surrogate pair as a
+/// whole and stops at a surrogate without its partner, so the slice holds no
+/// lone surrogate and is UTF-8, and the empty default of a failed decoding is
+/// never taken. Safe Rust makes a `&str` of such bytes only through the check
+/// of `core::str::from_utf8`, which a body of text does not need. A slice that
 /// may cut a pair is [`slice_code_units`].
 // A `from_utf8_unchecked` would skip this check.
 pub(crate) fn slice(body: &[u8], start: usize, end: usize) -> &str {

@@ -5,7 +5,7 @@
  *
  * The one mapAsyncIterator, which envelop and @graphql-tools/utils re-export.
  *
- * Derived from whatwg-node 1.3.2, cjs/index.js, MIT.
+ * Derived from @whatwg-node/promise-helpers 1.3.2, cjs/index.js, MIT.
  */
 
 //! The `mapAsyncIterator` of `@whatwg-node/promise-helpers`.
@@ -20,12 +20,13 @@
 //!
 //! The reference answers a fake promise in two places, a value or an error
 //! with a `then` that runs at once. A fake promise is the value itself here,
-//! on the synchronous path of [󰀁](crate::handle_maybe_promise()), and a fake
-//! promise that rejects is a throw on that path. Where the reference calls
-//! `.then` on the answer of a method of the source and that answer is a value,
-//! the value becomes `Promise.resolve(value)` first, which costs jobs the
-//! reference does not run and changes no frame, because each frame of one
-//! stream waits for the one before it.
+//! on the synchronous path of
+//! [`handle_maybe_promise`](crate::handle_maybe_promise()), and a fake promise
+//! that rejects is a throw on that path. Where the reference calls `.then` on
+//! the answer of a method of the source and that answer is a value, the value
+//! becomes `Promise.resolve(value)` first, which costs jobs the reference does
+//! not run and changes no frame, because each frame of one stream waits for
+//! the one before it.
 //!
 //! The module names `core` and `alloc` and no item of `std`, and its state
 //! is shared through `Rc`.

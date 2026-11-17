@@ -1,14 +1,13 @@
 # SPDX-License-Identifier: MIT
 """Aosabi harness: the test CA and the certificate of 127.0.0.1, through the openssl command line.
 
-The HTTPS port of tests/harness/mock_ingest.py serves the certificate this
-module writes, and both sides trust it through the CA file alone: the reference
-through `NODE_EXTRA_CA_CERTS`, which Node reads at its start and adds to its
-bundled roots, and the twin through `AOSABI_EXTRA_CA_CERTS`, the name
-`aosabi-fetch` reads. No Python package makes a key or a certificate here,
-because tests/pyproject.toml gains none, so every file comes from the `openssl`
-of the machine, which risk 23 of the plan asks 00_environment to find present
-in round 2.
+The HTTPS port of the mock ingest serves the certificate this module writes,
+and both sides trust it through the CA file alone: the reference through
+`NODE_EXTRA_CA_CERTS`, which Node reads at its start and adds to its bundled
+roots, and the twin through `AOSABI_EXTRA_CA_CERTS`, the name `aosabi-fetch`
+reads. No Python package makes a key or a certificate here, because
+tests/pyproject.toml gains none, so every file comes from the `openssl` of the
+machine, whose version the notebook of the environment prints.
 
 `generate` writes a fresh set on every call, under target/harness/tls/ unless
 the caller names a directory:
@@ -35,19 +34,25 @@ issuer of tests/harness/mock_issuer.py. The name resolves to 127.0.0.1 through
 answers every name under `localhost.` with the loopback addresses, so no step
 needs root.
 
-The reference reads either form through `crypto.createPrivateKey`.
-`ClientKey.auth_key` answers the record `AUTH_KEY` carries,
+The module also holds the client key of the run, which `client_key` writes and
+`generate` writes beside the certificates when its caller asks: a 2048 bit RSA
+key in the PKCS#1 form, `client.pkcs1.pem`, the form a key file of Zitadel
+carries, the same key in the PKCS#8 form, `client.pkcs8.pem`, and its public
+half, `client.pub.pem`, which the mocked issuer of tests/harness/mock_issuer.py
+verifies each client assertion with. The reference reads either form through
+`crypto.createPrivateKey`. `ClientKey.auth_key` answers the record `AUTH_KEY`
+carries,
 `{"type":"application","keyId":"test-key-1","key":"<PEM>","clientId":"test-client"}`
 in that key order, and `write_key_file` writes the same record as the
 `key.json` a side reads from its working directory. A client key lives under
 target/harness/ alone, which `client_key` asserts, so no key reaches a
 committed path.
 
-The key cases of `61_oidc_login` and `63_zitadel_auth` ask `client_key` for
-keys of other sizes and of more than two primes, which `bits` and `primes`
-name, and the PKCS#1 public half of a key, which `ClientKey.public_pkcs1`
-answers. `CLIENT_KEY_BITS` is the size of the key of a run, which every other
-case takes.
+The key cases of the login routes and of the provider ask `client_key` for keys
+of other sizes and of more than two primes, which `bits` and `primes` name, and
+the PKCS#1 public half of a key, which `ClientKey.public_pkcs1` answers.
+`CLIENT_KEY_BITS` is the size of the key of a run, which every other case
+takes.
 """
 
 from __future__ import annotations
@@ -128,7 +133,7 @@ class ClientKey:
         return (self.pkcs1 if form == "pkcs1" else self.pkcs8).read_text(encoding="ascii")
 
     def auth_key(self, form: str = "pkcs1") -> dict:
-        """The record of `AUTH_KEY` and of a key file, in the key order of the plan."""
+        """The record of `AUTH_KEY` and of a key file, in the key order `type`, `keyId`, `key`, `clientId`."""
         return {"type": "application", "keyId": self.key_id, "key": self.pem(form), "clientId": self.client_id}
 
     def auth_key_json(self, form: str = "pkcs1") -> str:

@@ -17,9 +17,7 @@
 //! argument to its parameter and every reference to the node the source gives
 //! the same place, then it finds every named type no reference reached by the
 //! name of a declaration. Each node of the answer carries the kind of its
-//! Rust item, the site the macros recorded and the heritage of a type, which
-//! check C2 and check C4 of `tests/notebooks/12_authoring_parity.ipynb`
-//! compare with the TypeScript side.
+//! Rust item, the site the macros recorded and the heritage of a type.
 //!
 //! | Kind | Item |
 //! | --- | --- |

@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: MIT
-"""`60_plugins` sends three generated corpora to the sidecar
-`tests/sidecar/plugins.mjs` and to the primitive `plugins` of aosabi-devtool
-and compares the two response streams as bytes:
+"""tests/gen: the plugin corpora, the served cases of plugins-app and its boots.
+
+A notebook sends three generated corpora to the plugins sidecar and to the
+primitive `plugins` of aosabi-devtool and compares the two response streams as
+bytes:
 
 - **The order vectors**, 2000 requests of the operation `topo_sort`, each of 1
   to 12 plugins with names drawn from 6, a tenth of them unnamed, a tenth
@@ -22,8 +24,10 @@ cases `pl-01` to `pl-15` of `plugins-app`, the boots of its table, and the
 `tests/gen/sentry.py` are made of. Cases `pl-12` and `pl-13` send the cookie of
 `pl-10` in one of two `Cookie` fields, after another cookie and before it,
 which the `Headers` of each side joins before the route reads the cookie, and
-they follow `pl-11`, so no case before them moves. Every name and value is a
-neutral test string.
+they follow `pl-11`, so no case before them moves. Cases `pl-14` and `pl-15`
+run the operations `ReadsData` and `WritesData`, whose done hook of the plugin
+`a` reads the data of the result and writes it, and they follow `pl-13`. Every
+name and value is a neutral test string.
 """
 
 from __future__ import annotations
@@ -49,7 +53,8 @@ NAMES = ("a", "b", "c", "d", "e", "f")
 #: Names a dependency may carry that no generated plugin carries.
 MISSING = ("identity", "database")
 
-FAMILY = "M7"
+#: The family the served cases of the plugins name in their `x-request-id`.
+FAMILY = "plugins"
 
 
 @dataclass(frozen=True)
@@ -125,21 +130,21 @@ def plugin_cases() -> list:
         served("pl-06", "plugins-app", "default", post("{hello}", short),
                "the GraphQL handler skipped and the short circuit lost, 500 and Internal Server Error", envs),
         served("pl-07", "plugins-app", "default", get("/plugin/ping"), "x-after: yes on a route answer", envs),
-        served("pl-08", "plugins-app", "default", get("/plugin/cookie"), "the attribute order of Set-Cookie, fact 51", envs),
-        served("pl-09", "plugins-app", "default", get("/plugin/redirect"), "302, Location and the null body of fact 52", envs),
+        served("pl-08", "plugins-app", "default", get("/plugin/cookie"), "the attribute order of Set-Cookie", envs),
+        served("pl-09", "plugins-app", "default", get("/plugin/redirect"), "302, Location and the null body", envs),
         served("pl-10", "plugins-app", "default", get("/plugin/cookie-read", [("Cookie", "k=v%20w")]),
                "the decoded value and the deleting Set-Cookie", envs),
         served("pl-11", "plugins-app", "default", get("/viewer/claimed"),
-               "the application's route below the reserved prefix, fact 65", envs),
+               "the application's route below the reserved prefix", envs),
         served("pl-12", "plugins-app", "default", get("/plugin/cookie-read", [("Cookie", "a=1"), ("Cookie", "k=v%20w")]),
                "the cookie of pl-10 in the second of two Cookie fields, which the Headers joins with 0x3B 0x20 as "
                "undici joins them", envs),
         served("pl-13", "plugins-app", "default", get("/plugin/cookie-read", [("Cookie", "k=v%20w"), ("Cookie", "a=1")]),
                "the cookie of pl-10 in the first of two Cookie fields", envs),
         served("pl-14", "plugins-app", "default", post("query ReadsData { hello }", operationName="ReadsData"),
-               "a done hook that reads data, data.hello copied into extensions.read, item X11 of EXEC1", envs),
+               "a done hook that reads data, data.hello copied into extensions.read", envs),
         served("pl-15", "plugins-app", "default", post("query WritesData { hello }", operationName="WritesData"),
-               "a done hook that writes data, data.hello in upper case, item X11 of EXEC1", envs),
+               "a done hook that writes data, data.hello in upper case", envs),
     ]
 
 
@@ -175,23 +180,23 @@ def order_vectors(seed: int = DEFAULT_SEED, count: int = ORDER_VECTOR_COUNT) -> 
     rng = Rng(seed)
     vectors = []
     for index in range(count):
-        size = rng.stream("M7.order.size").randint(1, 12)
+        size = rng.stream("plugins.order.size").randint(1, 12)
         plugins = []
         for _ in range(size):
-            roll = rng.stream("M7.order.name").random()
-            name = None if roll < 0.1 else "" if roll < 0.2 else rng.choice("M7.order.pick", NAMES)
+            roll = rng.stream("plugins.order.name").random()
+            name = None if roll < 0.1 else "" if roll < 0.2 else rng.choice("plugins.order.pick", NAMES)
             depends_on = None
-            if rng.stream("M7.order.deps").random() >= 0.4:
-                width = rng.stream("M7.order.width").randint(0, 3)
-                depends_on = [rng.choice("M7.order.dep", NAMES + MISSING) for _ in range(width)]
-                if name and rng.stream("M7.order.self").random() < 0.15:
+            if rng.stream("plugins.order.deps").random() >= 0.4:
+                width = rng.stream("plugins.order.width").randint(0, 3)
+                depends_on = [rng.choice("plugins.order.dep", NAMES + MISSING) for _ in range(width)]
+                if name and rng.stream("plugins.order.self").random() < 0.15:
                     depends_on.append(name)
             plugins.append({"name": name, "depends_on": depends_on})
         if index % 4 == 3:
-            first, second = rng.stream("M7.order.cycle").sample(NAMES, 2)
+            first, second = rng.stream("plugins.order.cycle").sample(NAMES, 2)
             if len(plugins) < 2:
                 plugins.append({"name": None, "depends_on": None})
-            at = rng.stream("M7.order.cycle.at").sample(range(len(plugins)), 2)
+            at = rng.stream("plugins.order.cycle.at").sample(range(len(plugins)), 2)
             for plugin in plugins:
                 if plugin["name"] in (first, second):
                     plugin["name"] = None
@@ -202,7 +207,7 @@ def order_vectors(seed: int = DEFAULT_SEED, count: int = ORDER_VECTOR_COUNT) -> 
 
 
 def order_counts(vectors: list) -> dict:
-    """The counts step 5 of `60_plugins` prints: collisions, self and missing dependencies, cycles planned."""
+    """The counts of the order vectors a notebook prints: collisions, self and missing dependencies, cycles planned."""
     counts = {"vectors": len(vectors), "collisions": 0, "self": 0, "missing": 0, "cycles planned": 0,
               "unnamed": 0, "empty names": 0}
     for index, vector in enumerate(vectors):
@@ -229,46 +234,46 @@ def boot_descriptions(seed: int = DEFAULT_SEED, count: int = BOOT_DESCRIPTION_CO
     rng = Rng(seed)
     descriptions = []
     for index in range(count):
-        size = rng.stream("M7.boot.size").randint(0, 8)
+        size = rng.stream("plugins.boot.size").randint(0, 8)
         plugins = []
         for _ in range(size):
             row = {}
-            roll = rng.stream("M7.boot.name").random()
+            roll = rng.stream("plugins.boot.name").random()
             if roll >= 0.2:
-                row["name"] = rng.choice("M7.boot.pick", NAMES)
+                row["name"] = rng.choice("plugins.boot.pick", NAMES)
             elif roll >= 0.15:
                 row["name"] = ""
-            if rng.stream("M7.boot.deps").random() < 0.3:
-                width = rng.stream("M7.boot.width").randint(1, 2)
-                row["depends_on"] = [rng.choice("M7.boot.dep", NAMES + MISSING) for _ in range(width)]
-            strategy = rng.stream("M7.boot.strategy").random()
+            if rng.stream("plugins.boot.deps").random() < 0.3:
+                width = rng.stream("plugins.boot.width").randint(1, 2)
+                row["depends_on"] = [rng.choice("plugins.boot.dep", NAMES + MISSING) for _ in range(width)]
+            strategy = rng.stream("plugins.boot.strategy").random()
             if strategy >= 0.7:
                 row["strategy"] = "last"
             elif strategy >= 0.5:
                 row["strategy"] = "first"
-            roles = rng.stream("M7.boot.roles").random()
+            roles = rng.stream("plugins.boot.roles").random()
             if roles >= 0.9:
                 row["roles"] = ["web", "worker"]
             elif roles >= 0.75:
                 row["roles"] = ["worker"]
             elif roles >= 0.6:
                 row["roles"] = ["web"]
-            if rng.stream("M7.boot.setup").random() < 0.7:
+            if rng.stream("plugins.boot.setup").random() < 0.7:
                 row["setup"] = "ok"
-            if rng.stream("M7.boot.middleware").random() < 0.3:
+            if rng.stream("plugins.boot.middleware").random() < 0.3:
                 row["middleware"] = True
             plugins.append(row)
-        if plugins and rng.stream("M7.boot.throw").random() < 0.3:
-            at = rng.stream("M7.boot.throw.at").randrange(len(plugins))
-            plugins[at]["setup"] = ("throw:setup failed" if rng.stream("M7.boot.throw.kind").random() < 0.5
+        if plugins and rng.stream("plugins.boot.throw").random() < 0.3:
+            at = rng.stream("plugins.boot.throw.at").randrange(len(plugins))
+            plugins[at]["setup"] = ("throw:setup failed" if rng.stream("plugins.boot.throw.kind").random() < 0.5
                                     else "throw-value:plain value")
         request = {"id": "gb-%03d" % (index + 1), "op": "boot", "plugins": plugins}
-        landing = rng.stream("M7.boot.landing").random()
+        landing = rng.stream("plugins.boot.landing").random()
         if landing >= 0.85:
             request["landing_page"] = True
         elif landing >= 0.7:
             request["landing_page"] = False
-        graphiql = rng.stream("M7.boot.graphiql").random()
+        graphiql = rng.stream("plugins.boot.graphiql").random()
         if graphiql >= 0.9:
             request["graphiql"] = True
         elif graphiql >= 0.7:
@@ -286,30 +291,30 @@ def error_lists(seed: int = DEFAULT_SEED, count: int = ERROR_LIST_COUNT) -> list
     fields = ("adminOnly", "report", "secret", "reports", "mixed", "guarded")
     lists = []
     for index in range(count):
-        size = rng.stream("M7.errors.size").randint(0, 6)
+        size = rng.stream("plugins.errors.size").randint(0, 6)
         errors = []
         for _ in range(size):
-            depth = rng.stream("M7.errors.depth").randint(0, 3)
+            depth = rng.stream("plugins.errors.depth").randint(0, 3)
             path = []
             for level in range(depth):
-                if level and rng.stream("M7.errors.index").random() < 0.3:
-                    path.append(rng.stream("M7.errors.at").randint(0, 2))
+                if level and rng.stream("plugins.errors.index").random() < 0.3:
+                    path.append(rng.stream("plugins.errors.at").randint(0, 2))
                 else:
-                    path.append(rng.choice("M7.errors.field", fields))
-            error = {"message": rng.choice("M7.errors.message", ("Unexpected error.", "plain failure", "denied"))}
+                    path.append(rng.choice("plugins.errors.field", fields))
+            error = {"message": rng.choice("plugins.errors.message", ("Unexpected error.", "plain failure", "denied"))}
             if path:
                 error["path"] = path
-            kind = rng.stream("M7.errors.kind").random()
+            kind = rng.stream("plugins.errors.kind").random()
             if kind < 0.5:
                 forbidden = {}
-                shape = rng.stream("M7.errors.forbidden").random()
+                shape = rng.stream("plugins.errors.forbidden").random()
                 if shape >= 0.3:
-                    forbidden["message"] = rng.choice("M7.errors.forbidden.message", ("Not permitted.", "Billing is off.", "No access."))
+                    forbidden["message"] = rng.choice("plugins.errors.forbidden.message", ("Not permitted.", "Billing is off.", "No access."))
                 if shape >= 0.6:
-                    forbidden["feature"] = rng.choice("M7.errors.feature", ("billing", "exports", ""))
+                    forbidden["feature"] = rng.choice("plugins.errors.feature", ("billing", "exports", ""))
                 error["forbidden"] = forbidden
-            if rng.stream("M7.errors.extensions").random() < 0.3:
-                error["extensions"] = {"code": rng.choice("M7.errors.code", ("BAD_INPUT", "LIMIT", "INTERNAL"))}
+            if rng.stream("plugins.errors.extensions").random() < 0.3:
+                error["extensions"] = {"code": rng.choice("plugins.errors.code", ("BAD_INPUT", "LIMIT", "INTERNAL"))}
             errors.append(error)
         lists.append({"id": "ge-%03d" % (index + 1), "op": "map_forbidden", "errors": errors})
     return lists

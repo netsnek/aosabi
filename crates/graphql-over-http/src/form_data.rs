@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: the multipart parser of a form data body.
  *
- * Derived from node v24.13.0, deps/undici/src/lib/web/fetch/formdata-parser.js, MIT.
+ * Derived from undici 7.18.2, lib/web/fetch/formdata-parser.js, MIT.
+ * Derived from undici 7.18.2, lib/web/fetch/data-url.js, MIT.
+ * Derived from undici 7.18.2, lib/web/fetch/util.js, MIT.
  */
 
 //! `FormData` and the multipart parser.
@@ -727,6 +729,9 @@ fn replace_ignore_case(text: &str, pattern: &str, replacement: &str) -> String {
 }
 
 /// Decodes the percent escapes of `text`, `decodeURIComponent(text)`.
+///
+/// An escape of a byte that starts no UTF-8 sequence, an escape cut short and
+/// a sequence that is no scalar value throw `URI malformed`.
 fn decode_uri_component(text: &str) -> Result<String, MultipartError> {
     let bytes = text.as_bytes();
     let mut out: Vec<u8> = Vec::with_capacity(bytes.len());
@@ -777,6 +782,9 @@ fn hex_byte(bytes: &[u8], index: usize) -> Option<u8> {
 }
 
 /// Decodes base64 as Node's `Buffer.from(text, 'base64')` does.
+///
+/// Both alphabets are read, a character of neither is skipped, and the first
+/// `=` ends the data.
 fn base64_decode(text: &str) -> Vec<u8> {
     let mut out = Vec::new();
     let mut buffer: u32 = 0;

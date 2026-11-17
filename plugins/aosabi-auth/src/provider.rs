@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT AND Apache-2.0
-// Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/index.ts,
-// Apache-2.0. Changed by the Aosabi authors.
+/*
+ * aosabi-auth: the identity seam with the request context of Aosabi as its
+ * context.
+ *
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ */
 
 //! `IdentityProvider` over the request `Context`.
 //!

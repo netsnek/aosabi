@@ -3,8 +3,8 @@
  * aosabi-core: a member whose value is computed when it is selected.
  *
  * No analogue on the reference side, where such a member is a property whose
- * value is an arrow function with no parameter, => value, which the executor
- * calls when the member is selected.
+ * value is an arrow function with no parameter, () => value, which the
+ * executor calls when the member is selected.
  */
 
 //! A member whose value is computed each time it is selected, the twin of a

@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: MIT
-"""The emulated switch of the raw IP half of `29_homa_raw`: the `prio`
-queuing discipline of 8 bands, each Homa priority level mapped to a band from
-the TOS bits or the traffic class, over `netem` for delay, loss and rate.
+"""The emulated switch of the runs over raw IP: the `prio` queuing discipline
+of 8 bands, each Homa priority level mapped to a band from the TOS bits or the
+traffic class, over `netem` for delay, loss and rate.
 
 The crate's engine writes the level of a packet into the three high bits of
 the IPv4 TOS byte or the IPv6 traffic class, the level shifted left by five.
-The priority map of `prio` reads the TOS field of RFC 1349 and not those
-bits, so a `u32` filter per level and family puts a packet of level `l` into
-band `7 - l`, band 0 draining first, and a packet no filter names into the
-band of level 0. Each band holds a `netem` qdisc of its own, so the loss of 1
-percent the notebook asks for falls on every band alike. The host has no
-`tc`, so the commands run in guest A through the `run` of `netns.py`.
+The priority map of `prio` reads the TOS field of RFC 1349 and not those bits,
+so a `u32` filter per level and family puts a packet of level `l` into band
+`7 - l`, band 0 draining first, and a packet no filter names into the band of
+level 0. Each band holds a `netem` qdisc of its own, so the loss of 1 percent
+a run asks for falls on every band alike. The host has no `tc`, so the
+commands run in guest A through the `run` of `netns.py`.
 """
 
 from __future__ import annotations

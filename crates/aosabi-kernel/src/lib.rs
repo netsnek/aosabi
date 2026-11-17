@@ -3,23 +3,28 @@
  * aosabi-kernel: layer 0 of Aosabi, the core a bare metal build links and
  * nothing above it.
  *
- * No analogue in the reference.
+ * No analogue in the reference. The crate holds the framing, which it names
+ * from the crate homa, the publish primitive, and the entry below HTTP, which
+ * a later release renames entry, compiles with no standard library and with
+ * allocation optional, and nothing in it reaches up into a layer above.
  */
 
 //! Layer 0 of Aosabi.
 //!
-//! Documentation/architecture.md section 3.1 gives it three things, the framing, the
-//! publish primitive and the entry traits. The framing is `AoFrame`, which the crate `homa`
-//! holds as `homa::stream`, so one implementation exists, and a build without either
-//! feature has none.
+//! The crate holds three things, the framing, the publish primitive and the
+//! entry traits. The framing is in place under the features `client` and
+//! `homa`, and the empty modules `cbor` and `document_table` stay until a
+//! later release removes them. The framing is `AoFrame`, which the crate
+//! `homa` holds as `homa::stream`, so one implementation exists, and a build
+//! without either feature has none.
 //!
 //! | Module | Holds | State |
 //! | --- | --- | --- |
 //! | `stream` | `AoFrame`, delimited and prefixed, the re-export of `homa::stream` | in place under `client` and `homa` |
 //! | [`publish`] | the publish primitive, its fan out with the coalescing per slot, the allowlist of a carrier and the lock the environment supplies | in place, the hub under `alloc` |
-//! | [`execute_closed`] | the entry below HTTP |  |
-//! | [`cbor`] | the CBOR codec with its per operation integer key maps |  |
-//! | [`document_table`] | the persisted document table |  |
+//! | [`execute_closed`] | the entry below HTTP | in place, renamed `entry` in a later release |
+//! | [`cbor`] | the CBOR codec with its per operation integer key maps | Withdrawn, empty until a later release removes it |
+//! | [`document_table`] | the persisted document table | Withdrawn, empty until a later release removes it |
 //!
 //! The crate is `no_std`. The `alloc` feature is the heap of the cards that have one, the
 //! hub of [`publish`] is the one module behind it, and the crate builds and answers without

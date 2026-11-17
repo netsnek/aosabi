@@ -5,11 +5,11 @@
 # It runs on the build host and uses the standard library.
 [package]
 name = "aosabi-cli"
-version = "0.0.0"
+version.workspace = true
 description = "The command line of Aosabi: cargo aosabi build and dev, and aosabi inspect, verify, mcp, pull and new."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 # The two programs are declared below, so cargo infers no third one from
@@ -38,10 +38,10 @@ name = "aosabi"
 path = "src/bin/aosabi.rs"
 doc = false
 
-# The crate graph of the plan names aosabi-fetch, aosabi-core for its trait
-# net::Fetch, the web layer of aosabi-http and aosabi-serve beside the crates
-# below. The project has no outbound client crate, so pull and the readiness
-# probe of dev use the http:// only client of src/http.rs, which blocks over
+# The crate graph names aosabi-fetch, aosabi-core for its trait net::Fetch, the
+# web layer of aosabi-http and aosabi-serve beside the crates below. The
+# project has no outbound client crate, so pull and the readiness probe of dev
+# use the http:// only client of src/http.rs, which blocks over
 # std::net::TcpStream and needs no runtime, and the crate names none of the
 # four.
 [dependencies]

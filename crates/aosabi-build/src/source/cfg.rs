@@ -3,7 +3,10 @@
  * aosabi-build: the active set of the build of a crate and the strip of its
  * source over that set, which rustc applies before it compiles a crate.
  *
- * The rules are those of the Rust Reference, chapter Conditional compilation.
+ * Stands in for the conditional compilation rustc applies to a crate,
+ * `StripUnconfigured` of compiler/rustc_expand/src/config.rs, over the source
+ * the reader reads. The rules are those of the Rust Reference, chapter
+ * Conditional compilation.
  */
 
 //! The active set of a build and the strip of a crate.

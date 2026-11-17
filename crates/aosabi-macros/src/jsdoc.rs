@@ -1,7 +1,13 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT AND Apache-2.0
 /*
  * aosabi-macros: the JSDoc parser of the TypeScript checker, over the text of
  * one documentation block.
+ *
+ * The file translates the JSDoc scanner, `resetTokenState`,
+ * `parseJSDocCommentWorker` with its helpers, and the tag text of
+ * `getCommentDisplayParts` and `buildLinkParts`.
+ *
+ * Derived from typescript 5.9.3, lib/typescript.js, Apache-2.0.
  */
 
 //! The `JSDoc` parser of the TypeScript checker.

@@ -3,7 +3,7 @@
  * aosabi-build: the entry of a build script and of a program that is no build
  * script, and the emitter that validates a schema and writes the artifacts.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/cli/builder/bundler/emit-server-glue.ts, Apache-2.0.
  * Changed by the Aosabi authors.
  *
@@ -37,6 +37,10 @@
 //! of the type resolvers generated from the model that writes
 //! `resolvers.js`, and [`NAME_FILE`], the package name of the application
 //! crate, which names the socket of HTTP(Unix Socket).
+//!
+//! The write order is fixed, `schema.graphql`, `resolvers.js`, `ir.json`,
+//! `descriptors.json`, `authoring.json` and then the copy in `OUT_DIR`, and
+//! nothing is written before the schema is valid.
 
 use std::{
     env,
@@ -88,11 +92,11 @@ use crate::{
     update_file_if_changed::update_file_if_changed, //
 };
 
-/// The file name of the schema text, which is the name the reference writes.
+/// The file name of the schema text, the name the reference writes.
 pub const SCHEMA_FILE: &str = "schema.graphql";
 
-/// The file name of the text copy of the resolvers, which is the name the
-/// reference writes.
+/// The file name of the text copy of the resolvers, the name the reference
+/// writes.
 pub const RESOLVERS_FILE: &str = "resolvers.js";
 
 /// The file name of the intermediate representation as JSON.
@@ -330,6 +334,9 @@ fn taken_dirs(artifact_dir: &str) -> Result<(PathBuf, PathBuf), BuildError> {
     Ok((manifest_dir.join(artifact_dir), var("OUT_DIR")?))
 }
 
+/// The exit status of a run with a wrong invocation, which is `EX_USAGE` of
+/// `sysexits.h`.
+///
 /// [sysexits(3)]: https://man.freebsd.org/cgi/man.cgi?query=sysexits&sektion=3
 const EX_USAGE: u8 = 64;
 
@@ -338,12 +345,11 @@ const EX_USAGE: u8 = 64;
 ///
 /// `entry` is the function `default` of the application crate, as for
 /// [`emit_from`]. The one argument of the program names the artifact
-/// directory, and a relative path resolves against the working directory.
-/// This is the post compile route of
-/// docs/decisions/ADR-0002-derive-inference-with-typesource-seam.md: the
-/// program links the application crate after it is compiled, its roots carry
-/// the declaration list as they do in a build script, and the harness writes
-/// the artifacts of a library that has no server crate.
+/// directory, and a relative path resolves against the working directory. This
+/// is the post compile route: the program links the application crate after it
+/// is compiled, its roots carry the declaration list as they do in a build
+/// script, and the harness writes the artifacts of a library that has no
+/// server crate.
 ///
 /// Nothing goes to stdout. There is no `OUT_DIR`, so the copy a server binary
 /// embeds is not written, and no directive for cargo is printed, because no
@@ -655,11 +661,13 @@ pub fn emit_schema(
 
 /// Returns the text of [`RESOLVERS_FILE`] for `built`.
 ///
-/// That object maps the name of every union and of every interface with a
-/// field to an object whose one key `__resolveType` holds the type resolver,
-/// and a build with neither writes `export const resolvers = {}` and one
-/// newline. The parser gives every union and every interface a resolver before
-/// it answers, so no value is undefined.
+/// The text is `export const resolvers = `, the object the parser returns from
+/// `getResolvers` as [`prepare_object_injection()`] writes it, and one
+/// newline. That object maps the name of every union and of every interface
+/// with a field to an object whose one key `__resolveType` holds the type
+/// resolver, and a build with neither writes `export const resolvers = {}` and
+/// one newline. The parser gives every union and every interface a resolver
+/// before it answers, so no value is undefined.
 #[must_use]
 pub fn resolvers_js(built: &Built) -> String {
     let resolvers: Vec<(&str, Injected<'_>)> = built

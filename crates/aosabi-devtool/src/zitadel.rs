@@ -4,8 +4,9 @@
  * principal, reads a token, takes the roles of a claim and writes the
  * introspection body of the Zitadel provider in process.
  *
- * No analogue in the reference. The protocol is tests/sidecar/zitadel.md, and
- * the judging notebook is tests/notebooks/63_zitadel_auth.ipynb, step 2.
+ * No analogue in the reference. It is the Rust half of the Zitadel sidecar,
+ * whose operations principal, read_token, roles and introspection_body call
+ * the reference's own functions.
  */
 
 //! The primitive `zitadel` of the seam.
@@ -36,15 +37,14 @@
 //! typed as the TypeScript options are, so a mapper answer outside that type
 //! takes the value the reference makes of it: an id mapper that answers
 //! `null` or `undefined` answers the subject, the `?? sub` of the reference,
-//! which the function pointer reads from a `static` of this thread, as rule
-//! 8 of section AUTH of the plan asks of a mapper that needs state, a
-//! permissions mapper the empty list of `?? []`, and an attributes mapper the
-//! user info of `?? user`. A tenant mapper that answers `null` answers no
-//! tenant, the one value of `Option<PrincipalId>` for both `null` and
-//! `undefined`, so its answer writes `undefined` where the reference keeps
-//! `null`, which step 2 of the notebook compares as one value. A mapper
-//! answer no typed option holds, such as an object for an id, answers
-//! `fatal`.
+//! which the function pointer reads from a `static` of this thread, since a
+//! function pointer captures nothing, a permissions mapper the empty list of
+//! `?? []`, and an attributes mapper the user info of `?? user`. A tenant
+//! mapper that answers `null` answers no tenant, the one value of
+//! `Option<PrincipalId>` for both `null` and `undefined`, so its answer
+//! writes `undefined` where the reference keeps `null`, which step 2 of the
+//! notebook compares as one value. A mapper answer no typed option holds,
+//! such as an object for an id, answers `fatal`.
 //!
 //! `introspection_body` installs a recording driver of the network
 //! capability on this thread, which takes the one request and answers an
@@ -137,8 +137,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "zitadel";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M7b";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "auth";
 
 /// The versions of the packages the crate ports, by the keys of the sidecar.
 const VERSIONS: [(&str, &str); 4] = [
@@ -479,7 +479,7 @@ fn options_of(request: &JsObject) -> Result<ZitadelAuthOptions, JsString> {
         };
         let unknown = || {
             JsString::from(format!(
-                "principal: no mapper \"{id}\" for {option}, the ids of tests/sidecar/zitadel.md"
+                "principal: no mapper \"{id}\" for {option}, not one of the ids of the table of mappers"
             ))
         };
         match option.as_str() {

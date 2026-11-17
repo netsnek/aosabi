@@ -2,9 +2,8 @@
 /*
  * aosabi-lang: the GraphQL language layer of Aosabi.
  *
- * This file holds the data model the lexer, the parser and the printer share:
- * the source, the location arithmetic, the kind enums, the token, the abstract
- * syntax tree and the GraphQL error.
+ * This file holds the module list, the names the crate exports at its root and
+ * the type SharedSlice.
  *
  * Derived from graphql-js 16.12.0, src/language, MIT.
  * Derived from graphql-js 16.12.0, src/error, MIT.
@@ -17,8 +16,7 @@
 //! 16.12.0, the version the wire is pinned to, and of
 //! `utilities/stripIgnoredCharacters.ts` beside it. Every function keeps the
 //! graphql-js name in snake case and follows the TypeScript line by line,
-//! because the exit number of the milestone is byte equality of error text and
-//! locations.
+//! because the goal is byte equality of error text and locations.
 //!
 //! | Module | Translates | Holds |
 //! | --- | --- | --- |
@@ -32,7 +30,7 @@
 //! | [`js_string`] | no analogue | [`JsStringBuilder`], [`js_string::join`], [`js_string::to_string_lossy`] and [`js_string::number_to_string`], the string operations behind the message of an error |
 //! | [`block_string`] | `blockString.ts` | [`dedent_block_string_lines()`](block_string::dedent_block_string_lines), [`is_printable_as_block_string()`](block_string::is_printable_as_block_string) and [`print_block_string()`](block_string::print_block_string) |
 //! | [`lexer`] | `lexer.ts` | [`Lexer`](lexer::Lexer), the token readers and the token descriptions |
-//! | [`parser`] | `parser.ts` | [`parse()`], [`parse_value()`], [`parse_const_value()`], [`parse_type()`], [`ParseOptions`] and [`Parser`], and [`parse_value_within()`] with [`Nesting`] and [`ParseValueError`], a value under a bound on its nesting |
+//! | [`parser`] | `parser.ts` | [`parse()`], [`parse_value()`], [`parse_const_value()`], [`parse_type()`], [`ParseOptions`] and [`Parser`], and [`parse_value_within()`] with [`Nesting`] and [`ParseValueError`], a value under a bound on its nesting, [`REQUEST_NESTING`], the bound on the nesting of a request document, and [`REQUEST_TOKENS`], the cap on its tokens where the app sets none |
 //! | [`predicates`] | `predicates.ts` | the kind predicates over a [`NodeRef`] |
 //! | [`print_string`](mod@print_string) | `printString.ts` | [`print_string()`] |
 //! | [`printer`] | `printer.ts` | [`print()`] |
@@ -65,11 +63,10 @@
 //! The crate builds with no standard library and needs an allocator, because
 //! every node owns its children. The `std` feature is the configuration symbol
 //! of a host build and gates nothing today. The dev feature
-//! `exec-walk-location` keeps `location::get_location_by_walk`, the walk of
-//! the body from its start, as the second judge of the table of line starts,
-//! and only `aosabi-devtool` names it, so no card ships the walk. There is no test in this crate,
-//! which is the rule of CONTRIBUTING.md section 3, and the judging notebook is
-//! `tests/notebooks/02_language.ipynb`.
+//! `exec-walk-location` keeps `location::get_location_by_walk`, the walk of the
+//! body from its start, as the second judge of the table of line starts, and
+//! only `aosabi-devtool` names it, so no card ships the walk. There is no test
+//! in this crate, which is the rule of CONTRIBUTING.md section 3.
 
 #![no_std]
 
@@ -157,6 +154,8 @@ pub use crate::{
         ParseOptions,
         ParseValueError,
         Parser,
+        REQUEST_NESTING,
+        REQUEST_TOKENS,
         parse,
         parse_const_value,
         parse_type,

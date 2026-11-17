@@ -30,10 +30,10 @@
 //! the `#[cfg]` of its item and of every module above it. The compiler takes a
 //! `cfg` on an element of an array expression and removes the element where the
 //! predicate fails. The derive includes the list of the target it expands in,
-//! so the roots of the crate carry the list, and [󰀉](crate::emit()) reads it
-//! through them. The list is a constant on every target, safe code with no
-//! linker section, and its order is the order of the scan, which the inference
-//! replaces by the order of the source positions.
+//! so the roots of the crate carry the list, and [`emit()`](crate::emit())
+//! reads it through them. The list is a constant on every target, safe code
+//! with no linker section, and its order is the order of the scan, which the
+//! inference replaces by the order of the source positions.
 //!
 //! The module `scan` walks the module tree of one target, and the module
 //! `manifest` finds the targets of the package.

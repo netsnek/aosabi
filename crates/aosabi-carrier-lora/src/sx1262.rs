@@ -10,9 +10,9 @@
  * word of its register list, fetched from
  * cdn.sparkfun.com/assets/6/b/5/1/4/SX1262_datasheet.pdf with the SHA-256
  * 644b55f38e97309161ea0c952a3a093020d94268ca8276eca53e5aa933ae7068. The
- * driver is written in the project because the driver crates that exist are
- * not well known under ADR-0024, and the SPI and the pins come from the
- * card's HAL through embedded-hal.
+ * driver is written in the project because no driver crate that exists is
+ * well known enough to enter the workspace, and the SPI and the pins come
+ * from the card's HAL through embedded-hal.
  */
 
 //! The SX1262 radio of a card.
@@ -481,6 +481,9 @@ where
     }
 
     fn channel_busy(&mut self) -> Result<bool, Self::Error> {
+        // The sensitivity over two symbols by the spreading factor, assumed
+        // from Semtech's application note AN1200.48, which Table 13-73 names
+        // and which the bench half of 29_carrier_lora tunes.
         let peak = match self.sf {
             7 | 8 => 22,
             9 => 23,

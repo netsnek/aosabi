@@ -4,9 +4,8 @@
  * client builds as one OPERATION of GraphTP/1 and returns a Response, with createGraphtpFetch,
  * connect, close and subscriptionClient.
  *
- * The design is docs/graphtp-fetch.md of the Aosabi repository, sections 3 to 8. The module
- * graphtp.wasm writes and reads every message, and this file and lib/ move bytes, build the
- * Response and read URLs (docs/graphtp-fetch.md section 2.1).
+ * The module graphtp.wasm writes and reads every message, and this file and lib/ move bytes,
+ * build the Response and read URLs.
  */
 
 import {Link, linkError} from './lib/engine.js'
@@ -54,7 +53,7 @@ onDrop(module => {
  * Returns a function with the signature of fetch that sends every URL of GraphTP as one OPERATION
  * and every other URL to `options.fallback`, the global fetch at call time by default.
  *
- * A 200.3 becomes the event stream of docs/graphtp-fetch.md section 7 where the `accept` of the
+ * A 200.3 becomes the event stream where the `accept` of the
  * request admits it, as Yoga answers a subscription, and the function's own 406 after a CANCEL of
  * the stream where it does not.
  */
@@ -115,7 +114,7 @@ export async function close(url) {
 /**
  * Returns a client of the shape of graphql-ws whose subscribe runs one subscription through
  * graphtpFetch and feeds each event to the sink, for the GraphiQL toolkit, which calls subscribe
- * and uses what it returns as the teardown and nothing else (docs/graphtp-fetch.md section 12.4).
+ * and uses what it returns as the teardown and nothing else.
  *
  * Each `next` event of the stream reaches `sink.next` as its parsed result and the `complete` event
  * `sink.complete`. An answer that is no stream, the JSON answer to a query or a mutation, reaches

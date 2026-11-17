@@ -1,10 +1,16 @@
-# The facade, layer 5. Documentation/architecture.md section 3 names it the one
-# crate a service depends on. It holds no code of its own but the function serve
-# and the macro build_output.
+# The facade, layer 5. Documentation/architecture.md section 3 names it the one crate a
+# service depends on. It holds no code of its own but the function serve and
+# the macro build_output. It carries the descriptor types, the macros, the
+# application with its plugins, context, logger and authoring run time, and
+# the service below HTTP with the request stream of a twin, which stay until
+# the twins move to the entry.
 #
 # Its defaults are the translation alone, the web layer of aosabi-http and the
 # Yoga layer with the executor, which every card links, and the engine that
-# serves sockets is a feature the package of a card names.
+# serves sockets is a feature the package of a card names. The feature lines of
+# the cards, which the server crate of every served twin writes by hand, and
+# the package cargo aosabi generates for a card writes once device cards
+# arrive:
 #
 #   server, server-legacy, docker
 #                    aosabi = { <aosabi>, features = ["serve", "unix-socket", "deflate", "linux"] }
@@ -12,21 +18,23 @@
 #                    "h2c" when it switches h2c on
 #   player           aosabi = { <aosabi>, features = ["serve", "unix-socket", "deflate", "linux"] }
 #   worker           aosabi = { <aosabi>, features = ["platform-coding"] }
+#   esp32c3-devkitm1 no facade
 #
-# The Linux pillar ships two cards, server linked with packed relocations for a
-# loader of glibc 2.36 or newer and server-legacy linked without them, the two
-# otherwise the same build, so both name the same features. A shipped card of
-# the three pillars holds at most 1 MiB with its application and without a
-# development tool, the framework aiming at 512 KiB, and the Linux web server
-# with TLS, HTTP/2 and OIDC at most 3 MiB, under the size profile. The plan and
-# the amendment reach this branch with the merge of main.
+# The feature deflate is the one content coding of the cards above, since
+# Aosabi codes no gzip. The Linux pillar ships two cards, server linked with
+# packed relocations for a loader of glibc 2.36 or newer and server-legacy
+# linked without them, the two otherwise the same build, so both name the same
+# features. A shipped card of the three pillars holds at most 1 MiB with its
+# application and without a development tool, the framework aiming at 512 KiB,
+# and the Linux web server with TLS, HTTP/2 and OIDC at most 3 MiB, under the
+# size profile.
 [package]
 name = "aosabi"
-version = "0.0.0"
+version.workspace = true
 description = "Aosabi in Rust: the facade crate a service depends on."
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT AND Apache-2.0"
 authors.workspace = true
 repository.workspace = true
 
@@ -36,11 +44,17 @@ workspace = true
 [features]
 # The translation alone, which every card links.
 default = []
-# The feature keeps the macros and create_decorator at their paths,
-# aosabi::serve beside serve_app, Lazy and the module remote, the contract of
-# the registries of aosabi pull, and the names of the engine in the module json,
-# and reaches the rest through the module mirror, aosabi::mirror::App among
-# them.
+# The forms of the derive path for the twins and the cases that wait for the
+# TypeScript judge, a hidden feature no application names. Those forms are
+# retired for application code: under the default features every macro of
+# aosabi-macros, json!, the macros of the federation and create_decorator
+# answer a compile error that names the native form, and the engine's app, the
+# Result over Thrown, Thrown, Unchecked, JsObject, JsValue, Lazy and the module
+# remote stand outside the root. The feature keeps the macros and
+# create_decorator at their paths, aosabi::serve beside serve_app, Lazy and the
+# module remote, the contract of the registries of aosabi pull, and the names
+# of the engine in the module json, and reaches the rest through the module
+# mirror, aosabi::mirror::App among them.
 mirror = ["aosabi-macros/mirror"]
 # The engine that serves sockets, whose aosabi-serve names aosabi-http with
 # node-server, and the file server serve_static over the file system provider
@@ -79,12 +93,12 @@ bluetooth = ["dep:aosabi-carrier-bluetooth", "aosabi-carrier-bluetooth/linux"]
 # HTTP(TCP) of the same service, whose driver the boot runs under
 # AOSABI_HOMA_NETWORK with AOSABI_HOMA_PROTECTION. It is off by default, is a
 # dependency of a Linux target alone and enables the crate with its feature
-# homa-ip, and stage H5 adds the kernel path to it.
+# homa-ip, and the kernel path joins it later.
 homa-network = ["dep:aosabi-carrier-network", "aosabi-carrier-network/homa-ip"]
-# The carrier LoRa, which a card crate of the device card track that names LoRa
-# turns on for its bare metal image, and which leaves the driver of the SX1262
-# to the card crate's own dependency with its feature sx1262. It is off by
-# default and reaches no host build, so no card but a LoRa card links it.
+# The carrier LoRa, which a card crate that names LoRa turns on for its bare
+# metal image, and which leaves the driver of the SX1262 to the card crate's
+# own dependency with its feature sx1262. It is off by default and reaches no
+# host build, so no card but a LoRa card links it.
 lora = ["dep:aosabi-carrier-lora"]
 # The outbound HTTP call of a service, aosabi::fetch and FetchError, and on a
 # native target the client of aosabi-fetch, which serve hands the boot as the
@@ -147,10 +161,6 @@ aosabi-sentry = { path = "../../plugins/aosabi-sentry", optional = true }
 # The Zitadel integration, behind the feature auth-zitadel. It builds on
 # every target, and on one that is not cfg(unix) without its signer.
 aosabi-auth-zitadel = { path = "../../plugins/aosabi-auth-zitadel", optional = true }
-# The two plugins every boot adds, the viewer in the first slot and the
-# landing page of the unhandled route.
-aosabi-landing = { path = "../../plugins/aosabi-landing" }
-aosabi-viewer = { path = "../../plugins/aosabi-viewer" }
 # Federation behind the feature federation, on every target, the worker card
 # on wasm32 among them, since a delegation leaves through the network
 # capability and never through a socket of its own.

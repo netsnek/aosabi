@@ -3,7 +3,9 @@
  * aosabi-ir: the JSON shape of the model, the bytes `JSON.stringify(ir)`
  * writes and the reader that takes them back.
  *
- * No file of the reference is translated here.
+ * No file of the reference is translated here. The key orders follow the
+ * object literals of `toIR`, of `emptyIR`, and of `entityFromDefinition` with
+ * the assignment of `sharedTable`.
  */
 
 //! The JSON shape of the model.
@@ -13,10 +15,11 @@
 //! the order the object literal created them and leaves out a key whose value
 //! is `undefined`. The shape is therefore the order of the literals in
 //! `toIR`, in `emptyIR` and in `entityFromDefinition` at `db/ir.ts:281-324`,
-//! with `sharedTable` set on an entity at `db/ir.ts:407`. [`to_js_value`]
-//! writes that order through the value model of `aosabi-json`, the only crate
-//! that writes JSON bytes. A `None` is an absent key and never `null`, an
-//! empty list is `[]` and an empty record is `{}`.
+//! with `sharedTable` last, set on an entity at `db/ir.ts:407`.
+//! [`to_js_value`] writes that order through the value model of
+//! `aosabi-json`, the only crate that writes JSON bytes. A `None` is an
+//! absent key and never `null`, an empty list is `[]` and an empty record is
+//! `{}`.
 //!
 //! | Type | Keys in the order written |
 //! | --- | --- |

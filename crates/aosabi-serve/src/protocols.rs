@@ -3,7 +3,9 @@
  * aosabi-serve: the stream type of every socket and the selection of the
  * protocol of an accepted socket.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. A Linux card of Aosabi serves plain
+ * HTTP/1.1, HTTP/2 by prior knowledge under the feature h2c and TLS with ALPN
+ * under the feature tls.
  */
 
 //! `Stream` and `serve_accepted`.
@@ -22,11 +24,12 @@
 //! `node1` keeps for a connection it takes at the accept, and a socket that
 //! reaches it undecided, a silent one among them, gets Node's 408 and is
 //! closed, as `node1` answers a head past its timer. A `PRI * HTTP/2.0`
-//! request, which Node refuses with 400 (quirk Q18), becomes an HTTP/2
-//! connection under `h2c`, the one named divergence of the opt in, which is why
-//! the twins of the byte contract build without it. The `Upgrade: h2c` of
-//! HTTP/1.1 is not served, because RFC 9113 deprecates it, and a request that
-//! carries it is an ordinary request of `node1` (quirk Q40).
+//! request, which Node refuses with 400 (quirk `LLHTTP_METHODS`), becomes an
+//! HTTP/2 connection under `h2c`, the one named divergence of the opt in, which
+//! is why the twins of the byte contract build without it. The `Upgrade: h2c`
+//! of HTTP/1.1 is not served, because RFC 9113 deprecates it, and a request
+//! that carries it is an ordinary request of `node1` (quirk
+//! `NODE_UPGRADE_DROPS_READ`).
 //!
 //! Every socket a card serves goes through one stream type, [`Stream`], a
 //! plain TCP socket, a Unix socket of HTTP(Unix Socket) or, in a build with

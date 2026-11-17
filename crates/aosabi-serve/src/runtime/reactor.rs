@@ -2,7 +2,8 @@
 /*
  * aosabi-serve: the reactor trait and the poll reactor.
  *
- * No analogue on the reference side.
+ * No analogue on the reference side. The poll reactor serves every build without
+ * the feature linux.
  */
 
 //! `Reactor` and `PollReactor`.
@@ -24,8 +25,9 @@
 //! reactor sleeps until the next cold sweep or deadline. A turn whose deadline
 //! is due, the turn of an executor that holds a woken task, wakes the hot
 //! sources and a cold sweep that is due with no yield and no sleep. The
-//! constants are the design's, and `35_http_budget` prints the curve for
-//! `SWEEP_SHARE` at 99, 49 and 19, so a change of them is a measured change.
+//! constants are the design's, and the budget checks of the HTTP layer print
+//! the curve for `SWEEP_SHARE` at 99, 49 and 19, so a change of them is a
+//! measured change.
 
 use core::{
     cell::RefCell,

@@ -12,8 +12,10 @@ loaded machine can trip, and finishes in seconds. Every entry of the subset buil
 checks with the pinned toolchain, and some read the sizes of their builds with llvm-size and
 llvm-nm, which the component llvm-tools of the toolchain provides.
 
-The conformance notebooks compare Aosabi with graphql-js and need it at run time, so they run
-in the full matrix and not here.
+The conformance notebooks compare Aosabi with a clone of graphql-js and need it at run time, so
+they run in the full matrix and not here. 80_embed asks the sidecar of graphql-js for one error,
+from the package that continuous integration installs from the lock beside the sidecar before it
+runs the subset.
 
 Every id of the subset must name exactly one entry of the matrix, and every entry must pass.
 The script asks the runner for the entries the ids select before it runs them and reads the
@@ -54,6 +56,8 @@ FAST = (
     "05_homa_wire_full-synthetic",
     # The frame of the LoRa carrier.
     "06_lora_frame",
+    # The entry of a host that embeds the engine, and the facade such a host links.
+    "80_embed",
     # Loss recovery of the Homa engine over seeded lossy links, without sockets.
     "22_homa_lossy-engine",
     # The size budgets of the client, of GraphTP and of the LoRa build for the ESP32-C3.

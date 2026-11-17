@@ -3,13 +3,12 @@
  * aosabi-carrier-lora frame: the LoRa frame that seals one compact Homa
  * packet, and the window that refuses a replayed frame.
  *
- * The frame is that of the Homa design note, second version, homa/design.md
- * section 6.5, lines 1928 to 1979: a header of the link and the counter, the
- * packet sealed with ChaCha20-Poly1305 of RFC 8439, and the tag of 16 bytes
- * over the header and the sealed bytes, the nonce the link, the direction,
- * six zero bytes and the counter, and a receiver that keeps the highest
- * counter per link and direction with a window of 64 frames. The AEAD is the
- * construction of RFC 8439 section 2.8 through the crate chacha20poly1305.
+ * The frame is a header of the link and the counter, the packet sealed with
+ * ChaCha20-Poly1305 of RFC 8439, and the tag of 16 bytes over the header and
+ * the sealed bytes, the nonce the link, the direction, six zero bytes and
+ * the counter, and a receiver keeps the highest counter per link and
+ * direction with a window of 64 frames. The AEAD is the construction of RFC
+ * 8439 section 2.8 through the crate chacha20poly1305.
  */
 
 //! The `LoRa` frame and the replay window.
@@ -189,10 +188,10 @@ pub fn open_detached(
         .map_err(|_| FrameError::Tag)
 }
 
-/// Seals one compact Homa packet into a `LoRa` frame of the design note's
-/// section 6.5: a 5 byte header of link and counter, the sealed packet and
-/// a 16 byte tag, the nonce the link, the direction, six zero bytes and the
-/// counter, and returns the bytes of the frame written to `out`.
+/// Seals one compact Homa packet into a `LoRa` frame, a 5 byte header of
+/// link and counter, the sealed packet and a 16 byte tag, the nonce the
+/// link, the direction, six zero bytes and the counter, and returns the
+/// bytes of the frame written to `out`.
 ///
 /// # Errors
 ///
@@ -278,9 +277,9 @@ pub fn open<'a>(
 /// of the 64 counters up to it.
 ///
 /// A counter above the highest moves the window up, a counter inside the
-/// window is taken once, and a counter below it is refused, as the design
-/// note's section 6.5 asks. The window lives in the memory of the
-/// receiver, so a receiver that restarts starts a new window.
+/// window is taken once, and a counter below it is refused. The window lives
+/// in the memory of the receiver, so a receiver that restarts starts a new
+/// window.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Replay {
     /// The highest counter taken.

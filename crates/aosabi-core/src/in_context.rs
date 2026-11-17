@@ -2,7 +2,7 @@
 /*
  * aosabi-core in_context: the `@inContext` directive as a resolver sees it.
  *
- * Derived from Pylon 2.9.5 by Nico Schett,
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
  * packages/pylon/src/core/in-context.ts and
  * packages/pylon/src/plugins/use-in-context.ts, Apache-2.0.
  * Changed by the Aosabi authors.
@@ -17,10 +17,10 @@
 //! [`get_locale`] and [`get_in_context`].
 //!
 //! The SDL of the directive is the extracted literal `in_context.graphql`
-//! beside this file, which `tools/provenance` writes. The plugin
-//! `use_in_context` of `plugins::in_context` reads the directive in its hook
-//! `onExecute` over HTTP, and the service below HTTP calls
-//! [`apply_in_context`] where that hook would run, over the same reading.
+//! beside this file, pinned byte for byte. The plugin `use_in_context` of
+//! `plugins::in_context` reads the directive in its hook `onExecute` over
+//! HTTP, and the service below HTTP calls [`apply_in_context`] where that hook
+//! would run, over the same reading.
 
 use aosabi_execute::kernel_entry::Request;
 use aosabi_json::{
@@ -116,15 +116,16 @@ impl InContext {
 /// This stands where the hook `onExecute` of the plugin runs. The hook sees a
 /// parsed and validated document. The pipeline of the executor crate parses
 /// inside, so the document is parsed here a second time, and only when its
-/// text names the directive at all. A document that does not parse reaches
+/// text names the directive at all, under the cap `max_tokens` on its tokens
+/// that the pipeline parses it under. A document that does not parse reaches
 /// no resolver, so nothing is lost by leaving its context unset.
-pub fn apply_in_context(context: &Context, request: &Request<'_>) {
+pub fn apply_in_context(context: &Context, request: &Request<'_>, max_tokens: u32) {
     if !request.document.contains(DIRECTIVE_NAME) {
         return;
     }
     let options = ParseOptions {
         no_location: true,
-        ..ParseOptions::default()
+        ..ParseOptions::request_capped(max_tokens)
     };
     let Ok(document) = parse(request.document, options) else {
         return;

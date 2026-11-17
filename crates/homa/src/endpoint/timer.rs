@@ -3,11 +3,8 @@
  * homa endpoint timer: the deadlines of an endpoint, peer death and patient
  * RPCs.
  *
- * The rules are those of retransmission, cleanup and peer death in the Homa
- * design note, first version, homa/design-v1.md section 2.4, lines 504 to 565,
- * with the patient RPCs of its section 1.5, lines 282 to 320, and the
- * durations as values of a profile rather than ticks of the second version,
- * homa/design.md section 3.2, lines 479 to 508.
+ * The rules are those of retransmission, cleanup and peer death, with the
+ * patient RPCs and the durations as values of a profile rather than ticks.
  */
 
 //! The timers of the endpoint.

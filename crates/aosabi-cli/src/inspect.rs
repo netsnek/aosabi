@@ -2,8 +2,11 @@
 /*
  * aosabi-cli: the command inspect.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/cli/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/cli/index.ts, Apache-2.0. Changed by the Aosabi authors.
+ *
+ * The schema under --sdl, else the DDL under --ddl, else the model as JSON with
+ * an indent of two, each with a newline.
  */
 
 //! The command `inspect`.
@@ -13,17 +16,26 @@
 //! `--sdl` prints its SDL, else `--ddl` its DDL, else the model goes out as
 //! `JSON.stringify(model, null, 2)`, each followed by one newline.
 //!
-//! The runner validates nothing, so a service whose schema the build refuses is
-//! still inspected.
+//! [`inspect_app`] is the Rust form of that child: it runs steps 1 to 3 of
+//! `build` for the `server` card, which write the generated workspace and its
+//! derived lock, builds the inspect package `<name>-inspect` with `--locked`,
+//! the generated manifest and the target directory of the project and its
+//! output captured, runs it with `target/aosabi/inspect/model.json` as its one
+//! argument, reads the file with the reader of `aosabi-json`, reads its `ir`
+//! with [`aosabi_ir::from_js_value`] and forms the model with [`app_model`]
+//! over the empty `authz` and `queues` the runner writes until a later release
+//! harvests them. The runner validates nothing, so a service whose schema the
+//! build refuses is still inspected.
 //!
 //! [`command`] prints the model on standard output and nothing else, with the
-//! precedence above, and the JSON form with the gap of two spaces
-//! through [`to_string_with_gap`], so the bytes of `aosabi inspect --json`
-//! equal `target/aosabi/manifest.json` of a build of the same sources. `-e` and
-//! `-m` are accepted for their spelling and refused with `AO-C0104` for any
-//! value that is not the crate root of the package, the path of its `[lib]`
-//! table or cargo's default `src/lib.rs`, because the entry of an Aosabi
-//! service is its crate root. A value is read against the working directory.
+//! precedence above, and the JSON form with the gap of two spaces through
+//! [`to_string_with_gap`], so the bytes of `aosabi inspect --json` equal
+//! `target/aosabi/manifest.json` of a build of the same sources. `-e` and `-m`
+//! are accepted for their spelling and refused with `AO-C0104` for any value
+//! that is not the crate root of the package, the path of its `[lib]` table or
+//! cargo's default `src/lib.rs`, because the entry of an Aosabi service is its
+//! crate root. A value is read against the working directory. `--ddl` prints
+//! one newline, as no entity exists yet.
 //!
 //! A plain crate, whose roots no fragment of `graphql!` holds, needs no runner:
 //! [`inspect_app`] reads its source through `aosabi_build::introspect_source`,

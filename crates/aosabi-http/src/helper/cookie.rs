@@ -60,7 +60,9 @@ pub fn get_cookie_with(c: &Context, name: &str, prefix: Option<CookiePrefix>) ->
 /// Returns every cookie of the request of `c`, `getCookie(c)`.
 ///
 /// An object of the cookies in the key order of an object of JavaScript, and
-/// none for a request with no `Cookie` header or an empty one.
+/// none for a request with no `Cookie` header or an empty one. A name the
+/// header holds twice answers its first value, as [`get_cookie`] does, a
+/// named divergence.
 #[must_use]
 pub fn get_cookies(c: &Context) -> Vec<(String, String)> {
     match c.req().header("Cookie").filter(|cookie| !cookie.is_empty()) {

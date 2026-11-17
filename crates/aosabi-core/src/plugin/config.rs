@@ -2,25 +2,27 @@
 /*
  * aosabi-core: the config contract.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/index.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/index.ts, Apache-2.0. Changed by the Aosabi authors.
  */
 
 //! `AppConfig`, `PluginList` and `IntoConfig`.
 //!
 //! The configuration of the reference is
 //! `{landingPage?, graphiql?, logger?, plugins?}`, and the handler spreads the
-//! whole configuration into the options of Yoga, so a key of Yoga a configuration
-//! names reaches Yoga. The keys of Yoga Aosabi ports are fields as well,
-//! `maskedErrors`, `graphqlEndpoint`, `healthCheckEndpoint` and `multipart`, and
-//! a key Aosabi does not port does not exist on the struct and fails the build.
-//! The key `cors` is no field, since the engine answers no CORS, the named
-//! divergence D46, so an app writes the middleware `cors` of the web server under
-//! hono's names and a configuration that names the key fails the build. The key
-//! `batching` is no field, since the function of `graphql-over-http` holds no
-//! batching, the named divergence D58 of `docs/byte-equality.md` section 3, so a
-//! configuration that names it fails the build. Every key is an `Option`, because
-//! the reference tells an absent key from a present one.
+//! whole configuration into the options of Yoga, so a key of Yoga a
+//! configuration names reaches Yoga. The keys of Yoga Aosabi ports are fields as
+//! well, `maskedErrors`, `graphqlEndpoint` and `multipart`, and a key Aosabi
+//! does not port does not exist on the struct and fails the build. The key
+//! `cors` is no field, since the engine answers no CORS, a named divergence, so
+//! an app writes the middleware `cors` of the web server under hono's names and
+//! a configuration that names the key fails the build. The key `batching` is no
+//! field, since the function of `graphql-over-http` holds no batching, a named
+//! divergence, so a configuration that names it fails the build. The key
+//! `healthCheckEndpoint` is no field, since the function answers no health
+//! check, a named divergence, so the web server or the host answers `/health`
+//! and a configuration that names the key fails the build. Every key is an
+//! `Option`, because the reference tells an absent key from a present one.
 //!
 //! `defineConfig` is the identity at run time, and its factory form is
 //! `pub async fn config()`, which [`IntoConfig`] takes beside the plain
@@ -31,9 +33,10 @@
 //! key of the configuration, names them through the facade and never names
 //! `graphql-over-http`.
 //!
-//! The key `viewer` is Aosabi's own and no key of the reference: `true` opens
-//! the plugin list with the viewer, which serves `/viewer`, the named divergence D48 of
-//! `docs/byte-equality.md` section 3.
+//! The key `maxTokens` is Aosabi's own and no key of the reference: the cap on
+//! the tokens of a request document, which every parse of a request document of
+//! the app takes, `REQUEST_TOKENS` of `aosabi-lang`, 120,008, where the key is
+//! absent, a named divergence. No value of the key lifts the cap.
 
 use core::future::Future;
 
@@ -49,44 +52,39 @@ use crate::logger::LoggerOption;
 /// The configuration of a service.
 #[derive(Clone, Default)]
 pub struct AppConfig {
-    /// `landingPage`, the landing page on an unhandled route only when `true`,
-    /// the named divergence D47 of `docs/byte-equality.md` section 3.
-    pub landing_page: Option<bool>,
-    /// `graphiql`, the page of `GraphiQL` only when `true`, the named
-    /// divergence D48 of `docs/byte-equality.md` section 3, where Yoga serves
-    /// it unless the key is `false`, which turns off introspection as well.
-    pub graphiql: Option<bool>,
-    /// `viewer`, Aosabi's own key, the viewer at `/viewer` only when `true`,
-    /// D48.
-    pub viewer: Option<bool>,
+    /// `introspection`, a key of Aosabi's own: `false` refuses introspection and
+    /// any other value leaves it on, a named divergence, where Pylon refuses it
+    /// under `graphiql: false`.
+    pub introspection: Option<bool>,
     /// `logger`, `false` for no access line or the object form.
     pub logger: Option<LoggerOption>,
     /// `plugins`, which the boot writes back with the built array (quirk
-    /// `Q01_DUPLICATE_PLUGIN_WRITEBACK`).
+    /// `DUPLICATE_PLUGIN_WRITEBACK`).
     pub plugins: Option<PluginList>,
-    /// `maskedErrors` of Yoga.
+    /// `maskedErrors` of Yoga, no mask when absent, a named divergence, where
+    /// Pylon masks outside `NODE_ENV=development`.
     pub masked_errors: Option<MaskedErrors>,
     /// `graphqlEndpoint` of Yoga, which the handler sets first and the
     /// configuration overrides.
     pub graphql_endpoint: Option<String>,
-    /// `healthCheckEndpoint` of Yoga.
-    pub health_check_endpoint: Option<String>,
-    /// `multipart` of Yoga, the parser of uploads only when `true`, the named
-    /// divergence D49 of `docs/byte-equality.md` section 3.
+    /// `multipart` of Yoga, the parser of uploads only when `true`, a named
+    /// divergence.
     pub multipart: Option<bool>,
+    /// `maxTokens`, Aosabi's own key, the cap on the tokens of a request
+    /// document, `REQUEST_TOKENS` of `aosabi-lang` when absent, a named
+    /// divergence.
+    pub max_tokens: Option<u32>,
 }
 
 impl core::fmt::Debug for AppConfig {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("AppConfig")
-            .field("landing_page", &self.landing_page)
-            .field("graphiql", &self.graphiql)
-            .field("viewer", &self.viewer)
+            .field("introspection", &self.introspection)
             .field("logger", &self.logger)
             .field("plugins", &self.plugins)
             .field("graphql_endpoint", &self.graphql_endpoint)
-            .field("health_check_endpoint", &self.health_check_endpoint)
             .field("multipart", &self.multipart)
+            .field("max_tokens", &self.max_tokens)
             .finish_non_exhaustive()
     }
 }

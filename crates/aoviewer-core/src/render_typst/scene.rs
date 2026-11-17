@@ -10,10 +10,10 @@
 //! The Typst scene writer.
 //!
 //! [`render_typst_scene`] writes a [`Scene`] as the `#sv-diagram(..)` call of
-//! `docs/documentation-generator.md` section 8.1, from the same scene the SVG
-//! writer draws, so text stays text, selectable and searchable, and the
-//! drawing functions of `sabi-theme.typ` turn the data into place, rectangle,
-//! text and curve primitives.
+//! the printed documents, from the same scene the SVG writer draws, so text
+//! stays text, selectable and searchable, and the drawing functions of
+//! `sabi-theme.typ` turn the data into place, rectangle, text and curve
+//! primitives.
 //!
 //! Every coordinate is a length in points, the centipixels of the scene times
 //! 3/400, since a pixel is 0.75 pt. The quotient is written as an exact

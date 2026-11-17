@@ -3,7 +3,8 @@
  * aosabi-devtool homa_frame: frames, checks and resynchronises Homa packets on
  * a byte stream with AoFrame.
  *
- * No analogue in the reference. Its judging notebook is
+ * No analogue in the reference. The primitive and its operations run over both forms
+ * of AoFrame in homa::stream. Its judging notebook is
  * tests/notebooks/04_aoframe.ipynb, whose references are
  * tests/harness/homa/{aoframe,cobs,crc32c}.py.
  */

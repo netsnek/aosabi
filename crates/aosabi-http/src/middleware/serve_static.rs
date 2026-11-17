@@ -4,7 +4,7 @@
  *
  * Derived from hono 4.11.9, dist/middleware/serve-static/index.js, MIT.
  * Derived from hono 4.11.9, dist/middleware/serve-static/path.js, MIT.
- * Derived from hono 1.19.9, dist/serve-static.js, MIT.
+ * Derived from @hono/node-server 1.19.9, dist/serve-static.js, MIT.
  */
 
 //! `serve_static`.
@@ -19,11 +19,13 @@
 //!
 //! A request passes through these steps.
 //!
-//! 1. A finalized context passes on to `next`.
-//! 2. The file name is the option `path` where it is set, which serves one
-//!    file for every request, and otherwise `decodeURIComponent` of the
-//!    request path. A path that does not decode or that holds a `..` segment
-//!    calls `on_not_found` with the request path and passes on.
+//! 1. A finalized context passes on to `next`, and so does a request of a
+//!    method other than `GET` and `HEAD`, a named divergence.
+//! 2. The file name is the option `path` where it is set, which serves one file
+//!    for every request, and otherwise the request path as the router decoded
+//!    it, with no second decode. A path that holds a `%`, a segment of one or
+//!    two dots, a run of two or more `/` or a `\` calls `on_not_found` with the
+//!    request path and passes on, a named divergence.
 //! 3. The path is the root joined with the file name, rewritten by
 //!    `rewrite_request_path` where no `path` is set. A directory is joined
 //!    with `index`, `index.html` by default. A path with no file calls
@@ -34,25 +36,23 @@
 //!    `br`, `zstd` and `gzip` that `Accept-Encoding` names and whose sibling
 //!    `.br`, `.zst` or `.gz` exists is served with `Content-Encoding` and
 //!    `Vary: Accept-Encoding`.
-//! 5. `HEAD` and `OPTIONS` answer 200 with `Content-Length` and no body. A
-//!    request with no `Range` answers 200 with the whole file and
-//!    `Content-Length`.
+//! 5. `HEAD` answers 200 with `Content-Length` and no body. A `GET` with no
+//!    `Range` answers 200 with the whole file and `Content-Length`.
 //! 6. The callback `on_found` is called with the path last, before the
 //!    answer is made, so a header it sets reaches the answer.
 //!
 //! The answer carries no `Last-Modified` and no `ETag`.
 //!
-//! Four readings of the adapter are kept where HTTP or a reader expects
-//! otherwise, each a quirk proposed to the register of `docs/byte-equality.md`
-//! section 13. The `Date` of a range answer is the birth time of the file,
-//! where HTTP gives `Date` the time the message originated. The `Range` is read
-//! by `parseInt` with no check, so a suffix range `bytes=-N` reads from 0, a
-//! range that starts inside the file and ends past it while it is no longer
-//! than the file declares more bytes than it sends, and a start past the end or
-//! below 0 fails the check of `fs.createReadStream`, whose `RangeError` the
-//! error handler answers, where HTTP answers 416. An `OPTIONS` declares the
-//! length of the file and sends no body. A file whose extension names a
-//! property of `Object.prototype` fails in `getMimeType` with a `TypeError`.
+//! Three readings of the adapter are kept where HTTP or a reader expects
+//! otherwise, each a named quirk. The `Date` of a range answer is the birth
+//! time of the file, where HTTP gives `Date` the time the message originated.
+//! The `Range` is read by `parseInt` with no check, so a suffix range
+//! `bytes=-N` reads from 0, a range that starts inside the file and ends past
+//! it while it is no longer than the file declares more bytes than it sends,
+//! and a start past the end or below 0 fails the check of
+//! `fs.createReadStream`, whose `RangeError` the error handler answers, where
+//! HTTP answers 416. A file whose extension names a property of
+//! `Object.prototype` fails in `getMimeType` with a `TypeError`.
 
 use std::{
     rc::Rc,
@@ -76,16 +76,12 @@ use crate::{
     },
     middleware::compress::is_compressible,
     utils::{
-        filepath::{
-            DEFAULT_DOCUMENT,
-            has_parent_segment, //
-        },
+        filepath::DEFAULT_DOCUMENT,
         mime::{
             InheritedProperty,
             MIMES,
             get_mime_type, //
-        },
-        url::decode_uri_component, //
+        }, //
     }, //
     web_app::RouteError,
 };
@@ -239,6 +235,10 @@ async fn serve<E: RouteError, C: Content>(
     if c.finalized() {
         return next.run(c).await;
     }
+    let method = c.req().method();
+    if method != "GET" && method != "HEAD" {
+        return next.run(c).await;
+    }
     let option_path = options.path.as_deref().filter(|path| !path.is_empty());
     let filename = if let Some(path) = option_path {
         String::from(path)
@@ -269,12 +269,25 @@ async fn serve<E: RouteError, C: Content>(
     body_with(&c, body, code)
 }
 
-/// Returns the file name of the request path `request_path`, `None` where it
-/// does not decode or holds a `..` segment.
+/// Returns the file name of the request path `request_path`, the path itself,
+/// `None` where it holds a `%`, a segment of one or two dots, a run of two or
+/// more `/` or a `\`.
 ///
-/// The reference throws in either case and passes on in its `catch`.
+/// The router reads the path of a request decoded once, so the file name takes
+/// no second decode, a named divergence. A refused path passes on as a path
+/// with no file, the way the reference passes on a path it does not serve in
+/// its `catch`.
 fn request_filename(request_path: &str) -> Option<String> {
-    decode_uri_component(request_path).filter(|filename| !has_parent_segment(filename))
+    let refused = request_path.contains(['%', '\\'])
+        || request_path.contains("//")
+        || request_path
+            .split('/')
+            .any(|segment| segment == "." || segment == "..");
+    if refused {
+        None
+    } else {
+        Some(String::from(request_path))
+    }
 }
 
 /// Returns the path of `filename` below the root and what the provider knows
@@ -418,8 +431,7 @@ fn respond<E: RouteError, C: Content>(
 ) -> Result<Option<Prepared>, E> {
     let size = stats.size.to_string();
     let range = c.req().header("range").unwrap_or_default();
-    let method = c.req().method();
-    if method == "HEAD" || method == "OPTIONS" {
+    if c.req().method() == "HEAD" {
         c.header("Content-Length", &size);
         return Ok(Some((200, Body::Empty)));
     }
@@ -463,8 +475,7 @@ fn respond_range<E: RouteError, C: Content>(
 ///
 /// The context has no helper that takes a body and a status, so the status
 /// is prepared first, where it stays for the rest of the request. For a
-/// `HEAD` and an `OPTIONS` this is `c.status(200)` and `c.body(null)` of the
-/// reference.
+/// `HEAD` this is `c.status(200)` and `c.body(null)` of the reference.
 fn body_with<E: RouteError>(c: &Context, body: Body, status: u16) -> Result<Response, E> {
     c.status(status);
     c.body(body)
@@ -556,6 +567,8 @@ fn validate_integer(value: f64, name: &str) -> Result<(), String> {
 ///
 /// An integer beyond 2^32 in magnitude is written with `_` between each group
 /// of three digits from the right, and any other number as `String` writes it.
+///
+/// Derived from node v24.13.0, lib/internal/errors.js, MIT.
 ///
 /// [errors.js]: https://github.com/nodejs/node/blob/v24.13.0/lib/internal/errors.js
 fn out_of_range(name: &str, range: &str, input: f64) -> String {

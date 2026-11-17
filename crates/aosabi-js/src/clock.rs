@@ -4,7 +4,8 @@
  * agents of the engine.
  *
  * No analogue in the reference, whose timers are those of the event loop of
- * its host.
+ * its host. It is the clock whose streams ping on an interval of the agent
+ * of their request, over the trait HostClock of aosabi-execute.
  */
 
 //! The clock of the host.

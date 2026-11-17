@@ -2,9 +2,8 @@
 /*
  * aosabi-build: the text of authoring.json, the authoring map of a build.
  *
- * The file is the Rust half of checks C2, C3 and C4 of
- * tests/notebooks/12_authoring_parity.ipynb, whose TypeScript half is the
- * operation authoring_map of the TypeScript sidecar.
+ * The file is the Rust half of the checks of the authoring parity, whose
+ * TypeScript half is the operation authoring_map of the TypeScript sidecar.
  */
 
 //! The text of `authoring.json`.
@@ -12,11 +11,11 @@
 //! The file holds `{"version":1,"side":"aosabi","nodes":[..]}` as
 //! `JSON.stringify` writes it and one newline, with one node per node of the
 //! intermediate representation in the order of
-//! [󰀂](aosabi_infer::DescriptorSource::authoring_map). A node is
-//! `{"path","kind","file","line","docs","blocks","heritage"}`, where a kind, a
-//! file, a line and the docs the walk finds no item for are `null`, and `docs`
-//! is `null` for an item with no documentation block. An entry of `graphql!`
-//! adds `"mutation"`, and an entry or a method with decorators adds
+//! [`DescriptorSource::authoring_map`](aosabi_infer::DescriptorSource::authoring_map).
+//! A node is `{"path","kind","file","line","docs","blocks","heritage"}`, where
+//! a kind, a file, a line and the docs the walk finds no item for are `null`,
+//! and `docs` is `null` for an item with no documentation block. An entry of
+//! `graphql!` adds `"mutation"`, and an entry or a method with decorators adds
 //! `"decorators"`, a list of `{"text","line"}`, which checks C3 and C4 read. A
 //! node without them writes neither key. Every node ends with `"guards"`, the
 //! list of the guard facts of the leading run of the body it reaches, each

@@ -3,8 +3,9 @@
  * aosabi-federation: the selection a delegation fetches beside what the
  * client selects.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
  * The types of a needs selection, and, buildSelectionsFromNeeds.
  */
@@ -24,12 +25,12 @@
 //! whether it rewrites the request.
 //!
 //! The typed builder of a needs selection, [`NeedsBuilder`], is what the
-//! literal [󰀁](crate::needs!) expands into: a closure over a builder typed
-//! by the record the delegated field returns, which names each field through
-//! an accessor the builder never calls. A field the record lacks is then
-//! refused by the compiler at its name. [`NeedsTarget`] finds that record
-//! through the `Option`, `Vec`, `Box` and `Callable` around it, and a pulled
-//! registry implements it for each of its records, since a blanket
+//! literal [`needs!`](crate::needs!) expands into: a closure over a builder
+//! typed by the record the delegated field returns, which names each field
+//! through an accessor the builder never calls. A field the record lacks is
+//! then refused by the compiler at its name. [`NeedsTarget`] finds that
+//! record through the `Option`, `Vec`, `Box` and `Callable` around it, and a
+//! pulled registry implements it for each of its records, since a blanket
 //! implementation over `RemoteType` beside the one for `Option` is refused
 //! with E0119 outside the crate of `RemoteType`.
 //!

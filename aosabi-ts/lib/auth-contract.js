@@ -3,9 +3,9 @@
  * auth-contract.js: the entry aosabi/auth/contract of the package aosabi, the
  * auth contract with no dependency.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/auth/contract.ts
- * and packages/pylon/src/auth/principal.ts, Apache-2.0.
- * Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/auth/contract.ts and packages/pylon/src/auth/principal.ts,
+ * Apache-2.0. Changed by the Aosabi authors.
  *
  * The functions as the build of the reference writes them, with the class
  * ForbiddenError of lib/errors.js, whose brand the engine reads, so the map of

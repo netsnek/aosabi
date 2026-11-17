@@ -3,7 +3,8 @@
  * aosabi-devtool homa_packet: encodes and decodes one Homa packet in either
  * wire form.
  *
- * No analogue in the reference. Its judging notebooks are
+ * No analogue in the reference. Its two wire forms are the compact form and
+ * the full form. Its judging notebooks are
  * tests/notebooks/03_homa_packets.ipynb and
  * tests/notebooks/05_homa_wire_full.ipynb, whose references are
  * tests/harness/homa/compact.py and tests/harness/homa/full.py.
@@ -30,7 +31,7 @@
 //! `RESEND`, `RPC_UNKNOWN`, `BUSY`, `CUTOFFS`, `FREEZE`, `NEED_ACK`, `ACK`,
 //! `START_MSG` or `LIMITS`, followed by its fields in the order of
 //! [`homa::wire::Packet`], and a payload travels as lowercase hex. The
-//! `form` is `compact`, version 0 of the first version of the design note,
+//! `form` is `compact`, version 0 of the compact form of the crate `homa`,
 //! or `full`, `homa_wire.h` at the pinned commit of `HomaModule`. An
 //! identifier travels as a number, which holds the 32 bits of the compact
 //! form exactly and an identifier of the full form below 2^53, the range
@@ -88,8 +89,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "homa-packet";
 
-/// The stage of the Homa track the primitive lands at.
-pub const LANDS_AT: &str = "H0";
+/// The area the primitive lands at.
+pub const LANDS_AT: &str = "homa";
 
 /// The largest integer a double carries without a gap, 2^53 - 1.
 const MAX_SAFE_INTEGER: f64 = 9_007_199_254_740_991.0;

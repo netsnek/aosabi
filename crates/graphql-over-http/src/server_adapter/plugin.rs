@@ -2,7 +2,9 @@
 /*
  * graphql-over-http: the plugin type of the server adapter.
  *
- * Derived from whatwg-node 0.10.18, cjs/plugins/types.js, MIT.
+ * Its hooks are onRequest, onResponse and onDispose.
+ *
+ * Derived from @whatwg-node/server 0.10.18, typings/plugins/types.d.ts, MIT.
  */
 
 //! `ServerAdapterPlugin`.
@@ -80,6 +82,12 @@ impl LazyUrl {
             .get_or_init(|| parse_url(href, Some("http://localhost")).map_err(|_| ()))
             .as_ref()
             .map_err(|()| Value::from(ErrorObject::type_error("Invalid URL")))
+    }
+
+    /// Returns whether no read has parsed the URL yet.
+    #[must_use]
+    pub(crate) fn is_unparsed(&self) -> bool {
+        self.0.get().is_none()
     }
 }
 

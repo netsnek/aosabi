@@ -3,7 +3,7 @@
  * graphql-over-http: the handling of an error that escapes the execution.
  *
  * The substatus of GraphTP beside the status has no analogue in the
- * reference, and docs/graphtp-in-aosabi.md section 4 gives its values.
+ * reference, and Documentation/guides/graphtp.md gives its values.
  *
  * Derived from graphql-yoga 5.18.0, cjs/error.js, MIT.
  */
@@ -15,8 +15,7 @@
 //! and the headers of the answer off a result.
 //!
 //! Beside the status the same function decides the substatus of `GraphTP`,
-//! which Yoga has no reading of, from the phase that made the result. The
-//! notebook `tests/notebooks/32_graphtp_replay.ipynb` judges it.
+//! which Yoga has no reading of, from the phase that made the result.
 
 use core::cell::RefCell;
 use std::{
@@ -270,8 +269,8 @@ const INVALID_REQUEST_BODY: u8 = 6;
 ///
 /// A batch and a stream have neither `extensions` nor `errors` and answer 200.
 /// The substatus comes from the error whose `http` extension gave the status
-/// and from the data of the result, by the phases of
-/// `docs/graphtp-in-aosabi.md` section 4, and a batch and a stream have none.
+/// and from the data of the result, by the phases, and a batch and a stream
+/// have none.
 #[must_use]
 pub fn get_response_init_by_respecting_errors(
     result: &HttpResult,

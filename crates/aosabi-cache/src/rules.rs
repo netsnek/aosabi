@@ -2,6 +2,9 @@
 /*
  * aosabi-cache rules: the interned lists of the names of the rules a
  * validation runs.
+ *
+ * The key of the rules of Yoga, rules.map(rule => rule.name).join(','), kept
+ * as the list of names it joins.
  */
 
 //! The interned lists of rule names.

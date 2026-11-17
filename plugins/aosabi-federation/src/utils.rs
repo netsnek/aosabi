@@ -4,6 +4,12 @@
  * delegation calls.
  *
  * Derived from @graphql-tools/utils 11.0.0, cjs, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/errors.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/getResponseKeyFromInfo.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/rootTypes.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/getOperationASTFromRequest.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/astFromValueUntyped.js, MIT.
+ * Derived from @graphql-tools/utils 11.0.0, cjs/implementsAbstractType.js, MIT.
  */
 
 //! The helpers of `@graphql-tools/utils`, `create_graphql_error`,
@@ -93,8 +99,8 @@ use crate::transforms::ExecutionRequest;
 /// extensions, and the original error is the error itself. An error that is
 /// no `GraphQLError` carries none of these but its message, and an object
 /// that is no error, which an error becomes once
-/// [󰀅](crate::delegate::transformer::remove_overlapping_aliases) copied it,
-/// carries its own `message`, `path` and `extensions` members.
+/// [`remove_overlapping_aliases`](crate::delegate::transformer::remove_overlapping_aliases)
+/// copied it, carries its own `message`, `path` and `extensions` members.
 #[must_use]
 pub fn relocated_error(original_error: &Value, path: Option<Vec<PathSegment>>) -> Value {
     let error = match original_error {

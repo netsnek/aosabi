@@ -55,16 +55,8 @@
 //! target it is turned on for. The crate denies `unsafe_code` in place of
 //! forbidding it, every module but this root and `abi` forbids it, and no
 //! unsafe block exists. The root holds no code but the declarations of its
-//! modules, and a forbid there would bind `abi` as well. The judging notebooks
-//! are `tests/notebooks/13_ts1_boundary.ipynb`, which serves apps on the
-//! module through the wrapper `aosabi-ts/lib/core.js` and checks their
-//! answers, `tests/notebooks/39_ts1_parity.ipynb`, which serves the build of
-//! each fixture on the module and on the native library
-//! through `aosabi-ts/lib/bun.js`, `tests/notebooks/36_ts1_gate.ipynb`, which
-//! measures both and reads their trees and symbols, and
-//! `tests/notebooks/08_card_builds.ipynb` and
-//! `tests/notebooks/32_graphtp_fetch.ipynb`, which count the boundary, and
-//! there is no test in this crate, the rule of `CONTRIBUTING.md` section 3.
+//! modules, and a forbid there would bind `abi` as well. There is no test in
+//! this crate, the rule of `CONTRIBUTING.md` section 3.
 #![cfg(any(
     target_arch = "wasm32",
     all(

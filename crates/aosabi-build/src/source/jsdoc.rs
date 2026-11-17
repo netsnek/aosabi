@@ -1,12 +1,14 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT AND Apache-2.0
 /*
  * aosabi-build: the JSDoc parser of the TypeScript checker, over the text of
  * one documentation block, for the source path.
  *
- * Every line below this block is the line of that file below its block,
- * because the source path reads a comment as the derive path reads it and a
- * procedural macro crate exports no function another crate calls, and check C6
- * of tests/notebooks/12_authoring_parity.ipynb holds the two equal.
+ * Every line below this block is the line of crates/aosabi-macros/src/jsdoc.rs
+ * below its block, because the source path reads a comment as the derive path
+ * reads it and a procedural macro crate exports no function another crate
+ * calls.
+ *
+ * Derived from typescript 5.9.3, lib/typescript.js, Apache-2.0.
  */
 
 //! The `JSDoc` parser of the TypeScript checker.

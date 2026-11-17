@@ -49,10 +49,10 @@ const EDGE: &str = " => ";
 
 /// A stable id of an element of the schema, of a cluster or of an edge.
 ///
-/// The grammar is the one of `docs/aoviewer-parity.md` row 38, extended by
-/// argument, enum value, input field and cluster ids. The text form is what
-/// the routes, the SVG ids and the anchors carry. The derived order compares
-/// the variant first and then the names in byte order.
+/// The grammar is the one of Voyager, extended by argument, enum value, input
+/// field and cluster ids. The text form is what the routes, the SVG ids and the
+/// anchors carry. The derived order compares the variant first and then the
+/// names in byte order.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ElementId {
     /// A named type, `TYPE::Organization`.

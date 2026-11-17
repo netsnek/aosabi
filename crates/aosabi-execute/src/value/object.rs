@@ -361,7 +361,7 @@ pub trait ObjectLike {
     /// [`ObjectLike::get`] cannot answer it. The default is `None`, the plain
     /// object. A type that stands for an async iterable answers the method,
     /// whose call returns the async iterator, and the module
-    /// [󰀃](crate::value::iter) reads it.
+    /// [`iter`](crate::value::iter) reads it.
     fn async_iterator(self: Rc<Self>) -> Option<Function> {
         None
     }

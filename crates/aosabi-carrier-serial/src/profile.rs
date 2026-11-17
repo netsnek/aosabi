@@ -3,10 +3,8 @@
  * aosabi-carrier-serial profile: the values of Serial Line that a device card
  * fills, core only.
  *
- * No analogue on the reference side. The values are the row of Serial Line of
- * the Homa design note, first version, homa/design-v1.md section 3.1 in the
- * design folder outside this repository, which homa::Profile::serial_line
- * gives, scaled by the rate of the line.
+ * No analogue on the reference side. The values are the row of Serial Line
+ * that homa::Profile::serial_line gives, scaled by the rate of the line.
  */
 
 //! The profile of Serial Line.
@@ -24,12 +22,12 @@ use homa::{
 /// The bytes of the largest packet on Serial Line, header included.
 pub const MAX_PACKET: u16 = 256;
 
-/// The RPCs a peer may have open at this end, the eight slots of the device
-/// configuration of the Homa design note, second version, section 8.3.
+/// The RPCs a peer may have open at this end, the eight slots of a small
+/// device's configuration.
 pub const MAX_RPCS: u8 = 8;
 
-/// Returns the profile of Serial Line at `baud`, the design note's row scaled
-/// by the rate.
+/// Returns the profile of Serial Line at `baud`, the row of Serial Line
+/// scaled by the rate.
 #[must_use]
 pub fn profile(baud: u32) -> Profile {
     let mut profile = Profile::serial_line(baud);

@@ -3,10 +3,7 @@
  * homa wire compact: version 0 of the compact form, for links between two
  * ends.
  *
- * The layout is version 0 of the Homa design note, first version,
- * homa/design-v1.md section 2.3, lines 402 to 503, which its second version
- * keeps unchanged for every carrier but Network, homa/design.md section 3.3,
- * lines 509 to 561.
+ * The layout is version 0, unchanged for every carrier but Network.
  */
 
 //! The compact form.
@@ -101,11 +98,10 @@ pub const COMMON_LEN: usize = 6;
 /// five entries, so an output of this length holds the header of every packet
 /// the form has a layout for.
 ///
-/// The header of DATA is at most 18 bytes, a part with an ACK, which the first
-/// version of the Homa design note calls the largest header, section 2.3,
-/// where the same section gives an ACK of five entries 26 bytes. The entries
-/// of an ACK are its header here, as `HomaModule`'s largest header of 90 bytes
-/// covers its ACK of 80 bytes with five entries.
+/// The header of DATA is at most 18 bytes, a part with an ACK, the largest
+/// header, and an ACK of five entries takes 26 bytes. The entries of an ACK
+/// are its header here, as `HomaModule`'s largest header of 90 bytes covers
+/// its ACK of 80 bytes with five entries.
 pub const MAX_HEADER_LEN: usize = 26;
 
 /// The smallest `max_packet` a LIMITS may name, which lets a LIMITS travel in

@@ -3,9 +3,7 @@
  * aosabi-devtool client-schema: builds the client schema of an introspection
  * result and prints it, and writes the introspection query that pull posts.
  *
- * No analogue in the reference. The judging notebook is
- * tests/notebooks/02_language.ipynb, which sends the same request lines to
- * this primitive and to tests/sidecar/graphql-js.mjs.
+ * No analogue in the reference.
  */
 
 //! The `client-schema` primitive of the seam.
@@ -31,9 +29,11 @@
 //! oracle answers it.
 //!
 //! The `options` of `introspection_query` are the six flags of
-//! [`IntrospectionOptions`] by their names in the reference. The payload
-//! `query` is the text [`get_introspection_query()`] writes, the query `pull`
-//! posts when no option is named.
+//! [`IntrospectionOptions`] by their names in the reference. A flag the object
+//! names takes the truthiness of its value and an absent flag keeps its
+//! default, which is the spread over the defaults of the reference. The
+//! payload `query` is the text [`get_introspection_query()`] writes, the query
+//! `pull` posts when no option is named.
 
 use std::process::ExitCode;
 
@@ -66,8 +66,8 @@ use crate::{
 /// The name of the primitive.
 const NAME: &str = "client-schema";
 
-/// The milestone the primitive lands at.
-const LANDS_AT: &str = "M8";
+/// The area the primitive lands at.
+const LANDS_AT: &str = "cli";
 
 /// The operations of the batch form.
 const OPERATIONS: &Operations = &[

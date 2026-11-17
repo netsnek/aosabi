@@ -60,9 +60,8 @@
 //! the map a group of four slots at a time on every target, which is how a
 //! host runs the probe of the ESP32-C3.
 //!
-//! The judging notebook is `tests/notebooks/01_json_writer.ipynb`, which
-//! drives `aosabi-devtool json` against node `JSON.stringify`. There is no
-//! test in this crate, which is the rule of CONTRIBUTING.md section 3.
+//! There is no test in this crate, which is the rule of CONTRIBUTING.md
+//! section 3.
 
 #![no_std]
 

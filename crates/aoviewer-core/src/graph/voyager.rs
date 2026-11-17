@@ -2,6 +2,9 @@
 /*
  * aoviewer-core graph voyager: the type graph in the canonical form of the
  * Voyager goldens.
+ *
+ * The capture of Voyager's type graphs writes one plain text form per fixture
+ * and option set, and this writes the same form from the core.
  */
 
 //! The Voyager form.

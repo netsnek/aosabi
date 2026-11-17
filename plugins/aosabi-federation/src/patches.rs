@@ -3,10 +3,12 @@
  * aosabi-federation: the patches of a configured federation, each keyed by the
  * remote type it takes.
  *
- * Derived from Pylon 2.9.5 by Nico Schett, packages/pylon/src/core/gateway.ts,
- * Apache-2.0. Changed by the Aosabi authors.
+ * Derived from Pylon 3.0.0-canary by Nico Schett,
+ * packages/pylon/src/core/gateway.ts, Apache-2.0.
+ * Changed by the Aosabi authors.
  *
- * The option patches of configure, and of passthrough.
+ * The option patches of configure, and of passthrough. The file holds a table,
+ * a macro and a key check.
  */
 
 //! The patches of a configured federation, keyed by the name of a remote type.
@@ -15,15 +17,15 @@
 //! `keyof TRegistry['types']` and whose values take the type of their key, so
 //! a key the registry lacks and a patch over another type both fail to
 //! compile. [`Patches`] is that map over a pulled registry, and the literal
-//! [󰀂](crate::patches!) writes it as the reference writes the object. Each
-//! entry expands into a block with a key type of its own, which implements
-//! [`PatchKey`] with the text of the key, and a call of [`Patches::insert`],
-//! whose bound asks that the patch take a type of the registry and whose
-//! inline constant asks that the name of that type be the key. The bare
-//! `passthrough()` expands into [`Patches::insert_passthrough`], whose inline
-//! constant looks the key up in [`Registry::TYPES`]. A refused key is an error
-//! of constant evaluation, which `cargo build` reports where the federation is
-//! configured.
+//! [`patches!`](crate::patches!) writes it as the reference writes the object.
+//! Each entry expands into a block with a key type of its own, which
+//! implements [`PatchKey`] with the text of the key, and a call of
+//! [`Patches::insert`], whose bound asks that the patch take a type of the
+//! registry and whose inline constant asks that the name of that type be the
+//! key. The bare `passthrough()` expands into [`Patches::insert_passthrough`],
+//! whose inline constant looks the key up in [`Registry::TYPES`]. A refused
+//! key is an error of constant evaluation, which `cargo build` reports where
+//! the federation is configured.
 //!
 //! A patch is a closure in one of the forms [`IntoPatch`] lists, told apart
 //! by a marker type: [`OneArg`] for `data => value`, [`TwoArgs`] for

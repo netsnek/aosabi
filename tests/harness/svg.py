@@ -5,7 +5,9 @@ xml.etree.ElementTree.
 A drawing has no box overlap, no run whose text length exceeds its box, no edge
 through a foreign box and unique ids in the grammar of the parity table.
 
-The checks read geometry and never pixels.
+The checks read geometry and never pixels. A drawing is read in the shape
+below, the stable id on every box and edge group of the SVG writer, with the
+nesting of the elements assumed until that writer lands:
 
 - The root is `<svg>` with `width`, `height`, `role="img"` and a `<title>`.
 - A box is an element whose `id` is a type or a cluster id in the grammar
@@ -280,7 +282,10 @@ def path_points(d: str, step_px: float = None) -> list:
     """Returns the sampled points of a path in absolute or relative commands.
 
     Without `step_px`, straight segments contribute their end points and cubic
-    segments `SAMPLES_PER_SEGMENT` points each. The first and the last point
+    segments `SAMPLES_PER_SEGMENT` points each. With it, every segment is
+    sampled so two neighbouring points lie at most `step_px` apart along the
+    curve: a straight segment by its length, and a cubic segment by 3 times its
+    longest control leg, which bounds its speed. The first and the last point
     are the two ends of the path.
     """
     tokens = PATH_TOKEN.findall(d)
@@ -501,7 +506,7 @@ def _curves_cross(a: list, b: list) -> bool:
 
 
 def check(data, focus: str = None, budget: bool = True) -> Report:
-    """Checks one SVG against the invariants of step 11 of `51_viewer_core`.
+    """Checks one SVG against the invariants of a drawing.
 
     `focus` is the id of the focus box of an ego view, such as `TYPE::Order`,
     and is what the first ring rule is judged around. Without it the rule is

@@ -9,7 +9,7 @@
 //! | --- | --- | --- |
 //! | `prod` | first | none, masking on |
 //! | `dev` | first | `maskedErrors: false` |
-//! | `graphiqlFalse` | first | `graphiql: false` |
+//! | `graphiqlFalse` | first | none, as `prod`, since the function serves no page of `GraphiQL` |
 //! | `batching` | first | `batching: true` |
 //! | `noData` | first | a plugin that throws in `onParams` for `{__boom__}` |
 //! | `second` | second | none |
@@ -23,7 +23,9 @@
 //! instances of [`super::pass_probe`], `passReplace` and `passInvalidSchema`,
 //! which exist only under it. The switch of the request cache sets
 //! `parserAndValidationCache: false` where it is off, on the nine instances
-//! above. Without a switch every instance is the one above, whose engine
+//! above. The cap on the tokens of a request document sets the field
+//! `max_tokens` of the options of every instance, the probe instances among
+//! them. Without a switch every instance is the one above, whose engine
 //! follows the default of `graphql-over-http`. Every instance takes the bound on
 //! nesting of the card this build serves, `aosabi_core::single_pass::TARGET`,
 //! as a served build does.
@@ -39,16 +41,12 @@ use aosabi_execute::{
     Value, //
 };
 use aosabi_hooks::{
-    HookContext,
     HookPlugin,
     plugins::use_engine::PassCounts, //
 };
-use aosabi_http::Request;
 use aosabi_type::Schema;
 use graphql_over_http::{
     AgentSetup,
-    Graphiql,
-    GraphiqlOptions,
     HttpOptions,
     HttpPlugin,
     HttpServer,
@@ -90,6 +88,10 @@ pub struct Switches {
     /// Whether the request cache of Yoga is installed, `None` for the
     /// default, which installs it.
     pub cache: Option<bool>,
+    /// The cap on the tokens of a request document, the key `maxTokens` of
+    /// an app, `None` for the default of `graphql-over-http`, which is
+    /// `REQUEST_TOKENS` of `aosabi-lang`.
+    pub max_tokens: Option<u32>,
 }
 
 /// One instance and the counters of its engine.
@@ -169,14 +171,16 @@ impl Instances {
 
 impl Instance {
     /// Returns the instance `name` of `options` with the switch of the single
-    /// pass of `switches` and its counters, and with the bound on nesting of
-    /// the card this build serves, as `build_http_options` of `aosabi-core` sets it.
+    /// pass of `switches` and its counters, with the cap on the tokens of
+    /// `switches`, and with the bound on nesting of the card this build
+    /// serves, as `build_http_options` of `aosabi-core` sets it.
     fn create(name: &'static str, options: HttpOptions, switches: Switches) -> Self {
         let mut options = options;
         let counts = switches.single_pass.map(|_| Rc::new(PassCounts::default()));
         options.single_pass = switches.single_pass;
         options.single_pass_counts.clone_from(&counts);
         options.single_pass_max_depth = Some(single_pass::TARGET);
+        options.max_tokens = switches.max_tokens;
         Self {
             name,
             server: HttpServer::new(options),
@@ -188,23 +192,14 @@ impl Instance {
 /// Returns the options of the instance `name`, the base options with the
 /// variation the capture gives it.
 fn options(name: &str, schema: Arc<Schema>, agent: AgentSetup) -> HttpOptions {
-    let graphiql = Graphiql::Factory(Rc::new(|_: &Request, _: &HookContext| {
-        Some(GraphiqlOptions {
-            should_persist_headers: Some(true),
-            title: Some(String::from("Aosabi Playground")),
-            default_query: Some(String::from("# Welcome to the Aosabi Playground!")),
-        })
-    }));
     let mut options = HttpOptions {
         graphql_endpoint: Some(String::from("/graphql")),
-        graphiql,
         schema: Some(schema),
         agent,
         ..HttpOptions::default()
     };
     match name {
         "dev" => options.masked_errors = MaskedErrors::Off,
-        "graphiqlFalse" => options.graphiql = Graphiql::Off,
         "noData" => options.plugins = vec![Rc::new(Boom)],
         "secondNoIntrospection" => options.plugins = vec![use_disable_introspection()],
         _ => {}

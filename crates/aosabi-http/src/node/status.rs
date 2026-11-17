@@ -2,27 +2,27 @@
 /*
  * aosabi-http: the 63 reasons of Node and the reason of a status.
  *
- * It carries the quirk Q60_NODE_REASON_TABLE of docs/byte-equality.md section
- * 13.1.
+ * Derived from node v24.13.0, lib/_http_server.js, MIT.
+ *
+ * It carries the quirk NODE_REASON_TABLE.
  */
 
 //! `STATUS_CODES` and `status_text`.
 //!
 //! Node writes the status line `HTTP/1.1 <status> <reason>` with the reason of
 //! its own table, or `unknown` for a status the table lacks, because the
-//! adapter of `@hono/node-server` never passes a reason phrase (N1 of the
-//! plan's version 2 draft). The table has 63 entries, in the order of the
-//! internal module, which is the order of the status. Hyper reads its own
-//! table, which differs in three rows and answers no reason for an unknown
-//! status, so the serve layer hands this reason to the fork through
-//! `ext::ReasonPhrase`, quirk `Q60_NODE_REASON_TABLE`. The judging notebook
-//! compares the table with the pinned Node,
-//! `tests/notebooks/30_http_tier1.ipynb`.
+//! adapter of `@hono/node-server` never passes a reason phrase. The table has
+//! 63 entries, in the order of the internal module, which is the order of the
+//! status. Hyper reads its own table, which differs in three rows and answers
+//! no reason for an unknown status, so the serve layer hands this reason to
+//! the fork through `ext::ReasonPhrase`, quirk `NODE_REASON_TABLE`.
 
 /// The 63 reasons of Node, each beside its status, in the order of the status.
 ///
 /// The reason of 418 is `I'm a Teapot` and the one of 413 is
 /// `Payload Too Large`, as Node spells them.
+///
+/// Derived from node v24.13.0, `lib/_http_server.js`, MIT.
 pub const STATUS_CODES: [(u16, &str); 63] = [
     (100, "Continue"),
     (101, "Switching Protocols"),
@@ -90,6 +90,8 @@ pub const STATUS_CODES: [(u16, &str); 63] = [
 ];
 
 /// Returns the reason Node writes for `status`, `unknown` for a status its table lacks.
+///
+/// Derived from node v24.13.0, `lib/_http_server.js`, MIT.
 #[must_use]
 pub fn status_text(status: u16) -> &'static str {
     match STATUS_CODES.binary_search_by_key(&status, |&(code, _)| code) {

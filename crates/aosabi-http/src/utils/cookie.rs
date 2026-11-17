@@ -9,19 +9,24 @@
 //! `parse`, `serialize`, `CookieOptions`, `SameSite`, `Priority`,
 //! `CookiePrefix` and `CookieError`.
 //!
-//! A `Cookie` header is split on `;`, each pair is trimmed and split at its
-//! first `=`, a pair whose name or value fails the grammar of hono is
-//! skipped, a value in double quotes loses them, and a value that holds a `%`
-//! is decoded with `decodeURIComponent` where it can be. The answer is the
-//! object the reference builds, a later pair of a name taking the place of
-//! the earlier one and the names that are array indices first in ascending
-//! order, which is the key order of an object of JavaScript.
+//! A `Cookie` header is split on `;`, each pair is trimmed of the space and
+//! the tab alone, a named divergence, and split at its first `=`, a pair whose
+//! name or value fails the grammar of hono is skipped, a value in double
+//! quotes loses them, and a value that holds a `%` is decoded with
+//! `decodeURIComponent` where it can be. The answer is the object the
+//! reference builds, but the first pair of a name that passes stands where a
+//! later pair of that name would take its place, a named divergence, and the
+//! names that are array indices come first in ascending order, which is the
+//! key order of an object of JavaScript.
 //!
 //! A `Set-Cookie` value is the name, `=`, the value encoded with
 //! `encodeURIComponent`, and the attributes in the order `Max-Age`, `Domain`,
 //! `Path`, `Expires`, `HttpOnly`, `Secure`, `SameSite`, `Priority` and
 //! `Partitioned`. The throws of the reference are the values of
-//! [`CookieError`] with its messages, in the order the reference meets them.
+//! [`CookieError`] with its messages, in the order the reference meets them. A
+//! name outside the token of a cookie name, and a `Domain` or a `Path` that
+//! holds `;`, CR or LF, are refused as well, each with an error of its own
+//! kind, a named divergence.
 
 use core::fmt::Write as _;
 use std::time::SystemTime;
@@ -158,13 +163,21 @@ pub enum CookieError {
     ExpiresTooFar,
     /// `partitioned` without `secure`.
     PartitionedNotSecure,
+    /// A name outside the token of a cookie name, checked before every other rule.
+    InvalidName,
+    /// A `domain` that holds `;`, CR or LF.
+    InvalidDomain,
+    /// A `path` that holds `;`, CR or LF.
+    InvalidPath,
 }
 
 impl CookieError {
     /// Returns the message of the error the reference throws.
     ///
     /// The texts are those of `cookie.js:77`, `:81`, `:84`, `:87`, `:93`,
-    /// `:107` and `:126`.
+    /// `:107` and `:126`. The refusals of a name, a domain and a path carry
+    /// the messages the hono of the TypeScript option throws for them, a named
+    /// divergence.
     #[must_use]
     pub const fn message(self) -> &'static str {
         match self {
@@ -179,6 +192,9 @@ impl CookieError {
                 "Cookies Expires SHOULD NOT be greater than 400 days (34560000 seconds) in the future."
             }
             Self::PartitionedNotSecure => "Partitioned Cookie must have Secure attributes",
+            Self::InvalidName => "Invalid cookie name",
+            Self::InvalidDomain => "domain must not contain \";\", \"\\r\", or \"\\n\"",
+            Self::InvalidPath => "path must not contain \";\", \"\\r\", or \"\\n\"",
         }
     }
 }
@@ -195,7 +211,8 @@ impl core::error::Error for CookieError {}
 ///
 /// With a name the walk stops at the first pair of that name whose value
 /// passes, and a header that does not hold the name at all answers nothing.
-/// An empty name is no name, as the reference tests it for truth.
+/// Without a name the first such pair of each name stands as well, a named
+/// divergence. An empty name is no name, as the reference tests it for truth.
 #[must_use]
 pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
     let name = name.filter(|name| !name.is_empty());
@@ -205,16 +222,16 @@ pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
         return Vec::new();
     }
     let mut parsed: Vec<(String, String)> = Vec::new();
-    for pair in js_trim(cookie).split(';') {
-        let pair = js_trim(pair);
+    for pair in trim_space_and_tab(cookie).split(';') {
+        let pair = trim_space_and_tab(pair);
         let Some(value_start) = pair.find('=') else {
             continue;
         };
-        let cookie_name = js_trim(&pair[..value_start]);
+        let cookie_name = trim_space_and_tab(&pair[..value_start]);
         if name.is_some_and(|name| name != cookie_name) || !is_cookie_name(cookie_name) {
             continue;
         }
-        let mut value = js_trim(&pair[value_start + 1..]);
+        let mut value = trim_space_and_tab(&pair[value_start + 1..]);
         if value.starts_with('"') && value.ends_with('"') {
             value = value.get(1..value.len().saturating_sub(1)).unwrap_or("");
         }
@@ -226,7 +243,7 @@ pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
         } else {
             String::from(value)
         };
-        set_property(&mut parsed, cookie_name, value);
+        add_property(&mut parsed, cookie_name, value);
         if name.is_some() {
             break;
         }
@@ -238,16 +255,25 @@ pub fn parse(cookie: &str, name: Option<&str>) -> Vec<(String, String)> {
 ///
 /// # Errors
 ///
-/// Returns the [`CookieError`] of the first rule the cookie breaks, in the
-/// order the reference checks them.
+/// Returns the [`CookieError`] of the first rule the cookie breaks: the name,
+/// then the rules of the reference in its order, the domain and the path
+/// after the prefixes.
 pub fn serialize(name: &str, value: &str, opt: &CookieOptions) -> Result<String, CookieError> {
     serialize_encoded(name, &encode_uri_component(value), opt)
 }
 
 /// Returns the `Set-Cookie` value of `name` and the encoded `value`, `_serialize(name, value, opt)`.
+///
+/// A name outside the token of [`is_cookie_name`] is refused before any other
+/// rule, and a domain or a path that holds `;`, CR or LF after the rules of
+/// the prefixes, so no such cookie is written, a named divergence.
 fn serialize_encoded(name: &str, value: &str, opt: &CookieOptions) -> Result<String, CookieError> {
+    if !is_cookie_name(name) {
+        return Err(CookieError::InvalidName);
+    }
     let mut cookie = format!("{name}={value}");
     check_prefix(name, opt)?;
+    check_attributes(opt)?;
     if let Some(max_age) = opt.max_age.filter(|max_age| *max_age >= 0.0) {
         if max_age > MAX_AGE_LIMIT {
             return Err(CookieError::MaxAgeTooLong);
@@ -303,11 +329,14 @@ fn serialize_encoded(name: &str, value: &str, opt: &CookieOptions) -> Result<Str
 }
 
 /// Checks the rules of the name prefixes `__Secure-` and `__Host-`, `cookie.js:76-89`.
+///
+/// A name takes the rules of a prefix it starts with in any case of ASCII, so
+/// `__secure-id` and `__HOST-id` take them as well, a named divergence.
 fn check_prefix(name: &str, opt: &CookieOptions) -> Result<(), CookieError> {
-    if name.starts_with("__Secure-") && !opt.secure {
+    if has_prefix(name, "__Secure-") && !opt.secure {
         return Err(CookieError::SecurePrefixNotSecure);
     }
-    if name.starts_with("__Host-") {
+    if has_prefix(name, "__Host-") {
         if !opt.secure {
             return Err(CookieError::HostPrefixNotSecure);
         }
@@ -325,8 +354,27 @@ fn check_prefix(name: &str, opt: &CookieOptions) -> Result<(), CookieError> {
     Ok(())
 }
 
+/// Returns whether `name` starts with `prefix` in any case of ASCII.
+fn has_prefix(name: &str, prefix: &str) -> bool {
+    name.get(..prefix.len())
+        .is_some_and(|head| head.eq_ignore_ascii_case(prefix))
+}
+
+/// Returns whether `name` starts with `__Secure-` or `__Host-` in any case of
+/// ASCII, the names [`serialize`] writes only with `Secure`, a named
+/// divergence.
+#[must_use]
+pub fn has_cookie_prefix(name: &str) -> bool {
+    has_prefix(name, "__Secure-") || has_prefix(name, "__Host-")
+}
+
 /// Returns whether `name` passes ``/^[\w!#$%&'*.^`|~+-]+$/``.
-fn is_cookie_name(name: &str) -> bool {
+///
+/// The pattern is the token that RFC 6265 section 4.1.1 takes as a cookie
+/// name. [`serialize`] refuses every other name before any other rule, so an
+/// option that names a cookie checks its name here when the app starts.
+#[must_use]
+pub fn is_cookie_name(name: &str) -> bool {
     !name.is_empty()
         && name
             .bytes()
@@ -340,18 +388,32 @@ fn is_cookie_value(value: &str) -> bool {
         .all(|byte| matches!(byte, b' ' | b'!' | b'#'..=b':' | b'<'..=b'[' | b']'..=b'~'))
 }
 
-/// Sets the property `key` of the object `object` to `value`, `object[key] = value`.
+/// Refuses a `domain` or a `path` that holds `;`, CR or LF, which the value of
+/// an attribute leaves out.
+fn check_attributes(opt: &CookieOptions) -> Result<(), CookieError> {
+    let holds_separator = |text: &str| {
+        text.bytes()
+            .any(|byte| matches!(byte, b';' | b'\r' | b'\n'))
+    };
+    if opt.domain.as_deref().is_some_and(holds_separator) {
+        return Err(CookieError::InvalidDomain);
+    }
+    if opt.path.as_deref().is_some_and(holds_separator) {
+        return Err(CookieError::InvalidPath);
+    }
+    Ok(())
+}
+
+/// Adds the property `key` with `value` to the object `object` where it holds no such key.
 ///
-/// An existing key keeps its place. The key `__proto__` reaches the setter of
+/// A key the object holds keeps its first value, so the first pair of a name
+/// stands, a named divergence. The key `__proto__` reaches the setter of
 /// `Object.prototype`, which ignores a string, so no property is made.
-fn set_property(object: &mut Vec<(String, String)>, key: &str, value: String) {
-    if key == "__proto__" {
+fn add_property(object: &mut Vec<(String, String)>, key: &str, value: String) {
+    if key == "__proto__" || object.iter().any(|(known, _)| known == key) {
         return;
     }
-    match object.iter_mut().find(|(known, _)| known == key) {
-        Some(entry) => entry.1 = value,
-        None => object.push((String::from(key), value)),
-    }
+    object.push((String::from(key), value));
 }
 
 /// Returns `object` in the key order of an object of JavaScript.
@@ -365,12 +427,14 @@ fn own_keys_order(mut object: Vec<(String, String)>) -> Vec<(String, String)> {
     object
 }
 
-/// Returns `text` without the white space `String.prototype.trim` removes.
+/// Returns `text` without the space and the horizontal tab at its ends.
 ///
-/// That set is `WhiteSpace` and `LineTerminator` of ECMA-262, which is the
-/// Unicode `White_Space` property with U+FEFF added and U+0085 left out.
-fn js_trim(text: &str) -> &str {
-    text.trim_matches(|c: char| c == '\u{FEFF}' || (c.is_whitespace() && c != '\u{0085}'))
+/// Those two are the white space `WSP` a browser trims from the name and the
+/// value of a cookie it stores, and no other white space is trimmed, so a name
+/// or a value that another one opens or ends fails its grammar, a named
+/// divergence.
+fn trim_space_and_tab(text: &str) -> &str {
+    text.trim_matches([' ', '\t'])
 }
 
 /// Returns `new Date(time).toUTCString()`, `Invalid Date` for no time value.

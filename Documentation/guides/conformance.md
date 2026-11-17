@@ -20,13 +20,14 @@ primitive at a time, so a byte that differs points at one crate rather than at a
 ## 2. The oracle
 
 The other side of each comparison is graphql-js 16.12.0 itself, run on Node.js 24.13.0 by the
-sidecar `tests/sidecar/graphql-js.mjs`. The script `tests/fetch_oracles.py` clones graphql-js at the
-commit that `tests/oracles.toml` pins, and the notebooks read its own test documents from there. The
-sidecar reads one JSON request per line on its standard input and writes one JSON answer per line,
-so a whole corpus travels through one process. It binds no port and reaches no network, and before
-its first answer it reads the version of the library it loaded and stops with an error when the
-version is not the pinned one, since an oracle at another version would define correctness by
-accident.
+sidecar `tests/sidecar/graphql-js.mjs`, which imports the library from the package beside it that
+`tests/sidecar/package.json` and its lock `tests/sidecar/package-lock.json` pin. The script
+`tests/fetch_oracles.py` clones graphql-js at the commit that `tests/oracles.toml` pins, and the
+notebooks read its own test documents from there. The sidecar reads one JSON request per line on
+its standard input and writes one JSON answer per line, so a whole corpus travels through one
+process. It binds no port and reaches no network, and before its first answer it reads the version
+of the library it loaded and stops with an error when the version is not the pinned one, since an
+oracle at another version would define correctness by accident.
 
 Node.js runs in the test suite beside the engine, for the oracles and for the JavaScript clients the
 suite drives, and in the dev package of the TypeScript layer at build time. No crate links a
@@ -68,23 +69,71 @@ of 28 schemas.
 
 ## 5. Running the suite
 
-The Python side is pinned in [tests/pyproject.toml](../../tests/pyproject.toml): papermill,
-nbclient, nbformat, ipykernel, jupyter_client, PyYAML and requests. The kernel the notebooks run on
-is registered as `aosabi`. The script `tests/fetch_oracles.py` clones the oracles and installs
-nothing, and the packages the JavaScript side of a suite needs install from the lockfile of its
-oracle with pnpm 10.34.5 and `pnpm install --frozen-lockfile`, on the Node.js 24.13.0 that
-`.node-version` pins. The oracles come first, then the runner sweeps the matrix of entries and
-writes each executed notebook and a report under `tests/notebooks/out/`, which is never committed:
+The public suites run on Linux with Python 3.12 or later and the Rust toolchain that
+`rust-toolchain.toml` pins, 1.95.0, with the component `llvm-tools`, whose `llvm-size` and
+`llvm-nm` read the sizes of the builds for the ESP32-C3. The Python side is pinned in
+[tests/pyproject.toml](../../tests/pyproject.toml): papermill 2.7.0, nbclient 0.11.0, nbformat
+5.11.1, ipykernel 7.3.0, jupyter_client 8.10.0, PyYAML 6.0.3 and requests 2.34.2. The file names no
+build backend, so its dependencies install as a list into a virtual environment, which registers the
+kernel `aosabi` the notebooks run on:
 
 ```sh
-python3 tests/fetch_oracles.py
-python3 tests/run.py --matrix tests/matrix.yaml
-python3 tests/run.py --matrix tests/matrix.yaml --jobs 4
+rustup toolchain install 1.95.0 --profile minimal --component llvm-tools \
+  --target wasm32-unknown-unknown --target riscv32imc-unknown-none-elf
+python3 -m venv tests/.venv
+tests/.venv/bin/python -c 'import tomllib; print("\n".join(tomllib.load(open("tests/pyproject.toml", "rb"))["project"]["dependencies"]))' > tests/.venv/requirements.txt
+tests/.venv/bin/python -m pip install --requirement tests/.venv/requirements.txt
+tests/.venv/bin/python -m ipykernel install --sys-prefix --name aosabi
+```
+
+The component installs `llvm-size` and `llvm-nm` in the folder of the toolchain's own tools, which
+is not on `PATH`, and the notebooks look them up on `PATH`. The runner keeps the locks of its job
+slots under `XDG_RUNTIME_DIR`, and under `/tmp` where the variable is not set, as in a shell over
+SSH. Continuous integration sets both before it runs the matrix, and a shell does the same with:
+
+```sh
+export PATH="$(rustc --print sysroot)/lib/rustlib/$(rustc -vV | sed -n 's/^host: //p')/bin:$PATH"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-$(mktemp -d)}"
+```
+
+The suite `80_embed` asks the sidecar of section 2 for the error of a document past the token cap,
+so the package of the sidecar installs before a run, with the npm of the Node.js 24.13.0 that
+`.node-version` pins. `npm ci` takes graphql 16.12.0 from the lock beside the sidecar, refuses a
+package whose integrity is not the one the lock records and runs no script of it:
+
+```sh
+npm --prefix tests/sidecar ci --ignore-scripts --no-audit --no-fund
+```
+
+The runner sweeps the matrix of entries and writes each executed notebook and a report under
+`tests/notebooks/out/`, which is never committed:
+
+```sh
+tests/.venv/bin/python tests/run.py --matrix tests/matrix.yaml
+tests/.venv/bin/python tests/run.py --matrix tests/matrix.yaml --jobs 4
 ```
 
 The last line runs up to four entries at once, each in a kernel of its own and on ports of its own.
 An entry that times something or holds a shared resource runs alone after the others. The exit code
 is non zero when any notebook failed.
+
+Continuous integration installs the package of the sidecar and runs ten entries that need no
+network, no privileges and no device and end in seconds: `03_homa_packets`, `04_aoframe`,
+`05_homa_wire_full-synthetic`, `06_lora_frame`, `80_embed`, `22_homa_lossy-engine`,
+`23_homa_budget-client`, `23_homa_budget-graphtp`, `23_homa_budget-lora` and
+`29_carrier_lora-model`. The same subset runs locally with
+`python3 -I .github/scripts/fast_tests.py --python tests/.venv/bin/python`.
+
+`25_carrier_unix` binds its sockets under `tests/notebooks/out/` where their paths fit the 108 bytes
+of the address of a Unix socket, and otherwise in a folder of its own with the mode 0700 under
+`XDG_RUNTIME_DIR`, or under `/tmp` where the variable is not set, so it passes in a checkout at any
+path. One entry needs more than the others: `28_carrier_bluetooth-emulated` boots two guests under
+KVM, so it runs on an aarch64 Linux host with `/dev/kvm` open for reading and writing,
+`qemu-system-aarch64`, `qemu-img` and the EDK2 firmware for aarch64, and it fetches the 829 MiB of
+guest images that `tests/guests/guests.lock` pins.
+
+The suites of section 3 read graphql-js from a clone at the commit that `tests/oracles.toml` pins,
+which `python3 tests/fetch_oracles.py` makes. No public suite needs it.
 
 A notebook that judges speed prints its times beside its verdict and does not assert them on a
 shared machine. Its numbers are those of the machine it ran on, and the page that quotes one names
